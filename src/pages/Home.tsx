@@ -4,6 +4,7 @@ import sandImg from "../assets/sand.png"
 import cloudSmall from "../assets/cloudSmall.svg"
 import cloudBig from "../assets/cloudBig.svg"
 import Castle from "../assets/Castle.png";
+import Moon from "../assets/Moon.png";
     export default function Home() {
         return (
         <div className={styles.container}>
@@ -17,6 +18,9 @@ import Castle from "../assets/Castle.png";
             </div>
             <div className={styles.castle}>
                 <img src={Castle} className={styles.castleImg} />
+            </div>
+            <div className={styles.moon}>
+                <img src={Moon} className={styles.moonImg} />
             </div>
             <div className={styles.clouds} >
             
