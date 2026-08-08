@@ -6,6 +6,7 @@ import cloudBig from "../assets/cloudBig.svg"
 import cloudThree from "../assets/cloudThree.svg"
 import Castle from "../assets/Castle.png";
 import Moon from "../assets/Moon.png";
+import Nav from "../components/Nav"
     export default function Home() {
         return (
         <div className={styles.container}>
@@ -28,8 +29,12 @@ import Moon from "../assets/Moon.png";
                 <div className={styles.cloudTwo}>
                     <img src = {cloudBig} />
                 </div>
-                
-
+                <div className={styles.cloudThree}>
+                    <img src = {cloudThree} />
+                </div>
+                <div className={styles.cloudFour}>
+                    <img src = {cloudThree} />
+                </div>¸
             </div>
             <div className={styles.moon}>
                 <img src={Moon} className={styles.moonImg} />

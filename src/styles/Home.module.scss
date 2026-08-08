@@ -26,8 +26,8 @@
 // each cloud wrapper: controls SIZE and POSITION only
 .cloudOne {
   position: absolute;
-  top: 30%;
-  left: 3%;
+  top: 35%;
+  left: 0%;
   width: 20%;
 }
 
@@ -40,15 +40,23 @@
 
 .cloudThree {
   position: absolute;
-  top: 10%;
-  left: 20%;
+  top: 15%;
+  left: 15%;
   width: 20%;
 }
+.cloudFour {
+  position: absolute;
+  top: 10%;
+  left: 40%;
+  width: 20%;
+}
+
 
 // every cloud's img: controls DISPLAY only
 .cloudOne img,
 .cloudTwo img,
-.cloudThree img {
+.cloudThree img,
+.cloudFour img {
   display: block;
   width: 100%;
   height: auto;
