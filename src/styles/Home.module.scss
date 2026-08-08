@@ -85,11 +85,11 @@
 }
 .moon {
   position: absolute;
-  bottom: 28%;
-  left: 24%;
-  width: 32%;
+  bottom: 23%;
+  left: 40%;
+  width: 35%;
   z-index: 1;
-  scale:1.1
+  transform: translateX(-50%);
 }
 
 .moonImg {
