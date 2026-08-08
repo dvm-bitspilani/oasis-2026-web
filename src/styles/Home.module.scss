@@ -1,9 +1,10 @@
 .sand{
     position: absolute;
     width: 100vw;
-    height: auto;
+    height: 50%;
     z-index: 1;
     bottom: 0%;
+   overflow: hidden;
 }
 
 .sandImg{
