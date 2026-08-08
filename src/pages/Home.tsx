@@ -1,8 +1,9 @@
-    import bg from "../assets/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg";
+import bg from "../assets/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg";
 import styles from "../styles/Home.module.scss"
 import sandImg from "../assets/sand.png"
 import cloudSmall from "../assets/cloudSmall.svg"
 import cloudBig from "../assets/cloudBig.svg"
+import cloudThree from "../assets/cloudThree.svg"
 import Castle from "../assets/Castle.png";
 import Moon from "../assets/Moon.png";
     export default function Home() {
@@ -19,9 +20,6 @@ import Moon from "../assets/Moon.png";
             <div className={styles.castle}>
                 <img src={Castle} className={styles.castleImg} />
             </div>
-            <div className={styles.moon}>
-                <img src={Moon} className={styles.moonImg} />
-            </div>
             <div className={styles.clouds} >
             
                 <div className={styles.cloudOne}>
@@ -32,6 +30,9 @@ import Moon from "../assets/Moon.png";
                 </div>
                 
 
+            </div>
+            <div className={styles.moon}>
+                <img src={Moon} className={styles.moonImg} />
             </div>
         </div> )
 }

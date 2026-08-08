@@ -1,8 +1,8 @@
-.container {
-  position: relative;
-  height: 100svh;
-  width: 100%;
-  overflow: hidden;
+.container{
+    height: 100svh;
+    width: 100svw;
+    overflow: hidden;
+    position: relative;
 }
 
 .background {
@@ -13,18 +13,46 @@
   background-position: center;
   background-repeat: no-repeat;
 }
-
 .clouds {
   position: absolute;
-  top: 20%;
+  top: 0;
   left: 0;
   width: 100%;
+  height: 100%;   // safe now — children are absolute, this doesn't need to "contain" them
   z-index: 1;
+  pointer-events: none; // clouds shouldn't block nav/clicks
 }
 
-.cloudOne  { margin-left: 8%; }
-.cloudTwo  { margin-left: 55%; }
+// each cloud wrapper: controls SIZE and POSITION only
+.cloudOne {
+  position: absolute;
+  top: 30%;
+  left: 3%;
+  width: 20%;
+}
 
+.cloudTwo {
+  position: absolute;
+  top: 15%;
+  left: 68%;
+  width: 20%;
+}
+
+.cloudThree {
+  position: absolute;
+  top: 10%;
+  left: 20%;
+  width: 20%;
+}
+
+// every cloud's img: controls DISPLAY only
+.cloudOne img,
+.cloudTwo img,
+.cloudThree img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 .sand {
   position: absolute;
   bottom: 0;
@@ -35,16 +63,16 @@
   overflow: hidden;
 }
 
-.sandImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.sandImg{
+
+    width: 100%;
+    height: 100%;
 }
 
 .castle {
   position: absolute;
   bottom: 28%;         
-  left: 41%;
+  left: 42%;
   transform: translateX(-50%);
   width: 45%;           
   z-index: 2;
