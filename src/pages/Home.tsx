@@ -6,10 +6,10 @@ import cloudBig from "../assets/cloudBig.svg"
 import Castle from "../assets/Castle.png";
     export default function Home() {
         return (
-        <div>
+        <div className={styles.container}>
             <div
             className="background"
-            style={{background: `url(${bg}) no-repeat center center/cover`,height: "100svh", width: "100svw"}}
+            style={{background: `url(${bg}) no-repeat center center/cover`,height: "100svh", width: "100svw" , overflow:"hidden"}}
             >
             </div>
             <div className={styles.sand}>
@@ -23,7 +23,7 @@ import Castle from "../assets/Castle.png";
                 <div className={styles.cloudOne}>
                     <img src = {cloudSmall} />
                 </div>
-                <div className={styles.cloudOne}>
+                <div className={styles.cloudTwo}>
                     <img src = {cloudBig} />
                 </div>
                 

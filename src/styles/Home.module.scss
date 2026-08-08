@@ -1,10 +1,15 @@
+.container{
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
 .sand{
     position: absolute;
     width: 100vw;
     height: 50%;
     z-index: 1;
     bottom: 0%;
-   overflow: hidden;
+    overflow: hidden;
 }
 
 .sandImg{
@@ -18,8 +23,9 @@
     height: auto;
     position: absolute;
     top: 30%;
-    left: 10%;
-    right: 10%;
+}
+.cloudTwo{
+    margin-left: 40%;
 }
 .castle{
     width: 100%;
