@@ -3,6 +3,7 @@ import styles from "../styles/Home.module.scss"
 import sandImg from "../assets/sand.png"
 import cloudSmall from "../assets/cloudSmall.svg"
 import cloudBig from "../assets/cloudBig.svg"
+import Castle from "../assets/Castle.png";
     export default function Home() {
         return (
         <div>
@@ -14,6 +15,9 @@ import cloudBig from "../assets/cloudBig.svg"
             <div className={styles.sand}>
                 <img src={sandImg} className={styles.sandImg} />
             </div>
+            <div className={styles.castle}>
+                <img src={Castle} className={styles.castleImg} />
+            </div>
             <div className={styles.clouds} >
             
                 <div className={styles.cloudOne}>
@@ -22,6 +26,7 @@ import cloudBig from "../assets/cloudBig.svg"
                 <div className={styles.cloudOne}>
                     <img src = {cloudBig} />
                 </div>
+                
 
             </div>
         </div> )
