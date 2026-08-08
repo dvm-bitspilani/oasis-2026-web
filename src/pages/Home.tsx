@@ -12,5 +12,5 @@ import sandImg from "../assets/sand.png"
             <div className={styles.sand}>
                 <img src={sandImg} className={styles.sandImg} />
             </div>
-            </div> )
-    }
+        </div> )
+}
