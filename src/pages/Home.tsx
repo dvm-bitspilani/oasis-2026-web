@@ -9,7 +9,7 @@ import cloudBig from "../assets/cloudBig.svg";
 import cloudThree from "../assets/cloudThree.svg";
 import Castle from "../assets/Castle.png";
 import Moon from "../assets/Moon.png";
-
+import Nav from "../components/Nav"
 type Cloud = {
   src: string;
   top: string;      
@@ -59,6 +59,7 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
+      <Nav />
       <div
         className={styles.background}
         style={{ backgroundImage: `url(${bg})` }}

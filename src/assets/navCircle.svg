@@ -1,0 +1,23 @@
+<svg width="109" height="109" viewBox="0 0 109 109" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_dg_1031_125)">
+<circle cx="54.0703" cy="54.0692" r="45" fill="#8F8F8F" fill-opacity="0.17" shape-rendering="crispEdges"/>
+<circle cx="54.0703" cy="54.0692" r="44.2857" stroke="#F0CBB3" stroke-width="1.42857" shape-rendering="crispEdges"/>
+</g>
+<defs>
+<filter id="filter0_dg_1031_125" x="0.00108051" y="9.53674e-07" width="108.138" height="108.138" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="2.76923"/>
+<feGaussianBlur stdDeviation="1.38462"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.356239 0 0 0 0 0.205111 0 0 0 0 0.201027 0 0 0 1 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1031_125"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1031_125" result="shape"/>
+<feTurbulence type="fractalNoise" baseFrequency="0.24904213845729828 0.99900001287460327" numOctaves="3" seed="839" />
+<feDisplacementMap in="shape" scale="18.138463973999023" xChannelSelector="R" yChannelSelector="G" result="displacedImage" width="100%" height="100%" />
+<feMerge result="effect2_texture_1031_125">
+<feMergeNode in="displacedImage"/>
+</feMerge>
+</filter>
+</defs>
+</svg>
