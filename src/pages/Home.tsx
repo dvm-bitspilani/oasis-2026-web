@@ -9,13 +9,17 @@ import cloudBig from "../assets/cloudBig.svg";
 import cloudThree from "../assets/cloudThree.svg";
 import Castle from "../assets/Castle.png";
 import Moon from "../assets/Moon.png";
-import Nav from "../components/Nav"
+import LogoOasis from "../assets/LogoOasisi.png";
+import RegBtn from "../assets/registerBtn.png";
+import Nav from "../components/Nav";
+import ShootingStars from "../components/ShootingStars";
+
 type Cloud = {
   src: string;
-  top: string;      
-  left: string;    
+  top: string;
+  left: string;
   width: string;
-  duration: number; 
+  duration: number;
 };
 
 const CLOUDS: Cloud[] = [
@@ -65,6 +69,8 @@ export default function Home() {
         style={{ backgroundImage: `url(${bg})` }}
       />
 
+      <ShootingStars />
+
       <div className={styles.sand}>
         <img src={sandImg} className={styles.sandImg} alt="" />
       </div>
@@ -88,6 +94,14 @@ export default function Home() {
 
       <div className={styles.moon}>
         <img src={Moon} className={styles.moonImg} alt="" />
+      </div>
+
+      <div className={styles.oasisLogo}>
+        <img src={LogoOasis} alt="" />
+      </div>
+
+      <div className={styles.regBtn}>
+        <img src={RegBtn} alt="" />
       </div>
     </div>
   );

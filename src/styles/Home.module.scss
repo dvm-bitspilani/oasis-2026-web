@@ -103,7 +103,7 @@
   bottom: 15%;
   left: 40%;
   width: 38%;
-  z-index: 1;
+  z-index: 0;
   transform: translateX(-50%);
 }
 
@@ -114,12 +114,43 @@
 }
 .cloud {
   position: absolute;
-  z-index: 4;
+  z-index: 1;
   will-change: transform;
 
   img {
     display: block;
     width: 100%;
     height: auto;
+  }
+}
+
+.oasisLogo{
+  position: absolute;
+  bottom: 5%;
+  right:3%;
+  height: 30vh;
+  width: 30vw;
+  z-index: 5;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+}
+.regBtn{
+  position: absolute;
+  bottom: -2%;
+  left:3%;
+  height: 30vh;
+  width: 30vw;
+  z-index: 5;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
   }
 }
