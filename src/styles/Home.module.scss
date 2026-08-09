@@ -18,41 +18,46 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;   // safe now — children are absolute, this doesn't need to "contain" them
-  z-index: 1;
-  pointer-events: none; // clouds shouldn't block nav/clicks
+  height: 100%;  
+
+  pointer-events: none; 
+  
 }
 
-// each cloud wrapper: controls SIZE and POSITION only
+
 .cloudOne {
   position: absolute;
   top: 35%;
   left: 0%;
   width: 20%;
+  z-index: 4;
 }
 
 .cloudTwo {
   position: absolute;
   top: 15%;
-  left: 68%;
+  left: 70%;
   width: 20%;
+  z-index: 4;
 }
 
 .cloudThree {
   position: absolute;
   top: 15%;
-  left: 15%;
+  left: 20%;
   width: 20%;
+  z-index: 4;
 }
 .cloudFour {
   position: absolute;
-  top: 10%;
-  left: 40%;
+  top: 20%;
+  left: 50%;
   width: 20%;
+    z-index: 4;
 }
 
 
-// every cloud's img: controls DISPLAY only
+
 .cloudOne img,
 .cloudTwo img,
 .cloudThree img,
@@ -60,6 +65,7 @@
   display: block;
   width: 100%;
   height: auto;
+
 }
 .sand {
   position: absolute;
@@ -72,7 +78,8 @@
 }
 
 .sandImg{
-
+    object-fit: cover;
+    object-position: center bottom;
     width: 100%;
     height: 100%;
 }
@@ -104,4 +111,15 @@
   width: 100%;
   height: auto;
   display: block;
+}
+.cloud {
+  position: absolute;
+  z-index: 4;
+  will-change: transform;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
 }

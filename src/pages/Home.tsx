@@ -1,43 +1,93 @@
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+
+import styles from "../styles/Home.module.scss";
 import bg from "../assets/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg";
-import styles from "../styles/Home.module.scss"
-import sandImg from "../assets/sand.png"
-import cloudSmall from "../assets/cloudSmall.svg"
-import cloudBig from "../assets/cloudBig.svg"
-import cloudThree from "../assets/cloudThree.svg"
+import sandImg from "../assets/sand.png";
+import cloudSmall from "../assets/cloudSmall.svg";
+import cloudBig from "../assets/cloudBig.svg";
+import cloudThree from "../assets/cloudThree.svg";
 import Castle from "../assets/Castle.png";
 import Moon from "../assets/Moon.png";
-import Nav from "../components/Nav"
-    export default function Home() {
-        return (
-        <div className={styles.container}>
-            <div
-            className="background"
-            style={{background: `url(${bg}) no-repeat center center/cover`,height: "100svh", width: "100svw" , overflow:"hidden"}}
-            >
-            </div>
-            <div className={styles.sand}>
-                <img src={sandImg} className={styles.sandImg} />
-            </div>
-            <div className={styles.castle}>
-                <img src={Castle} className={styles.castleImg} />
-            </div>
-            <div className={styles.clouds} >
-            
-                <div className={styles.cloudOne}>
-                    <img src = {cloudSmall} />
-                </div>
-                <div className={styles.cloudTwo}>
-                    <img src = {cloudBig} />
-                </div>
-                <div className={styles.cloudThree}>
-                    <img src = {cloudThree} />
-                </div>
-                <div className={styles.cloudFour}>
-                    <img src = {cloudThree} />
-                </div>¸
-            </div>
-            <div className={styles.moon}>
-                <img src={Moon} className={styles.moonImg} />
-            </div>
-        </div> )
+
+type Cloud = {
+  src: string;
+  top: string;      
+  left: string;    
+  width: string;
+  duration: number; 
+};
+
+const CLOUDS: Cloud[] = [
+  { src: cloudSmall, top: "35%", left: "-20%", width: "20%", duration: 240 },
+  { src: cloudBig,   top: "12%", left: "10%",  width: "24%", duration: 320 },
+  { src: cloudThree, top: "22%", left: "40%",  width: "18%", duration: 200 },
+  { src: cloudSmall, top: "42%", left: "65%",  width: "15%", duration: 180 },
+  { src: cloudBig,   top: "8%",  left: "90%",  width: "22%", duration: 380 },
+];
+
+export default function Home() {
+  const cloudsRef = useRef<HTMLDivElement>(null);
+  const cloudRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      cloudRefs.current.forEach((cloud, i) => {
+        if (!cloud) return;
+
+        const width = cloud.offsetWidth;
+        const left = cloud.offsetLeft;
+        const min = -left - width;
+        const max = window.innerWidth - left;
+
+        gsap.to(cloud, {
+          x: `+=${max - min}`,
+          duration: CLOUDS[i].duration,
+          ease: "none",
+          repeat: -1,
+          modifiers: {
+            x: gsap.utils.unitize((x) =>
+              gsap.utils.wrap(min, max, parseFloat(x))
+            ),
+          },
+        });
+      });
+    }, cloudsRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <div className={styles.container}>
+      <div
+        className={styles.background}
+        style={{ backgroundImage: `url(${bg})` }}
+      />
+
+      <div className={styles.sand}>
+        <img src={sandImg} className={styles.sandImg} alt="" />
+      </div>
+
+      <div className={styles.castle}>
+        <img src={Castle} className={styles.castleImg} alt="" />
+      </div>
+
+      <div className={styles.clouds} ref={cloudsRef}>
+        {CLOUDS.map((c, i) => (
+          <div
+            key={i}
+            className={styles.cloud}
+            style={{ top: c.top, left: c.left, width: c.width }}
+            ref={(el) => { cloudRefs.current[i] = el; }}
+          >
+            <img src={c.src} alt="" />
+          </div>
+        ))}
+      </div>
+
+      <div className={styles.moon}>
+        <img src={Moon} className={styles.moonImg} alt="" />
+      </div>
+    </div>
+  );
 }
