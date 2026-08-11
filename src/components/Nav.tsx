@@ -1,7 +1,6 @@
 import styles from "../styles/Nav.module.scss"
 import navLine from "../assets/hamLine.svg"
-import { useRef , useEffect } from  'react'
-import gsap from "gsap";
+
 export default function Nav(){
     return (
         <div className={styles.container}>
