@@ -18,15 +18,21 @@ export default function ShootingStars() {
       const star = document.createElement("div");
       star.className = styles.star;
 
-      const startX = Math.random() * 70; 
-      const startY = -5;             
+      const startX = Math.random() * 70;
+      const startY = -5;
 
-      const travelX = 20 + Math.random() * 15; // vw — rightward drift
-      const travelY = 55 + Math.random() * 25; // vh — downward fall
+      const angle = 15 + Math.random() * 20; // deg below horizontal
+      const distance = 35 + Math.random() * 20; // vw along the line
       const duration = 1.2 + Math.random() * 0.6;
+
+      const rad = (angle * Math.PI) / 180;
+      const travelX = distance * Math.cos(rad);
+      const travelY = distance * Math.sin(rad);
+      const rotation = 90 + angle;
 
       star.style.left = `${startX}vw`;
       star.style.top = `${startY}vh`;
+      star.style.transform = `rotate(${rotation}deg)`; // set BEFORE gsap touches it
 
       container.appendChild(star);
 
@@ -35,8 +41,8 @@ export default function ShootingStars() {
         { opacity: 0, x: 0, y: 0 },
         {
           opacity: 1,
-          x: `${travelX*1.2}vw`,
-          y: `${travelY}vh`,
+          x: `${travelX}vw`,
+          y: `${travelY}vw`,
           duration,
           ease: "power1.in",
           onComplete: () => {

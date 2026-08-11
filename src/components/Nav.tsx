@@ -11,7 +11,8 @@ export default function Nav(){
             </div>
             <div
                 className={styles.rectangle}
-            >
+            >   
+                
                 <div>home</div>
                 <div>contact</div>
                 <div>events</div>
