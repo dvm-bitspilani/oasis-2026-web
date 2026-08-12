@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
 import styles from "../styles/Home.module.scss";
@@ -10,10 +10,11 @@ import cloudThree from "../assets/cloudThree.svg";
 import Castle from "../assets/Castle.png";
 import Moon from "../assets/Moon.png";
 import LogoOasis from "../assets/LogoOasisi.png";
-import RegBtn from "../assets/regBtn.png";
+import RegBtn from "../assets/registerBtn.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
 import camelLand from "../assets/camelLand.png"
+
 type Cloud = {
   src: string;
   top: string;
@@ -33,6 +34,7 @@ const CLOUDS: Cloud[] = [
 export default function Home() {
   const cloudsRef = useRef<HTMLDivElement>(null);
   const cloudRefs = useRef<(HTMLDivElement | null)[]>([]);
+
 
   useEffect(() => {
     const ctx = gsap.context(() => {
