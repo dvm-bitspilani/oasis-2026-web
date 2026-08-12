@@ -4,11 +4,10 @@
   width: 100%;
   height: 100vh;
   background: transparent;
-  z-index: 9999;
+  z-index: 9999; // sits behind .cloud (z-index: 1) so strings thread up
+                // from behind the clouds during the fall phase
   overflow: hidden;
 
-  // Overlay only draws strings — never block clicks on the real page
-  // underneath while it's not actively mid-transition.
   pointer-events: none;
 }
 
@@ -26,4 +25,33 @@
   stroke-width: 2;
   stroke-linecap: round;
   filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.45));
+}
+
+// Gate needs to sit above everything — including the real page content —
+// once it starts closing, regardless of the container's own low z-index
+// used for the string phase.
+.gate {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none; // panels below toggle this on while visible
+}
+
+.gatePanelLeft,
+.gatePanelRight {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  background: #05030a; // deep night tone — swap for your actual theme color
+  pointer-events: auto; // blocks interaction with whatever's underneath
+                         // while the gate is closed/animating
+}
+
+.gatePanelLeft {
+  left: 0;
+}
+
+.gatePanelRight {
+  right: 0;
 }

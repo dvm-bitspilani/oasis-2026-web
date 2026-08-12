@@ -67,16 +67,12 @@ export default function PageTransition({
         return `M ${r.anchorX} ${TOP_Y} Q ${r.anchorX + sag} ${midY} ${r.anchorX} ${endY}`;
       };
 
-      // Start fully invisible and with the dash fully hidden — nothing
-      // renders until the fall tween below actively draws it in.
       rigs.forEach((r) => {
         r.path.setAttribute("d", buildPath(r, START_LEN, START_SAG));
         gsap.set(r.path, { opacity: 0 });
       });
 
       const tl = gsap.timeline({ onComplete: () => onComplete?.() });
-
-      // --- Phase 1–3 per cloud: grow+straighten, hook, tighten. ---
       rigs.forEach((r, i) => {
         const state = { fall: 0 };
 
@@ -97,15 +93,9 @@ export default function PageTransition({
               const d = buildPath(r, endY, sag);
               r.path.setAttribute("d", d);
 
-              // Fade in fast over the first ~25% of the fall, so it
-              // eases into view instead of popping.
               const fadeInP = Math.min(p / 0.25, 1);
               gsap.set(r.path, { opacity: fadeInP });
 
-              // Dash-draw: the string appears to trace itself out from
-              // the anchor rather than existing as a complete shape
-              // instantly. Redraw dasharray each frame against the
-              // path's current (growing) length.
               const currentLen = r.path.getTotalLength();
               const drawP = Math.min(p / 0.6, 1); // draws in a bit faster than the fall itself
               gsap.set(r.path, {

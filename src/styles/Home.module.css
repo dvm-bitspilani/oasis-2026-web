@@ -73,6 +73,7 @@
   height: 45%;
   z-index: 3;
   overflow: hidden;
+  
 }
 
 .sandImg {
@@ -118,7 +119,7 @@
 
 .cloud {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   will-change: transform;
 }
 .cloud img {
