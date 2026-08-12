@@ -25,7 +25,7 @@ type Cloud = {
 
 const CLOUDS: Cloud[] = [
   { src: cloudSmall, top: "35%", left: "-20%", width: "20%", duration: 240 },
-  { src: cloudBig,   top: "12%", left: "10%",  width: "24%", duration: 320 },
+  { src: cloudBig,   top: "12%", left: "15%",  width: "24%", duration: 320 },
   { src: cloudThree, top: "22%", left: "40%",  width: "18%", duration: 200 },
   { src: cloudSmall, top: "42%", left: "65%",  width: "15%", duration: 180 },
   { src: cloudBig,   top: "8%",  left: "90%",  width: "22%", duration: 380 },
