@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom"
+
 import styles from "../styles/Nav.module.scss"
 import navLine from "../assets/hamLine.svg"
 //import { useRef , useEffect } from  'react'
@@ -13,10 +15,10 @@ export default function Nav(){
             <div
                 className={styles.rectangle}
             >
-                <div>home</div>
-                <div>contact</div>
-                <div>events</div>
-                <div>about us</div>
+                <NavLink to="/">Home</NavLink>
+                <NavLink to="/">Contacts</NavLink>
+                <NavLink to="/">Events</NavLink>
+                <NavLink to="/">About Us</NavLink>
             </div>
         </div>
     )

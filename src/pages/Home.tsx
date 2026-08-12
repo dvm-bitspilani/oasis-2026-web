@@ -10,10 +10,10 @@ import cloudThree from "../assets/cloudThree.svg";
 import Castle from "../assets/Castle.png";
 import Moon from "../assets/Moon.png";
 import LogoOasis from "../assets/LogoOasisi.png";
-import RegBtn from "../assets/registerBtn.png";
+import RegBtn from "../assets/regBtn.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
-
+import camelLand from "../assets/camelLand.png"
 type Cloud = {
   src: string;
   top: string;
@@ -57,9 +57,10 @@ export default function Home() {
         });
       });
     }, cloudsRef);
-
     return () => ctx.revert();
   }, []);
+
+  
 
   return (
     <div className={styles.container}>
@@ -102,6 +103,9 @@ export default function Home() {
 
       <div className={styles.regBtn}>
         <img src={RegBtn} alt="" />
+      </div>
+      <div className={styles.camelLand}>
+        <img src={camelLand} alt="" />
       </div>
     </div>
   );
