@@ -13,7 +13,7 @@ import LogoOasis from "../assets/LogoOasisi.png";
 import RegBtn from "../assets/registerBtn.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
-import camelLand from "../assets/camelLand.png"
+import camelLand from "../assets/camelLand.png";
 
 type Cloud = {
   src: string;
@@ -25,7 +25,7 @@ type Cloud = {
 
 const CLOUDS: Cloud[] = [
   { src: cloudSmall, top: "35%", left: "-20%", width: "20%", duration: 240 },
-  { src: cloudBig,   top: "12%", left: "15%",  width: "24%", duration: 320 },
+  { src: cloudBig,   top: "12%", left: "10%",  width: "24%", duration: 320 },
   { src: cloudThree, top: "22%", left: "40%",  width: "18%", duration: 200 },
   { src: cloudSmall, top: "42%", left: "65%",  width: "15%", duration: 180 },
   { src: cloudBig,   top: "8%",  left: "90%",  width: "22%", duration: 380 },
@@ -34,7 +34,6 @@ const CLOUDS: Cloud[] = [
 export default function Home() {
   const cloudsRef = useRef<HTMLDivElement>(null);
   const cloudRefs = useRef<(HTMLDivElement | null)[]>([]);
-
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -53,7 +52,7 @@ export default function Home() {
           repeat: -1,
           modifiers: {
             x: gsap.utils.unitize((x) =>
-              gsap.utils.wrap(min, max, parseFloat(x))
+              gsap.utils.wrap(min, max, parseFloat(x)),
             ),
           },
         });
@@ -61,8 +60,6 @@ export default function Home() {
     }, cloudsRef);
     return () => ctx.revert();
   }, []);
-
-  
 
   return (
     <div className={styles.container}>
@@ -87,8 +84,11 @@ export default function Home() {
           <div
             key={i}
             className={styles.cloud}
+            data-cloud-string
             style={{ top: c.top, left: c.left, width: c.width }}
-            ref={(el) => { cloudRefs.current[i] = el; }}
+            ref={(el) => {
+              cloudRefs.current[i] = el;
+            }}
           >
             <img src={c.src} alt="" />
           </div>
