@@ -1,8 +1,9 @@
 import "../styles/About.module.scss";
-
+import Nav from "../components/Nav";
 const About = () => {
   return (
     <section className="about">
+        <Nav />
       <div className="about__content">
         <span className="about__label">ABOUT US</span>
 

@@ -1,14 +1,10 @@
 import styles from "./PageTransition.module.scss";
 import { gsap } from "gsap";
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-} from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 
 const CLOUD_SELECTOR = "[data-cloud-string]";
 const CASTLE_SELECTOR = "[data-castle-drown]";
+const MOON_SELECTOR = "[data-moon-shrink]";
 const SAND_SELECTOR = "[data-sand-parallax]";
 
 type CloudRig = {
@@ -20,22 +16,20 @@ type CloudRig = {
 };
 
 export type PageTransitionHandle = {
-  /** Call once the next page's content is mounted behind the (closed) doors. */
   openDoors: () => Promise<void>;
 };
 
 type PageTransitionProps = {
-  /** Fires the instant the doors are fully closed — screen is fully covered. */
   onComplete?: () => void;
-  /** Fires once the doors have finished opening again. */
   onOpenComplete?: () => void;
 };
 
-const DOOR_OPEN_DURATION = 1.4; // was 0.6 — slower reveal
+const DOOR_OPEN_DELAY = 0.3;
+const DOOR_OPEN_DURATION = 1.4;
 
 const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
   function PageTransition({ onComplete, onOpenComplete }, ref) {
-    const containerRef = useRef<HTMLDivElement | null>(null);
+    const rootRef = useRef<HTMLDivElement | null>(null);
     const layerRef = useRef<SVGSVGElement | null>(null);
     const doorLeftRef = useRef<HTMLDivElement | null>(null);
     const doorRightRef = useRef<HTMLDivElement | null>(null);
@@ -45,48 +39,54 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         new Promise<void>((resolve) => {
           const doorLeft = doorLeftRef.current;
           const doorRight = doorRightRef.current;
+
           if (!doorLeft || !doorRight) {
             resolve();
             return;
           }
 
-          gsap.to([doorLeft, doorRight], {
-            xPercent: (i) => (i === 0 ? -100 : 100),
-            duration: DOOR_OPEN_DURATION,
-            ease: "power2.inOut",
-            onComplete: () => {
-              onOpenComplete?.();
-              resolve();
-            },
+          gsap.delayedCall(DOOR_OPEN_DELAY, () => {
+            gsap.to([doorLeft, doorRight], {
+              xPercent: (i) => (i === 0 ? -100 : 100),
+              duration: DOOR_OPEN_DURATION,
+              ease: "power2.inOut",
+              onComplete: () => {
+                onOpenComplete?.();
+                resolve();
+              },
+            });
           });
         }),
     }));
 
     useEffect(() => {
-      const container = containerRef.current;
+      const root = rootRef.current;
       const layer = layerRef.current;
-      if (!container || !layer) return;
+      if (!root || !layer) return;
 
       const cloudEls = Array.from(
-        document.querySelectorAll<HTMLElement>(CLOUD_SELECTOR)
+        document.querySelectorAll<HTMLElement>(CLOUD_SELECTOR),
       );
       if (cloudEls.length === 0) return;
 
       while (layer.firstChild) {
         layer.removeChild(layer.firstChild);
       }
-
+      gsap.killTweensOf(cloudEls);
       const ctx = gsap.context(() => {
         const rigs: CloudRig[] = cloudEls.map((el) => {
           const rect = el.getBoundingClientRect();
+
           const group = document.createElementNS(
             "http://www.w3.org/2000/svg",
-            "g"
+            "g",
           );
+
           const path = document.createElementNS(
             "http://www.w3.org/2000/svg",
-            "path"
+            "path",
           );
+
           path.setAttribute("class", styles.path);
           group.appendChild(path);
           layer.appendChild(group);
@@ -106,7 +106,10 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
         const buildPath = (r: CloudRig, endY: number, sag: number) => {
           const midY = (TOP_Y + endY) / 2;
-          return `M ${r.anchorX} ${TOP_Y} Q ${r.anchorX + sag} ${midY} ${r.anchorX} ${endY}`;
+
+          return `M ${r.anchorX} ${TOP_Y} Q ${
+            r.anchorX + sag
+          } ${midY} ${r.anchorX} ${endY}`;
         };
 
         rigs.forEach((r) => {
@@ -115,17 +118,18 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         });
 
         const castleEl = document.querySelector<HTMLElement>(CASTLE_SELECTOR);
+        const moonEl = document.querySelector<HTMLElement>(MOON_SELECTOR);
         const sandEl = document.querySelector<HTMLElement>(SAND_SELECTOR);
 
-        // Doors start fully open (off-screen).
         if (doorLeftRef.current && doorRightRef.current) {
           gsap.set(doorLeftRef.current, { xPercent: -100 });
           gsap.set(doorRightRef.current, { xPercent: 100 });
         }
 
-        const tl = gsap.timeline({ onComplete: () => onComplete?.() });
+        const tl = gsap.timeline({
+          onComplete: () => onComplete?.(),
+        });
 
-        // --- Clouds: fall + swing + settle ---
         rigs.forEach((r, i) => {
           const state = { fall: 0 };
 
@@ -137,12 +141,15 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
               ease: "power1.in",
               onUpdate: () => {
                 const p = state.fall;
+
                 const endY = gsap.utils.interpolate(START_LEN, r.hookY, p);
+
                 const sag = gsap.utils.interpolate(
                   START_SAG,
                   0,
-                  Math.pow(p, 0.7)
+                  Math.pow(p, 0.7),
                 );
+
                 const d = buildPath(r, endY, sag);
                 r.path.setAttribute("d", d);
 
@@ -151,13 +158,14 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
                 const currentLen = r.path.getTotalLength();
                 const drawP = Math.min(p / 0.6, 1);
+
                 gsap.set(r.path, {
                   strokeDasharray: currentLen,
                   strokeDashoffset: currentLen * (1 - drawP),
                 });
               },
             },
-            i * 0.045
+            i * 0.045,
           )
             .to(
               {},
@@ -165,10 +173,11 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
                 duration: 0.05,
                 onUpdate: function () {
                   const overshoot = Math.sin(this.progress() * Math.PI) * 10;
+
                   r.path.setAttribute("d", buildPath(r, r.hookY, overshoot));
                 },
               },
-              ">-0.03"
+              ">-0.03",
             )
             .to(
               {},
@@ -177,14 +186,18 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
                 ease: "power3.out",
                 onUpdate: function () {
                   const sag = gsap.utils.interpolate(5, 0, this.progress());
+
                   r.path.setAttribute("d", buildPath(r, r.hookY, sag));
-                  gsap.set(r.path, { strokeDashoffset: 0, opacity: 1 });
+
+                  gsap.set(r.path, {
+                    strokeDashoffset: 0,
+                    opacity: 1,
+                  });
                 },
-              }
+              },
             );
         });
 
-        // --- Pull up ---
         const liftDistance = window.innerHeight * 1.3;
 
         tl.to(
@@ -195,7 +208,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
             ease: "power2.in",
             stagger: 0.03,
           },
-          "+=0.05"
+          "+=0.05",
         ).to(
           rigs.map((r) => r.el),
           {
@@ -205,12 +218,11 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
             ease: "power2.in",
             stagger: 0.03,
           },
-          "<"
+          "<",
         );
 
         const cloudsDuration = tl.duration();
 
-        // --- Castle: drowns into the sand, wobbling like it's sinking ---
         const SINK_DISTANCE = window.innerHeight;
         const SAND_DRIFT = -14;
         const CASTLE_DURATION = cloudsDuration * 1.15;
@@ -218,34 +230,63 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         const WOBBLE_AMPLITUDE_ROT = 2;
         const WOBBLE_CYCLES = 5;
 
-        if (castleEl) {
-          gsap.set(castleEl, { willChange: "transform" });
+        const applyDrownWobble = (
+          el: HTMLElement,
+          duration: number,
+          sinkDistance = SINK_DISTANCE,
+          basePercent?: { xPercent?: number; yPercent?: number },
+        ) => {
+          gsap.set(el, {
+            willChange: "transform",
+            ...(basePercent ?? {}),
+          });
 
-          const castleState = { p: 0 };
+          const state = { p: 0 };
+
           tl.to(
-            castleState,
+            state,
             {
               p: 1,
-              duration: CASTLE_DURATION,
+              duration,
               ease: "power2.in",
               onUpdate: () => {
-                const p = castleState.p;
-                const y = SINK_DISTANCE * p;
+                const p = state.p;
+                const y = sinkDistance * p;
 
                 const wobblePhase = p * Math.PI * WOBBLE_CYCLES;
+
                 const wobbleEnvelope = Math.sin(
-                  Math.min(p / 0.15, 1) * (Math.PI / 2)
+                  Math.min(p / 0.15, 1) * (Math.PI / 2),
                 );
+
                 const x =
                   Math.sin(wobblePhase) * WOBBLE_AMPLITUDE_X * wobbleEnvelope;
+
                 const rot =
                   Math.sin(wobblePhase) * WOBBLE_AMPLITUDE_ROT * wobbleEnvelope;
 
-                gsap.set(castleEl, { y, x, rotation: rot });
+                gsap.set(el, {
+                  y,
+                  x,
+                  rotation: rot,
+                  ...(basePercent ?? {}),
+                });
               },
             },
-            0
+            0,
           );
+        };
+
+        if (castleEl) {
+          applyDrownWobble(castleEl, CASTLE_DURATION, SINK_DISTANCE, {
+            xPercent: -50,
+          });
+        }
+
+        if (moonEl) {
+          applyDrownWobble(moonEl, CASTLE_DURATION, SINK_DISTANCE, {
+            xPercent: -50,
+          });
         }
 
         if (sandEl) {
@@ -256,15 +297,15 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
               duration: cloudsDuration,
               ease: "power1.in",
             },
-            0
+            0,
           );
         }
 
-        // --- Doors close over the whole sequence, meeting in the middle
-        // exactly as the timeline finishes.
         const introEnd = tl.duration();
 
         if (doorLeftRef.current && doorRightRef.current) {
+          const DOOR_START_DELAY = 0.3;
+
           tl.to(
             doorLeftRef.current,
             {
@@ -272,7 +313,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
               duration: introEnd,
               ease: "power2.in",
             },
-            0
+            DOOR_START_DELAY,
           ).to(
             doorRightRef.current,
             {
@@ -280,13 +321,14 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
               duration: introEnd,
               ease: "power2.in",
             },
-            0
+            DOOR_START_DELAY,
           );
         }
-      }, containerRef);
+      }, rootRef);
 
       return () => {
         ctx.revert();
+
         while (layer.firstChild) {
           layer.removeChild(layer.firstChild);
         }
@@ -294,21 +336,30 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
     }, [onComplete]);
 
     return (
-      <div ref={containerRef} className={styles.container}>
-        <svg
-          ref={layerRef}
-          className={styles.stringLayer}
-          width="100%"
-          height="100%"
-        />
-        <div ref={doorLeftRef} className={`${styles.door} ${styles.doorLeft}`} />
-        <div
-          ref={doorRightRef}
-          className={`${styles.door} ${styles.doorRight}`}
-        />
+      <div ref={rootRef} className={styles.root}>
+        <div className={styles.stringLayerWrap}>
+          <svg
+            ref={layerRef}
+            className={styles.stringLayer}
+            width="100%"
+            height="100%"
+          />
+        </div>
+
+        <div className={styles.doorLayer}>
+          <div
+            ref={doorLeftRef}
+            className={`${styles.door} ${styles.doorLeft}`}
+          />
+
+          <div
+            ref={doorRightRef}
+            className={`${styles.door} ${styles.doorRight}`}
+          />
+        </div>
       </div>
     );
-  }
+  },
 );
 
 export default PageTransition;

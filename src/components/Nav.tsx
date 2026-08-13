@@ -4,7 +4,7 @@ import navLine from "../assets/hamLine.svg";
 import { useTransition } from "../context/TransitionProvider";
 
 const LINKS = [
-  { label: "Home", to: "/about" },
+  { label: "Home", to: "/" },
   { label: "Contacts", to: "/about" },
   { label: "Events", to: "/about" },
   { label: "About Us", to: "/about" },

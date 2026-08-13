@@ -1,10 +1,11 @@
-.container {
+.root {
+  pointer-events: none;
+}
+
+.stringLayerWrap {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100vh;
-  background: transparent;
-  z-index: 100; // was 1 — must beat every z-index in the page underneath (sand: 3, regBtn/oasisLogo: 5, etc.)
+  z-index: 0; // below .cloud (z-index: 1) in Home.module.scss — string renders behind clouds
   overflow: hidden;
   pointer-events: none;
 }
@@ -25,13 +26,19 @@
   filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.45));
 }
 
+.doorLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 100; // above sand (3), castle (2), regBtn/oasisLogo (5), everything
+  pointer-events: none;
+}
+
 .door {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 50.5%; // slight overlap past 50% so a subpixel gap never shows at the seam
+  width: 50.5%;
   background: #0b1622;
-  z-index: 10;
   pointer-events: auto;
   will-change: transform;
 }

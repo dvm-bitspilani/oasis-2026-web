@@ -93,8 +93,7 @@ export default function Home() {
           </div>
         ))}
       </div>
-
-      <div className={styles.moon}>
+      <div className={styles.moon} data-moon-shrink>
         <img src={Moon} className={styles.moonImg} alt="" />
       </div>
 
