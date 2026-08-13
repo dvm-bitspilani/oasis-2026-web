@@ -13,7 +13,10 @@ import LogoOasis from "../assets/LogoOasisi.png";
 import RegBtn from "../assets/registerBtn.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
-import camelLand from "../assets/camelLand.png";
+import camel1 from "../assets/camel1.svg";
+import camel2 from "../assets/camel2.svg";
+import camel3 from "../assets/camel3.svg";
+import camel4 from "../assets/camel4.svg";
 
 type Cloud = {
   src: string;
@@ -104,9 +107,13 @@ export default function Home() {
       <div className={styles.regBtn}>
         <img src={RegBtn} alt="" />
       </div>
-      <div className={styles.camelLand}>
-        <img src={camelLand} alt="" />
+      <div className={styles.camels}>
+        <img src={camel1} className={styles.camel1}  />
+        <img src={camel2} className={styles.camel2}  />
+        <img src={camel3} className={styles.camel3}  />
+        <img src={camel4} className={styles.camel4} />
       </div>
+      
     </div>
   );
 }
