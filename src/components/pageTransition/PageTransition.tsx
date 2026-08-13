@@ -19,20 +19,43 @@ export type PageTransitionHandle = {
   openDoors: () => Promise<void>;
 };
 
+type TransitionMode = "full" | "doors";
+
 type PageTransitionProps = {
   onComplete?: () => void;
   onOpenComplete?: () => void;
+  // "full": cloud-string pull + castle/moon sink + sand drift + doors.
+  // "doors": skips all of the above, doors close/open only, on a fixed
+  // duration rather than one derived from the (in this mode, empty)
+  // intro sequence.
+  mode?: TransitionMode;
 };
 
 const DOOR_OPEN_DELAY = 0.3;
 const DOOR_OPEN_DURATION = 1.4;
+const DOOR_CLOSE_DURATION_DOORS_ONLY = 0.9;
+const DOOR_START_DELAY_DOORS_ONLY = 0;
 
 const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
-  function PageTransition({ onComplete, onOpenComplete }, ref) {
+  function PageTransition(
+    { onComplete, onOpenComplete, mode = "full" },
+    ref
+  ) {
     const rootRef = useRef<HTMLDivElement | null>(null);
     const layerRef = useRef<SVGSVGElement | null>(null);
     const doorLeftRef = useRef<HTMLDivElement | null>(null);
     const doorRightRef = useRef<HTMLDivElement | null>(null);
+
+    // Keep the latest callbacks in refs. TransitionProvider hands us a new
+    // inline function on every render, and its onComplete triggers a
+    // navigate() -> location change -> re-render, so depending on these
+    // directly in the effect below caused the GSAP timeline to be torn
+    // down and rebuilt mid-transition (snapping the doors back open
+    // right after they closed). Only `mode` should ever rebuild it.
+    const onCompleteRef = useRef(onComplete);
+    const onOpenCompleteRef = useRef(onOpenComplete);
+    onCompleteRef.current = onComplete;
+    onOpenCompleteRef.current = onOpenComplete;
 
     useImperativeHandle(ref, () => ({
       openDoors: () =>
@@ -51,7 +74,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
               duration: DOOR_OPEN_DURATION,
               ease: "power2.inOut",
               onComplete: () => {
-                onOpenComplete?.();
+                onOpenCompleteRef.current?.();
                 resolve();
               },
             });
@@ -64,15 +87,22 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       const layer = layerRef.current;
       if (!root || !layer) return;
 
-      const cloudEls = Array.from(
-        document.querySelectorAll<HTMLElement>(CLOUD_SELECTOR),
-      );
-      if (cloudEls.length === 0) return;
+      // "doors" mode never looks for clouds at all — this is what makes
+      // any-page-to-any-page transitions skip the whole intro sequence,
+      // regardless of whether the destination page happens to have
+      // data-cloud-string elements on it.
+      const cloudEls =
+        mode === "full"
+          ? Array.from(
+              document.querySelectorAll<HTMLElement>(CLOUD_SELECTOR)
+            )
+          : [];
 
       while (layer.firstChild) {
         layer.removeChild(layer.firstChild);
       }
       gsap.killTweensOf(cloudEls);
+
       const ctx = gsap.context(() => {
         const rigs: CloudRig[] = cloudEls.map((el) => {
           const rect = el.getBoundingClientRect();
@@ -117,9 +147,20 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           gsap.set(r.path, { opacity: 0 });
         });
 
-        const castleEl = document.querySelector<HTMLElement>(CASTLE_SELECTOR);
-        const moonEl = document.querySelector<HTMLElement>(MOON_SELECTOR);
-        const sandEl = document.querySelector<HTMLElement>(SAND_SELECTOR);
+        // Castle/moon/sand only ever run in "full" mode — "doors" mode
+        // is doors-only, nothing else in the scene should move.
+        const castleEl =
+          mode === "full"
+            ? document.querySelector<HTMLElement>(CASTLE_SELECTOR)
+            : null;
+        const moonEl =
+          mode === "full"
+            ? document.querySelector<HTMLElement>(MOON_SELECTOR)
+            : null;
+        const sandEl =
+          mode === "full"
+            ? document.querySelector<HTMLElement>(SAND_SELECTOR)
+            : null;
 
         if (doorLeftRef.current && doorRightRef.current) {
           gsap.set(doorLeftRef.current, { xPercent: -100 });
@@ -127,101 +168,107 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         }
 
         const tl = gsap.timeline({
-          onComplete: () => onComplete?.(),
+          onComplete: () => onCompleteRef.current?.(),
         });
 
-        rigs.forEach((r, i) => {
-          const state = { fall: 0 };
+        if (rigs.length > 0) {
+          rigs.forEach((r, i) => {
+            const state = { fall: 0 };
 
-          tl.to(
-            state,
-            {
-              fall: 1,
-              duration: 0.35,
-              ease: "power1.in",
-              onUpdate: () => {
-                const p = state.fall;
-
-                const endY = gsap.utils.interpolate(START_LEN, r.hookY, p);
-
-                const sag = gsap.utils.interpolate(
-                  START_SAG,
-                  0,
-                  Math.pow(p, 0.7),
-                );
-
-                const d = buildPath(r, endY, sag);
-                r.path.setAttribute("d", d);
-
-                const fadeInP = Math.min(p / 0.25, 1);
-                gsap.set(r.path, { opacity: fadeInP });
-
-                const currentLen = r.path.getTotalLength();
-                const drawP = Math.min(p / 0.6, 1);
-
-                gsap.set(r.path, {
-                  strokeDasharray: currentLen,
-                  strokeDashoffset: currentLen * (1 - drawP),
-                });
-              },
-            },
-            i * 0.045,
-          )
-            .to(
-              {},
+            tl.to(
+              state,
               {
-                duration: 0.05,
-                onUpdate: function () {
-                  const overshoot = Math.sin(this.progress() * Math.PI) * 10;
+                fall: 1,
+                duration: 0.35,
+                ease: "power1.in",
+                onUpdate: () => {
+                  const p = state.fall;
 
-                  r.path.setAttribute("d", buildPath(r, r.hookY, overshoot));
-                },
-              },
-              ">-0.03",
-            )
-            .to(
-              {},
-              {
-                duration: 0.12,
-                ease: "power3.out",
-                onUpdate: function () {
-                  const sag = gsap.utils.interpolate(5, 0, this.progress());
+                  const endY = gsap.utils.interpolate(START_LEN, r.hookY, p);
 
-                  r.path.setAttribute("d", buildPath(r, r.hookY, sag));
+                  const sag = gsap.utils.interpolate(
+                    START_SAG,
+                    0,
+                    Math.pow(p, 0.7),
+                  );
+
+                  const d = buildPath(r, endY, sag);
+                  r.path.setAttribute("d", d);
+
+                  const fadeInP = Math.min(p / 0.25, 1);
+                  gsap.set(r.path, { opacity: fadeInP });
+
+                  const currentLen = r.path.getTotalLength();
+                  const drawP = Math.min(p / 0.6, 1);
 
                   gsap.set(r.path, {
-                    strokeDashoffset: 0,
-                    opacity: 1,
+                    strokeDasharray: currentLen,
+                    strokeDashoffset: currentLen * (1 - drawP),
                   });
                 },
               },
-            );
-        });
+              i * 0.045,
+            )
+              .to(
+                {},
+                {
+                  duration: 0.05,
+                  onUpdate: function () {
+                    const overshoot = Math.sin(this.progress() * Math.PI) * 10;
 
-        const liftDistance = window.innerHeight * 1.3;
+                    r.path.setAttribute("d", buildPath(r, r.hookY, overshoot));
+                  },
+                },
+                ">-0.03",
+              )
+              .to(
+                {},
+                {
+                  duration: 0.12,
+                  ease: "power3.out",
+                  onUpdate: function () {
+                    const sag = gsap.utils.interpolate(5, 0, this.progress());
 
-        tl.to(
-          rigs.map((r) => r.group),
-          {
-            y: -liftDistance,
-            duration: 0.35,
-            ease: "power2.in",
-            stagger: 0.03,
-          },
-          "+=0.05",
-        ).to(
-          rigs.map((r) => r.el),
-          {
-            y: -liftDistance,
-            opacity: 0,
-            duration: 0.35,
-            ease: "power2.in",
-            stagger: 0.03,
-          },
-          "<",
-        );
+                    r.path.setAttribute("d", buildPath(r, r.hookY, sag));
 
-        const cloudsDuration = tl.duration();
+                    gsap.set(r.path, {
+                      strokeDashoffset: 0,
+                      opacity: 1,
+                    });
+                  },
+                },
+              );
+          });
+
+          const liftDistance = window.innerHeight * 1.3;
+
+          tl.to(
+            rigs.map((r) => r.group),
+            {
+              y: -liftDistance,
+              duration: 0.35,
+              ease: "power2.in",
+              stagger: 0.03,
+            },
+            "+=0.05",
+          ).to(
+            rigs.map((r) => r.el),
+            {
+              y: -liftDistance,
+              opacity: 0,
+              duration: 0.35,
+              ease: "power2.in",
+              stagger: 0.03,
+            },
+            "<",
+          );
+        }
+
+        // Fallback of 0.5 guards against tl.duration() being 0 when
+        // there were no cloud tweens — without this, CASTLE_DURATION
+        // and (in "full" mode) the door-close duration below would
+        // collapse toward 0, making the close animation look instant.
+        const cloudsDuration = tl.duration() || 0.5;
 
         const SINK_DISTANCE = window.innerHeight;
         const SAND_DRIFT = -14;
@@ -301,28 +348,52 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           );
         }
 
-        const introEnd = tl.duration();
-
         if (doorLeftRef.current && doorRightRef.current) {
-          const DOOR_START_DELAY = 0.3;
+          if (mode === "full") {
+            // Door close is timed to match however long the intro
+            // sequence (clouds + castle/moon + sand) actually took.
+            const introEnd = tl.duration();
+            const DOOR_START_DELAY = 0.3;
 
-          tl.to(
-            doorLeftRef.current,
-            {
-              xPercent: 0,
-              duration: introEnd,
-              ease: "power2.in",
-            },
-            DOOR_START_DELAY,
-          ).to(
-            doorRightRef.current,
-            {
-              xPercent: 0,
-              duration: introEnd,
-              ease: "power2.in",
-            },
-            DOOR_START_DELAY,
-          );
+            tl.to(
+              doorLeftRef.current,
+              {
+                xPercent: 0,
+                duration: introEnd,
+                ease: "power2.in",
+              },
+              DOOR_START_DELAY,
+            ).to(
+              doorRightRef.current,
+              {
+                xPercent: 0,
+                duration: introEnd,
+                ease: "power2.in",
+              },
+              DOOR_START_DELAY,
+            );
+          } else {
+            // "doors" mode: nothing else runs before this, so use a
+            // fixed, reliable close duration rather than one derived
+            // from an empty intro timeline.
+            tl.to(
+              doorLeftRef.current,
+              {
+                xPercent: 0,
+                duration: DOOR_CLOSE_DURATION_DOORS_ONLY,
+                ease: "power2.in",
+              },
+              DOOR_START_DELAY_DOORS_ONLY,
+            ).to(
+              doorRightRef.current,
+              {
+                xPercent: 0,
+                duration: DOOR_CLOSE_DURATION_DOORS_ONLY,
+                ease: "power2.in",
+              },
+              DOOR_START_DELAY_DOORS_ONLY,
+            );
+          }
         }
       }, rootRef);
 
@@ -333,7 +404,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           layer.removeChild(layer.firstChild);
         }
       };
-    }, [onComplete]);
+    }, [mode]); // only `mode` — see refs above for why onComplete/onOpenComplete are excluded
 
     return (
       <div ref={rootRef} className={styles.root}>

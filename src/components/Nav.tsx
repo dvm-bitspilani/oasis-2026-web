@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink} from "react-router-dom";
 import styles from "../styles/Nav.module.scss";
 import navLine from "../assets/hamLine.svg";
 import { useTransition } from "../context/TransitionProvider";
@@ -12,7 +12,6 @@ const LINKS = [
 
 export default function Nav() {
   const { navigateWithTransition } = useTransition();
-  const location = useLocation();
 
   const handleNavClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
