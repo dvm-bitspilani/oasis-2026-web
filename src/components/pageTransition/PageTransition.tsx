@@ -303,11 +303,11 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           window.innerHeight;
 
         const FOREGROUND_DURATION =
-          cloudsDuration * 0.85;
+          cloudsDuration * 1.0;
 
         // Moon is faster than the castle
         const MOON_DURATION =
-          cloudsDuration * 0.7;
+          cloudsDuration * 1.2;
 
         const WOBBLE_AMPLITUDE_X = 10;
         const WOBBLE_AMPLITUDE_ROT = 2;
