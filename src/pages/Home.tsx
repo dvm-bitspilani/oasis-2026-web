@@ -1,4 +1,4 @@
-import { useEffect, useRef} from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 
 import styles from "../styles/Home.module.scss";
@@ -63,7 +63,10 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <Nav />
+      <div data-transition-fade>
+        <Nav />
+      </div>
+
       <div
         className={styles.background}
         style={{ backgroundImage: `url(${bg})` }}
@@ -78,6 +81,7 @@ export default function Home() {
       <div className={styles.castle} data-castle-drown>
         <img src={Castle} className={styles.castleImg} alt="" />
       </div>
+
       <div className={styles.clouds} ref={cloudsRef}>
         {CLOUDS.map((c, i) => (
           <div
@@ -93,18 +97,20 @@ export default function Home() {
           </div>
         ))}
       </div>
+
       <div className={styles.moon} data-moon-shrink>
         <img src={Moon} className={styles.moonImg} alt="" />
       </div>
 
-      <div className={styles.oasisLogo}>
+      <div className={styles.oasisLogo} data-transition-fade>
         <img src={LogoOasis} alt="" />
       </div>
 
-      <div className={styles.regBtn}>
+      <div className={styles.regBtn} data-transition-fade>
         <img src={RegBtn} alt="" />
       </div>
-      <div className={styles.camelLand}>
+
+      <div className={styles.camelLand} data-transition-fade>
         <img src={camelLand} alt="" />
       </div>
     </div>
