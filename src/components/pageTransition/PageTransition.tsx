@@ -221,15 +221,15 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
                     opacity: fadeInP,
                   });
 
-                  const currentLen = r.path.getTotalLength();
+                  // const currentLen = r.path.getTotalLength();
 
-                  const drawP = Math.min(p / 0.6, 1);
+                  // const drawP = Math.min(p / 0.6, 1);
 
-                  gsap.set(r.path, {
-                    strokeDasharray: currentLen,
-                    strokeDashoffset:
-                      currentLen * (1 - drawP),
-                  });
+                  // gsap.set(r.path, {
+                  //   strokeDasharray: currentLen,
+                  //   strokeDashoffset:
+                  //     currentLen * (1 - drawP),
+                  // });
                 },
               },
               i * 0.045,
@@ -383,12 +383,12 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
                     wobbleEnvelope;
                 }
 
-                gsap.set(el, {
-                  y,
-                  x,
-                  rotation: rot,
-                  ...(basePercent ?? {}),
-                });
+                // gsap.set(el, {
+                //   y,
+                //   x,
+                //   rotation: rot,
+                //   ...(basePercent ?? {}),
+                // });
               },
             },
             0,
@@ -529,7 +529,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       }, rootRef);
 
       return () => {
-        ctx.revert();
+        // ctx.revert();
 
         while (layer.firstChild) {
           layer.removeChild(layer.firstChild);
