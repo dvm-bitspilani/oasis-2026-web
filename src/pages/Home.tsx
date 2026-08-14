@@ -47,6 +47,8 @@ const CLOUDS_MOBILE: Cloud[] = [
   { src: cloudBig, top: "5%", left: "85%", width: "55%", duration: 380 },
 ];
 
+
+
 export default function Home() {
   const camelRef = useRef(null);
   const cloudsRef = useRef<HTMLDivElement>(null);
