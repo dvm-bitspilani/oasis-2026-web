@@ -32,6 +32,7 @@ const DOOR_OPEN_DELAY = 0.3;
 const DOOR_OPEN_DURATION = 0.8;
 const DOOR_CLOSE_DURATION_DOORS_ONLY = 0.5;
 const DOOR_START_DELAY_DOORS_ONLY = 0;
+const STRING_TAUT_DELAY = 0.05;
 
 const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
   function PageTransition({ onComplete, onOpenComplete, mode = "full" }, ref) {
@@ -126,18 +127,30 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
         const TOP_Y = 0;
         const START_LEN = 30;
-        const START_SAG = 90;
+        const START_SAG = 120;
+
+        // Cubic Bezier instead of quadratic — a single quadratic curve is one
+        // continuous arc (same concavity the whole way), so it can't hold a
+        // straight run and then hook. Two control points let us fake "hold
+        // one end, drop the other": control1 shares the anchor's x, so the
+        // line leaves straight/vertical and stays that way for most of its
+        // length; control2 sits near the end and is offset by `sag`, so the
+        // curl only happens right before the free end — an upward-opening
+        // (⌣) hook, not a symmetric bow.
+        const STRAIGHT_T = 0.55; // how far down the line stays straight before curling
+        const HOOK_T = 0.85; // how close to the end the hook control sits
 
         const buildPath = (
           r: CloudRig,
           endY: number,
           sag: number,
         ) => {
-          const midY = (TOP_Y + endY) / 2;
+          const control1Y = TOP_Y + (endY - TOP_Y) * STRAIGHT_T;
+          const control2Y = TOP_Y + (endY - TOP_Y) * HOOK_T;
 
-          return `M ${r.anchorX} ${TOP_Y} Q ${
+          return `M ${r.anchorX} ${TOP_Y} C ${r.anchorX} ${control1Y} ${
             r.anchorX + sag
-          } ${midY} ${r.anchorX} ${endY}`;
+          } ${control2Y} ${r.anchorX} ${endY}`;
         };
 
         rigs.forEach((r) => {
@@ -227,7 +240,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
                   duration: 0.05,
                   onUpdate: function () {
                     const overshoot =
-                      Math.sin(this.progress() * Math.PI) * 10;
+                      -Math.sin(this.progress() * Math.PI) * 10;
 
                     r.path.setAttribute(
                       "d",
@@ -240,6 +253,12 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
                   },
                 },
                 ">-0.03",
+              )
+              .to(
+                {},
+                {
+                  duration: STRING_TAUT_DELAY,
+                },
               )
               .to(
                 {},
@@ -440,8 +459,6 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           );
         }
 
-        // Sand moves only a tiny amount for subtle parallax.
-        // It runs in parallel with the other foreground animations.
         if (sandEl) {
           applyDrown(
             sandEl,
@@ -450,7 +467,6 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           );
         }
 
-        // Fade out Nav, logo, register button and camel
         if (fadeEls.length > 0) {
           tl.to(
             fadeEls,
