@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom"
 import gsap from "gsap";
 
 import styles from "../styles/ComingSoon.module.scss";
@@ -11,6 +10,8 @@ import cloudBig from "../assets/cloudBig.svg";
 import cloudThree from "../assets/cloudThree.svg";
 import Moon from "../assets/Moon.png";
 import ShootingStars from "../components/ShootingStars";
+import { useTransition } from "../context/TransitionProvider"; // NEW
+import goHomeIcon from "../assets/goHome.svg"; // NEW: import instead of string path
 
 type Cloud = {
   src: string;
@@ -29,78 +30,86 @@ const CLOUDS: Cloud[] = [
 ];
 
 export default function ComingSoon() {
-    const cloudsRef = useRef<HTMLDivElement>(null);
-    const cloudRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cloudsRef = useRef<HTMLDivElement>(null);
+  const cloudRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const { navigateWithTransition } = useTransition(); // NEW
 
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-        cloudRefs.current.forEach((cloud, i) => {
-            if (!cloud) return;
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      cloudRefs.current.forEach((cloud, i) => {
+        if (!cloud) return;
 
-            const width = cloud.offsetWidth;
-            const left = cloud.offsetLeft;
-            const min = -left - width;
-            const max = window.innerWidth - left;
+        const width = cloud.offsetWidth;
+        const left = cloud.offsetLeft;
+        const min = -left - width;
+        const max = window.innerWidth - left;
 
-            gsap.to(cloud, {
-            x: `+=${max - min}`,
-            duration: CLOUDS[i].duration,
-            ease: "none",
-            repeat: -1,
-            modifiers: {
-                x: gsap.utils.unitize((x) =>
-                gsap.utils.wrap(min, max, parseFloat(x)),
-                ),
-            },
-            });
+        gsap.to(cloud, {
+          x: `+=${max - min}`,
+          duration: CLOUDS[i].duration,
+          ease: "none",
+          repeat: -1,
+          modifiers: {
+            x: gsap.utils.unitize((x) =>
+              gsap.utils.wrap(min, max, parseFloat(x)),
+            ),
+          },
         });
-        }, cloudsRef);
-        return () => ctx.revert();
-    }, []);
+      });
+    }, cloudsRef);
+    return () => ctx.revert();
+  }, []);
 
-    return (
-        <div className={styles.container}>
-            <div
-                className={styles.background}
-                style={{ backgroundImage: `url(${bg})` }}
-            />
+  // NEW: same interception pattern Nav.tsx uses.
+  const handleGoHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    navigateWithTransition("/");
+  };
 
-            <ShootingStars />
+  return (
+    <div className={styles.container}>
+      <div
+        className={styles.background}
+        style={{ backgroundImage: `url(${bg})` }}
+      />
 
-            <div className={styles.sand} data-sand-parallax>
-                <img src={sandImg} className={styles.sandImg} alt="" />
-            </div>
+      <ShootingStars />
 
-            <div className={styles.clouds} ref={cloudsRef}>
-                {CLOUDS.map((c, i) => (
-                <div
-                    key={i}
-                    className={styles.cloud}
-                    data-cloud-string
-                    style={{ top: c.top, left: c.left, width: c.width }}
-                    ref={(el) => {
-                    cloudRefs.current[i] = el;
-                    }}
-                >
-                    <img src={c.src} alt="" />
-                </div>
-                ))}
-            </div>
+      <div className={styles.sand} data-sand-parallax>
+        <img src={sandImg} className={styles.sandImg} alt="" />
+      </div>
 
-            <div className={styles.moon} data-moon-shrink>
-                <img src={Moon} className={styles.moonImg} alt="" />
-            </div>
+      <div className={styles.clouds} ref={cloudsRef}>
+        {CLOUDS.map((c, i) => (
+          <div
+            key={i}
+            className={styles.cloud}
+            data-cloud-string
+            style={{ top: c.top, left: c.left, width: c.width }}
+            ref={(el) => {
+              cloudRefs.current[i] = el;
+            }}
+          >
+            <img src={c.src} alt="" />
+          </div>
+        ))}
+      </div>
 
-            <div className={styles.tint} />
+      <div className={styles.moon} data-moon-shrink>
+        <img src={Moon} className={styles.moonImg} alt="" />
+      </div>
 
-            <div className={styles.centerBox}>
-                <h1>COMING SOON...</h1>
-                <h3>This page is still under construction</h3>
-                <Link to="/" className={styles.goHome}>
-                    <img src="src\assets\goHome.svg" alt="Go Home" />
-                </Link>
-            </div>
+      <div className={styles.tint} />
 
-        </div>
-    )
+      <div className={styles.centerBox}>
+        <h1>COMING SOON...</h1>
+        <h3>This page is still under construction</h3>
+        {/* CHANGED: was <Link to="/">, now a plain <a> intercepted the
+           same way Nav.tsx intercepts its NavLinks */}
+        <a href="/" className={styles.goHome} onClick={handleGoHomeClick}>
+          <img src={goHomeIcon} alt="Go Home" />
+        </a>
+      </div>
+    </div>
+  );
 }

@@ -218,3 +218,16 @@
       drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
   }
 }
+
+.moonCloudOverlay {
+  position: absolute; // top/left/width/height set via JS each frame
+  border-radius: 50%;
+  overflow: hidden;
+  mix-blend-mode: color;
+  pointer-events: none;
+  z-index: 4; // same tier as .clouds; comes after it in DOM so it paints on top
+}
+
+.moonCloudOverlayInner {
+  position: absolute; // top/left/width/height set via JS each frame
+}
