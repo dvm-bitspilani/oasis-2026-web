@@ -14,6 +14,7 @@
   background-position: center;
   background-repeat: no-repeat;
 }
+
 .clouds {
   position: absolute;
   top: 0;
@@ -24,7 +25,6 @@
   pointer-events: none; 
   
 }
-
 
 .cloudOne {
   position: absolute;
@@ -57,8 +57,6 @@
     z-index: 4;
 }
 
-
-
 .cloudOne img,
 .cloudTwo img,
 .cloudThree img,
@@ -86,21 +84,6 @@
     z-index: 5;
 }
 
-.castle {
-  position: absolute;
-  bottom: 24%;         
-  left: 41%;
-  transform: translateX(-50%);
-  width: 45%;           
-  z-index: 2;
-}
-
-.castleImg {
-  width: 100%;
-  height: auto;
-  display: block;
-  filter: brightness(1.45);
-}
 .moon {
   position: absolute;
   bottom: 15%;
@@ -127,64 +110,35 @@
   }
 }
 
-.oasisLogo{
+.tint {
   position: absolute;
-  bottom: 2%;
-  right:5%;
-  height: 30vh;
-  width: 30vw;
-  z-index: 5;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-  } 
+  inset: 0;
+  z-index: 10;
+  backdrop-filter: brightness(60%);
+  -webkit-backdrop-filter: brightness(60%);
+  pointer-events: none;
 }
-.regBtn{
-  position: absolute;
-  bottom: -1%;
-  left:-1%;
-  height: 33vh;
-  width: 33vw;
-  z-index: 5;
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
+.centerBox {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #FEEAD1;
+
+  h1 {
+    font-family: "Almalik", sans-serif;
+    font-size: 4rem;
+    font-weight: 200;
+    margin: 0;
   }
-}
 
-.camelLand{
-  position: absolute;
-  bottom: 17%;
-  left:35%;
-  height: 15vh;
-  width: 15vw;
-  z-index: 4;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-  }
-}
-
-.links {
-  position: relative;
-  width: 27vw;
-  aspect-ratio: 1 / 1; // <-- swap for bgPath's real ratio, e.g. 4/3, 16/9
-  margin-top: 7%;
-  margin-left: 65%;
-  z-index: 1;
-}
-
-.linksSvg {
-  display: block;
-  width: 100%;
-  height: 100%;
+  h3 {
+      font-family: "Montserrat", sans-serif;
+      font-weight: 300;
+    } 
 }
