@@ -154,19 +154,27 @@
   .castle{
     width: 100vw;
     left: 50%;
-    bottom: 25%;
+    bottom: 42%;
   }
-  .sandImg{
-    object-fit: cover;
-  }
+  .sandImg {
+  object-fit: cover;
+  // transform: scaleX(-1);
+}
+
+.sand {
+  height: 70%;
+  // left: 1%;
+
+}
   .moon{
     width: 100vw;
     left: 50%;
+    bottom: 30%;
   }
 
   .oasisLogo{
     position: absolute;
-    bottom: -2%;
+    bottom: 10%;
     left:5%;
     height: 50vh;
     width: 50vw;
@@ -182,11 +190,11 @@
 
   .regBtn{
     position: absolute;
-    height:60vh;
-    width: 60vw;
+    height:70vh;
+    width: 70vw;
     z-index: 5; 
     bottom: -15%;
-    left: 20%;
+    left: 15%;
 
     img {
       width: 100%;
