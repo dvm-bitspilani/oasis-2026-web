@@ -28,3 +28,8 @@ a {
   font-family: "Almalik";
   src: url(./assets/fonts/Almalik.otf);
 }
+
+@font-face {
+  font-family: "Ramadhan";
+  src: url(./assets/fonts/Lentera\ Ramadhan.ttf);
+}
