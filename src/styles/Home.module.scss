@@ -14,60 +14,28 @@
   background-position: center;
   background-repeat: no-repeat;
 }
+
 .clouds {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;  
-
-  pointer-events: none; 
-  
+  height: 100%;
+  pointer-events: none;
 }
 
-
-.cloudOne {
+.cloud {
   position: absolute;
-  top: 35%;
-  left: 0%;
-  width: 20%;
   z-index: 4;
+  will-change: transform;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
 }
 
-.cloudTwo {
-  position: absolute;
-  top: 15%;
-  left: 70%;
-  width: 20%;
-  z-index: 4;
-}
-
-.cloudThree {
-  position: absolute;
-  top: 15%;
-  left: 20%;
-  width: 20%;
-  z-index: 4;
-}
-.cloudFour {
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  width: 20%;
-    z-index: 4;
-}
-
-
-
-.cloudOne img,
-.cloudTwo img,
-.cloudThree img,
-.cloudFour img {
-  display: block;
-  width: 100%;
-  height: auto;
-
-}
 .sand {
   position: absolute;
   bottom: -1%;
@@ -101,6 +69,7 @@
   display: block;
   filter: brightness(1.45);
 }
+
 .moon {
   position: absolute;
   bottom: 15%;
@@ -114,17 +83,6 @@
   width: 100%;
   height: auto;
   display: block;
-}
-.cloud {
-  position: absolute;
-  z-index: 1;
-  will-change: transform;
-
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
 }
 
 .oasisLogo{
@@ -142,6 +100,7 @@
     display: block;
   } 
 }
+
 .regBtn{
   position: absolute;
   bottom: -1%;
@@ -177,7 +136,7 @@
 .links {
   position: relative;
   width: 27vw;
-  aspect-ratio: 1 / 1; // <-- swap for bgPath's real ratio, e.g. 4/3, 16/9
+  aspect-ratio: 1 / 1;
   margin-top: 7%;
   margin-left: 65%;
   z-index: 1;
@@ -187,4 +146,53 @@
   display: block;
   width: 100%;
   height: 100%;
+}
+
+@media (max-width: 650px){
+  .castle{
+    width: 100vw;
+    left: 50%;
+    bottom: 25%;
+  }
+
+  .moon{
+    width: 100vw;
+    left: 50%;
+  }
+
+  .oasisLogo{
+    position: absolute;
+    bottom: -2%;
+    left:5%;
+    height: 50vh;
+    width: 50vw;
+    z-index: 5;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+  }
+
+  .regBtn{
+    position: absolute;
+    height:60vh;
+    width: 60vw;
+    z-index: 5; 
+    bottom: -15%;
+    left: 20%;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+  }
+
+  .links{
+    display: none;
+  }
 }
