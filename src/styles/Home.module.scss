@@ -48,7 +48,7 @@
 
 
 .sandImg{
-    object-fit: contatin;
+    // object-fit: contatin;
     object-position: center bottom;
     width: 100%;
     height: 100%;
@@ -156,7 +156,9 @@
     left: 50%;
     bottom: 25%;
   }
-
+  .sandImg{
+    object-fit: cover;
+  }
   .moon{
     width: 100vw;
     left: 50%;
