@@ -6,9 +6,11 @@ interface PreloaderProps {
   onEnter: () => void;
 }
 
-const TEXT_LINES = [
-  "lorem ipsum dolore sel ami",
-  "lorem ipsum dolore sel ami",
+// Each entry is a "beat" in the sequence; each sub-string renders as its
+// own line, each riding its own gently curved path.
+const TEXT_LINES: string[][] = [
+  ["The desert has one rule.", "It does not open for everyone."],
+  ["But the lamps are lit tonight,", "and the oasis is expecting you."],
 ];
 
 // Timings (ms) — tune these to taste
@@ -20,6 +22,14 @@ const FADE_OUT = 1200;
 const GAP = 400;
 
 type Phase = "in" | "glow" | "hold" | "out" | "done";
+
+// Builds a gentle arc path, offset vertically by `yOffset`.
+// Increase `curve` for a more pronounced bend.
+const buildArcPath = (yOffset: number, curve = 45) => {
+  const y = yOffset;
+  const controlY = yOffset - curve;
+  return `M -450 ${y} Q 0 ${controlY} 450 ${y}`;
+};
 
 export default function Preloader({
   assets = [],
@@ -123,9 +133,12 @@ export default function Preloader({
       <div className={styles.vignette} />
 
       <div className={styles.content}>
-        {TEXT_LINES.map((line, index) => {
+        {TEXT_LINES.map((subLines, index) => {
           const isActive = index === activeLine && phase !== "done";
-          const pathId = `preloader-path-${index}`;
+
+          // Vertically center the stack of curved lines around y=0.
+          const lineHeight = 70;
+          const startY = -((subLines.length - 1) * lineHeight) / 2;
 
           return (
             <svg
@@ -133,40 +146,47 @@ export default function Preloader({
               className={`${styles.lineSvg} ${
                 isActive ? styles[`phase-${phase}`] : ""
               }`}
-              viewBox="0 0 1000 120"
+              viewBox="-500 -160 1000 320"
               style={{ display: index === activeLine ? "block" : "none" }}
             >
               <defs>
-                {/* Slight arc for a title-card feel; use
-                    "M 50 60 L 950 60" for a dead-straight line instead */}
-                <path
-                  id={pathId}
-                  d="M 50 80 Q 500 20 950 80"
-                  fill="none"
-                />
+                {subLines.map((_, subIndex) => (
+                  <path
+                    key={subIndex}
+                    id={`preloader-arc-${index}-${subIndex}`}
+                    d={buildArcPath(startY + subIndex * lineHeight)}
+                    fill="none"
+                  />
+                ))}
               </defs>
 
-              {/* Glow layer: blurred duplicate sitting behind the crisp text.
-                  Only opacity is animated — the blur radius itself is static,
-                  which is what keeps this reliable across browsers. */}
-              <text
-                className={styles.glowText}
-                textAnchor="middle"
-              >
-                <textPath href={`#${pathId}`} startOffset="50%">
-                  {line}
-                </textPath>
-              </text>
+              {/* Glow layer: blurred duplicate riding the same curves */}
+              <g className={styles.glowText}>
+                {subLines.map((sub, subIndex) => (
+                  <text key={subIndex} textAnchor="middle">
+                    <textPath
+                      href={`#preloader-arc-${index}-${subIndex}`}
+                      startOffset="50%"
+                    >
+                      {sub}
+                    </textPath>
+                  </text>
+                ))}
+              </g>
 
               {/* Crisp foreground text */}
-              <text
-                className={styles.pathText}
-                textAnchor="middle"
-              >
-                <textPath href={`#${pathId}`} startOffset="50%">
-                  {line}
-                </textPath>
-              </text>
+              <g className={styles.pathText}>
+                {subLines.map((sub, subIndex) => (
+                  <text key={subIndex} textAnchor="middle">
+                    <textPath
+                      href={`#preloader-arc-${index}-${subIndex}`}
+                      startOffset="50%"
+                    >
+                      {sub}
+                    </textPath>
+                  </text>
+                ))}
+              </g>
             </svg>
           );
         })}

@@ -49,9 +49,9 @@ export default function App() {
 
   return (
     <>
-       {/* {!entered && (
+        {!entered && (
         <Preloader assets={assets} onEnter={() => setEntered(true)} />
-      )}  */}
+      )}  
 
       <AppRoutes />
     </>
