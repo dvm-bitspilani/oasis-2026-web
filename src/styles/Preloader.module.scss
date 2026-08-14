@@ -1,0 +1,104 @@
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // Add your background here
+  background:black ;
+
+  // Add your font here
+  font-family: url;
+
+  color: white;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.text {
+  min-height: 80px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  font-size: clamp(18px, 2vw, 28px);
+  letter-spacing: 0.08em;
+  line-height: 1.6;
+}
+
+.line {
+  white-space: nowrap;
+}
+
+.cursor {
+  display: inline-block;
+  margin-left: 3px;
+
+  animation: cursorBlink 0.7s steps(1) infinite;
+}
+
+@keyframes cursorBlink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.enter {
+  margin-top: 45px;
+
+  padding: 12px 28px;
+
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+
+  color: white;
+
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+
+  cursor: pointer;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transform: translateY(10px);
+
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease,
+    background 0.3s ease;
+}
+
+.enterVisible {
+  opacity: 1;
+  visibility: visible;
+
+  transform: translateY(0);
+}
+
+.enter:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.enter:disabled {
+  cursor: default;
+}
