@@ -14,8 +14,3 @@ img {
   /* Prevent ghost image dragging */
   -webkit-user-drag: none;
 }
-
-@font-face {
-  font-family: "Almalik";
-  src: url(./assets/fonts/Almalik.otf);
-}
