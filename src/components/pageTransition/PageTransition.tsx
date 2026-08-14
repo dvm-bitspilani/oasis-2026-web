@@ -263,7 +263,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
               .to(
                 {},
                 {
-                  duration: 0.12,
+                  duration: 0.05,
                   ease: "power3.out",
                   onUpdate: function () {
                     const sag = gsap.utils.interpolate(

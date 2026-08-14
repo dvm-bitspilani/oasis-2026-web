@@ -14,6 +14,12 @@ import RegBtn from "../assets/registerBtn.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
 import camelLand from "../assets/camelLand.png";
+
+import instagramIcon from "../assets/links/instagram.png";
+import twitterIcon from "../assets/links/twitter.png";
+import LinkdinIcon from "../assets/links/linkdin.png";
+import youtubeIcon from "../assets/links/youtube.png";
+import bgPath from "../assets/links/bg.png";
 type Cloud = {
   src: string;
   top: string;
@@ -31,9 +37,21 @@ const CLOUDS: Cloud[] = [
 ];
 
 export default function Home() {
+  const camelRef = useRef(null);
   const cloudsRef = useRef<HTMLDivElement>(null);
   const cloudRefs = useRef<(HTMLDivElement | null)[]>([]);
-
+  //   useEffect(() => {
+  //     const tl = gsap.timeline()
+  //     tl.to(camelRef.current , {
+  //       x:-150,
+  //       duration
+  //     })
+  //     // .set(camelRef.current ,{x:50})
+  //     // .to(camelRef.current , {
+  //     //   x:50,
+  //     //   y:20,
+  //     // })
+  // }, []);
   useEffect(() => {
     const ctx = gsap.context(() => {
       cloudRefs.current.forEach((cloud, i) => {
@@ -109,10 +127,47 @@ export default function Home() {
         <img src={RegBtn} alt="" />
       </div>
 
-      <div className={styles.camelLand} data-transition-fade>
+      <div ref={camelRef} className={styles.camelLand} data-transition-fade>
         <img src={camelLand} alt="" />
       </div>
-      
+      <div className={styles.links}>
+        <svg
+          viewBox="0 0 100 100"
+          className={styles.linksSvg}
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <image href={bgPath} x="0" y="0" width="100" height="100" />
+
+          <a
+            href="https://www.instagram.com/bitsoasis/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <image href={instagramIcon} x="43" y="68" width="12" height="12" />
+          </a>
+
+          <a
+            href="https://www.linkedin.com/company/oasis24-bits-pilani/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <image href={LinkdinIcon} x="87" y="46" width="12" height="12" />
+          </a>
+
+          <a href="" target="_blank" rel="noreferrer">
+            <image href={youtubeIcon} x="53" y="25" width="12" height="12" />
+          </a>
+
+          <a
+            href="https://www.linkedin.com/company/oasis24-bits-pilani/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <image href={twitterIcon} x="1" y="23" width="12" height="12" />
+          </a>
+        </svg>
+      </div>
     </div>
   );
 }
