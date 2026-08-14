@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { TransitionProvider } from "../context/TransitionProvider";
-import Register from "../pages/registration/components/Register/Register";
+import Register from "../pages/registration//Registration";
 import Home from "../pages/Home";
 import About from "../pages/About";
 import ComingSoon from "../pages/ComingSoon";
