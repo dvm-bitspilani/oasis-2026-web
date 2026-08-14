@@ -8,6 +8,7 @@ const LINKS = [
   { label: "Contacts", to: "/comingsoon" },
   { label: "Events", to: "/comingsoon" },
   { label: "About Us", to: "/about" },
+  { label: "Register", to: "/register" },
 ];
 
 export default function Nav() {
