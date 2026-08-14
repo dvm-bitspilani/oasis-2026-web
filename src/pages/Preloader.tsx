@@ -11,13 +11,24 @@ const TEXT_LINES = [
   "lorem ipsum dolore sel ami",
 ];
 
+// Timings (ms) — tune these to taste
+const FADE_IN = 1600;
+const GLOW_DELAY = 300; // pause after text settles, before glow blooms
+const GLOW_IN = 900;
+const HOLD = 1400;
+const FADE_OUT = 1200;
+const GAP = 400;
+
+type Phase = "in" | "glow" | "hold" | "out" | "done";
+
 export default function Preloader({
   assets = [],
   onEnter,
 }: PreloaderProps) {
   const [loaded, setLoaded] = useState(false);
-  const [typedLines, setTypedLines] = useState<string[]>(["", ""]);
-  const [typingDone, setTypingDone] = useState(false);
+  const [activeLine, setActiveLine] = useState(0);
+  const [phase, setPhase] = useState<Phase>("in");
+  const [sequenceDone, setSequenceDone] = useState(false);
 
   // Preload assets
   useEffect(() => {
@@ -30,7 +41,6 @@ export default function Preloader({
 
     const handleLoaded = () => {
       loadedCount++;
-
       if (loadedCount === assets.length) {
         setLoaded(true);
       }
@@ -38,76 +48,128 @@ export default function Preloader({
 
     assets.forEach((src) => {
       const img = new Image();
-
       img.onload = handleLoaded;
       img.onerror = handleLoaded;
       img.src = src;
     });
   }, [assets]);
 
-  // Typing animation
+  // Cinematic line-by-line fade + glow sequence
   useEffect(() => {
     let cancelled = false;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
 
-    const typeText = async () => {
-      for (let lineIndex = 0; lineIndex < TEXT_LINES.length; lineIndex++) {
-        const text = TEXT_LINES[lineIndex];
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => {
+        const t = setTimeout(resolve, ms);
+        timeouts.push(t);
+      });
 
-        for (let i = 0; i <= text.length; i++) {
-          if (cancelled) return;
+    const run = async () => {
+      for (let i = 0; i < TEXT_LINES.length; i++) {
+        if (cancelled) return;
+        setActiveLine(i);
+        setPhase("in");
 
-          setTypedLines((prev) => {
-            const updated = [...prev];
-            updated[lineIndex] = text.slice(0, i);
-            return updated;
-          });
+        await wait(FADE_IN);
+        if (cancelled) return;
 
-          await new Promise((resolve) => setTimeout(resolve, 70));
+        await wait(GLOW_DELAY);
+        if (cancelled) return;
+        setPhase("glow");
+
+        await wait(GLOW_IN);
+        if (cancelled) return;
+        setPhase("hold");
+
+        await wait(HOLD);
+        if (cancelled) return;
+        setPhase("out");
+
+        await wait(FADE_OUT);
+        if (cancelled) return;
+
+        if (i < TEXT_LINES.length - 1) {
+          await wait(GAP);
         }
-
-        await new Promise((resolve) => setTimeout(resolve, 250));
       }
 
       if (!cancelled) {
-        setTypingDone(true);
+        setPhase("done");
+        setSequenceDone(true);
       }
     };
 
-    typeText();
+    run();
 
     return () => {
       cancelled = true;
+      timeouts.forEach(clearTimeout);
     };
   }, []);
 
-  const showEnter = loaded && typingDone;
+  // Once assets are loaded and the text sequence has finished, move on.
+  useEffect(() => {
+    if (loaded && sequenceDone) {
+      const t = setTimeout(() => {
+        onEnter();
+      }, 900);
+      return () => clearTimeout(t);
+    }
+  }, [loaded, sequenceDone, onEnter]);
 
   return (
     <div className={styles.preloader}>
+      <div className={styles.vignette} />
+
       <div className={styles.content}>
+        {TEXT_LINES.map((line, index) => {
+          const isActive = index === activeLine && phase !== "done";
+          const pathId = `preloader-path-${index}`;
 
-        <div className={styles.text}>
-          {typedLines.map((line, index) => (
-            <div className={styles.line} key={index}>
-              {line}
+          return (
+            <svg
+              key={index}
+              className={`${styles.lineSvg} ${
+                isActive ? styles[`phase-${phase}`] : ""
+              }`}
+              viewBox="0 0 1000 120"
+              style={{ display: index === activeLine ? "block" : "none" }}
+            >
+              <defs>
+                {/* Slight arc for a title-card feel; use
+                    "M 50 60 L 950 60" for a dead-straight line instead */}
+                <path
+                  id={pathId}
+                  d="M 50 80 Q 500 20 950 80"
+                  fill="none"
+                />
+              </defs>
 
-              {index === typedLines.length - 1 && !showEnter && (
-                <span className={styles.cursor}>|</span>
-              )}
-            </div>
-          ))}
-        </div>
+              {/* Glow layer: blurred duplicate sitting behind the crisp text.
+                  Only opacity is animated — the blur radius itself is static,
+                  which is what keeps this reliable across browsers. */}
+              <text
+                className={styles.glowText}
+                textAnchor="middle"
+              >
+                <textPath href={`#${pathId}`} startOffset="50%">
+                  {line}
+                </textPath>
+              </text>
 
-        <button
-          className={`${styles.enter} ${
-            showEnter ? styles.enterVisible : ""
-          }`}
-          onClick={onEnter}
-          disabled={!showEnter}
-        >
-          ENTER
-        </button>
-
+              {/* Crisp foreground text */}
+              <text
+                className={styles.pathText}
+                textAnchor="middle"
+              >
+                <textPath href={`#${pathId}`} startOffset="50%">
+                  {line}
+                </textPath>
+              </text>
+            </svg>
+          );
+        })}
       </div>
     </div>
   );
