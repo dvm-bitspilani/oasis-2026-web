@@ -21,20 +21,19 @@ const Instructions = forwardRef<HTMLDivElement, PropsType>(
         )}
         <div className={styles.content} ref={ref}>
           <div className={styles.headingCont}>
-            <img src={null} alt="left" />
-            <h3 className={styles.heading}>INSTRUCTIONS</h3>
-            <img src={null} alt="right" />
+            <h3 className={styles.heading}>Registration</h3>
           </div>
+          <h5>INSTRUCTIONS</h5>
           <ul className={styles.instr}>
             <li>
               Complete the registration form with all required details. You'll
               be able to login through your registered email id when required.
             </li>
-            <li>All team members are required to register separately.</li>
             <li>All prof shows are free. </li>
+            <li>All team members are required to register separately.</li>
             <li>
-              For further details contact, Ujjwal Kansal: <a href="tel:+919991520330">+91 99915 20330</a>,
-              Sneha: <a href="tel:+919026855597">+91 90268 55597</a>
+              For further details contact, Parimal: <a href="tel:8638304074">8638304074</a>,
+              Ishita: <a href="tel:7804051996">7804051996</a>
             </li>
             <li>
               For detailed Instructions{" "}
@@ -43,7 +42,6 @@ const Instructions = forwardRef<HTMLDivElement, PropsType>(
           </ul>
 
           <button className={styles.googleButton} onClick={onGoogleSignIn}>
-            Sign in with Google
           </button>
         </div>
       </>

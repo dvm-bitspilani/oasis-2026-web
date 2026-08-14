@@ -28,3 +28,18 @@ a {
   font-family: "Almalik";
   src: url(./assets/fonts/Almalik.otf);
 }
+
+@font-face {
+  font-family: "Syamsiah";
+  src: url(./assets/fonts/Syamsiah\ Arabic.ttf);
+}
+
+@font-face {
+  font-family: "Cinzel";
+  src: url(./assets/fonts/Cinzel-VariableFont_wght.ttf);
+}
+
+@font-face {
+  font-family: "EB";
+  src: url(./assets/fonts/EBGaramond-Medium.ttf);
+}
