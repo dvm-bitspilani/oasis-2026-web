@@ -166,7 +166,7 @@ export default function Home() {
           xmlns="http://www.w3.org/2000/svg"
           preserveAspectRatio="xMidYMid meet"
         >
-          <image href={bgPath} x="0" y="0" width="100" height="100" />
+          <image href={bgPath} x="0" y="0" width="110" height="100" className={styles.socialLink} />
 
           <a
             href="https://www.instagram.com/bitsoasis/"
@@ -179,6 +179,7 @@ export default function Home() {
               y="68"
               width="12"
               height="12"
+              className={styles.socialLink}
             />
           </a>
 
@@ -193,6 +194,7 @@ export default function Home() {
               y="46"
               width="12"
               height="12"
+              className={styles.socialLink}
             />
           </a>
 
@@ -203,6 +205,7 @@ export default function Home() {
               y="25"
               width="12"
               height="12"
+              className={styles.socialLink}
             />
           </a>
 
@@ -217,6 +220,7 @@ export default function Home() {
               y="23"
               width="12"
               height="12"
+              className={styles.socialLink}
             />
           </a>
         </svg>
