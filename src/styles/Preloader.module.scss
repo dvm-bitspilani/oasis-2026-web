@@ -7,98 +7,164 @@
   align-items: center;
   justify-content: center;
 
-  // Add your background here
-  background:black ;
+  background: #000;
+  color: #e8e3d8;
 
-  // Add your font here
-  font-family: url;
+  font-family: "Playfair Display", "Cormorant Garamond", Georgia, serif;
 
-  color: white;
+  overflow: hidden;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0) 40%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
 }
 
 .content {
+  position: relative;
+
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
 
+  width: 100%;
   text-align: center;
 }
 
-.text {
-  min-height: 80px;
+.lineSvg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1.04);
 
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  width: min(90vw, 900px);
+  height: auto;
 
-  font-size: clamp(18px, 2vw, 28px);
-  letter-spacing: 0.08em;
-  line-height: 1.6;
+  opacity: 0;
 }
 
-.line {
-  white-space: nowrap;
+// Shared type styling for both layers
+.pathText,
+.glowText {
+  font-weight: 400;
+  font-size: 34px;
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
 }
 
-.cursor {
-  display: inline-block;
-  margin-left: 3px;
-
-  animation: cursorBlink 0.7s steps(1) infinite;
+.pathText {
+  fill: #e8e3d8;
 }
 
-@keyframes cursorBlink {
-  0%,
-  50% {
+// The blurred duplicate behind the crisp text — static blur radius,
+// opacity is what we animate to "bloom" it in
+.glowText {
+  fill: #fff8e8;
+
+  filter: blur(6px);
+  opacity: 0;
+}
+
+// --- Phase 1: text fades + settles in (no glow yet) ---
+.phase-in {
+  animation: lineIn 1.6s ease-out forwards;
+}
+
+@keyframes lineIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+  100% {
     opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+// --- Phase 2: glow blooms in behind the settled text ---
+.phase-glow {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+
+  .glowText {
+    animation: glowBloom 0.9s ease-out forwards;
   }
 
-  51%,
+  .pathText {
+    animation: textBrighten 0.9s ease-out forwards;
+  }
+}
+
+@keyframes glowBloom {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes textBrighten {
+  0% {
+    fill: #e8e3d8;
+  }
+  100% {
+    fill: #fffdf5;
+  }
+}
+
+// --- Phase 3: hold, fully glowing ---
+.phase-hold {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+
+  .glowText {
+    opacity: 0.85;
+  }
+
+  .pathText {
+    fill: #fffdf5;
+  }
+}
+
+// --- Phase 4: fade out, glow fading with it ---
+.phase-out {
+  animation: lineOut 1.2s ease-in forwards;
+
+  .glowText {
+    opacity: 0.85;
+    animation: glowFade 1.2s ease-in forwards;
+  }
+
+  .pathText {
+    fill: #fffdf5;
+  }
+}
+
+@keyframes lineOut {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.98);
+  }
+}
+
+@keyframes glowFade {
+  0% {
+    opacity: 0.85;
+  }
   100% {
     opacity: 0;
   }
-}
-
-.enter {
-  margin-top: 45px;
-
-  padding: 12px 28px;
-
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-
-  color: white;
-
-  font: inherit;
-  font-size: 14px;
-  letter-spacing: 0.2em;
-
-  cursor: pointer;
-
-  opacity: 0;
-  visibility: hidden;
-
-  transform: translateY(10px);
-
-  transition:
-    opacity 0.6s ease,
-    transform 0.6s ease,
-    background 0.3s ease;
-}
-
-.enterVisible {
-  opacity: 1;
-  visibility: visible;
-
-  transform: translateY(0);
-}
-
-.enter:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.enter:disabled {
-  cursor: default;
 }
