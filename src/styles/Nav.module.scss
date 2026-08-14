@@ -1,15 +1,15 @@
-.container{
-    position: absolute;
-    top: 24px;
-    left: 0;
-    width: 95vw;
-    height: 10vh;
-    display: flex;
-    align-items: center;
-    justify-content: space-between; // circle goes left, rectangle goes right
-    padding: 0 24px;
-    z-index: 5;
-    margin-left: 5%;
+.container {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  width: 95vw;
+  height: 10vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; // circle goes left, rectangle goes right
+  padding: 0 24px;
+  z-index: 5;
+  margin-left: 5%;
 }
 
 .rectangle {
@@ -23,13 +23,16 @@
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+  // The sand motion now lives inside the SVG itself (animated feTurbulence /
+  // feDisplacementMap in navSan.svg), so this stays a plain background-image —
+  // no overlay canvas, no extra DOM.
   background-image: url("../assets/navSan.svg");
   font-family: "Lentera Ramadhan", sans-serif;
-  color: #EED8AF;
+  color: #eed8af;
   margin-right: 5%;
 }
 
-.circle{
+.circle {
   height: 100%;
   aspect-ratio: 1 / 1;
   background-image: url("../assets/navCircle.svg");
@@ -42,17 +45,17 @@
   justify-content: center;
   gap: 6px;
   opacity: 0;
+
   img {
     width: 40%;
     height: auto;
     display: block;
   }
-  
 }
 
 a {
   text-decoration: none;
-  color: #EED8AF;
+  color: #eed8af;
   font-size: 1.25rem;
   font-family: "Ramadhan", sans-serif;
 }
@@ -112,5 +115,17 @@ a {
     a:not(:first-child) {
       display: none;
     }
+  }
+}
+
+.rectangle a {
+  display: inline-block;
+  transition: transform 200ms ease, text-shadow 200ms ease;
+  transform-origin: center;
+
+  &:hover,
+  &:focus-visible {
+    transform: scale(1.15);
+    text-shadow: 0 0 10px rgba(238, 216, 175, 0.7);
   }
 }
