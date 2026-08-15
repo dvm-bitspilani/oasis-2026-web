@@ -355,6 +355,8 @@
 ========================================================= */
 
 .fadeOut {
+  pointer-events: none;
+
   animation:
     contentOut 400ms ease-in forwards;
 }
