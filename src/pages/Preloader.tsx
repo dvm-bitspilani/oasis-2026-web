@@ -10,7 +10,7 @@ const TEXT_LINES = [
   "The Desert has one Rule",
   "It does not open for everyone",
   "But the Lamps are lit Tonight",
-  "Ans the Oasis is expecting You"
+  "And the Oasis is expecting You"
 ];
 
 // Timings (ms) — tune these to taste
