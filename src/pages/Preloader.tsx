@@ -13,65 +13,87 @@ const TEXT_LINES = [
   "And the Oasis is expecting You",
 ];
 
+// Lines are revealed in two groups: [0,1] first, then [2,3].
+// Within a group, line 1 paints, then line 2 paints after a stagger —
+// they are NOT simultaneous. Once a (non-final) group has fully
+// painted and held, the whole group fades out before the next mounts.
+const LINE_GROUPS: number[][] = [
+  [0, 1],
+  [2, 3],
+];
+
 // ---------------------------------------------------------
 // TIMINGS
 // ---------------------------------------------------------
 
-const PAINT_DURATION = 7000;
+// How long a single line takes to fully paint in.
+const PAINT_DURATION = 8000;
 
-const PAINT_STAGGER = 500;
+// Delay between line 1 starting and line 2 starting, within a group.
+const PAINT_STAGGER = 50;
 const STAGGER_RANDOM = 50;
 
-const LAST_LINE_DELAY = 3000;
+// How long a fully-painted group holds before fading out.
+const GROUP_HOLD = 800;
 
+// How long the group-fade-out transition itself takes.
+const GROUP_FADE_OUT = 400;
+
+// Pause after a group has fully faded out before the next group starts.
+const GROUP_GAP = 200;
+
+// Wait after the FINAL group has held, before auto-advancing to home.
+const LAST_LINE_DELAY = 2000;
+
+// Whole-preloader fade-out duration before onEnter() fires.
 const FADE_OUT = 400;
 
-export default function Preloader({
-  assets = [],
-  onEnter,
-}: PreloaderProps) {
+export default function Preloader({ assets = [], onEnter }: PreloaderProps) {
   const [loaded, setLoaded] = useState(false);
-  const [visibleLines, setVisibleLines] = useState(0);
+
+  // Per-line visibility (opacity 1/0), independent of group fade.
+  const [lineVisible, setLineVisible] = useState<boolean[]>(
+    TEXT_LINES.map(() => false)
+  );
+
+  // Per-group fade-out flag — toggles a CSS transition on the group's
+  // wrapper div, fading BOTH lines in that group out together.
+  const [groupFading, setGroupFading] = useState<boolean[]>(
+    LINE_GROUPS.map(() => false)
+  );
 
   /*
    * Starts false.
    *
-   * Becomes true 3 seconds after the 4th line mounts.
+   * Becomes true LAST_LINE_DELAY after the last group has held.
    */
-  const [lastLineDone, setLastLineDone] =
-    useState(false);
+  const [lastLineDone, setLastLineDone] = useState(false);
 
-  const [fadingOut, setFadingOut] =
-    useState(false);
+  const [fadingOut, setFadingOut] = useState(false);
 
   /*
-   * Enter appears only when BOTH:
+   * Ready to leave only when BOTH:
    *
    * 1. Assets are loaded
-   * 2. 3 seconds have passed after line 4 mounted
+   * 2. LAST_LINE_DELAY has passed after the last group finished holding
    */
   const ready = loaded && lastLineDone;
 
-  const paintAnimRefs = useRef<
-    (SVGAnimateElement | null)[]
-  >([]);
+  const paintAnimRefs = useRef<(SVGAnimateElement | null)[]>([]);
 
   const seedsRef = useRef<number[]>(
-    TEXT_LINES.map(() =>
-      Math.floor(Math.random() * 1000),
-    ),
+    TEXT_LINES.map(() => Math.floor(Math.random() * 1000))
   );
 
   /*
-   * Randomized stagger between lines.
+   * Randomized stagger between line 1 and line 2 within each group.
    */
   const staggerRefs = useRef<number[]>(
-    TEXT_LINES.slice(0, -1).map(
+    LINE_GROUPS.map(
       () =>
         PAINT_STAGGER +
-        (Math.random() * STAGGER_RANDOM * 2 -
-          STAGGER_RANDOM),
-    ),
+        (Math.random() * STAGGER_RANDOM * 2 - STAGGER_RANDOM)
+    )
   );
 
   // =========================================================
@@ -104,32 +126,30 @@ export default function Preloader({
     });
   }, [assets]);
 
-  // =========================================================
-  // START PAINT ANIMATION
-  // =========================================================
+  const showLine = (index: number) => {
+    setLineVisible((prev) => {
+      const next = [...prev];
+      next[index] = true;
+      return next;
+    });
+  };
 
-  const startPaint = (index: number) => {
-    const animation =
-      paintAnimRefs.current[index];
-
-    if (!animation) return;
-
-    try {
-      animation.beginElement();
-    } catch {
-      // Safe to ignore if SMIL isn't supported.
-    }
+  const hideLine = (index: number) => {
+    setLineVisible((prev) => {
+      const next = [...prev];
+      next[index] = false;
+      return next;
+    });
   };
 
   // =========================================================
-  // SEQUENTIAL TEXT ANIMATION
+  // GROUPED, SEQUENTIAL-WITHIN-GROUP ANIMATION
   // =========================================================
 
   useEffect(() => {
     let cancelled = false;
 
-    const timers: ReturnType<typeof setTimeout>[] =
-      [];
+    const timers: ReturnType<typeof setTimeout>[] = [];
 
     const wait = (ms: number) =>
       new Promise<void>((resolve) => {
@@ -138,84 +158,104 @@ export default function Preloader({
         timers.push(timer);
       });
 
-    const run = async () => {
-      // -----------------------------------------------------
-      // LINE 1
-      // -----------------------------------------------------
+    const startPaint = (index: number) => {
+      const animation = paintAnimRefs.current[index];
 
-      setVisibleLines(1);
+      if (!animation) return;
 
-      /*
-       * Give React time to mount line 1.
-       */
-      await wait(50);
+      try {
+        animation.beginElement();
+      } catch {
+        // Safe to ignore if SMIL isn't supported.
+      }
+    };
+
+    /*
+     * Reveals a line and starts its paint animation. The glow is no
+     * longer tied to paint completion at all — .pathText glows the
+     * whole time a line is visible, including while it's still being
+     * painted in, so there's nothing left to time here.
+     */
+    const revealAndPaint = async (index: number) => {
+      showLine(index);
+
+      await wait(50); // let React mount/update the SVG before beginElement()
 
       if (cancelled) return;
 
-      startPaint(0);
+      startPaint(index);
+    };
 
-      // -----------------------------------------------------
-      // LINES 2, 3, 4
-      // -----------------------------------------------------
-
-      for (
-        let index = 1;
-        index < TEXT_LINES.length;
-        index++
-      ) {
+    const run = async () => {
+      for (let groupIndex = 0; groupIndex < LINE_GROUPS.length; groupIndex++) {
         if (cancelled) return;
 
-        /*
-         * Wait only for the stagger.
-         *
-         * This does NOT wait for PAINT_DURATION.
-         */
-        await wait(
-          staggerRefs.current[index - 1],
-        );
+        const [first, second] = LINE_GROUPS[groupIndex];
+        const isLastGroup = groupIndex === LINE_GROUPS.length - 1;
+
+        // -----------------------------------------------------
+        // LINE 1 of this group
+        // -----------------------------------------------------
+
+        await revealAndPaint(first);
 
         if (cancelled) return;
 
-        /*
-         * Mount the next line.
-         */
-        setVisibleLines(index + 1);
+        // -----------------------------------------------------
+        // LINE 2 of this group, after a stagger
+        // -----------------------------------------------------
 
-        /*
-         * Give React time to mount the SVG
-         * and its animation.
-         */
-        await wait(50);
+        await wait(staggerRefs.current[groupIndex]);
 
         if (cancelled) return;
 
-        /*
-         * Start paint animation.
-         */
-        startPaint(index);
+        await revealAndPaint(second);
 
-        // ---------------------------------------------------
-        // LINE 4
-        // ---------------------------------------------------
+        if (cancelled) return;
 
-        if (
-          index ===
-          TEXT_LINES.length - 1
-        ) {
+        // -----------------------------------------------------
+        // Hold once line 2 has fully painted
+        // -----------------------------------------------------
+
+        await wait(PAINT_DURATION + GROUP_HOLD);
+
+        if (cancelled) return;
+
+        if (isLastGroup) {
           /*
-           * The 4th line has now mounted.
-           *
-           * Start the independent 3-second countdown.
-           *
-           * PAINT_DURATION has NO involvement here.
+           * Final group: don't fade it out — just start the
+           * independent countdown to auto-advance to home.
            */
-          const timer = setTimeout(() => {
-            if (!cancelled) {
-              setLastLineDone(true);
-            }
-          }, LAST_LINE_DELAY);
+          await wait(LAST_LINE_DELAY);
 
-          timers.push(timer);
+          if (!cancelled) {
+            setLastLineDone(true);
+          }
+        } else {
+          // -----------------------------------------------------
+          // Fade this whole group out, then move to the next
+          // -----------------------------------------------------
+
+          setGroupFading((prev) => {
+            const next = [...prev];
+            next[groupIndex] = true;
+            return next;
+          });
+
+          await wait(GROUP_FADE_OUT);
+
+          if (cancelled) return;
+
+          hideLine(first);
+          hideLine(second);
+
+          setGroupFading((prev) => {
+            const next = [...prev];
+            next[groupIndex] = false;
+            return next;
+          });
+
+          await wait(GROUP_GAP);
         }
       }
     };
@@ -230,31 +270,27 @@ export default function Preloader({
   }, []);
 
   // =========================================================
-  // ENTER
+  // AUTO-ADVANCE TO HOME
   // =========================================================
 
-  const handleEnter = () => {
+  useEffect(() => {
     if (!ready || fadingOut) return;
 
     setFadingOut(true);
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       onEnter();
     }, FADE_OUT);
-  };
+
+    return () => clearTimeout(timer);
+  }, [ready, fadingOut, onEnter]);
 
   // =========================================================
   // RENDER
   // =========================================================
 
   return (
-    <div
-      className={`${styles.preloader} ${
-        fadingOut
-          ? styles.fadeOut
-          : ""
-      }`}
-    >
+    <div className={`${styles.preloader} ${fadingOut ? styles.fadeOut : ""}`}>
       {/* =====================================================
           ARABIAN NIGHT BACKGROUND
       ===================================================== */}
@@ -262,9 +298,7 @@ export default function Preloader({
       <div className={styles.nightSky} />
 
       <div className={styles.stars}>
-        {Array.from({
-          length: 25,
-        }).map((_, i) => (
+        {Array.from({ length: 25 }).map((_, i) => (
           <span key={i} />
         ))}
       </div>
@@ -272,9 +306,7 @@ export default function Preloader({
       <div className={styles.moon} />
 
       <div className={styles.dust}>
-        {Array.from({
-          length: 14,
-        }).map((_, i) => (
+        {Array.from({ length: 14 }).map((_, i) => (
           <span key={i} />
         ))}
       </div>
@@ -286,163 +318,104 @@ export default function Preloader({
       ===================================================== */}
 
       <div className={styles.content}>
-        {TEXT_LINES.map(
-          (line, index) => {
-            const pathId =
-              `preloader-path-${index}`;
+        {LINE_GROUPS.map((group, groupIdx) => (
+          <div
+            key={groupIdx}
+            className={`${styles.lineGroup} ${
+              groupFading[groupIdx] ? styles.lineGroupFading : ""
+            }`}
+          >
+            {group.map((index) => {
+              const line = TEXT_LINES[index];
+              const pathId = `preloader-path-${index}`;
+              const filterId = `preloader-paint-${index}`;
 
-            const filterId =
-              `preloader-paint-${index}`;
-
-            return (
-              <svg
-                key={index}
-                className={styles.lineSvg}
-                viewBox="0 0 1000 120"
-                style={{
-                  opacity:
-                    index <
-                    visibleLines
-                      ? 1
-                      : 0,
-                }}
-              >
-                <defs>
-                  {/* -----------------------------------------
-                      TEXT PATH
-                  ----------------------------------------- */}
-
-                  <path
-                    id={pathId}
-                    d="M 50 80 Q 500 20 950 80"
-                    fill="none"
-                  />
-
-                  {/* -----------------------------------------
-                      PAINT FILTER
-                  ----------------------------------------- */}
-
-                  <filter
-                    id={filterId}
-                    x="-30%"
-                    y="-100%"
-                    width="160%"
-                    height="300%"
-                    filterUnits="objectBoundingBox"
-                  >
-                    <feTurbulence
-                      type="fractalNoise"
-                      baseFrequency="0.012 0.07"
-                      numOctaves={3}
-                      seed={
-                        seedsRef.current[
-                          index
-                        ]
-                      }
-                      result="noise"
-                    />
-
-                    <feColorMatrix
-                      in="noise"
-                      type="matrix"
-                      values="
-                        0 0 0 0 0
-                        0 0 0 0 0
-                        0 0 0 0 0
-                        0.33 0.33 0.33 0 0
-                      "
-                      result="noiseAlpha"
-                    />
-
-                    <feComponentTransfer
-                      in="noiseAlpha"
-                      result="thresholded"
-                    >
-                      <feFuncA
-                        type="linear"
-                        slope="18"
-                        intercept="-18"
-                      >
-                        <animate
-                          ref={(el) => {
-                            /*
-                             * React gives SVGElement | null,
-                             * while our ref expects
-                             * SVGAnimateElement | null.
-                             */
-                            paintAnimRefs.current[
-                              index
-                            ] =
-                              el as
-                                | SVGAnimateElement
-                                | null;
-                          }}
-                          attributeName="intercept"
-                          from="-18"
-                          to="9"
-                          dur={`${PAINT_DURATION}ms`}
-                          begin="indefinite"
-                          fill="freeze"
-                          calcMode="spline"
-                          keySplines="0.22 0.05 0.2 1"
-                          keyTimes="0;1"
-                        />
-                      </feFuncA>
-                    </feComponentTransfer>
-
-                    <feComposite
-                      in="SourceGraphic"
-                      in2="thresholded"
-                      operator="in"
-                    />
-                  </filter>
-                </defs>
-
-                {/* -----------------------------------------
-                    TEXT
-                ----------------------------------------- */}
-
-                <g
-                  style={{
-                    filter: `url(#${filterId})`,
-                  }}
+              return (
+                <svg
+                  key={index}
+                  className={styles.lineSvg}
+                  viewBox="0 0 1000 120"
+                  style={{ opacity: lineVisible[index] ? 1 : 0 }}
                 >
-                  <text
-                    className={
-                      styles.pathText
-                    }
-                    textAnchor="middle"
-                  >
-                    <textPath
-                      href={`#${pathId}`}
-                      startOffset="50%"
+                  <defs>
+                    <path
+                      id={pathId}
+                      d="M 50 80 Q 500 20 950 80"
+                      fill="none"
+                    />
+
+                    <filter
+                      id={filterId}
+                      x="-30%"
+                      y="-100%"
+                      width="160%"
+                      height="300%"
+                      filterUnits="objectBoundingBox"
                     >
-                      {line}
-                    </textPath>
-                  </text>
-                </g>
-              </svg>
-            );
-          },
-        )}
+                      <feTurbulence
+                        type="turbulence"
+                        baseFrequency="0.05 0.09"
+                        numOctaves={4}
+                        seed={seedsRef.current[index]}
+                        result="noise"
+                      />
+
+                      <feColorMatrix
+                        in="noise"
+                        type="matrix"
+                        values="
+                          0 0 0 0 0
+                          0 0 0 0 0
+                          0 0 0 0 0
+                          0.33 0.33 0.33 0 0
+                        "
+                        result="noiseAlpha"
+                      />
+
+                      <feComponentTransfer in="noiseAlpha" result="thresholded">
+                        <feFuncA type="linear" slope="26" intercept="-26">
+                          <animate
+                            ref={(el) => {
+                              paintAnimRefs.current[index] =
+                                el as SVGAnimateElement | null;
+                            }}
+                            attributeName="intercept"
+                            from="-26"
+                            to="13"
+                            dur={`${PAINT_DURATION}ms`}
+                            begin="indefinite"
+                            fill="freeze"
+                            calcMode="spline"
+                            keySplines="0.22 0.05 0.2 1"
+                            keyTimes="0;1"
+                          />
+                        </feFuncA>
+                      </feComponentTransfer>
+
+                      <feComposite
+                        in="SourceGraphic"
+                        in2="thresholded"
+                        operator="in"
+                      />
+                    </filter>
+                  </defs>
+
+                  <g style={{ filter: `url(#${filterId})` }}>
+                    {/* .pathText always carries the glow now — it's on
+                        the whole time the line is visible, including
+                        while the paint filter is still revealing it. */}
+                    <text className={styles.pathText} textAnchor="middle">
+                      <textPath href={`#${pathId}`} startOffset="50%">
+                        {line}
+                      </textPath>
+                    </text>
+                  </g>
+                </svg>
+              );
+            })}
+          </div>
+        ))}
       </div>
-
-      {/* =====================================================
-          ENTER BUTTON
-      ===================================================== */}
-
-      <button
-        type="button"
-        className={`${styles.enterButton} ${
-          ready
-            ? styles.enterButtonVisible
-            : ""
-        }`}
-        onClick={handleEnter}
-        disabled={!ready}
-      >
-        Enter
-      </button>
     </div>
   );
 }

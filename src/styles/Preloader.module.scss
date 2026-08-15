@@ -73,130 +73,31 @@
   animation: twinkle 2.5s ease-in-out infinite;
 }
 
-.stars span:nth-child(1) {
-  top: 8%;
-  left: 12%;
-}
-
-.stars span:nth-child(2) {
-  top: 15%;
-  left: 25%;
-}
-
-.stars span:nth-child(3) {
-  top: 10%;
-  left: 41%;
-}
-
-.stars span:nth-child(4) {
-  top: 21%;
-  left: 57%;
-}
-
-.stars span:nth-child(5) {
-  top: 7%;
-  left: 73%;
-}
-
-.stars span:nth-child(6) {
-  top: 18%;
-  left: 88%;
-}
-
-.stars span:nth-child(7) {
-  top: 29%;
-  left: 8%;
-}
-
-.stars span:nth-child(8) {
-  top: 34%;
-  left: 19%;
-}
-
-.stars span:nth-child(9) {
-  top: 27%;
-  left: 34%;
-}
-
-.stars span:nth-child(10) {
-  top: 38%;
-  left: 48%;
-}
-
-.stars span:nth-child(11) {
-  top: 31%;
-  left: 63%;
-}
-
-.stars span:nth-child(12) {
-  top: 25%;
-  left: 78%;
-}
-
-.stars span:nth-child(13) {
-  top: 40%;
-  left: 93%;
-}
-
-.stars span:nth-child(14) {
-  top: 12%;
-  left: 52%;
-}
-
-.stars span:nth-child(15) {
-  top: 44%;
-  left: 28%;
-}
-
-.stars span:nth-child(16) {
-  top: 36%;
-  left: 70%;
-}
-
-.stars span:nth-child(17) {
-  top: 17%;
-  left: 94%;
-}
-
-.stars span:nth-child(18) {
-  top: 5%;
-  left: 63%;
-}
-
-.stars span:nth-child(19) {
-  top: 45%;
-  left: 5%;
-}
-
-.stars span:nth-child(20) {
-  top: 32%;
-  left: 55%;
-}
-
-.stars span:nth-child(21) {
-  top: 23%;
-  left: 43%;
-}
-
-.stars span:nth-child(22) {
-  top: 11%;
-  left: 6%;
-}
-
-.stars span:nth-child(23) {
-  top: 41%;
-  left: 84%;
-}
-
-.stars span:nth-child(24) {
-  top: 28%;
-  left: 74%;
-}
-
-.stars span:nth-child(25) {
-  top: 48%;
-  left: 38%;
-}
+.stars span:nth-child(1) { top: 8%; left: 12%; }
+.stars span:nth-child(2) { top: 15%; left: 25%; }
+.stars span:nth-child(3) { top: 10%; left: 41%; }
+.stars span:nth-child(4) { top: 21%; left: 57%; }
+.stars span:nth-child(5) { top: 7%; left: 73%; }
+.stars span:nth-child(6) { top: 18%; left: 88%; }
+.stars span:nth-child(7) { top: 29%; left: 8%; }
+.stars span:nth-child(8) { top: 34%; left: 19%; }
+.stars span:nth-child(9) { top: 27%; left: 34%; }
+.stars span:nth-child(10) { top: 38%; left: 48%; }
+.stars span:nth-child(11) { top: 31%; left: 63%; }
+.stars span:nth-child(12) { top: 25%; left: 78%; }
+.stars span:nth-child(13) { top: 40%; left: 93%; }
+.stars span:nth-child(14) { top: 12%; left: 52%; }
+.stars span:nth-child(15) { top: 44%; left: 28%; }
+.stars span:nth-child(16) { top: 36%; left: 70%; }
+.stars span:nth-child(17) { top: 17%; left: 94%; }
+.stars span:nth-child(18) { top: 5%; left: 63%; }
+.stars span:nth-child(19) { top: 45%; left: 5%; }
+.stars span:nth-child(20) { top: 32%; left: 55%; }
+.stars span:nth-child(21) { top: 23%; left: 43%; }
+.stars span:nth-child(22) { top: 11%; left: 6%; }
+.stars span:nth-child(23) { top: 41%; left: 84%; }
+.stars span:nth-child(24) { top: 28%; left: 74%; }
+.stars span:nth-child(25) { top: 48%; left: 38%; }
 
 .stars span:nth-child(3n) {
   width: 3px;
@@ -325,75 +226,20 @@
   animation: dustMove 1.2s ease-out infinite;
 }
 
-.dust span:nth-child(1) {
-  left: 3%;
-  top: 65%;
-}
-
-.dust span:nth-child(2) {
-  left: 10%;
-  top: 30%;
-}
-
-.dust span:nth-child(3) {
-  left: 18%;
-  top: 75%;
-}
-
-.dust span:nth-child(4) {
-  left: 27%;
-  top: 45%;
-}
-
-.dust span:nth-child(5) {
-  left: 35%;
-  top: 65%;
-}
-
-.dust span:nth-child(6) {
-  left: 43%;
-  top: 25%;
-}
-
-.dust span:nth-child(7) {
-  left: 51%;
-  top: 55%;
-}
-
-.dust span:nth-child(8) {
-  left: 60%;
-  top: 35%;
-}
-
-.dust span:nth-child(9) {
-  left: 68%;
-  top: 70%;
-}
-
-.dust span:nth-child(10) {
-  left: 76%;
-  top: 40%;
-}
-
-.dust span:nth-child(11) {
-  left: 84%;
-  top: 65%;
-}
-
-.dust span:nth-child(12) {
-  left: 91%;
-  top: 30%;
-}
-
-.dust span:nth-child(13) {
-  left: 96%;
-  top: 55%;
-}
-
-.dust span:nth-child(14) {
-  left: 50%;
-  top: 80%;
-}
+.dust span:nth-child(1) { left: 3%; top: 65%; }
+.dust span:nth-child(2) { left: 10%; top: 30%; }
+.dust span:nth-child(3) { left: 18%; top: 75%; }
+.dust span:nth-child(4) { left: 27%; top: 45%; }
+.dust span:nth-child(5) { left: 35%; top: 65%; }
+.dust span:nth-child(6) { left: 43%; top: 25%; }
+.dust span:nth-child(7) { left: 51%; top: 55%; }
+.dust span:nth-child(8) { left: 60%; top: 35%; }
+.dust span:nth-child(9) { left: 68%; top: 70%; }
+.dust span:nth-child(10) { left: 76%; top: 40%; }
+.dust span:nth-child(11) { left: 84%; top: 65%; }
+.dust span:nth-child(12) { left: 91%; top: 30%; }
+.dust span:nth-child(13) { left: 96%; top: 55%; }
+.dust span:nth-child(14) { left: 50%; top: 80%; }
 
 @keyframes dustMove {
   0% {
@@ -440,26 +286,42 @@
 
   z-index: 5;
 
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  flex-direction: column;
-
-  gap: 0.15em;
-
   width: 100%;
-
-  text-align: center;
+  height: 100%;
 
   opacity: 1;
+}
+
+/* =========================================================
+   LINE GROUP
+========================================================= */
+
+.lineGroup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15em;
+
+  width: min(90vw, 900px);
+
+  opacity: 1;
+
+  transition: opacity 400ms ease; // matches GROUP_FADE_OUT in the component
+}
+
+.lineGroupFading {
+  opacity: 0;
 }
 
 .lineSvg {
   display: block;
 
-  width: min(90vw, 900px);
+  width: 100%;
 
   height: auto;
 
@@ -468,6 +330,10 @@
 
 /* =========================================================
    TEXT
+   Glow is now baked directly into .pathText — it's present
+   from the moment the line mounts, through the paint reveal,
+   and for as long as the line stays on screen. No class
+   toggling, no timer, nothing to get out of sync.
 ========================================================= */
 
 .pathText {
@@ -478,62 +344,10 @@
   letter-spacing: 0.14em;
 
   fill: #e8e3d8;
-}
 
-/* =========================================================
-   ENTER BUTTON
-========================================================= */
-
-.enterButton {
-  position: absolute;
-
-  left: 50%;
-  bottom: 12%;
-
-  transform: translateX(-50%);
-
-  z-index: 10;
-
-  padding: 12px 34px;
-
-  border: 1px solid rgba(232, 227, 216, 0.6);
-
-  background: transparent;
-
-  color: #e8e3d8;
-
-  font-family: "Syamsiah", sans-serif;
-
-  font-size: 18px;
-
-  letter-spacing: 0.15em;
-
-  cursor: pointer;
-
-  opacity: 0;
-
-  pointer-events: none;
-
-  transition:
-    opacity 300ms ease,
-    background 300ms ease,
-    color 300ms ease;
-}
-
-.enterButtonVisible {
-  opacity: 1;
-
-  pointer-events: auto;
-}
-
-.enterButton:hover {
-  background: #e8e3d8;
-
-  color: #000;
-}
-
-.enterButton:disabled {
-  cursor: default;
+  text-shadow:
+    0 0 10px rgba(255, 230, 160, 0.55),
+    0 0 22px rgba(255, 210, 140, 0.25);
 }
 
 /* =========================================================
