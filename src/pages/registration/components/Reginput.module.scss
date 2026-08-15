@@ -1,3 +1,244 @@
+// // .reginputContainer {
+// //   width: 100%;
+// //   height: 20%;
+// //   display: flex;
+// //   flex-direction: column;
+// //   align-items: center;
+// //   justify-content: center;
+
+// //   .inputContainer {
+// //     width: 80%;
+// //     height: 40%;
+// //     display: flex;
+// //     flex-direction: column;
+// //     align-items: center;
+// //     background-position: center;
+// //     background-size: contain;
+// //     background-repeat: no-repeat;
+
+// //     /* ONLY normal text inputs */
+// //     > input:not([type="radio"]):not([type="checkbox"]) {
+// //       width: 100%;
+// //       height: 100%;
+// //       border: none;
+// //       outline: none;
+// //       background: transparent;
+// //     }
+// //   }
+// // }
+
+// // .inputTitle {
+// //   margin: 0;
+// //   padding: 0;
+// //   font-family: "Cinzel", sans-serif;
+// //   font-size: 1.5rem;
+// //   font-weight: 700;
+// //   color: #38170B;
+// // }
+
+// .reginputContainer {
+//   width: 100%;
+//   height: 20%;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+// }
+
+// .inputTitle {
+//   margin: 0;
+//   padding: 0;
+
+//   font-family: "Cinzel", sans-serif;
+//   font-size: 1.2rem;
+//   font-weight: 700;
+
+//   color: #38170b;
+// }
+
+// .inputContainer {
+//   width: 100%;
+//   height: 7vh;
+
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+
+//   background-position: center;
+//   background-size: contain;
+//   background-repeat: no-repeat;
+
+//   input {
+//     width: 50%;
+//     height: 100%;
+//     border: none;
+//     outline: none;
+//     background: transparent;
+//     font-family: "Cinzel", sans-serif;
+//     font-size: 1rem;
+//     color: #38170b;
+//     text-align: center;
+//     &::placeholder {
+//       color: #777;
+//     }
+
+//     &:disabled {
+//       opacity: 1;
+//       color: #777;
+//       cursor: default;
+//     }
+//   }
+// }
+
+// /* ========================================= */
+// /* REACT SELECT                              */
+// /* ========================================= */
+
+// /*
+//   React Select generates classes such as:
+//   .regselect__control
+//   .regselect__value-container
+//   etc.
+
+//   Since this file is a CSS module,
+//   :global() is required.
+// */
+
+// :global(.regselect__control) {
+//   width: 100% !important;
+//   min-height: 0 !important;
+
+//   background: transparent !important;
+
+//   border: none !important;
+//   border-color: transparent !important;
+
+//   box-shadow: none !important;
+
+//   cursor: pointer !important;
+// }
+
+// :global(.regselect__control:hover) {
+//   border: none !important;
+//   border-color: transparent !important;
+
+//   box-shadow: none !important;
+// }
+
+// :global(.regselect__control--is-focused) {
+//   border: none !important;
+//   border-color: transparent !important;
+
+//   box-shadow: none !important;
+// }
+
+// :global(.regselect__value-container) {
+//   padding: 0 !important;
+
+//   background: transparent !important;
+
+//   display: flex !important;
+//   justify-content: center !important;
+// }
+
+// :global(.regselect__placeholder) {
+//   margin: 0 !important;
+
+//   color: #777 !important;
+
+//   font-family: "Cinzel", sans-serif !important;
+//   font-size: 1rem !important;
+
+//   text-align: center !important;
+// }
+
+// :global(.regselect__single-value) {
+//   margin: 0 !important;
+
+//   color: #38170b !important;
+
+//   font-family: "Cinzel", sans-serif !important;
+//   font-size: 1rem !important;
+
+//   text-align: center !important;
+// }
+
+// :global(.regselect__input-container) {
+//   margin: 0 !important;
+//   padding: 0 !important;
+
+//   background: transparent !important;
+// }
+
+// :global(.regselect__input) {
+//   margin: 0 !important;
+//   padding: 0 !important;
+
+//   background: transparent !important;
+
+//   border: none !important;
+//   outline: none !important;
+//   box-shadow: none !important;
+// }
+
+// :global(.regselect__indicators) {
+//   background: transparent !important;
+// }
+
+// :global(.regselect__indicator-separator) {
+//   display: block !important;
+
+//   background: rgba(56, 23, 11, 0.3) !important;
+// }
+
+// :global(.regselect__indicator) {
+//   padding: 4px !important;
+
+//   color: #38170b !important;
+// }
+
+// :global(.regselect__indicator:hover) {
+//   color: #38170b !important;
+// }
+
+// :global(.regselect__menu) {
+//   z-index: 1000 !important;
+
+//   color: #38170b !important;
+
+//   font-family: "Cinzel", sans-serif !important;
+// }
+
+// :global(.regselect__option) {
+//   color: #38170b !important;
+
+//   cursor: pointer !important;
+// }
+
+// :global(.regselect__option--is-selected) {
+//   background: #d6b77a !important;
+//   color: #38170b !important;
+// }
+
+// :global(.regselect__option--is-focused) {
+//   background: #ead5a8 !important;
+//   color: #38170b !important;
+// }
+
+// /* Remove the white background when select is disabled */
+
+// :global(.regselect__control--is-disabled) {
+//   background: transparent !important;
+//   border: none !important;
+//   opacity: 1 !important;
+// }
+
+// :global(.regselect__single-value--is-disabled) {
+//   color: #777 !important;
+// }
+
+
+
 // .reginputContainer {
 //   width: 100%;
 //   height: 20%;
@@ -87,6 +328,11 @@
       color: #777;
       cursor: default;
     }
+  }
+
+  input::placeholder{
+    color: white;
+    font-weight: 400;
   }
 }
 
@@ -204,25 +450,51 @@
 :global(.regselect__menu) {
   z-index: 1000 !important;
 
+  /* wider than the input box, centered under it */
+  width: calc(100% + 160px) !important;
+  min-width: calc(100% + 80px) !important;
+  left: -80px !important;
+  box-sizing: border-box !important;
+
+  /* dropdown looks like the book/parchment background */
+  background: #ecdcb0 !important;
+  border: 1px solid #c9a769 !important;
+  border-radius: 8px !important;
+
+  overflow: hidden !important;
+
   color: #38170b !important;
 
   font-family: "Cinzel", sans-serif !important;
 }
 
+:global(.regselect__menu-portal) {
+  box-sizing: border-box !important;
+}
+
+:global(.regselect__menu-list) {
+  background: transparent !important;
+  padding: 4px !important;
+}
+
 :global(.regselect__option) {
+  background: transparent !important;
   color: #38170b !important;
 
   cursor: pointer !important;
+
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 :global(.regselect__option--is-selected) {
-  background: #d6b77a !important;
+  background: #c9a769 !important;
   color: #38170b !important;
 }
 
+/* hover / keyboard-focus -> color of the main (outer) background */
 :global(.regselect__option--is-focused) {
-  background: #ead5a8 !important;
-  color: #38170b !important;
+  background: #2a180d !important;
+  color: #f5e6c8 !important;
 }
 
 /* Remove the white background when select is disabled */
