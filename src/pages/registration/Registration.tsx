@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import styles from "./Registration.module.scss";
 
 import Instructions from "../../pages/registration/components/Instructions/Instructions";
-import Register from "../../pages/registration/components/Register/Register";
+import Register from "../../pages/registration/components/reg";
 import Events from "../../pages/registration/components/Events/Events";
 
 import { useState } from "react";
@@ -26,7 +26,7 @@ const Registration = ({ goToPage }: RegistrationProps) => {
   const [_cookies, setCookies] = useCookies([
     "Authorization",
     "user-auth",
-    "Access_token",
+    "id_token",
   ]);
 
   const breadcrumbJsonLd = {
@@ -156,7 +156,7 @@ const Registration = ({ goToPage }: RegistrationProps) => {
           console.log(err);
         });
     };
-
+console.log("CURRENT PAGE:", currentPage);
   return (
     <div className={styles.instrback}>
       <Helmet>
