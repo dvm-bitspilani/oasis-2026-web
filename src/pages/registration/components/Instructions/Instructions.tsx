@@ -119,7 +119,7 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
             shape="pill"
             size="large"
             text="signin_with"
-            width={window.innerWidth < 500 ? "200" : "350"}
+            width={window.innerWidth < 500 ? "200" : "305"}
           />
         </div>
         </div>

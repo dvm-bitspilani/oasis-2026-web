@@ -88,18 +88,26 @@
     width: 20vw;
     height: 3.216vw;
     margin-top: 20px;
-    
+    position: relative;
+    overflow: hidden; // clip the iframe to your button's box
+
     &:hover {
-      filter: brightness(0.8)
+      cursor: default;
     }
-    &:focus {
-      outline: none;
+
+    &:has(div:hover) {
+      filter: brightness(0.8);
     }
+
     div {
-      // visibility: hidden;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.01;
     }
   }
-}
+}  
 
 @media (max-width: 1200px) and (max-aspect-ratio: 1.45) {
   .content {
