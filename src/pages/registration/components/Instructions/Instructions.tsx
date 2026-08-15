@@ -82,9 +82,7 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
         )}
         <div className={styles.content} ref={ref}>
           <div className={styles.headingCont}>
-            <img src={null} alt="left" />
             <h3 className={styles.heading}>INSTRUCTIONS</h3>
-            <img src={null} alt="right" />
           </div>
           <ul className={styles.instr}>
             <li>
@@ -103,21 +101,11 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
             </li>
           </ul>
 
-           <div className={styles.googleButton}>
-          <GoogleLogin
-            onSuccess={onGoogleSignIn}
-            onError={() => console.log("Login Failed")}
-            theme="filled_blue"
-            shape="pill"
-            size="large"
-            text="signin_with"
-            width={window.innerWidth < 500 ? "200" : "350"}
-          />
+          <button className={styles.googleButton} onClick={onGoogleSignIn}>
+            Sign in with Google
+          </button>
         </div>
-      </div>
       </>
     );
   }
-
-
 export default Instructions;
