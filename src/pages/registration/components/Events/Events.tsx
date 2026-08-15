@@ -196,6 +196,8 @@ export default function Events({
         },
       ]);
     }
+
+    setActiveEvent(event);
   };
 
   /* ========================================= */
@@ -395,6 +397,9 @@ export default function Events({
                         item.id === event.id,
                     );
 
+                  const active =
+                    activeEvent?.id === event.id;
+
                   return (
                     <button
                       key={event.id}
@@ -404,6 +409,10 @@ export default function Events({
                       } ${
                         selected
                           ? styles.selected
+                          : ""
+                      } ${
+                        active
+                          ? styles.active
                           : ""
                       }`}
                       style={{
@@ -513,8 +522,6 @@ export default function Events({
                       styles.eventNavigation
                     }
                   >
-                    {/* PREVIOUS */}
-
                     <button
                       type="button"
                       onClick={
@@ -527,8 +534,6 @@ export default function Events({
                     >
                       ‹
                     </button>
-
-                    {/* PAGE NUMBERS */}
 
                     <div
                       className={
@@ -593,8 +598,6 @@ export default function Events({
                         )
                       )}
                     </div>
-
-                    {/* NEXT */}
 
                     <button
                       type="button"
