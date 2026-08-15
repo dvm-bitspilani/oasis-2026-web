@@ -5,8 +5,7 @@ import leftbottom from "../../../assets/registration/reg/leftbottom.png"
 import rightbottom from "../../../assets/registration/reg/rightbottom.png"
 import lefttop from "../../../assets/registration/reg/lefttop.png"
 import righttop from "../../../assets/registration/reg/righttop.png"
-import book from "../../../assets/registration/reg/book.png"
-import 
+import book from "../../../assets/registration/reg/book.png" 
 export default function Reg() {
   return (
     <div className={styles.registerContainer} 
