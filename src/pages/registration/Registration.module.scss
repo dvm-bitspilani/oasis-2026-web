@@ -1,7 +1,5 @@
-// @use "/src/assets/global.scss" as *;
-
 .instrback {
-  background-image:url(../../assets/registration/reg/RegBg.png);
+  background-image: url(../../assets/registration/reg/RegBg.png);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -33,8 +31,6 @@
     aspect-ratio: 1;
     z-index: 0;
     border-radius: 50%;
-    // box-shadow: 0px 0px 10px white;
-    // background-color: white;
     display: inline-block;
   }
 
@@ -42,7 +38,8 @@
     z-index: 2;
     margin-top: 1.5vw;
     width: 45vw;
-    background: center / contain no-repeat url("/svgs/registration/birds.svg");
+    background: center / contain no-repeat
+      url("/svgs/registration/birds.svg");
     background-blend-mode: overlay;
     display: flex;
     justify-content: center;
@@ -53,6 +50,7 @@
       object-fit: contain;
     }
   }
+
   .backBtn {
     outline: none;
     border: none;
@@ -64,15 +62,18 @@
     width: 4vw;
     height: 4vw;
     background: transparent;
+
     &:focus {
       outline: none;
     }
+
     img {
       width: 100%;
       height: 100%;
       object-fit: contain;
     }
   }
+
   .inActive {
     display: none;
   }
@@ -80,7 +81,6 @@
 
 @media (max-width: 1200px) and (max-aspect-ratio: 1.45) {
   .instrback {
-    // height: 100svh;
     overflow-y: hidden;
 
     .overlay {
@@ -92,6 +92,7 @@
       background: rgba(0, 0, 0, 0.77);
       z-index: 1;
     }
+
     .backgroundImage {
       bottom: 0;
       left: 0;
@@ -101,35 +102,40 @@
       object-fit: contain;
       object-position: 0 0;
     }
+
     .sun {
       position: absolute;
       bottom: 45vw;
       left: 50%;
       transform: translateX(-50%);
-      // transform: translateY(-25%);
       height: 37vw;
       z-index: 0;
     }
+
     .birds {
       width: 85vw;
     }
+
     .backBtn {
       width: 8vw;
       height: 8vw;
     }
   }
 }
+
 @media (max-width: 1200px) and (max-aspect-ratio: 0.75) {
   .instrback {
     .birds {
       width: 85vw;
     }
+
     .sun {
       position: absolute;
       bottom: 63vw;
       height: 67vw;
       filter: blur(1px);
     }
+
     .backBtn {
       background: #070707;
       width: 14vw;
