@@ -3,13 +3,16 @@ import axios from "axios";
 
 import styles from "./Events.module.scss";
 
-import ConfirmModal from "../ConfirmModal/ConfirmModal";
-
+import bg from "../../../../assets/registration/reg/inputBg.png";
+import btn from "../../../../assets/registration/reg/btn.png";
 import RegBg from "../../../../assets/registration/reg/RegBg.png";
+import searchBg from "../../../../assets/registration/reg/searchBg.png";
+
 import leftbottom from "../../../../assets/registration/reg/leftbottom.png";
 import lefttop from "../../../../assets/registration/reg/lefttop.png";
 import rightbottom from "../../../../assets/registration/reg/rightbottom.png";
 import righttop from "../../../../assets/registration/reg/righttop.png";
+
 import book from "../../../../assets/registration/reg/book.png";
 
 interface Event {
@@ -120,9 +123,6 @@ export default function Events({
   const [activeEvent, setActiveEvent] =
     useState<Event | null>(null);
 
-  const [confirmModal, setConfirmModal] =
-    useState(false);
-
   const [loading, setLoading] = useState(true);
 
   /* ========================================= */
@@ -150,9 +150,11 @@ export default function Events({
         }
       })
       .catch((error) => {
-        console.error("EVENT API ERROR:", error);
+        console.error(
+          "EVENT API ERROR:",
+          error,
+        );
 
-        // Use test data if API fails
         setEvents(TEST_EVENTS);
       })
       .finally(() => {
@@ -171,7 +173,7 @@ export default function Events({
   );
 
   /* ========================================= */
-  /* SELECT / REMOVE EVENT                    */
+  /* SELECT / REMOVE EVENT                     */
   /* ========================================= */
 
   const handleEvent = (event: Event) => {
@@ -201,18 +203,26 @@ export default function Events({
   /* ========================================= */
 
   const goToNextEvent = () => {
-    if (!activeEvent || filteredEvents.length === 0) {
+    if (
+      !activeEvent ||
+      filteredEvents.length === 0
+    ) {
       return;
     }
 
-    const currentIndex = filteredEvents.findIndex(
-      (event) => event.id === activeEvent.id,
-    );
+    const currentIndex =
+      filteredEvents.findIndex(
+        (event) =>
+          event.id === activeEvent.id,
+      );
 
     const nextIndex =
-      (currentIndex + 1) % filteredEvents.length;
+      (currentIndex + 1) %
+      filteredEvents.length;
 
-    setActiveEvent(filteredEvents[nextIndex]);
+    setActiveEvent(
+      filteredEvents[nextIndex],
+    );
   };
 
   /* ========================================= */
@@ -220,202 +230,256 @@ export default function Events({
   /* ========================================= */
 
   const goToPreviousEvent = () => {
-    if (!activeEvent || filteredEvents.length === 0) {
+    if (
+      !activeEvent ||
+      filteredEvents.length === 0
+    ) {
       return;
     }
 
-    const currentIndex = filteredEvents.findIndex(
-      (event) => event.id === activeEvent.id,
-    );
+    const currentIndex =
+      filteredEvents.findIndex(
+        (event) =>
+          event.id === activeEvent.id,
+      );
 
     const previousIndex =
-      (currentIndex - 1 + filteredEvents.length) %
+      (currentIndex -
+        1 +
+        filteredEvents.length) %
       filteredEvents.length;
 
-    setActiveEvent(filteredEvents[previousIndex]);
+    setActiveEvent(
+      filteredEvents[previousIndex],
+    );
   };
 
   /* ========================================= */
-  /* SUBMIT                                    */
+  /* GO TO PAGE                                */
   /* ========================================= */
 
-  const handleSubmit = () => {
-    if (selectedEvents.length === 0) {
+  const goToPage = (index: number) => {
+    if (
+      filteredEvents.length === 0 ||
+      index < 0 ||
+      index >= filteredEvents.length
+    ) {
       return;
     }
 
-    if (setUserData) {
-      setUserData((previousData: any) => ({
-        ...previousData,
-        events: selectedEvents.map(
-          (event) => event.id,
-        ),
-      }));
-    }
-
-    setConfirmModal(true);
+    setActiveEvent(filteredEvents[index]);
   };
+
+  /* ========================================= */
+  /* CURRENT PAGE                              */
+  /* ========================================= */
+
+  const currentIndex = activeEvent
+    ? filteredEvents.findIndex(
+        (event) =>
+          event.id === activeEvent.id,
+      )
+    : -1;
+
+  const pageOffsets = [-1, 0, 1];
 
   /* ========================================= */
   /* RENDER                                    */
   /* ========================================= */
 
   return (
-    <>
+    <div
+      className={styles.eventsContainer}
+      style={{
+        backgroundImage: `url(${RegBg})`,
+      }}
+    >
+      {/* ================================= */}
+      {/* DECORATIONS                        */}
+      {/* ================================= */}
+
+      <img
+        src={leftbottom}
+        className={styles.leftbottom}
+        alt=""
+      />
+
+      <img
+        src={lefttop}
+        className={styles.lefttop}
+        alt=""
+      />
+
+      <img
+        src={rightbottom}
+        className={styles.rightbottom}
+        alt=""
+      />
+
+      <img
+        src={righttop}
+        className={styles.righttop}
+        alt=""
+      />
+
+      {/* ================================= */}
+      {/* BOOK                               */}
+      {/* ================================= */}
+
       <div
-        className={styles.eventsContainer}
+        className={styles.bookContainer}
         style={{
-          backgroundImage: `url(${RegBg})`,
+          backgroundImage: `url(${book})`,
         }}
-      >
-        {/* ================================= */}
-        {/* DECORATIONS                        */}
-        {/* ================================= */}
+      />
 
-        <img
-          src={leftbottom}
-          className={styles.leftbottom}
-          alt=""
-        />
+      {/* ================================= */}
+      {/* CONTENT                            */}
+      {/* ================================= */}
 
-        <img
-          src={lefttop}
-          className={styles.lefttop}
-          alt=""
-        />
+      <div className={styles.content}>
+        <div className={styles.eventsArea}>
 
-        <img
-          src={rightbottom}
-          className={styles.rightbottom}
-          alt=""
-        />
+          {/* ================================= */}
+          {/* LEFT PAGE                         */}
+          {/* ================================= */}
 
-        <img
-          src={righttop}
-          className={styles.righttop}
-          alt=""
-        />
-
-        {/* ================================= */}
-        {/* BOOK                               */}
-        {/* ================================= */}
-
-        <div
-          className={styles.bookContainer}
-          style={{
-            backgroundImage: `url(${book})`,
-          }}
-        />
-
-        {/* ================================= */}
-        {/* CONTENT                            */}
-        {/* ================================= */}
-
-        <div className={styles.content}>
-          <div className={styles.eventsArea}>
-
-            {/* ================================= */}
-            {/* LEFT SIDE                         */}
-            {/* ================================= */}
-
-            <div className={styles.eventsPage}>
-
-              <h1 className={styles.chooseEventsHeading}>
-                CHOOSE EVENTS
-              </h1>
-
-              {/* SEARCH */}
-
-              <div className={styles.searchContainer}>
-                <input
-                  id="event-search"
-                  name="event-search"
-                  type="text"
-                  placeholder="SEARCH EVENTS"
-                  value={search}
-                  onChange={(e) =>
-                    setSearch(e.target.value)
-                  }
-                  autoComplete="off"
-                />
-              </div>
-
-              {/* EVENTS LIST */}
-
-              {loading ? (
-                <div className={styles.message}>
-                  LOADING EVENTS...
-                </div>
-              ) : filteredEvents.length > 0 ? (
-                <div className={styles.eventsList}>
-                  {filteredEvents.map((event) => {
-                    const selected =
-                      selectedEvents.some(
-                        (item) =>
-                          item.id === event.id,
-                      );
-
-                    return (
-                      <button
-                        key={event.id}
-                        type="button"
-                        className={`${styles.eventItem} ${
-                          selected
-                            ? styles.selected
-                            : ""
-                        }`}
-                        onMouseEnter={() =>
-                          setActiveEvent(event)
-                        }
-                        onFocus={() =>
-                          setActiveEvent(event)
-                        }
-                        onClick={() =>
-                          handleEvent(event)
-                        }
-                      >
-                        <span>
-                          {event.name}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className={styles.message}>
-                  NO EVENTS FOUND
-                </div>
-              )}
-
-              {/* SELECTED COUNT */}
-
-              <div className={styles.selectedCount}>
-                {selectedEvents.length} EVENTS SELECTED
-              </div>
-            </div>
-
-            {/* ================================= */}
-            {/* RIGHT SIDE                        */}
-            {/* ================================= */}
-
-            <div
-              className={styles.infoPage}
-              onMouseLeave={() =>
-                setActiveEvent(null)
+          <div className={styles.eventsPage}>
+            <h1
+              className={
+                styles.chooseEventsHeading
               }
             >
+              Choose Events
+            </h1>
+
+            {/* SEARCH */}
+
+            <div
+              className={
+                styles.searchContainer
+              }
+              style={{
+                backgroundImage: `url(${searchBg})`,
+              }}
+            >
+              <input
+                id="event-search"
+                name="event-search"
+                type="text"
+                placeholder="SEARCH EVENTS"
+                value={search}
+                onChange={(e) =>
+                  setSearch(e.target.value)
+                }
+                autoComplete="off"
+              />
+            </div>
+
+            {/* EVENTS LIST */}
+
+            {loading ? (
+              <div
+                className={styles.message}
+              >
+                LOADING EVENTS...
+              </div>
+            ) : filteredEvents.length > 0 ? (
+              <div
+                className={styles.eventsList}
+              >
+                {filteredEvents.map((event) => {
+                  const selected =
+                    selectedEvents.some(
+                      (item) =>
+                        item.id === event.id,
+                    );
+
+                  return (
+                    <button
+                      key={event.id}
+                      type="button"
+                      className={`${
+                        styles.eventItem
+                      } ${
+                        selected
+                          ? styles.selected
+                          : ""
+                      }`}
+                      style={{
+                        backgroundImage: `url(${bg})`,
+                      }}
+                      onMouseEnter={() =>
+                        setActiveEvent(event)
+                      }
+                      onFocus={() =>
+                        setActiveEvent(event)
+                      }
+                      onClick={() =>
+                        handleEvent(event)
+                      }
+                    >
+                      <span>
+                        {event.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div
+                className={styles.message}
+              >
+                NO EVENTS FOUND
+              </div>
+            )}
+          </div>
+
+          {/* ================================= */}
+          {/* RIGHT PAGE                        */}
+          {/* ================================= */}
+
+          <div
+            className={styles.infoPage}
+            onMouseLeave={() =>
+              setActiveEvent(null)
+            }
+          >
+            <div className={styles.rightOuter}>
+
+              {/* ALWAYS VISIBLE */}
+
+              <h1
+                className={
+                  styles.eventHeading
+                }
+              >
+                Event Title
+              </h1>
+
+              {/* EVENT CONTENT */}
+
               {activeEvent ? (
-                <div className={styles.eventInfo}>
+                <div
+                  className={styles.eventInfo}
+                >
+                  {/* EVENT NAME */}
 
-                  {/* EVENT TITLE */}
-
-                  <h1 className={styles.eventTitle}>
+                  <h2
+                    className={
+                      styles.eventTitle
+                    }
+                  >
                     {activeEvent.name}
-                  </h1>
+                  </h2>
 
                   {/* DESCRIPTION */}
 
-                  <p className={styles.eventDescription}>
+                  <p
+                    className={
+                      styles.eventDescription
+                    }
+                  >
                     {activeEvent.about}
                   </p>
 
@@ -424,14 +488,11 @@ export default function Events({
                   <button
                     type="button"
                     className={
-                      selectedEvents.some(
-                        (event) =>
-                          event.id ===
-                          activeEvent.id,
-                      )
-                        ? styles.removeButton
-                        : styles.addButton
+                      styles.eventActionButton
                     }
+                    style={{
+                      backgroundImage: `url(${btn})`,
+                    }}
                     onClick={() =>
                       handleEvent(activeEvent)
                     }
@@ -448,42 +509,111 @@ export default function Events({
                   {/* NAVIGATION */}
 
                   <div
-                    className={styles.eventNavigation}
+                    className={
+                      styles.eventNavigation
+                    }
                   >
+                    {/* PREVIOUS */}
+
                     <button
                       type="button"
                       onClick={
                         goToPreviousEvent
                       }
                       aria-label="Previous event"
+                      className={
+                        styles.navArrow
+                      }
                     >
-                      ←
+                      ‹
                     </button>
 
-                    <span>
-                      {filteredEvents.findIndex(
-                        (event) =>
-                          event.id ===
-                          activeEvent.id,
-                      ) + 1}
-                      {" / "}
-                      {filteredEvents.length}
-                    </span>
+                    {/* PAGE NUMBERS */}
+
+                    <div
+                      className={
+                        styles.pageNumbers
+                      }
+                    >
+                      {filteredEvents.length <=
+                      3 ? (
+                        filteredEvents.map(
+                          (event, index) => (
+                            <button
+                              key={event.id}
+                              type="button"
+                              className={`${
+                                styles.pageNumber
+                              } ${
+                                index ===
+                                currentIndex
+                                  ? styles.currentPage
+                                  : ""
+                              }`}
+                              onClick={() =>
+                                goToPage(
+                                  index,
+                                )
+                              }
+                            >
+                              {index + 1}
+                            </button>
+                          ),
+                        )
+                      ) : (
+                        pageOffsets.map(
+                          (offset) => {
+                            const pageIndex =
+                              (currentIndex +
+                                offset +
+                                filteredEvents.length) %
+                              filteredEvents.length;
+
+                            return (
+                              <button
+                                key={offset}
+                                type="button"
+                                className={`${
+                                  styles.pageNumber
+                                } ${
+                                  offset === 0
+                                    ? styles.currentPage
+                                    : ""
+                                }`}
+                                onClick={() =>
+                                  goToPage(
+                                    pageIndex,
+                                  )
+                                }
+                              >
+                                {pageIndex + 1}
+                              </button>
+                            );
+                          },
+                        )
+                      )}
+                    </div>
+
+                    {/* NEXT */}
 
                     <button
                       type="button"
                       onClick={goToNextEvent}
                       aria-label="Next event"
+                      className={
+                        styles.navArrow
+                      }
                     >
-                      →
+                      ›
                     </button>
                   </div>
-
                 </div>
               ) : (
-                <div className={styles.emptyInfo}>
-                  <h2>EVENT INFO</h2>
-
+                <div
+                  className={
+                    styles.emptyInfo
+                  }
+                >
                   <p>
                     HOVER OVER AN EVENT
                     <br />
@@ -492,37 +622,9 @@ export default function Events({
                 </div>
               )}
             </div>
-
           </div>
         </div>
-
-        {/* ================================= */}
-        {/* CONFIRM BUTTON                     */}
-        {/* ================================= */}
-
-        <button
-          type="button"
-          className={styles.confirmButton}
-          onClick={handleSubmit}
-          disabled={selectedEvents.length === 0}
-        >
-          CONFIRM
-        </button>
       </div>
-
-      {/* =================================== */}
-      {/* CONFIRM MODAL                       */}
-      {/* =================================== */}
-
-      {confirmModal && (
-        <ConfirmModal
-          onCancel={() =>
-            setConfirmModal(false)
-          }
-          selectedEvents={selectedEvents}
-          userData={userData}
-        />
-      )}
-    </>
+    </div>
   );
 }

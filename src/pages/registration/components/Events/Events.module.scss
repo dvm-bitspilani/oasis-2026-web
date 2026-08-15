@@ -1,14 +1,12 @@
 .eventsContainer {
   position: relative;
-
+  overscroll-behavior: none;
   width: 100%;
   min-height: 100svh;
 
   overflow: hidden;
 
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+  background: transparent;
 
   display: flex;
   align-items: center;
@@ -65,7 +63,7 @@
 
   inset: 0;
 
-  z-index: 2;
+  z-index: 4;
 
   background-position: center;
   background-size: contain;
@@ -114,20 +112,28 @@
   align-items: center;
 
   min-width: 0;
+
+  background: transparent;
 }
 
 /* ========================================= */
-/* LEFT HEADING                              */
+/* CHOOSE EVENTS HEADING                     */
 /* ========================================= */
 
 .chooseEventsHeading {
+  width: 100%;
+
   margin: 0 0 1.5vw;
 
-  color: #38170b;
+  color: #6c1700;
 
-  font-family: "Cinzel", serif;
-  font-size: clamp(1.5rem, 2.5vw, 3rem);
-  font-weight: 700;
+  font-family: "Syamsiah", sans-serif;
+
+  font-size: clamp(3rem, 7vw, 5rem);
+
+  font-weight: 400;
+
+  line-height: 1;
 
   text-align: center;
 }
@@ -146,10 +152,11 @@
 
   display: flex;
   align-items: center;
+  justify-content: center;
 
-  background: rgba(255, 255, 255, 0.25);
-
-  border: 1px solid rgba(56, 23, 11, 0.6);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
 
   box-sizing: border-box;
 }
@@ -171,7 +178,12 @@
 
   font-size: clamp(12px, 1vw, 18px);
 
+  text-align: center;
+
   box-sizing: border-box;
+
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .searchContainer input::placeholder {
@@ -200,6 +212,8 @@
 
   box-sizing: border-box;
 
+  background: transparent;
+
   scrollbar-width: none;
 }
 
@@ -223,9 +237,12 @@
 
   padding: 0 1vw;
 
-  border: 1px solid rgba(56, 23, 11, 0.5);
+  border: none;
 
-  background: rgba(255, 255, 255, 0.2);
+  background-color: transparent;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
 
   color: #38170b;
 
@@ -239,48 +256,110 @@
 
   overflow: hidden;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  -webkit-tap-highlight-color: transparent;
+
   transition:
-    transform 0.25s ease,
-    background 0.25s ease,
-    box-shadow 0.25s ease,
-    border-color 0.25s ease;
+    transform 0.3s ease,
+    filter 0.3s ease;
 }
+
+/* ========================================= */
+/* EVENT LABEL                               */
+/* ========================================= */
 
 .eventItem span {
   position: relative;
 
   z-index: 1;
 
+  display: block;
+
+  width: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  text-align: center;
+
+  line-height: 1;
+
   transition:
-    transform 0.25s ease,
-    letter-spacing 0.25s ease;
+    transform 0.3s ease,
+    letter-spacing 0.3s ease,
+    text-shadow 0.3s ease;
 }
 
+/* ========================================= */
+/* EVENT HOVER                               */
+/* ========================================= */
+
 .eventItem:hover {
-  transform: translateX(0.5vw) scale(1.02);
+  transform: scale(1.06);
 
-  background: rgba(229, 195, 132, 0.4);
-
-  border-color: #38170b;
-
-  box-shadow:
-    0 0 10px rgba(229, 195, 132, 0.55),
-    inset 0 0 10px rgba(255, 255, 255, 0.2);
+  filter:
+    brightness(1.08)
+    drop-shadow(
+      0 0 8px rgba(229, 195, 132, 0.45)
+    );
 }
 
 .eventItem:hover span {
-  transform: translateX(0.3vw);
+  transform: scale(1.04);
 
   letter-spacing: 0.04em;
+
+  text-shadow:
+    0 0 6px rgba(229, 195, 132, 0.7);
 }
 
+/* ========================================= */
+/* EVENT SELECTED / CLICKED                  */
+/* ========================================= */
+
 .eventItem.selected {
-  background: rgba(229, 195, 132, 0.55);
+  transform: scale(1.04);
 
-  border-color: #38170b;
+  filter:
+    brightness(1.12)
+    drop-shadow(
+      0 0 10px rgba(229, 195, 132, 0.65)
+    );
 
-  box-shadow:
-    inset 0 0 8px rgba(56, 23, 11, 0.15);
+  animation: eventSelected 0.35s ease-out;
+}
+
+.eventItem.selected span {
+  letter-spacing: 0.04em;
+
+  text-shadow:
+    0 0 7px rgba(229, 195, 132, 0.8);
+}
+
+@keyframes eventSelected {
+  0% {
+    transform: scale(0.94);
+  }
+
+  60% {
+    transform: scale(1.07);
+  }
+
+  100% {
+    transform: scale(1.04);
+  }
+}
+
+.eventItem:active {
+  transform: scale(0.97);
 }
 
 /* ========================================= */
@@ -296,6 +375,8 @@
   align-items: center;
   justify-content: center;
 
+  background: transparent;
+
   color: #38170b;
 
   font-family: "Cinzel", serif;
@@ -306,25 +387,7 @@
 }
 
 /* ========================================= */
-/* SELECTED COUNT                            */
-/* ========================================= */
-
-.selectedCount {
-  margin-top: 1vw;
-
-  color: #38170b;
-
-  font-family: "Cinzel", serif;
-
-  font-size: clamp(11px, 0.9vw, 16px);
-
-  font-weight: 700;
-
-  text-align: center;
-}
-
-/* ========================================= */
-/* RIGHT INFO PAGE                           */
+/* RIGHT PAGE                                */
 /* ========================================= */
 
 .infoPage {
@@ -332,7 +395,7 @@
 
   min-height: 34vw;
 
-  padding: 3vw;
+  padding: 0;
 
   box-sizing: border-box;
 
@@ -343,22 +406,74 @@
   position: relative;
 
   color: #38170b;
+
+  background: transparent;
+
+  text-align: center;
 }
 
 /* ========================================= */
-/* EVENT INFO                                */
+/* RIGHT OUTER                               */
 /* ========================================= */
 
-.eventInfo {
+.rightOuter {
   width: 100%;
   height: 100%;
-
+  margin-left: 10%;
   display: flex;
   flex-direction: column;
 
   align-items: center;
 
+  box-sizing: border-box;
+  // background-color: red;
   text-align: center;
+}
+
+/* ========================================= */
+/* EVENT TITLE HEADING                       */
+/* ========================================= */
+
+.eventHeading {
+  width: 100%;
+
+  margin: 0 0 1.5vw;
+
+  color: #6c1700;
+
+  font-family: "Syamsiah", sans-serif;
+
+  font-size: clamp(3rem, 7vw, 5rem);
+
+  font-weight: 400;
+
+  line-height: 1;
+
+  text-align: center;
+
+  flex-shrink: 0;
+}
+
+/* ========================================= */
+/* RIGHT EVENT CONTENT                       */
+/* ========================================= */
+
+.eventInfo {
+  width: 80%;
+
+  max-width: 450px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  margin: 0 auto;
 
   animation: eventAppear 0.3s ease forwards;
 }
@@ -366,20 +481,24 @@
 @keyframes eventAppear {
   from {
     opacity: 0;
-    transform: translateX(1vw);
+
+    transform: translateY(0.8vw);
   }
 
   to {
     opacity: 1;
-    transform: translateX(0);
+
+    transform: translateY(0);
   }
 }
 
 /* ========================================= */
-/* RIGHT EVENT TITLE                         */
+/* ACTUAL EVENT NAME                         */
 /* ========================================= */
 
 .eventTitle {
+  width: 100%;
+
   margin: 0 0 1.5vw;
 
   color: #38170b;
@@ -388,7 +507,7 @@
 
   font-size: clamp(1.8rem, 3vw, 4rem);
 
-  font-weight: 700;
+  font-weight: 400;
 
   line-height: 1.1;
 
@@ -400,11 +519,13 @@
 }
 
 /* ========================================= */
-/* DESCRIPTION                               */
+/* EVENT DESCRIPTION                         */
 /* ========================================= */
 
 .eventDescription {
   width: 100%;
+
+  max-width: 32vw;
 
   margin: 0;
 
@@ -420,45 +541,73 @@
 }
 
 /* ========================================= */
-/* ADD / REMOVE                              */
+/* ADD / REMOVE BUTTON                       */
 /* ========================================= */
 
-.addButton,
-.removeButton {
-  width: min(180px, 14vw);
+.eventActionButton {
+  width: min(220px, 17vw);
 
-  min-width: 110px;
+  height: 5vw;
 
-  margin-top: auto;
+  min-width: 150px;
 
-  padding: 0.7vw 1vw;
+  min-height: 55px;
 
-  border: 1px solid #38170b;
+  margin: 2vw auto 0;
+
+  padding: 0;
+
+  border: none;
+
+  background-color: transparent;
+
+  background-position: center;
+
+  background-size: contain;
+
+  background-repeat: no-repeat;
+
+  color: #fed59b;
 
   font-family: "Cinzel", serif;
 
-  font-size: clamp(12px, 0.9vw, 17px);
+  font-size: clamp(15px, 1.2vw, 22px);
+
+  font-weight: 700;
 
   cursor: pointer;
 
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  line-height: 1;
+
+  appearance: none;
+
+  -webkit-appearance: none;
+
   transition:
-    transform 0.2s ease,
-    background 0.2s ease;
+    transform 0.25s ease,
+    filter 0.25s ease;
 }
 
-.addButton {
-  background: #38170b;
-  color: #fff6dd;
+.eventActionButton:hover {
+  transform: scale(1.06);
+
+  filter:
+    brightness(1.1)
+    drop-shadow(
+      0 0 8px rgba(254, 213, 155, 0.55)
+    );
 }
 
-.removeButton {
-  background: transparent;
-  color: #38170b;
-}
-
-.addButton:hover,
-.removeButton:hover {
-  transform: scale(1.05);
+.eventActionButton:active {
+  transform: scale(0.96);
 }
 
 /* ========================================= */
@@ -468,22 +617,45 @@
 .eventNavigation {
   width: 100%;
 
-  margin-top: 1.5vw;
+  margin-top: 2vw;
 
   display: flex;
 
   align-items: center;
+
   justify-content: center;
 
-  gap: 2vw;
+  gap: 1vw;
 }
 
-.eventNavigation button {
+/* ========================================= */
+/* PAGE NUMBERS                              */
+/* ========================================= */
+
+.pageNumbers {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 1vw;
+}
+
+/* ========================================= */
+/* NAVIGATION ARROWS                         */
+/* ========================================= */
+
+.navArrow {
   width: 2.5vw;
-  height: 2.5vw;
+
+  height: 3.5vw;
 
   min-width: 35px;
-  min-height: 35px;
+
+  min-height: 40px;
+
+  padding: 0;
 
   border: none;
 
@@ -491,25 +663,87 @@
 
   color: #38170b;
 
-  font-size: clamp(20px, 1.8vw, 30px);
+  font-family: serif;
+
+  font-size: clamp(38px, 3.5vw, 58px);
+
+  font-weight: 400;
+
+  line-height: 0.8;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
 
   cursor: pointer;
 
-  transition: transform 0.2s ease;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
 }
 
-.eventNavigation button:hover {
-  transform: scale(1.2);
+.navArrow:hover {
+  transform: scale(1.15);
+
+  opacity: 0.65;
 }
 
-.eventNavigation span {
+/* ========================================= */
+/* PAGE NUMBER                               */
+/* ========================================= */
+
+.pageNumber {
+  min-width: 2vw;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #a86618;
+
+  font-family: serif;
+
+  font-size: clamp(1.5rem, 2.2vw, 3rem);
+
+  font-weight: 400;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease,
+    font-size 0.3s ease,
+    opacity 0.3s ease;
+}
+
+/* ========================================= */
+/* CURRENT PAGE                              */
+/* ========================================= */
+
+.pageNumber.currentPage {
   color: #38170b;
 
-  font-family: "Cinzel", serif;
-
-  font-size: clamp(11px, 0.8vw, 15px);
+  font-size: clamp(2.2rem, 3.5vw, 4.2rem);
 
   font-weight: 700;
+
+  transform: scale(1.05);
+}
+
+/* ========================================= */
+/* PAGE NUMBER HOVER                         */
+/* ========================================= */
+
+.pageNumber:not(.currentPage):hover {
+  color: #38170b;
+
+  transform: scale(1.1);
 }
 
 /* ========================================= */
@@ -517,11 +751,16 @@
 /* ========================================= */
 
 .emptyInfo {
+  width: 80%;
+
+  flex: 1;
+
   display: flex;
 
   flex-direction: column;
 
   align-items: center;
+
   justify-content: center;
 
   text-align: center;
@@ -529,14 +768,6 @@
   color: #38170b;
 
   opacity: 0.65;
-}
-
-.emptyInfo h2 {
-  margin: 0 0 1vw;
-
-  font-family: "Cinzel", serif;
-
-  font-size: clamp(1.5rem, 2vw, 3rem);
 }
 
 .emptyInfo p {
@@ -550,53 +781,6 @@
 }
 
 /* ========================================= */
-/* CONFIRM BUTTON                            */
-/* ========================================= */
-
-.confirmButton {
-  position: absolute;
-
-  bottom: 3vw;
-  left: 50%;
-
-  transform: translateX(-50%);
-
-  z-index: 10;
-
-  width: min(220px, 18vw);
-
-  min-width: 150px;
-
-  padding: 0.8vw 1vw;
-
-  border: none;
-
-  background: #38170b;
-
-  color: #fff6dd;
-
-  font-family: "Cinzel", serif;
-
-  font-size: clamp(13px, 1vw, 18px);
-
-  cursor: pointer;
-
-  transition:
-    transform 0.2s ease,
-    opacity 0.2s ease;
-}
-
-.confirmButton:hover:not(:disabled) {
-  transform: translateX(-50%) scale(1.05);
-}
-
-.confirmButton:disabled {
-  opacity: 0.4;
-
-  cursor: not-allowed;
-}
-
-/* ========================================= */
 /* MOBILE                                    */
 /* ========================================= */
 
@@ -606,7 +790,9 @@
 
     overflow-y: auto;
 
-    padding: 8vw 5vw 25vw;
+    padding: 8vw 5vw 15vw;
+
+    background: transparent;
   }
 
   .leftbottom,
@@ -629,18 +815,32 @@
   .eventsPage,
   .infoPage {
     width: 100%;
+
+    background: transparent;
   }
+
+  /* ========================================= */
+  /* LEFT HEADING                              */
+  /* ========================================= */
 
   .chooseEventsHeading {
     margin-bottom: 4vw;
 
-    font-size: clamp(1.5rem, 7vw, 2.5rem);
+    font-size: clamp(2rem, 8vw, 3rem);
   }
+
+  /* ========================================= */
+  /* SEARCH                                    */
+  /* ========================================= */
 
   .searchContainer {
     height: 11vw;
 
     margin-bottom: 3vw;
+
+    background-size: contain;
+
+    background-repeat: no-repeat;
   }
 
   .searchContainer input {
@@ -648,6 +848,10 @@
 
     font-size: 3.5vw;
   }
+
+  /* ========================================= */
+  /* EVENTS                                    */
+  /* ========================================= */
 
   .eventsList {
     height: 50vw;
@@ -663,18 +867,66 @@
     min-height: 45px;
 
     font-size: 3.5vw;
+
+    background-size: contain;
+
+    background-repeat: no-repeat;
   }
 
-  .selectedCount {
-    margin-top: 3vw;
+  .eventItem span {
+    width: 100%;
 
-    font-size: 3vw;
+    margin: 0;
+
+    padding: 0;
+
+    text-align: center;
+
+    line-height: 1;
   }
+
+  /* ========================================= */
+  /* RIGHT PAGE                                */
+  /* ========================================= */
 
   .infoPage {
     min-height: 60vw;
 
-    padding: 6vw 5vw;
+    padding: 0;
+  }
+
+  .rightOuter {
+    width: 100%;
+
+    min-height: 60vw;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+  }
+
+  /* ========================================= */
+  /* RIGHT HEADING                             */
+  /* ========================================= */
+
+  .eventHeading {
+    margin-bottom: 4vw;
+
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+
+  /* ========================================= */
+  /* EVENT CONTENT                             */
+  /* ========================================= */
+
+  .eventInfo {
+    width: 85%;
+
+    max-width: none;
+
+    justify-content: center;
   }
 
   .eventTitle {
@@ -684,44 +936,78 @@
   }
 
   .eventDescription {
+    max-width: 80vw;
+
     font-size: 3.7vw;
 
     line-height: 1.6;
   }
 
-  .addButton,
-  .removeButton {
-    width: 40vw;
+  /* ========================================= */
+  /* ADD / REMOVE                              */
+  /* ========================================= */
+
+  .eventActionButton {
+    width: 48vw;
+
+    height: 14vw;
 
     min-width: 0;
 
+    min-height: 0;
+
     margin-top: 5vw;
 
-    padding: 2.5vw;
+    font-size: 4vw;
 
-    font-size: 3.5vw;
+    background-size: contain;
+
+    background-repeat: no-repeat;
   }
+
+  /* ========================================= */
+  /* NAVIGATION                                */
+  /* ========================================= */
 
   .eventNavigation {
     margin-top: 4vw;
 
-    gap: 5vw;
+    gap: 2vw;
   }
 
-  .eventNavigation button {
-    width: 10vw;
-    height: 10vw;
+  .pageNumbers {
+    gap: 2.5vw;
   }
 
-  .confirmButton {
-    bottom: 5vw;
+  .navArrow {
+    width: 9vw;
 
-    width: 50vw;
+    height: 11vw;
 
     min-width: 0;
 
-    padding: 3vw;
+    min-height: 0;
 
-    font-size: 4vw;
+    font-size: 12vw;
+  }
+
+  .pageNumber {
+    min-width: 6vw;
+
+    font-size: 6vw;
+  }
+
+  .pageNumber.currentPage {
+    font-size: 9vw;
+  }
+
+  /* ========================================= */
+  /* EMPTY                                    */
+  /* ========================================= */
+
+  .emptyInfo {
+    width: 85%;
+
+    flex: 1;
   }
 }
