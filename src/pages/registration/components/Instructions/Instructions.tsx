@@ -66,7 +66,7 @@
 
 import { useState } from "react";
 import styles from "./Instructions.module.scss";
-import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import InstructionModal from "../InstructionModal/InstructionModal";
 
 import leftbottom from "../../../../assets/registration/reg/leftbottom.png"
@@ -79,6 +79,11 @@ interface InstructionsProps {
 
 const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
   const [detailInst, setdetailInst] = useState(false);
+
+  const login = useGoogleLogin({
+    onSuccess: onGoogleSignIn,
+    onError: () => console.error("Login Failed"),
+  });
 
     return (
       <>
@@ -111,17 +116,9 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
             </li>
           </ul>
 
-           <div className={styles.googleButton}>
-          <GoogleLogin
-            onSuccess={onGoogleSignIn}
-            onError={() => console.log("Login Failed")}
-            theme="filled_blue"
-            shape="pill"
-            size="large"
-            text="signin_with"
-            width={window.innerWidth < 500 ? "200" : "350"}
-          />
-        </div>
+          <div>
+            <button className={styles.googleButton} onClick={() => login()} />
+          </div>
         </div>
       </>
     );

@@ -525,7 +525,7 @@ import Select from "react-select";
 import axios from "axios";
 
 import styles from "./reg.module.scss";
-import Reginput from "./Reginput";
+import Reginput from "./reginput.tsx";
 
 import RegBg from "../../../assets/registration/reg/RegBg.png";
 import leftbottom from "../../../assets/registration/reg/leftbottom.png";
