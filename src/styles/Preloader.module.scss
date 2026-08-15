@@ -1,7 +1,7 @@
 .preloader {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: 99999;
 
   display: flex;
   align-items: center;
@@ -10,364 +10,83 @@
   background: #000;
   color: #e8e3d8;
 
-  font-family: "Syamsiah", sans-serif;
+
+
 
   overflow: hidden;
 }
-/* =========================================================
-   ARABIAN NIGHT SKY
-========================================================= */
-
-.nightSky {
-  position: absolute;
-  inset: 0;
-
-  background:
-    radial-gradient(
-      circle at 50% 45%,
-      rgba(35, 42, 75, 0.35) 0%,
-      rgba(12, 15, 32, 0.5) 35%,
-      #000 85%
-    );
-
-  animation: skyAppear 500ms ease-out forwards;
-}
-
-@keyframes skyAppear {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-/* =========================================================
-   STARS
-========================================================= */
-
-.stars {
-  position: absolute;
-  inset: 0;
-
-  pointer-events: none;
-
-  animation: starsAppear 400ms ease-out forwards;
-}
-
-.stars span {
-  position: absolute;
-
-  width: 2px;
-  height: 2px;
-
-  border-radius: 50%;
-
-  background: #fff8d8;
-
-  box-shadow:
-    0 0 5px rgba(255, 244, 190, 0.8);
-
-  animation: twinkle 2.5s ease-in-out infinite;
-}
-
-.stars span:nth-child(1) { top: 8%; left: 12%; }
-.stars span:nth-child(2) { top: 15%; left: 25%; }
-.stars span:nth-child(3) { top: 10%; left: 41%; }
-.stars span:nth-child(4) { top: 21%; left: 57%; }
-.stars span:nth-child(5) { top: 7%; left: 73%; }
-.stars span:nth-child(6) { top: 18%; left: 88%; }
-.stars span:nth-child(7) { top: 29%; left: 8%; }
-.stars span:nth-child(8) { top: 34%; left: 19%; }
-.stars span:nth-child(9) { top: 27%; left: 34%; }
-.stars span:nth-child(10) { top: 38%; left: 48%; }
-.stars span:nth-child(11) { top: 31%; left: 63%; }
-.stars span:nth-child(12) { top: 25%; left: 78%; }
-.stars span:nth-child(13) { top: 40%; left: 93%; }
-.stars span:nth-child(14) { top: 12%; left: 52%; }
-.stars span:nth-child(15) { top: 44%; left: 28%; }
-.stars span:nth-child(16) { top: 36%; left: 70%; }
-.stars span:nth-child(17) { top: 17%; left: 94%; }
-.stars span:nth-child(18) { top: 5%; left: 63%; }
-.stars span:nth-child(19) { top: 45%; left: 5%; }
-.stars span:nth-child(20) { top: 32%; left: 55%; }
-.stars span:nth-child(21) { top: 23%; left: 43%; }
-.stars span:nth-child(22) { top: 11%; left: 6%; }
-.stars span:nth-child(23) { top: 41%; left: 84%; }
-.stars span:nth-child(24) { top: 28%; left: 74%; }
-.stars span:nth-child(25) { top: 48%; left: 38%; }
-
-.stars span:nth-child(3n) {
-  width: 3px;
-  height: 3px;
-}
-
-.stars span:nth-child(4n) {
-  animation-delay: 0.8s;
-}
-
-.stars span:nth-child(5n) {
-  animation-delay: 1.4s;
-}
-
-.stars span:nth-child(7n) {
-  animation-delay: 0.35s;
-}
-
-@keyframes starsAppear {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes twinkle {
-  0%,
-  100% {
-    opacity: 0.35;
-    transform: scale(0.8);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.25);
-  }
-}
-
-/* =========================================================
-   MOON
-========================================================= */
-
-.moon {
-  position: absolute;
-
-  top: 16%;
-  right: 15%;
-
-  width: 70px;
-  height: 70px;
-
-  border-radius: 50%;
-
-  background: #f5e7b0;
-
-  box-shadow:
-    0 0 15px rgba(255, 235, 160, 0.35),
-    0 0 35px rgba(255, 220, 130, 0.12);
-
-  animation:
-    moonAppear 500ms ease-out forwards;
-}
-
-.moon::after {
-  content: "";
-
-  position: absolute;
-
-  width: 70px;
-  height: 70px;
-
-  top: -8px;
-  left: 19px;
-
-  border-radius: 50%;
-
-  background: #080a16;
-}
-
-@keyframes moonAppear {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.8);
-  }
-
-  to {
-    opacity: 0.9;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* =========================================================
-   DUST
-========================================================= */
-
-.dust {
-  position: absolute;
-
-  left: -20%;
-  bottom: 8%;
-
-  width: 140%;
-  height: 100px;
-
-  pointer-events: none;
-
-  opacity: 0.25;
-}
-
-.dust span {
-  position: absolute;
-
-  width: 3px;
-  height: 3px;
-
-  border-radius: 50%;
-
-  background: #d9b86c;
-
-  box-shadow:
-    0 0 6px rgba(218, 182, 103, 0.7);
-
-  animation: dustMove 1.2s ease-out infinite;
-}
-
-.dust span:nth-child(1) { left: 3%; top: 65%; }
-.dust span:nth-child(2) { left: 10%; top: 30%; }
-.dust span:nth-child(3) { left: 18%; top: 75%; }
-.dust span:nth-child(4) { left: 27%; top: 45%; }
-.dust span:nth-child(5) { left: 35%; top: 65%; }
-.dust span:nth-child(6) { left: 43%; top: 25%; }
-.dust span:nth-child(7) { left: 51%; top: 55%; }
-.dust span:nth-child(8) { left: 60%; top: 35%; }
-.dust span:nth-child(9) { left: 68%; top: 70%; }
-.dust span:nth-child(10) { left: 76%; top: 40%; }
-.dust span:nth-child(11) { left: 84%; top: 65%; }
-.dust span:nth-child(12) { left: 91%; top: 30%; }
-.dust span:nth-child(13) { left: 96%; top: 55%; }
-.dust span:nth-child(14) { left: 50%; top: 80%; }
-
-@keyframes dustMove {
-  0% {
-    opacity: 0;
-    transform: translateX(-60px) translateY(15px);
-  }
-
-  40% {
-    opacity: 0.8;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateX(100px) translateY(-10px);
-  }
-}
-
-/* =========================================================
-   VIGNETTE
-========================================================= */
 
 .vignette {
   position: absolute;
   inset: 0;
-
   pointer-events: none;
 
-  z-index: 3;
-
-  background:
-    radial-gradient(
-      ellipse at center,
-      rgba(0, 0, 0, 0) 40%,
-      rgba(0, 0, 0, 0.85) 100%
-    );
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0) 40%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
 }
-
-/* =========================================================
-   CONTENT
-========================================================= */
 
 .content {
   position: relative;
 
-  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   width: 100%;
   height: 100%;
-
-  opacity: 1;
+  text-align: center;
 }
 
-/* =========================================================
-   LINE GROUP
-========================================================= */
-
-.lineGroup {
+.flashImage {
   position: absolute;
-  top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1.03);
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15em;
+  max-width: 70vw;
+  max-height: 70vh;
+  object-fit: contain;
 
-  width: min(90vw, 900px);
-
-  opacity: 1;
-
-  transition: opacity 400ms ease; // matches GROUP_FADE_OUT in the component
-}
-
-.lineGroupFading {
   opacity: 0;
 }
 
-.lineSvg {
-  display: block;
-
-  width: 100%;
-
-  height: auto;
-
-  overflow: visible;
+// --- Phase 1: quick fade/scale in ---
+.phase-in {
+  animation: flashIn 0.25s ease-out forwards;
 }
 
-/* =========================================================
-   TEXT
-   Glow is now baked directly into .pathText — it's present
-   from the moment the line mounts, through the paint reveal,
-   and for as long as the line stays on screen. No class
-   toggling, no timer, nothing to get out of sync.
-========================================================= */
-
-.pathText {
-  font-weight: 400;
-
-  font-size: 42px;
-
-  letter-spacing: 0.14em;
-
-  fill: #e8e3d8;
-
-  text-shadow:
-    0 0 10px rgba(255, 230, 160, 0.55),
-    0 0 22px rgba(255, 210, 140, 0.25);
+@keyframes flashIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
-/* =========================================================
-   FINAL FADE
-========================================================= */
-
-.fadeOut {
-  pointer-events: none;
-
-  animation:
-    contentOut 400ms ease-in forwards;
+// --- Phase 2: hold, fully visible ---
+.phase-hold {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
 }
 
-@keyframes contentOut {
+// --- Phase 3: fade/scale out ---
+.phase-out {
+  animation: flashOut 0.25s ease-in forwards;
+}
+
+@keyframes flashOut {
   0% {
     opacity: 1;
-    transform: scale(1);
+    transform: translate(-50%, -50%) scale(1);
   }
-
   100% {
     opacity: 0;
-    transform: scale(0.98);
+    transform: translate(-50%, -50%) scale(0.97);
   }
 }
