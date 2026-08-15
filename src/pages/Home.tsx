@@ -3,7 +3,8 @@ import gsap from "gsap";
 
 import styles from "../styles/Home.module.scss";
 import bg from "../assets/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg";
-import sandImg from "../assets/sand.png";
+import sandImg from "../assets/sandImg.png";
+import sandMob from "../assets/sandMob.png";
 import cloudSmall from "../assets/cloudSmall.svg";
 import cloudBig from "../assets/cloudBig.svg";
 import cloudThree from "../assets/cloudThree.svg";
@@ -46,20 +47,20 @@ const CLOUDS_MOBILE: Cloud[] = [
   { src: cloudSmall, top: "38%", left: "60%", width: "40%", duration: 180 },
   { src: cloudBig, top: "5%", left: "85%", width: "55%", duration: 380 },
 ];
-
-// Adjust to taste — this is the "different colour" the cloud becomes
-// while it's crossing the moon.
+const bgImg = window.innerWidth < 650 ? sandMob : sandImg
 const MOON_CLOUD_TINT =
   "brightness(0.35) sepia(1) hue-rotate(20deg) saturate(5)";
+
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const camelRef = useRef(null);
   const cloudsRef = useRef<HTMLDivElement>(null);
   const cloudRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const castleRef = useRef<HTMLDivElement>(null); // NEW
 
   const moonRef = useRef<HTMLDivElement>(null);
-  const portholeRef = useRef<HTMLDivElement>(null); // clipped circle
-  const portholeInnerRef = useRef<HTMLDivElement>(null); // full-size offset layer
+  const portholeRef = useRef<HTMLDivElement>(null);
+  const portholeInnerRef = useRef<HTMLDivElement>(null);
   const overlayCloudRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const [isMobile, setIsMobile] = useState(
@@ -74,7 +75,32 @@ export default function Home() {
 
   const CLOUDS = isMobile ? CLOUDS_MOBILE : CLOUDS_DESKTOP;
 
-  // Drives the real clouds (unchanged from before).
+  // NEW: on landing, rise the castle up from below its resting spot.
+  // Because .sand (z-index 3) sits above .castle (z-index 2), the sand
+  // naturally masks the bottom of the castle while it's still low, so
+  // rising it up reads as "emerging out of the sand" with no clip-path.
+  useEffect(() => {
+    const castleEl = castleRef.current;
+    if (!castleEl) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        castleEl,
+        { yPercent: 60, opacity: 0 },
+        {
+          yPercent: 0,
+          opacity: 1,
+          duration: 1.8,
+          ease: "power3.out",
+          delay: 0.3, // small pause after page load before it rises
+        },
+      );
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  // Drives the real clouds.
   useEffect(() => {
     const ctx = gsap.context(() => {
       cloudRefs.current.forEach((cloud, i) => {
@@ -104,11 +130,6 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile]);
 
-  // NEW: every frame, (1) position the circular porthole exactly over the
-  // moon's live rect, and (2) copy each real cloud's live transform onto
-  // its tinted twin. This is what keeps the overlay glued to both the
-  // moon (even if it shrinks/moves) and the clouds (however they move),
-  // with zero risk of the two tweens drifting apart.
   useEffect(() => {
     let raf: number;
 
@@ -130,10 +151,6 @@ export default function Home() {
         porthole.style.width = `${moonBox.width}px`;
         porthole.style.height = `${moonBox.height}px`;
 
-        // Inner layer is full-container sized, shifted so its (0,0)
-        // lines up with the container's (0,0) — same coordinate space
-        // the real .clouds layer uses — so the % top/left on each
-        // overlay cloud matches the real cloud's % top/left exactly.
         portholeInner.style.top = `${-top}px`;
         portholeInner.style.left = `${-left}px`;
         portholeInner.style.width = `${containerBox.width}px`;
@@ -143,7 +160,6 @@ export default function Home() {
       cloudRefs.current.forEach((real, i) => {
         const overlay = overlayCloudRefs.current[i];
         if (real && overlay) {
-          // Copy the exact live transform GSAP is applying right now.
           overlay.style.transform = real.style.transform;
         }
       });
@@ -170,10 +186,11 @@ export default function Home() {
       <ShootingStars />
 
       <div className={styles.sand} data-sand-parallax>
-        <img src={sandImg} className={styles.sandImg} alt="" />
+        <img src={bgImg} className={styles.sandImg} alt="" />
       </div>
 
-      <div className={styles.castle} data-castle-drown>
+      {/* CHANGED: added castleRef */}
+      <div className={styles.castle} data-castle-drown ref={castleRef}>
         <img src={Castle} className={styles.castleImg} alt="" />
       </div>
 
@@ -197,8 +214,6 @@ export default function Home() {
         <img src={Moon} className={styles.moonImg} alt="" />
       </div>
 
-      {/* Always mounted (not gated on any state), so refs exist from
-         frame 1 and the ticker above can always find them. */}
       <div className={styles.moonCloudOverlay} ref={portholeRef}>
         <div className={styles.moonCloudOverlayInner} ref={portholeInnerRef}>
           {CLOUDS.map((c, i) => (
