@@ -23,6 +23,89 @@ interface EventsProps {
   setUserData?: React.Dispatch<React.SetStateAction<any>>;
 }
 
+/* ========================================= */
+/* TEST DATA                                 */
+/* ========================================= */
+
+const TEST_EVENTS: Event[] = [
+  {
+    id: 1,
+    name: "Battle Dance",
+    about:
+      "A high-energy dance battle where performers compete against each other and showcase their creativity, musicality and choreography.",
+  },
+  {
+    id: 2,
+    name: "Solo Dance",
+    about:
+      "A solo performance where dancers get the stage to themselves and express their unique style and personality.",
+  },
+  {
+    id: 3,
+    name: "Group Dance",
+    about:
+      "A team-based dance performance where synchronization, formations and collective creativity take center stage.",
+  },
+  {
+    id: 4,
+    name: "Classical Dance",
+    about:
+      "A celebration of classical dance forms combining traditional movements, storytelling and artistic expression.",
+  },
+  {
+    id: 5,
+    name: "Solo Singing",
+    about:
+      "A vocal performance where singers compete individually and showcase their voice, expression and musicality.",
+  },
+  {
+    id: 6,
+    name: "Battle of Bands",
+    about:
+      "Bands go head-to-head with their best performances and compete to win over the audience.",
+  },
+  {
+    id: 7,
+    name: "Instrumental",
+    about:
+      "A showcase of instrumental talent featuring musicians performing their favorite compositions.",
+  },
+  {
+    id: 8,
+    name: "Street Play",
+    about:
+      "A powerful theatrical performance designed to engage audiences through storytelling, acting and social themes.",
+  },
+  {
+    id: 9,
+    name: "Stage Play",
+    about:
+      "A traditional theatrical performance combining acting, dialogue, stagecraft and storytelling.",
+  },
+  {
+    id: 10,
+    name: "Mono Act",
+    about:
+      "A solo theatrical performance where one actor takes on the challenge of carrying the entire story.",
+  },
+  {
+    id: 11,
+    name: "Debate",
+    about:
+      "Participants present arguments, challenge opposing viewpoints and demonstrate their communication and reasoning skills.",
+  },
+  {
+    id: 12,
+    name: "Quiz",
+    about:
+      "Put your knowledge to the test with challenging questions across a wide range of topics.",
+  },
+];
+
+/* ========================================= */
+/* COMPONENT                                 */
+/* ========================================= */
+
 export default function Events({
   userData,
   setUserData,
@@ -52,11 +135,25 @@ export default function Events({
         "https://bits-oasis.org/2026/main/registrations/events_details/",
       )
       .then((response) => {
-        console.log("EVENT API RESPONSE:", response.data);
-        setEvents(response.data);
+        console.log(
+          "EVENT API RESPONSE:",
+          response.data,
+        );
+
+        if (
+          Array.isArray(response.data) &&
+          response.data.length > 0
+        ) {
+          setEvents(response.data);
+        } else {
+          setEvents(TEST_EVENTS);
+        }
       })
       .catch((error) => {
         console.error("EVENT API ERROR:", error);
+
+        // Use test data if API fails
+        setEvents(TEST_EVENTS);
       })
       .finally(() => {
         setLoading(false);
@@ -74,7 +171,7 @@ export default function Events({
   );
 
   /* ========================================= */
-  /* SELECT EVENT                              */
+  /* SELECT / REMOVE EVENT                    */
   /* ========================================= */
 
   const handleEvent = (event: Event) => {
@@ -100,6 +197,45 @@ export default function Events({
   };
 
   /* ========================================= */
+  /* NEXT EVENT                                */
+  /* ========================================= */
+
+  const goToNextEvent = () => {
+    if (!activeEvent || filteredEvents.length === 0) {
+      return;
+    }
+
+    const currentIndex = filteredEvents.findIndex(
+      (event) => event.id === activeEvent.id,
+    );
+
+    const nextIndex =
+      (currentIndex + 1) % filteredEvents.length;
+
+    setActiveEvent(filteredEvents[nextIndex]);
+  };
+
+  /* ========================================= */
+  /* PREVIOUS EVENT                            */
+  /* ========================================= */
+
+  const goToPreviousEvent = () => {
+    if (!activeEvent || filteredEvents.length === 0) {
+      return;
+    }
+
+    const currentIndex = filteredEvents.findIndex(
+      (event) => event.id === activeEvent.id,
+    );
+
+    const previousIndex =
+      (currentIndex - 1 + filteredEvents.length) %
+      filteredEvents.length;
+
+    setActiveEvent(filteredEvents[previousIndex]);
+  };
+
+  /* ========================================= */
   /* SUBMIT                                    */
   /* ========================================= */
 
@@ -120,6 +256,10 @@ export default function Events({
     setConfirmModal(true);
   };
 
+  /* ========================================= */
+  /* RENDER                                    */
+  /* ========================================= */
+
   return (
     <>
       <div
@@ -129,7 +269,7 @@ export default function Events({
         }}
       >
         {/* ================================= */}
-        {/* REGISTER DECORATION                */}
+        {/* DECORATIONS                        */}
         {/* ================================= */}
 
         <img
@@ -157,7 +297,7 @@ export default function Events({
         />
 
         {/* ================================= */}
-        {/* BOOK                              */}
+        {/* BOOK                               */}
         {/* ================================= */}
 
         <div
@@ -168,44 +308,39 @@ export default function Events({
         />
 
         {/* ================================= */}
-        {/* CONTENT                           */}
+        {/* CONTENT                            */}
         {/* ================================= */}
 
         <div className={styles.content}>
-
-          {/* TITLE */}
-          <div className={styles.titleRow}>
-            <span className={styles.titleGlow} />
-            <h1>CHOOSE EVENTS</h1>
-            <span className={styles.titleGlow} />
-          </div>
-
-          {/* ================================= */}
-          {/* SEARCH                            */}
-          {/* ================================= */}
-
-          <div className={styles.searchContainer}>
-            <input
-              id="event-search"
-              name="event-search"
-              type="text"
-              placeholder="SEARCH EVENTS"
-              value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
-              }
-              autoComplete="off"
-            />
-          </div>
-
-          {/* ================================= */}
-          {/* EVENTS                            */}
-          {/* ================================= */}
-
           <div className={styles.eventsArea}>
 
-            {/* LEFT PAGE */}
+            {/* ================================= */}
+            {/* LEFT SIDE                         */}
+            {/* ================================= */}
+
             <div className={styles.eventsPage}>
+
+              <h1 className={styles.chooseEventsHeading}>
+                CHOOSE EVENTS
+              </h1>
+
+              {/* SEARCH */}
+
+              <div className={styles.searchContainer}>
+                <input
+                  id="event-search"
+                  name="event-search"
+                  type="text"
+                  placeholder="SEARCH EVENTS"
+                  value={search}
+                  onChange={(e) =>
+                    setSearch(e.target.value)
+                  }
+                  autoComplete="off"
+                />
+              </div>
+
+              {/* EVENTS LIST */}
 
               {loading ? (
                 <div className={styles.message}>
@@ -257,31 +392,34 @@ export default function Events({
               <div className={styles.selectedCount}>
                 {selectedEvents.length} EVENTS SELECTED
               </div>
-
             </div>
 
-            {/* RIGHT PAGE */}
+            {/* ================================= */}
+            {/* RIGHT SIDE                        */}
+            {/* ================================= */}
+
             <div
               className={styles.infoPage}
               onMouseLeave={() =>
                 setActiveEvent(null)
               }
             >
-
               {activeEvent ? (
                 <div className={styles.eventInfo}>
 
-                  <div className={styles.eventCategory}>
-                    EVENT
-                  </div>
+                  {/* EVENT TITLE */}
 
-                  <h2>
+                  <h1 className={styles.eventTitle}>
                     {activeEvent.name}
-                  </h2>
+                  </h1>
 
-                  <p>
+                  {/* DESCRIPTION */}
+
+                  <p className={styles.eventDescription}>
                     {activeEvent.about}
                   </p>
+
+                  {/* ADD / REMOVE */}
 
                   <button
                     type="button"
@@ -307,6 +445,40 @@ export default function Events({
                       : "ADD"}
                   </button>
 
+                  {/* NAVIGATION */}
+
+                  <div
+                    className={styles.eventNavigation}
+                  >
+                    <button
+                      type="button"
+                      onClick={
+                        goToPreviousEvent
+                      }
+                      aria-label="Previous event"
+                    >
+                      ←
+                    </button>
+
+                    <span>
+                      {filteredEvents.findIndex(
+                        (event) =>
+                          event.id ===
+                          activeEvent.id,
+                      ) + 1}
+                      {" / "}
+                      {filteredEvents.length}
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={goToNextEvent}
+                      aria-label="Next event"
+                    >
+                      →
+                    </button>
+                  </div>
+
                 </div>
               ) : (
                 <div className={styles.emptyInfo}>
@@ -319,7 +491,6 @@ export default function Events({
                   </p>
                 </div>
               )}
-
             </div>
 
           </div>
@@ -335,9 +506,8 @@ export default function Events({
           onClick={handleSubmit}
           disabled={selectedEvents.length === 0}
         >
-          <span>CONFIRM</span>
+          CONFIRM
         </button>
-
       </div>
 
       {/* =================================== */}

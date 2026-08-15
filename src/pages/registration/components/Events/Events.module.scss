@@ -1,31 +1,24 @@
 .eventsContainer {
   position: relative;
 
-  width: 100vw;
-  height: 100svh;
+  width: 100%;
+  min-height: 100svh;
 
   overflow: hidden;
 
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-
-  color: #e2dccb;
-
-  font-family:
-    "Abhaya Libre",
-    serif;
-
-  z-index: 3;
+  color: #38170b;
 }
 
 /* ========================================= */
-/* REGISTER DECORATIONS                      */
+/* CORNER DECORATIONS                        */
 /* ========================================= */
 
 .leftbottom,
@@ -36,53 +29,31 @@
 
   pointer-events: none;
 
-  z-index: 1;
-
-  user-select: none;
+  z-index: 3;
 }
-
-/* Bottom left */
 
 .leftbottom {
-  left: 0;
   bottom: 0;
-
-  width: 24vw;
-
-  height: auto;
+  left: 0;
+  width: 20vw;
 }
-
-/* Top left */
 
 .lefttop {
-  left: 0;
   top: 0;
-
+  left: 0;
   width: 20vw;
-
-  height: auto;
 }
-
-/* Bottom right */
 
 .rightbottom {
-  right: 0;
   bottom: 0;
-
-  width: 24vw;
-
-  height: auto;
+  right: 0;
+  width: 20vw;
 }
 
-/* Top right */
-
 .righttop {
-  right: 0;
   top: 0;
-
+  right: 0;
   width: 20vw;
-
-  height: auto;
 }
 
 /* ========================================= */
@@ -92,21 +63,15 @@
 .bookContainer {
   position: absolute;
 
-  left: 50%;
-  top: 50%;
-
-  transform: translate(-50%, -50%);
-
-  width: 82vw;
-  height: 88svh;
-
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-
-  pointer-events: none;
+  inset: 0;
 
   z-index: 2;
+
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+
+  pointer-events: none;
 }
 
 /* ========================================= */
@@ -116,133 +81,12 @@
 .content {
   position: relative;
 
-  width: 62vw;
-  height: 70svh;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
   z-index: 5;
-}
 
-/* ========================================= */
-/* TITLE                                     */
-/* ========================================= */
-
-.titleRow {
-  width: 100%;
+  width: min(1100px, 90vw);
 
   display: flex;
-  align-items: center;
   justify-content: center;
-
-  gap: 1vw;
-
-  margin-bottom: 1vw;
-}
-
-.titleRow h1 {
-  margin: 0;
-
-  color: #fff9e9;
-
-  font:
-    100 2.2vw
-    "Abhaya Libre Extrabold",
-    serif;
-
-  letter-spacing: 0.08em;
-
-  text-align: center;
-
-  white-space: nowrap;
-
-  text-shadow:
-    0 0 6px rgba(229, 195, 132, 0.54);
-}
-
-.titleGlow {
-  width: 7vw;
-
-  height: 1px;
-
-  background: #fff9e9;
-
-  box-shadow:
-    0 0 6px rgba(229, 195, 132, 0.7);
-}
-
-/* ========================================= */
-/* SEARCH                                    */
-/* ========================================= */
-
-.searchContainer {
-  position: relative;
-
-  width: 28vw;
-
-  aspect-ratio: 5.8223;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  margin-bottom: 1vw;
-}
-
-.searchContainer::before {
-  content: "";
-
-  position: absolute;
-
-  inset: 0;
-
-  /*
-   * Same cloud/field treatment used by Register.
-   * If your field SVG has a different filename,
-   * change only this URL.
-   */
-  background:
-    url("/svgs/registration/field2.svg")
-    center / contain no-repeat;
-
-  pointer-events: none;
-
-  z-index: -1;
-}
-
-.searchContainer input {
-  width: 90%;
-  height: 100%;
-
-  margin: 0 auto;
-
-  padding: 0;
-
-  box-sizing: border-box;
-
-  border: none;
-  outline: none;
-
-  background: transparent;
-
-  text-align: center;
-
-  color: #e2dccb;
-
-  caret-color: #fff9e9;
-
-  font:
-    100 1.4vw
-    "Abhaya Libre Extrabold",
-    serif;
-}
-
-.searchContainer input::placeholder {
-  color: #e2dccb;
-
-  opacity: 1;
 }
 
 /* ========================================= */
@@ -252,12 +96,8 @@
 .eventsArea {
   width: 100%;
 
-  flex: 1;
-
   display: flex;
-
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
 
   gap: 4vw;
 }
@@ -267,33 +107,96 @@
 /* ========================================= */
 
 .eventsPage {
-  width: 28vw;
-  height: 43svh;
+  width: 45%;
 
   display: flex;
   flex-direction: column;
-
   align-items: center;
+
+  min-width: 0;
 }
 
 /* ========================================= */
-/* EVENT LIST                                */
+/* LEFT HEADING                              */
+/* ========================================= */
+
+.chooseEventsHeading {
+  margin: 0 0 1.5vw;
+
+  color: #38170b;
+
+  font-family: "Cinzel", serif;
+  font-size: clamp(1.5rem, 2.5vw, 3rem);
+  font-weight: 700;
+
+  text-align: center;
+}
+
+/* ========================================= */
+/* SEARCH                                    */
+/* ========================================= */
+
+.searchContainer {
+  width: 100%;
+
+  height: 3.3vw;
+  min-height: 40px;
+
+  margin-bottom: 1vw;
+
+  display: flex;
+  align-items: center;
+
+  background: rgba(255, 255, 255, 0.25);
+
+  border: 1px solid rgba(56, 23, 11, 0.6);
+
+  box-sizing: border-box;
+}
+
+.searchContainer input {
+  width: 100%;
+  height: 100%;
+
+  padding: 0 1.2vw;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #38170b;
+
+  font-family: "Cinzel", serif;
+
+  font-size: clamp(12px, 1vw, 18px);
+
+  box-sizing: border-box;
+}
+
+.searchContainer input::placeholder {
+  color: rgba(56, 23, 11, 0.65);
+}
+
+/* ========================================= */
+/* EVENTS LIST                               */
 /* ========================================= */
 
 .eventsList {
   width: 100%;
-  height: 100%;
 
-  overflow-y: auto;
+  height: 28vw;
+  max-height: 55svh;
 
   display: flex;
   flex-direction: column;
 
-  align-items: center;
+  gap: 0.7vw;
 
-  gap: 0.45vw;
+  overflow-y: auto;
+  overflow-x: hidden;
 
-  padding: 0.4vw;
+  padding: 0.3vw;
 
   box-sizing: border-box;
 
@@ -311,293 +214,73 @@
 .eventItem {
   position: relative;
 
+  flex: 0 0 auto;
+
   width: 100%;
 
-  min-height: 3vw;
+  min-height: 42px;
+  height: 3.5vw;
 
-  padding: 0.5vw 1vw;
+  padding: 0 1vw;
 
-  border: none;
+  border: 1px solid rgba(56, 23, 11, 0.5);
 
-  background: transparent;
+  background: rgba(255, 255, 255, 0.2);
 
-  color: #e2dccb;
+  color: #38170b;
+
+  font-family: "Cinzel", serif;
+
+  font-size: clamp(12px, 1vw, 18px);
 
   cursor: pointer;
 
-  font:
-    100 1.25vw
-    "Abhaya Libre Extrabold",
-    serif;
-
-  text-align: center;
-
-  transition:
-    color 0.25s ease,
-    filter 0.25s ease,
-    transform 0.25s ease;
-}
-
-.eventItem::before {
-  content: "";
-
-  position: absolute;
-
-  left: 5%;
-  right: 5%;
-
-  bottom: 0;
-
-  height: 1px;
-
-  background: rgba(226, 220, 203, 0.4);
-
-  transition:
-    left 0.25s ease,
-    right 0.25s ease,
-    background 0.25s ease;
-}
-
-.eventItem:hover {
-  color: #fff9e9;
-
-  transform: translateX(0.3vw);
-
-  text-shadow:
-    0 0 6px rgba(229, 195, 132, 0.54);
-}
-
-.eventItem:hover::before {
-  left: 0;
-  right: 0;
-
-  background: #e5c384;
-}
-
-.eventItem.selected {
-  color: #181818;
-
-  background: #e2dccb;
-
-  text-shadow: none;
-}
-
-.eventItem.selected::before {
-  display: none;
-}
-
-.eventItem span {
-  display: block;
-
-  width: 100%;
+  box-sizing: border-box;
 
   overflow: hidden;
 
-  text-overflow: ellipsis;
-
-  white-space: nowrap;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
 }
 
-/* ========================================= */
-/* SELECTED COUNT                            */
-/* ========================================= */
+.eventItem span {
+  position: relative;
 
-.selectedCount {
-  flex-shrink: 0;
-
-  margin-top: 0.6vw;
-
-  color: #fff9e9;
-
-  font:
-    100 1.05vw
-    "Abhaya Libre Extrabold",
-    serif;
-
-  letter-spacing: 0.08em;
-
-  text-shadow:
-    0 0 6px rgba(229, 195, 132, 0.54);
-}
-
-/* ========================================= */
-/* RIGHT PAGE                                */
-/* ========================================= */
-
-.infoPage {
-  width: 28vw;
-  height: 43svh;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  box-sizing: border-box;
-
-  color: #e2dccb;
-}
-
-/* ========================================= */
-/* EVENT INFO                                */
-/* ========================================= */
-
-.eventInfo {
-  width: 100%;
-
-  height: 100%;
-
-  display: flex;
-
-  flex-direction: column;
-
-  justify-content: center;
-
-  align-items: center;
-
-  text-align: center;
-
-  padding: 3vw;
-
-  box-sizing: border-box;
-}
-
-.eventCategory {
-  margin-bottom: 0.7vw;
-
-  color: #f8d990;
-
-  font:
-    100 1vw
-    "Abhaya Libre Extrabold",
-    serif;
-
-  letter-spacing: 0.2em;
-
-  text-shadow:
-    0 0 6px rgba(229, 195, 132, 0.54);
-}
-
-.eventInfo h2 {
-  margin: 0 0 1vw;
-
-  color: #fff9e9;
-
-  font:
-    100 2.3vw
-    "Abhaya Libre Extrabold",
-    serif;
-
-  text-shadow:
-    0 0 6px rgba(229, 195, 132, 0.35);
-}
-
-.eventInfo p {
-  max-width: 24vw;
-
-  margin: 0;
-
-  color: #e2dccb;
-
-  font:
-    100 1.15vw
-    "Abhaya Libre",
-    serif;
-
-  line-height: 1.5;
-}
-
-/* ========================================= */
-/* ADD / REMOVE                              */
-/* ========================================= */
-
-.addButton,
-.removeButton {
-  width: 10vw;
-
-  min-width: 120px;
-
-  margin-top: 1.8vw;
-
-  padding: 0.7vw;
-
-  cursor: pointer;
-
-  font:
-    100 1.1vw
-    "Abhaya Libre Extrabold",
-    serif;
+  z-index: 1;
 
   transition:
-    filter 0.3s ease,
-    transform 0.3s ease;
+    transform 0.25s ease,
+    letter-spacing 0.25s ease;
 }
 
-.addButton {
-  border: none;
+.eventItem:hover {
+  transform: translateX(0.5vw) scale(1.02);
 
-  background: #fff9e9;
+  background: rgba(229, 195, 132, 0.4);
 
-  color: #181818;
+  border-color: #38170b;
+
+  box-shadow:
+    0 0 10px rgba(229, 195, 132, 0.55),
+    inset 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
-.removeButton {
-  border: 1px solid #e2dccb;
+.eventItem:hover span {
+  transform: translateX(0.3vw);
 
-  background: transparent;
-
-  color: #fff9e9;
+  letter-spacing: 0.04em;
 }
 
-.addButton:hover,
-.removeButton:hover {
-  transform: scale(1.04);
+.eventItem.selected {
+  background: rgba(229, 195, 132, 0.55);
 
-  filter: brightness(0.8);
-}
+  border-color: #38170b;
 
-/* ========================================= */
-/* EMPTY INFO                                */
-/* ========================================= */
-
-.emptyInfo {
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-
-  opacity: 0.6;
-}
-
-.emptyInfo h2 {
-  margin: 0 0 0.8vw;
-
-  color: #fff9e9;
-
-  font:
-    100 2vw
-    "Abhaya Libre Extrabold",
-    serif;
-}
-
-.emptyInfo p {
-  margin: 0;
-
-  color: #e2dccb;
-
-  font:
-    100 1.1vw
-    "Abhaya Libre",
-    serif;
-
-  line-height: 1.6;
+  box-shadow:
+    inset 0 0 8px rgba(56, 23, 11, 0.15);
 }
 
 /* ========================================= */
@@ -606,200 +289,311 @@
 
 .message {
   width: 100%;
+
+  min-height: 100px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #38170b;
+
+  font-family: "Cinzel", serif;
+
+  font-size: clamp(12px, 1vw, 18px);
+
+  text-align: center;
+}
+
+/* ========================================= */
+/* SELECTED COUNT                            */
+/* ========================================= */
+
+.selectedCount {
+  margin-top: 1vw;
+
+  color: #38170b;
+
+  font-family: "Cinzel", serif;
+
+  font-size: clamp(11px, 0.9vw, 16px);
+
+  font-weight: 700;
+
+  text-align: center;
+}
+
+/* ========================================= */
+/* RIGHT INFO PAGE                           */
+/* ========================================= */
+
+.infoPage {
+  width: 55%;
+
+  min-height: 34vw;
+
+  padding: 3vw;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  color: #38170b;
+}
+
+/* ========================================= */
+/* EVENT INFO                                */
+/* ========================================= */
+
+.eventInfo {
+  width: 100%;
   height: 100%;
 
   display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  text-align: center;
+
+  animation: eventAppear 0.3s ease forwards;
+}
+
+@keyframes eventAppear {
+  from {
+    opacity: 0;
+    transform: translateX(1vw);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ========================================= */
+/* RIGHT EVENT TITLE                         */
+/* ========================================= */
+
+.eventTitle {
+  margin: 0 0 1.5vw;
+
+  color: #38170b;
+
+  font-family: "Cinzel", serif;
+
+  font-size: clamp(1.8rem, 3vw, 4rem);
+
+  font-weight: 700;
+
+  line-height: 1.1;
+
+  text-align: center;
+
+  position: relative;
+
+  z-index: 6;
+}
+
+/* ========================================= */
+/* DESCRIPTION                               */
+/* ========================================= */
+
+.eventDescription {
+  width: 100%;
+
+  margin: 0;
+
+  color: #38170b;
+
+  font-family: "Cinzel", serif;
+
+  font-size: clamp(13px, 1.15vw, 20px);
+
+  line-height: 1.7;
+
+  text-align: center;
+}
+
+/* ========================================= */
+/* ADD / REMOVE                              */
+/* ========================================= */
+
+.addButton,
+.removeButton {
+  width: min(180px, 14vw);
+
+  min-width: 110px;
+
+  margin-top: auto;
+
+  padding: 0.7vw 1vw;
+
+  border: 1px solid #38170b;
+
+  font-family: "Cinzel", serif;
+
+  font-size: clamp(12px, 0.9vw, 17px);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.addButton {
+  background: #38170b;
+  color: #fff6dd;
+}
+
+.removeButton {
+  background: transparent;
+  color: #38170b;
+}
+
+.addButton:hover,
+.removeButton:hover {
+  transform: scale(1.05);
+}
+
+/* ========================================= */
+/* EVENT NAVIGATION                          */
+/* ========================================= */
+
+.eventNavigation {
+  width: 100%;
+
+  margin-top: 1.5vw;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 2vw;
+}
+
+.eventNavigation button {
+  width: 2.5vw;
+  height: 2.5vw;
+
+  min-width: 35px;
+  min-height: 35px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #38170b;
+
+  font-size: clamp(20px, 1.8vw, 30px);
+
+  cursor: pointer;
+
+  transition: transform 0.2s ease;
+}
+
+.eventNavigation button:hover {
+  transform: scale(1.2);
+}
+
+.eventNavigation span {
+  color: #38170b;
+
+  font-family: "Cinzel", serif;
+
+  font-size: clamp(11px, 0.8vw, 15px);
+
+  font-weight: 700;
+}
+
+/* ========================================= */
+/* EMPTY INFO                                */
+/* ========================================= */
+
+.emptyInfo {
+  display: flex;
+
+  flex-direction: column;
 
   align-items: center;
   justify-content: center;
 
   text-align: center;
 
-  color: #e2dccb;
+  color: #38170b;
 
-  font:
-    100 1.2vw
-    "Abhaya Libre Extrabold",
-    serif;
+  opacity: 0.65;
+}
+
+.emptyInfo h2 {
+  margin: 0 0 1vw;
+
+  font-family: "Cinzel", serif;
+
+  font-size: clamp(1.5rem, 2vw, 3rem);
+}
+
+.emptyInfo p {
+  margin: 0;
+
+  font-family: "Cinzel", serif;
+
+  font-size: clamp(11px, 0.9vw, 16px);
+
+  line-height: 1.6;
 }
 
 /* ========================================= */
-/* CONFIRM BUTTON                             */
+/* CONFIRM BUTTON                            */
 /* ========================================= */
 
 .confirmButton {
   position: absolute;
 
-  bottom: 2vw;
-
+  bottom: 3vw;
   left: 50%;
 
   transform: translateX(-50%);
 
-  z-index: 6;
+  z-index: 10;
 
-  width: 22vw;
+  width: min(220px, 18vw);
 
-  margin: 2vw 0;
+  min-width: 150px;
 
-  padding: 1vw;
+  padding: 0.8vw 1vw;
 
   border: none;
 
-  outline: none;
+  background: #38170b;
 
-  background:
-    center / contain no-repeat
-    url("/svgs/registration/button-banner.svg");
+  color: #fff6dd;
 
-  color: #fff;
+  font-family: "Cinzel", serif;
+
+  font-size: clamp(13px, 1vw, 18px);
 
   cursor: pointer;
 
-  font:
-    100 1.5vw
-    "Abhaya Libre Extrabold",
-    serif;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  transition: filter 0.3s;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
-.confirmButton:hover {
-  filter: brightness(0.8);
+.confirmButton:hover:not(:disabled) {
+  transform: translateX(-50%) scale(1.05);
 }
 
 .confirmButton:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
 
   cursor: not-allowed;
-
-  filter: grayscale(0.3);
-}
-
-/* ========================================= */
-/* TABLET                                    */
-/* ========================================= */
-
-@media (max-width: 1200px) and (max-aspect-ratio: 1.45) {
-  .eventsContainer {
-    width: 100%;
-    height: 100svh;
-
-    margin: 0;
-
-    overflow: hidden;
-  }
-
-  .lefttop {
-    width: 28vw;
-  }
-
-  .righttop {
-    width: 28vw;
-  }
-
-  .leftbottom {
-    width: 32vw;
-  }
-
-  .rightbottom {
-    width: 32vw;
-  }
-
-  .bookContainer {
-    width: 95vw;
-
-    height: 90svh;
-  }
-
-  .content {
-    width: 78vw;
-
-    height: 70svh;
-  }
-
-  .titleRow h1 {
-    font-size: 3.2vw;
-  }
-
-  .titleGlow {
-    width: 12vw;
-  }
-
-  .searchContainer {
-    width: 70vw;
-  }
-
-  .searchContainer input {
-    font-size: 3.2vw;
-  }
-
-  .eventsArea {
-    gap: 4vw;
-  }
-
-  .eventsPage,
-  .infoPage {
-    width: 35vw;
-
-    height: 42svh;
-  }
-
-  .eventItem {
-    min-height: 5vw;
-
-    font-size: 2.8vw;
-  }
-
-  .selectedCount {
-    font-size: 2.5vw;
-  }
-
-  .eventCategory {
-    font-size: 2.5vw;
-  }
-
-  .eventInfo h2 {
-    font-size: 4.5vw;
-  }
-
-  .eventInfo p {
-    max-width: 30vw;
-
-    font-size: 2.5vw;
-  }
-
-  .addButton,
-  .removeButton {
-    width: 30vw;
-
-    padding: 1.5vw;
-
-    font-size: 2.8vw;
-  }
-
-  .emptyInfo h2 {
-    font-size: 4vw;
-  }
-
-  .emptyInfo p {
-    font-size: 2.5vw;
-  }
-
-  .confirmButton {
-    width: 55vw;
-
-    padding: 1.5vw;
-
-    font-size: 3vw;
-
-    bottom: 3vw;
-  }
 }
 
 /* ========================================= */
@@ -808,132 +602,89 @@
 
 @media (max-width: 650px) {
   .eventsContainer {
-    height: 100svh;
+    min-height: 100svh;
 
     overflow-y: auto;
 
-    padding: 8vw 0 25vw;
-
-    justify-content: flex-start;
+    padding: 8vw 5vw 25vw;
   }
 
-  .lefttop {
-    width: 40vw;
-  }
-
+  .leftbottom,
+  .lefttop,
+  .rightbottom,
   .righttop {
-    width: 40vw;
-  }
-
-  .leftbottom {
-    width: 45vw;
-  }
-
-  .rightbottom {
-    width: 45vw;
-  }
-
-  .bookContainer {
-    width: 125vw;
-
-    height: 90svh;
-
-    opacity: 0.9;
+    width: 35vw;
   }
 
   .content {
-    width: 88vw;
-
-    height: auto;
-
-    min-height: 100svh;
-  }
-
-  .titleRow {
-    margin-bottom: 5vw;
-
-    gap: 2vw;
-  }
-
-  .titleRow h1 {
-    font-size: 6.5vw;
-  }
-
-  .titleGlow {
-    width: 10vw;
-  }
-
-  .searchContainer {
-    width: 87vw;
-
-    margin-bottom: 4vw;
-  }
-
-  .searchContainer input {
-    font-size: 4.2vw;
+    width: 90vw;
   }
 
   .eventsArea {
-    width: 87vw;
-
     flex-direction: column;
 
-    gap: 6vw;
+    gap: 5vw;
   }
 
   .eventsPage,
   .infoPage {
-    width: 87vw;
-
-    height: auto;
+    width: 100%;
   }
 
-  .eventsPage {
-    height: 42svh;
+  .chooseEventsHeading {
+    margin-bottom: 4vw;
+
+    font-size: clamp(1.5rem, 7vw, 2.5rem);
   }
 
-  .eventsList {
-    gap: 1.2vw;
-  }
-
-  .eventItem {
-    min-height: 10vw;
-
-    padding: 2vw;
-
-    font-size: 4.2vw;
-  }
-
-  .selectedCount {
-    margin-top: 2vw;
-
-    font-size: 3.8vw;
-  }
-
-  .infoPage {
-    min-height: 50vw;
-  }
-
-  .eventInfo {
-    padding: 6vw;
-  }
-
-  .eventCategory {
-    margin-bottom: 2vw;
-
-    font-size: 3.5vw;
-  }
-
-  .eventInfo h2 {
-    font-size: 7vw;
+  .searchContainer {
+    height: 11vw;
 
     margin-bottom: 3vw;
   }
 
-  .eventInfo p {
-    max-width: 75vw;
+  .searchContainer input {
+    padding: 0 3vw;
 
-    font-size: 4vw;
+    font-size: 3.5vw;
+  }
+
+  .eventsList {
+    height: 50vw;
+
+    max-height: 45svh;
+
+    gap: 2vw;
+  }
+
+  .eventItem {
+    height: 11vw;
+
+    min-height: 45px;
+
+    font-size: 3.5vw;
+  }
+
+  .selectedCount {
+    margin-top: 3vw;
+
+    font-size: 3vw;
+  }
+
+  .infoPage {
+    min-height: 60vw;
+
+    padding: 6vw 5vw;
+  }
+
+  .eventTitle {
+    margin-bottom: 4vw;
+
+    font-size: clamp(1.7rem, 8vw, 3rem);
+  }
+
+  .eventDescription {
+    font-size: 3.7vw;
 
     line-height: 1.6;
   }
@@ -942,38 +693,35 @@
   .removeButton {
     width: 40vw;
 
-    padding: 3vw;
-
-    font-size: 4vw;
+    min-width: 0;
 
     margin-top: 5vw;
-  }
 
-  .emptyInfo {
-    min-height: 40vw;
-  }
+    padding: 2.5vw;
 
-  .emptyInfo h2 {
-    font-size: 6vw;
-  }
-
-  .emptyInfo p {
     font-size: 3.5vw;
   }
 
-  .message {
-    font-size: 4vw;
+  .eventNavigation {
+    margin-top: 4vw;
+
+    gap: 5vw;
+  }
+
+  .eventNavigation button {
+    width: 10vw;
+    height: 10vw;
   }
 
   .confirmButton {
-    position: fixed;
+    bottom: 5vw;
 
-    width: 70vw;
+    width: 50vw;
 
-    bottom: 3vw;
+    min-width: 0;
 
     padding: 3vw;
 
-    font-size: 5.2vw;
+    font-size: 4vw;
   }
 }
