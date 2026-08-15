@@ -7,10 +7,8 @@ interface PreloaderProps {
 }
 
 const TEXT_LINES = [
-  "The Desert has one Rule",
-  "It does not open for everyone",
-  "But the Lamps are lit Tonight",
-  "And the Oasis is expecting You"
+  "lorem ipsum dolore sel ami",
+  "lorem ipsum dolore sel ami",
 ];
 
 // Timings (ms) — tune these to taste
@@ -28,7 +26,7 @@ export default function Preloader({
   onEnter,
 }: PreloaderProps) {
   const [loaded, setLoaded] = useState(false);
-  const [activeGroup, setActiveGroup] = useState(0);
+  const [activeLine, setActiveLine] = useState(0);
   const [phase, setPhase] = useState<Phase>("in");
   const [sequenceDone, setSequenceDone] = useState(false);
 
@@ -56,68 +54,60 @@ export default function Preloader({
     });
   }, [assets]);
 
-  // Cinematic 2-line group fade + glow sequence
-useEffect(() => {
-  let cancelled = false;
-  const timeouts: ReturnType<typeof setTimeout>[] = [];
+  // Cinematic line-by-line fade + glow sequence
+  useEffect(() => {
+    let cancelled = false;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
 
-  const wait = (ms: number) =>
-    new Promise<void>((resolve) => {
-      const t = setTimeout(resolve, ms);
-      timeouts.push(t);
-    });
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => {
+        const t = setTimeout(resolve, ms);
+        timeouts.push(t);
+      });
 
-  const run = async () => {
-    const groups = [
-      [0, 1],
-      [2, 3],
-    ];
+    const run = async () => {
+      for (let i = 0; i < TEXT_LINES.length; i++) {
+        if (cancelled) return;
+        setActiveLine(i);
+        setPhase("in");
 
-    for (let i = 0; i < groups.length; i++) {
-      if (cancelled) return;
+        await wait(FADE_IN);
+        if (cancelled) return;
 
-      setActiveGroup(i);
-      setPhase("in");
+        await wait(GLOW_DELAY);
+        if (cancelled) return;
+        setPhase("glow");
 
-      await wait(FADE_IN);
-      if (cancelled) return;
+        await wait(GLOW_IN);
+        if (cancelled) return;
+        setPhase("hold");
 
-      await wait(GLOW_DELAY);
-      if (cancelled) return;
+        await wait(HOLD);
+        if (cancelled) return;
+        setPhase("out");
 
-      setPhase("glow");
+        await wait(FADE_OUT);
+        if (cancelled) return;
 
-      await wait(GLOW_IN);
-      if (cancelled) return;
-
-      setPhase("hold");
-
-      await wait(HOLD);
-      if (cancelled) return;
-
-      setPhase("out");
-
-      await wait(FADE_OUT);
-      if (cancelled) return;
-
-      if (i < groups.length - 1) {
-        await wait(GAP);
+        if (i < TEXT_LINES.length - 1) {
+          await wait(GAP);
+        }
       }
-    }
 
-    if (!cancelled) {
-      setPhase("done");
-      setSequenceDone(true);
-    }
-  };
+      if (!cancelled) {
+        setPhase("done");
+        setSequenceDone(true);
+      }
+    };
 
-  run();
+    run();
 
-  return () => {
-    cancelled = true;
-    timeouts.forEach(clearTimeout);
-  };
-}, []);
+    return () => {
+      cancelled = true;
+      timeouts.forEach(clearTimeout);
+    };
+  }, []);
+
   // Once assets are loaded and the text sequence has finished, move on.
   useEffect(() => {
     if (loaded && sequenceDone) {
@@ -134,8 +124,7 @@ useEffect(() => {
 
       <div className={styles.content}>
         {TEXT_LINES.map((line, index) => {
-          const group = Math.floor(index / 2);
-          const isActive = group === activeGroup && phase !== "done";
+          const isActive = index === activeLine && phase !== "done";
           const pathId = `preloader-path-${index}`;
 
           return (
@@ -145,7 +134,8 @@ useEffect(() => {
                 isActive ? styles[`phase-${phase}`] : ""
               }`}
               viewBox="0 0 1000 120"
-              style={{ display: isActive ? "block" : "none" }}              >
+              style={{ display: index === activeLine ? "block" : "none" }}
+            >
               <defs>
                 {/* Slight arc for a title-card feel; use
                     "M 50 60 L 950 60" for a dead-straight line instead */}

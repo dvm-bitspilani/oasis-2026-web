@@ -403,10 +403,19 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
             xPercent?: number;
             yPercent?: number;
           },
+          // CHANGED: extra static transform props (e.g. scaleX: -1) that
+          // must ride along on every gsap.set call. GSAP writes transforms
+          // to the element's inline style, which fully replaces — not
+          // merges with — any transform declared in CSS (like the sand's
+          // `transform: scaleX(-1)` mirror). Without re-asserting it here
+          // on every tick, the first onUpdate call wipes the mirror and
+          // the sand visibly "unflips" the instant the transition starts.
+          extraTransform?: Record<string, number>,
         ) => {
           gsap.set(el, {
             willChange: "transform",
             ...(basePercent ?? {}),
+            ...(extraTransform ?? {}),
           });
 
           const state = { p: 0 };
@@ -429,6 +438,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
                   x,
                   rotation: rot,
                   ...(basePercent ?? {}),
+                  ...(extraTransform ?? {}),
                 });
               },
             },
@@ -459,11 +469,19 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           );
         }
 
+        // CHANGED: pass scaleX: -1 through so the sand's CSS mirror
+        // (`transform: scaleX(-1)` in Home.module.scss) survives every
+        // gsap.set call during the sink — previously this was the one
+        // caller with no extraTransform, so the very first onUpdate wrote
+        // a transform without the mirror and the sand visibly flipped and
+        // jumped the instant a nav link was clicked.
         if (sandEl) {
           applyDrown(
             sandEl,
             FOREGROUND_DURATION,
             SINK_DISTANCE * 0.02,
+            undefined,
+            { scaleX: -1 },
           );
         }
 

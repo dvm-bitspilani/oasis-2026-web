@@ -47,7 +47,7 @@ const CLOUDS_MOBILE: Cloud[] = [
   { src: cloudSmall, top: "38%", left: "60%", width: "40%", duration: 180 },
   { src: cloudBig, top: "5%", left: "85%", width: "55%", duration: 380 },
 ];
-const bgImg = window.innerWidth < 650 ? sandMob : sandImg
+const bgImg = window.innerWidth < 650 ? sandMob : sandImg;
 const MOON_CLOUD_TINT =
   "brightness(0.35) sepia(1) hue-rotate(20deg) saturate(5)";
 
@@ -255,18 +255,65 @@ export default function Home() {
           xmlns="http://www.w3.org/2000/svg"
           preserveAspectRatio="xMidYMid meet"
         >
-          <image href={bgPath} x="0" y="0" width="110" height="100" className={styles.socialLink} />
-          <a href="https://www.instagram.com/bitsoasis/" target="_blank" rel="noreferrer">
-            <image href={instagramIcon} x="43" y="68" width="12" height="12" className={styles.socialLink} />
+          <image
+            href={bgPath}
+            x="0"
+            y="0"
+            width="110"
+            height="100"
+            className={styles.socialLink}
+          />
+          <a
+            href="https://www.instagram.com/bitsoasis/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <image
+              href={instagramIcon}
+              x="43"
+              y="68"
+              width="12"
+              height="12"
+              className={styles.socialLink}
+            />
           </a>
-          <a href="https://www.linkedin.com/company/oasis24-bits-pilani/" target="_blank" rel="noreferrer">
-            <image href={LinkdinIcon} x="87" y="46" width="12" height="12" className={styles.socialLink} />
+          <a
+            href="https://www.linkedin.com/company/oasis24-bits-pilani/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <image
+              href={LinkdinIcon}
+              x="87"
+              y="46"
+              width="12"
+              height="12"
+              className={styles.socialLink}
+            />
           </a>
           <a href="" target="_blank" rel="noreferrer">
-            <image href={youtubeIcon} x="53" y="25" width="12" height="12" className={styles.socialLink} />
+            <image
+              href={youtubeIcon}
+              x="53"
+              y="25"
+              width="12"
+              height="12"
+              className={styles.socialLink}
+            />
           </a>
-          <a href="https://www.linkedin.com/company/oasis24-bits-pilani/" target="_blank" rel="noreferrer">
-            <image href={twitterIcon} x="1" y="23" width="12" height="12" className={styles.socialLink} />
+          <a
+            href="https://www.linkedin.com/company/oasis24-bits-pilani/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <image
+              href={twitterIcon}
+              x="1"
+              y="23"
+              width="12"
+              height="12"
+              className={styles.socialLink}
+            />
           </a>
         </svg>
       </div>
