@@ -481,7 +481,6 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
             FOREGROUND_DURATION,
             SINK_DISTANCE * 0.02,
             undefined,
-            { scaleX: -1 },
           );
         }
 
