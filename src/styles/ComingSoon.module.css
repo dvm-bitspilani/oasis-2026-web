@@ -1,0 +1,164 @@
+.container {
+  height: 100svh;
+  width: 100svw;
+  overflow: hidden;
+  position: relative;
+  overscroll-behavior: none;
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.clouds {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cloudOne {
+  position: absolute;
+  top: 35%;
+  left: 0%;
+  width: 20%;
+  z-index: 4;
+}
+
+.cloudTwo {
+  position: absolute;
+  top: 15%;
+  left: 70%;
+  width: 20%;
+  z-index: 4;
+}
+
+.cloudThree {
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 20%;
+  z-index: 4;
+}
+
+.cloudFour {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  width: 20%;
+  z-index: 4;
+}
+
+.cloudOne img,
+.cloudTwo img,
+.cloudThree img,
+.cloudFour img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.sand {
+  position: absolute;
+  bottom: -1%;
+  left: 0;
+  width: 100%;
+  height: 45%;
+  z-index: 3;
+  overflow: hidden;
+}
+
+.sandImg {
+  -o-object-fit: cover;
+     object-fit: cover;
+  -o-object-position: center bottom;
+     object-position: center bottom;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+}
+
+.moon {
+  position: absolute;
+  bottom: 15%;
+  left: 40%;
+  width: 38%;
+  z-index: 0;
+  transform: translateX(-50%);
+}
+
+.moonImg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.cloud {
+  position: absolute;
+  z-index: 1;
+  will-change: transform;
+}
+.cloud img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tint {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  backdrop-filter: brightness(50%);
+  -webkit-backdrop-filter: brightness(50%);
+  pointer-events: none;
+}
+
+.centerBox {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #FEEAD1;
+}
+.centerBox h1 {
+  font-family: "Almalik", sans-serif;
+  font-size: 4rem;
+  font-weight: 200;
+  margin: 0;
+}
+.centerBox h3 {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 300;
+}
+.centerBox img {
+  outline: none;
+}
+
+@media screen and (max-width: 768px) {
+  .moon {
+    transform: translateY(-100px);
+  }
+  .centerBox {
+    top: 40%;
+  }
+  .centerBox h1 {
+    font-size: 2.25rem;
+  }
+  .centerBox h3 {
+    font-size: 1.25rem;
+  }
+  .centerBox img {
+    scale: 0.75;
+  }
+}/*# sourceMappingURL=ComingSoon.module.css.map */

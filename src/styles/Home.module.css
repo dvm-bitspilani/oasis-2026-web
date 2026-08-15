@@ -24,42 +24,12 @@
   pointer-events: none;
 }
 
-.cloudOne {
+.cloud {
   position: absolute;
-  top: 35%;
-  left: 0%;
-  width: 20%;
   z-index: 4;
+  will-change: transform;
 }
-
-.cloudTwo {
-  position: absolute;
-  top: 15%;
-  left: 70%;
-  width: 20%;
-  z-index: 4;
-}
-
-.cloudThree {
-  position: absolute;
-  top: 15%;
-  left: 20%;
-  width: 20%;
-  z-index: 4;
-}
-
-.cloudFour {
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  width: 20%;
-  z-index: 4;
-}
-
-.cloudOne img,
-.cloudTwo img,
-.cloudThree img,
-.cloudFour img {
+.cloud img {
   display: block;
   width: 100%;
   height: auto;
@@ -67,20 +37,18 @@
 
 .sand {
   position: absolute;
-  bottom: 0;
+  bottom: -1%;
   left: 0;
   width: 100%;
-  height: 45%;
+  height: 100%;
   z-index: 3;
+  transform: scaleX(-1);
   overflow: hidden;
-  
 }
 
 .sandImg {
-  -o-object-fit: cover;
-  object-fit: cover;
   -o-object-position: center bottom;
-  object-position: center bottom;
+     object-position: center bottom;
   width: 100%;
   height: 100%;
   z-index: 5;
@@ -88,7 +56,7 @@
 
 .castle {
   position: absolute;
-  bottom: 24%;
+  bottom: 23%;
   left: 41%;
   transform: translateX(-50%);
   width: 45%;
@@ -117,61 +85,144 @@
   display: block;
 }
 
-.cloud {
-  position: absolute;
-  z-index: 2;
-  will-change: transform;
-}
-.cloud img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
 .oasisLogo {
   position: absolute;
-  bottom: 5%;
-  left: 3%;
-  height: 25vh;
-  width: 25vw;
+  bottom: -2%;
+  left: 5%;
+  height: 30vh;
+  width: 30vw;
   z-index: 5;
 }
 .oasisLogo img {
   width: 100%;
   height: 100%;
   -o-object-fit: contain;
-  object-fit: contain;
+     object-fit: contain;
   display: block;
 }
 
 .regBtn {
   position: absolute;
-  bottom: -2%;
-  right: 3%;
-  height: 30vh;
-  width: 30vw;
+  bottom: 0%;
+  right: 6%;
+  height: 33vh;
+  width: 33vw;
   z-index: 5;
 }
 .regBtn img {
   width: 100%;
   height: 100%;
   -o-object-fit: contain;
-  object-fit: contain;
+     object-fit: contain;
   display: block;
 }
 
 .camelLand {
   position: absolute;
-  bottom: -7%;
-  left: 10%;
-  height: 30vh;
-  width: 30vw;
+  bottom: 17%;
+  left: 35%;
+  height: 15vh;
+  width: 15vw;
   z-index: 4;
 }
 .camelLand img {
   width: 100%;
   height: 100%;
   -o-object-fit: contain;
-  object-fit: contain;
+     object-fit: contain;
   display: block;
-} /*# sourceMappingURL=Home.module.css.map */
+}
+
+.links {
+  position: relative;
+  width: 27vw;
+  aspect-ratio: 1/1;
+  margin-top: 7%;
+  margin-left: 65%;
+  z-index: 1;
+}
+
+.linksSvg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 650px) {
+  .castle {
+    width: 100vw;
+    left: 50%;
+    bottom: 41%;
+  }
+  .sand {
+    -o-object-fit: cover;
+       object-fit: cover;
+    height: 50%;
+  }
+  .moon {
+    width: 100vw;
+    left: 50%;
+    bottom: 30%;
+  }
+  .oasisLogo {
+    position: absolute;
+    bottom: 12%;
+    left: 5%;
+    height: 50vh;
+    width: 50vw;
+    z-index: 5;
+  }
+  .oasisLogo img {
+    width: 100%;
+    height: 100%;
+    -o-object-fit: contain;
+       object-fit: contain;
+    display: block;
+  }
+  .regBtn {
+    position: absolute;
+    height: 70vh;
+    width: 70vw;
+    z-index: 5;
+    bottom: -15%;
+    left: 15%;
+  }
+  .regBtn img {
+    width: 100%;
+    height: 100%;
+    -o-object-fit: contain;
+       object-fit: contain;
+    display: block;
+  }
+  .links {
+    display: none;
+  }
+}
+.socialLink {
+  transition: filter 0.25s ease, transform 0.25s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+  box-sizing: border-box;
+}
+
+.links a {
+  display: block;
+}
+.links a:hover .socialLink, .links a:focus-visible .socialLink {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.4)) drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
+}
+
+.moonCloudOverlay {
+  position: absolute;
+  border-radius: 50%;
+  overflow: hidden;
+  mix-blend-mode: color;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.moonCloudOverlayInner {
+  position: absolute;
+}/*# sourceMappingURL=Home.module.css.map */

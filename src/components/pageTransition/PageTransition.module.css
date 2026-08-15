@@ -1,0 +1,52 @@
+.root {
+  pointer-events: none;
+}
+
+.stringLayerWrap {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.stringLayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.path {
+  fill: none;
+  stroke: white;
+  stroke-width: 2;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.45));
+}
+
+.doorLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.door {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.5%;
+  background: #0b1622;
+  pointer-events: auto;
+  will-change: transform;
+}
+
+.doorLeft {
+  left: 0;
+}
+
+.doorRight {
+  right: 0;
+}/*# sourceMappingURL=PageTransition.module.css.map */

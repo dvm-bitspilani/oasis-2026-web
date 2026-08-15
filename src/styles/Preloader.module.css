@@ -1,0 +1,148 @@
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  color: #e8e3d8;
+  font-family: "Syamsiah", sans-serif;
+  overflow: hidden;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.85) 100%);
+}
+
+.content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  text-align: center;
+}
+
+/* Container for the two lines that appear together */
+.lineGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Each line is now part of the normal vertical layout,
+   instead of all occupying the exact same absolute position */
+.lineSvg {
+  display: block;
+  width: min(90vw, 900px);
+  height: auto;
+  opacity: 0;
+  transform: scale(1.04);
+}
+
+.pathText,
+.glowText {
+  font-weight: 400;
+  font-size: 34px;
+  letter-spacing: 0.14em;
+  /*text-transform: uppercase;*/
+}
+
+.pathText {
+  fill: #e8e3d8;
+}
+
+.glowText {
+  fill: #fff8e8;
+  filter: blur(6px);
+  opacity: 0;
+}
+
+.phase-in {
+  animation: lineIn 1.6s ease-out forwards;
+}
+
+@keyframes lineIn {
+  0% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.phase-glow {
+  opacity: 1;
+  transform: scale(1);
+}
+.phase-glow .glowText {
+  animation: glowBloom 0.9s ease-out forwards;
+}
+.phase-glow .pathText {
+  animation: textBrighten 0.9s ease-out forwards;
+}
+
+@keyframes glowBloom {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+@keyframes textBrighten {
+  0% {
+    fill: #e8e3d8;
+  }
+  100% {
+    fill: #fffdf5;
+  }
+}
+.phase-hold {
+  opacity: 1;
+  transform: scale(1);
+}
+.phase-hold .glowText {
+  opacity: 0.85;
+}
+.phase-hold .pathText {
+  fill: #fffdf5;
+}
+
+.phase-out {
+  animation: lineOut 1.2s ease-in forwards;
+}
+.phase-out .glowText {
+  opacity: 0.85;
+  animation: glowFade 1.2s ease-in forwards;
+}
+.phase-out .pathText {
+  fill: #fffdf5;
+}
+
+@keyframes lineOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+@keyframes glowFade {
+  0% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+  }
+}/*# sourceMappingURL=Preloader.module.css.map */
