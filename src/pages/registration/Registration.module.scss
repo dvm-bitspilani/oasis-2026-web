@@ -1,3 +1,13 @@
+*::selection {
+  background-color: #7A2E1C;
+  color: #F3E4C3;
+}
+
+*::-moz-selection {
+  background-color: #7A2E1C;
+  color: #F3E4C3;
+}
+
 .instrback {
   background-image: url(../../assets/registration/reg/RegBg.png);
   background-position: center;

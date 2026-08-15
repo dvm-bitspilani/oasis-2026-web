@@ -30,16 +30,6 @@
       color: #6C1700;
       font-size: 6rem;
       margin: 15vh 0 0;
-
-      &::selection {
-        background-color: #7A2E1C;
-        color: #F3E4C3;
-      }
-
-      &::-moz-selection {
-        background-color: #7A2E1C;
-        color: #F3E4C3;
-      }
     }
   }
 
@@ -50,16 +40,6 @@
     font-weight: 700;
     color: #38170B;
     padding: 0 150px;
-
-    &::selection {
-      background-color: #7A2E1C;
-      color: #F3E4C3;
-    }
-
-    &::-moz-selection {
-      background-color: #7A2E1C;
-      color: #F3E4C3;
-    }
   }
 
   .instr {
@@ -77,16 +57,6 @@
       text-align: left;
       font-family: "EB", sans-serif;
       font-size: 1.25rem;
-
-      &::selection {
-        background-color: #7A2E1C;
-        color: #F3E4C3;
-      }
-
-      &::-moz-selection {
-        background-color: #7A2E1C;
-        color: #F3E4C3;
-      }
 
       &::before {
         content: "";
@@ -121,6 +91,7 @@
     margin-top: 20px;
     position: relative;
     overflow: hidden; // clip the iframe to your button's box
+    scale: 1.25;
 
     &:hover {
       cursor: default;
@@ -184,8 +155,8 @@
 
   .book {
     scale: 0.5;
-    top: -15%;
-    right: -7%;
+    top: -10%;
+    right: -13%;
   }
 
   .googleButton {
@@ -255,13 +226,56 @@
   .content {
     width: 95vw;
     left: 3%;
+    gap: 5vh;
+
+    .headingCont {
+      padding-top: 40px;
+
+      .heading {
+        margin: 0;
+        font-size: 4rem;
+      }
+    }
+
+    h5 {
+      padding: 0;
+      align-self: center;
+      font-size: 1.5rem;
+    }
 
     .instr {
-    padding: 0 100px;
+      padding: 0;
+      margin: 0 50px;
+
+      li {
+        font-size: 1rem;
+      }
     }
 
     .googleButton {
-      scale: 2.5;
+      scale: 3.25;
+    }
+  }
+}
+
+@media (max-width: 991px) and (min-height: 750px) {
+  .content {
+    .headingCont {
+      padding-top: 60px;
+
+      .heading {
+        font-size: 5rem;
+      }
+    }
+
+    h5 {
+      font-size: 1.75rem;
+    }
+
+    .instr {
+      li {
+        font-size: 1.35rem;
+      }
     }
   }
 }
