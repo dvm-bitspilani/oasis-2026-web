@@ -521,6 +521,7 @@
     .formLeft {
       .regTitle {
         font-size: 3rem;
+
       }
     }
   }
@@ -554,7 +555,7 @@
   }
 
   .formContainer {
-    padding: 25px 25px 30px;
+    padding: 25px ;
 
     .formLeft,
     .formRight {
@@ -565,6 +566,409 @@
       .regTitle {
         font-size: 2.2rem;
       }
+    }
+  }
+}
+@media (max-width: 900px) {
+  .registerContainer {
+    overflow: hidden;
+    height: 100svh;
+  }
+
+  .bookContainer {
+    /* same crop that worked: 92vw wide, pinned near the left
+       edge so wood shows on the left and the book runs flush
+       to the right (no wood on the right side) */
+    position: absolute;
+    top: 52%;
+    left: 8vw;
+    transform: translateY(-50%);
+
+    width: 92vw;
+    height: 78vh;
+
+    background-size: 180% 100%;
+    background-position: left top;
+
+    overflow: hidden;
+  }
+
+  .formContainer {
+    position: absolute;
+    inset: 0;
+
+    width: 80%;
+    height: 100%;
+    box-sizing: border-box;
+
+    flex-direction: column;
+
+    padding: 78px 30px 30px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+
+    .formLeft,
+    .formRight {
+      width: 100%;
+      height: auto;
+      flex-shrink: 0;
+
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .formLeft {
+      .regTitle {
+        margin-top: 0;
+        font-size: 2.3rem;
+        text-align: center;
+      }
+    }
+
+    .formRight {
+      margin-top: 30px;
+    }
+  }
+
+  .yearOptions {
+    width: 100%;
+    height: auto;
+    padding: 6px 0;
+  }
+
+  .nextButton {
+    margin: 20px auto 10px;
+  }
+
+  .lefttop { width: 45%; }
+  .righttop { width: 30%; }
+  .leftbottom { width: 25%; }
+  .rightbottom { width: 30%; }
+}
+
+@media (max-width: 600px) {
+  .registerContainer {
+    height: 100svh;
+  }
+
+  .bookContainer {
+    left: 4vw;
+    width: 98vw;
+    height: 74vh;
+
+    background-size: 180% 100%;
+  }
+
+  .formContainer {
+    padding: 65px 22px 25px;
+
+    .formLeft {
+      .regTitle {
+        font-size: 1.9rem;
+      }
+    }
+  }
+}
+@media (max-width: 900px) {
+  .registerContainer {
+    overflow: hidden;
+    height: 100svh;
+  }
+
+  .bookContainer {
+    position: absolute;
+    top: 52%;
+    left: 13vw;
+    transform: translateY(-50%);
+
+    width: 92vw;
+    height: 78vh;
+
+    background-size: 180% 100%;
+    background-position: left top;
+
+    overflow: hidden;
+  }
+
+  .formContainer {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+
+    flex-direction: column;
+    gap: 14px;
+
+    padding: 0 0 20px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+
+    .formLeft,
+    .formRight {
+      display: contents;
+    }
+
+    > * {
+      width: 78%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .regTitle {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+
+      margin: 0 auto;
+      padding: 16px 0 10px;
+
+      font-size: 1.9rem;
+      text-align: center;
+
+      background: linear-gradient(
+        to bottom,
+        rgba(234, 213, 168, 0.97) 78%,
+        rgba(234, 213, 168, 0)
+      );
+    }
+  }
+
+  .yearOptions {
+    width: 100%;
+    height: auto;
+    padding: 4px 0;
+  }
+
+  .nextButton {
+    margin: 12px auto 4px;
+  }
+
+  .lefttop { width: 45%; }
+  .righttop { width: 30%; }
+  .leftbottom { width: 25%; }
+  .rightbottom { width: 30%; }
+}
+
+@media (max-width: 600px) {
+  .registerContainer {
+    height: 100svh;
+  }
+
+  .bookContainer {
+    left: 8vw;
+    width: 98vw;
+    height: 74vh;
+
+    background-size: 180% 100%;
+  }
+
+  .formContainer {
+    > * {
+      width: 84%;
+    }
+
+    .regTitle {
+      width: 84%;
+      padding: 12px 0 8px;
+      font-size: 1.5rem;
+    }
+  }
+  .formContainer {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+
+    flex-direction: column;
+    gap: 14px;
+
+    padding: 0 0 20px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+
+    /* Tells the browser "don't scroll content underneath the
+       sticky header" — this is the actual fix for the auto-scroll
+       hiding NAME behind the title on load/focus. */
+    scroll-padding-top: 56px;
+
+    .formLeft,
+    .formRight {
+      display: contents;
+    }
+
+    > * {
+      width: 78%;
+      margin-left: auto;
+      margin-right: auto;
+
+      /* belt-and-suspenders per-field version of the same thing,
+         for browsers that respect this over the container-level
+         scroll-padding-top */
+      scroll-margin-top: 56px;
+    }
+
+    .regTitle {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+
+      margin: 0 auto !important;
+      padding: 16px 0 10px;
+
+      font-size: 1.9rem;
+      text-align: center;
+
+      background: linear-gradient(
+        to bottom,
+        rgba(234, 213, 168, 0.97) 78%,
+        rgba(234, 213, 168, 0)
+      );
+    }
+  }
+}
+@media (max-width: 900px) {
+  .registerContainer {
+    overflow: hidden;
+    height: 100svh;
+  }
+
+  .bookContainer {
+    position: absolute;
+    top: 52%;
+    left: 13vw;
+    transform: translateY(-50%);
+
+    width: 92vw;
+    height: 78vh;
+
+    background-size: 180% 100%;
+    background-position: left top;
+
+    overflow: hidden;
+  }
+
+  .formContainer {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+
+    flex-direction: column;
+    gap: 14px;
+
+    padding: 0 0 20px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+
+    /* keeps any scroll-into-view (focus, autofill, browser scroll
+       restoration) from landing content underneath the sticky
+       header — reserves 56px of "no-go" space at the top of the
+       scrollable area */
+    scroll-padding-top: 56px;
+
+    .formLeft,
+    .formRight {
+      display: contents;
+    }
+
+    > * {
+      width: 78%;
+      margin-left: auto;
+      margin-right: auto;
+
+      scroll-margin-top: 56px;
+    }
+
+    .regTitle {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+
+      margin: 0 auto !important;
+      padding: 16px 0 10px;
+
+      font-size: 1.9rem;
+      text-align: center;
+
+      /* no background — heading is just transparent text now */
+      background: none;
+    }
+
+    /* Since the heading no longer has a backing color, fields
+       scrolling upward would visually pass "through" it. This is
+       the actual fix for that: a plain, non-sticky spacer that
+       sits right after the sticky title and reserves height equal
+       to it, combined with a hard clip on formContainer so nothing
+       can render above the sticky title's own box in the first
+       place — content stops exactly at its lower edge instead of
+       sliding behind it. */
+    .regTitle::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 1px;
+    }
+  }
+
+  .yearOptions {
+    width: 100%;
+    height: auto;
+    padding: 4px 0;
+  }
+
+  .nextButton {
+    margin: 12px auto 4px;
+  }
+
+  .lefttop { width: 45%; }
+  .righttop { width: 30%; }
+  .leftbottom { width: 25%; }
+  .rightbottom { width: 30%; }
+}
+
+@media (max-width: 600px) {
+  .registerContainer {
+    height: 100svh;
+  }
+
+  .bookContainer {
+    left: 8vw;
+    width: 98vw;
+    height: 74vh;
+
+    background-size: 180% 100%;
+  }
+
+  .formContainer {
+    scroll-padding-top: 48px;
+
+    > * {
+      width: 84%;
+      scroll-margin-top: 48px;
+    }
+
+    .regTitle {
+      width: 84%;
+      padding: 12px 0 8px;
+      font-size: 1.5rem;
     }
   }
 }
