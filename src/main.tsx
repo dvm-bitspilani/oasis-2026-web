@@ -12,7 +12,7 @@ import App from "./App.tsx";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <CookiesProvider>
-      <GoogleOAuthProvider clientId="513838793862-gfa9g1snl74coi736ggti5nd9uglh66k.apps.googleusercontent.com">
+      <GoogleOAuthProvider clientId="425843336268-s352aj1hnh6m54n40ga6vtuoke5jma4b.apps.googleusercontent.com">
         <HelmetProvider>
           <BrowserRouter>
             <App />

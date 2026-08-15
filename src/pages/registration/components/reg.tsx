@@ -869,6 +869,7 @@ export default function Reg({
                     options={
                       genderOptions
                     }
+                      classNamePrefix="regselect"
                     placeholder="SELECT GENDER"
                     value={
                       genderOptions.find(
@@ -913,6 +914,7 @@ export default function Reg({
                     options={
                       collegeOptions
                     }
+                      classNamePrefix="regselect"
                     placeholder="SELECT COLLEGE"
                     value={
                       collegeOptions.find(
@@ -991,6 +993,7 @@ export default function Reg({
                     options={
                       stateOptions
                     }
+                      classNamePrefix="regselect"
                     placeholder="SELECT STATE"
                     value={
                       stateOptions.find(
@@ -1040,10 +1043,12 @@ export default function Reg({
                     options={
                       availableCities
                     }
+                    
                     placeholder="SELECT CITY"
                     isDisabled={
                       !selectedState
                     }
+                      classNamePrefix="regselect"
                     value={
                       availableCities.find(
                         (city) =>
