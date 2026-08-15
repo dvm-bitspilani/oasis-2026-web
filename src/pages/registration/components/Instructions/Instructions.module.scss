@@ -95,6 +95,9 @@
     &:focus {
       outline: none;
     }
+    div {
+      visibility: hidden;
+    }
   }
 }
 
