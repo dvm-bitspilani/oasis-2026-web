@@ -26,15 +26,27 @@ const LINE_GROUPS: number[][] = [
 // TIMINGS
 // ---------------------------------------------------------
 
-// How long a single line takes to fully paint in.
+// How long the underlying SMIL reveal animation technically runs for.
+// Kept at 8000 so the paint motion itself still looks the same speed.
 const PAINT_DURATION = 8000;
+
+// How long it takes, in practice, for the line to LOOK fully painted —
+// well before PAINT_DURATION elapses, because the threshold's steep
+// slope + ease curve reveal almost everything early and then barely
+// change for the rest of the animation. All scheduling (hold/fade)
+// is based on THIS, not PAINT_DURATION, so lines don't sit around
+// fully-formed for several extra seconds before anything happens.
+// Tune this by eye: lower it if lines still linger, raise it if they
+// start fading while visibly still filling in.
+const PAINT_VISUAL_COMPLETE = 4500;
 
 // Delay between line 1 starting and line 2 starting, within a group.
 const PAINT_STAGGER = 50;
 const STAGGER_RANDOM = 50;
 
-// How long a fully-painted group holds before fading out.
-const GROUP_HOLD = 800;
+// How long a fully-painted group holds before fading out, measured
+// from PAINT_VISUAL_COMPLETE (not PAINT_DURATION).
+const GROUP_HOLD = 400;
 
 // How long the group-fade-out transition itself takes.
 const GROUP_FADE_OUT = 400;
@@ -42,8 +54,9 @@ const GROUP_FADE_OUT = 400;
 // Pause after a group has fully faded out before the next group starts.
 const GROUP_GAP = 200;
 
-// Wait after the FINAL group has held, before auto-advancing to home.
-const LAST_LINE_DELAY = 2000;
+// Wait after the FINAL group has visually finished + held, before
+// auto-advancing to home.
+const LAST_LINE_DELAY = 1000;
 
 // Whole-preloader fade-out duration before onEnter() fires.
 const FADE_OUT = 400;
@@ -171,10 +184,8 @@ export default function Preloader({ assets = [], onEnter }: PreloaderProps) {
     };
 
     /*
-     * Reveals a line and starts its paint animation. The glow is no
-     * longer tied to paint completion at all — .pathText glows the
-     * whole time a line is visible, including while it's still being
-     * painted in, so there's nothing left to time here.
+     * Reveals a line and starts its paint animation. The glow is
+     * baked into .pathText permanently — nothing to schedule for it.
      */
     const revealAndPaint = async (index: number) => {
       showLine(index);
@@ -214,10 +225,13 @@ export default function Preloader({ assets = [], onEnter }: PreloaderProps) {
         if (cancelled) return;
 
         // -----------------------------------------------------
-        // Hold once line 2 has fully painted
+        // Hold once line 2 LOOKS fully painted — based on
+        // PAINT_VISUAL_COMPLETE, not the animation's technical
+        // PAINT_DURATION, so there's no dead time where the fully-
+        // formed text just sits there before anything happens.
         // -----------------------------------------------------
 
-        await wait(PAINT_DURATION + GROUP_HOLD);
+        await wait(PAINT_VISUAL_COMPLETE + GROUP_HOLD);
 
         if (cancelled) return;
 
@@ -401,9 +415,6 @@ export default function Preloader({ assets = [], onEnter }: PreloaderProps) {
                   </defs>
 
                   <g style={{ filter: `url(#${filterId})` }}>
-                    {/* .pathText always carries the glow now — it's on
-                        the whole time the line is visible, including
-                        while the paint filter is still revealing it. */}
                     <text className={styles.pathText} textAnchor="middle">
                       <textPath href={`#${pathId}`} startOffset="50%">
                         {line}
