@@ -3,6 +3,8 @@ import axios from "axios";
 
 import styles from "./Events.module.scss";
 
+import ConfirmModal from "../ConfirmModal/ConfirmModal";
+
 import bg from "../../../../assets/registration/reg/inputBg.png";
 import btn from "../../../../assets/registration/reg/btn.png";
 import RegBg from "../../../../assets/registration/reg/RegBg.png";
@@ -109,7 +111,10 @@ const TEST_EVENTS: Event[] = [
 /* COMPONENT                                 */
 /* ========================================= */
 
-export default function Events() {
+export default function Events({
+  userData,
+  setUserData,
+}: EventsProps) {
   const [events, setEvents] = useState<Event[]>([]);
   const [search, setSearch] = useState("");
 
@@ -121,6 +126,9 @@ export default function Events() {
     useState<Event | null>(null);
 
   const [loading, setLoading] = useState(true);
+
+  const [confirmModal, setConfirmModal] =
+    useState(false);
 
   /* ========================================= */
   /* FETCH EVENTS                              */
@@ -160,7 +168,7 @@ export default function Events() {
   }, []);
 
   /* ========================================= */
-  /* AUTO SHOW FIRST EVENT                    */
+  /* AUTO SHOW FIRST EVENT                     */
   /* ========================================= */
 
   useEffect(() => {
@@ -180,7 +188,7 @@ export default function Events() {
   );
 
   /* ========================================= */
-  /* KEEP ACTIVE EVENT VALID AFTER SEARCH     */
+  /* KEEP ACTIVE EVENT VALID AFTER SEARCH      */
   /* ========================================= */
 
   useEffect(() => {
@@ -313,343 +321,393 @@ export default function Events() {
   const pageOffsets = [-1, 0, 1];
 
   /* ========================================= */
+  /* SUBMIT / CONFIRM                         */
+  /* ========================================= */
+
+  const handleSubmit = () => {
+    if (selectedEvents.length === 0) {
+      return;
+    }
+
+    if (setUserData) {
+      setUserData((previousData: any) => ({
+        ...previousData,
+        events: selectedEvents.map(
+          (event) => event.id,
+        ),
+      }));
+    }
+
+    setConfirmModal(true);
+  };
+
+  /* ========================================= */
   /* RENDER                                    */
   /* ========================================= */
 
   return (
-    <div
-      className={styles.eventsContainer}
-      style={{
-        backgroundImage: `url(${RegBg})`,
-      }}
-    >
-      {/* ================================= */}
-      {/* DECORATIONS                        */}
-      {/* ================================= */}
-
-      <img
-        src={leftbottom}
-        className={styles.leftbottom}
-        alt=""
-      />
-
-      <img
-        src={lefttop}
-        className={styles.lefttop}
-        alt=""
-      />
-
-      <img
-        src={rightbottom}
-        className={styles.rightbottom}
-        alt=""
-      />
-
-      <img
-        src={righttop}
-        className={styles.righttop}
-        alt=""
-      />
-
-      {/* ================================= */}
-      {/* BOOK                               */}
-      {/* ================================= */}
-
+    <>
       <div
-        className={styles.bookContainer}
+        className={styles.eventsContainer}
         style={{
-          backgroundImage: `url(${book})`,
+          backgroundImage: `url(${RegBg})`,
         }}
-      />
+      >
+        {/* ================================= */}
+        {/* DECORATIONS                        */}
+        {/* ================================= */}
 
-      {/* ================================= */}
-      {/* CONTENT                            */}
-      {/* ================================= */}
+        <img
+          src={leftbottom}
+          className={styles.leftbottom}
+          alt=""
+        />
 
-      <div className={styles.content}>
-        <div className={styles.eventsArea}>
+        <img
+          src={lefttop}
+          className={styles.lefttop}
+          alt=""
+        />
 
-          {/* ================================= */}
-          {/* LEFT PAGE                         */}
-          {/* ================================= */}
+        <img
+          src={rightbottom}
+          className={styles.rightbottom}
+          alt=""
+        />
 
-          <div className={styles.eventsPage}>
-            <h1
-              className={
-                styles.chooseEventsHeading
-              }
-            >
-              Choose Events
-            </h1>
+        <img
+          src={righttop}
+          className={styles.righttop}
+          alt=""
+        />
 
-            {/* SEARCH */}
+        {/* ================================= */}
+        {/* BOOK                               */}
+        {/* ================================= */}
 
-            <div
-              className={
-                styles.searchContainer
-              }
-              style={{
-                backgroundImage: `url(${searchBg})`,
-              }}
-            >
-              <input
-                id="event-search"
-                name="event-search"
-                type="text"
-                placeholder="SEARCH EVENTS"
-                value={search}
-                onChange={(e) =>
-                  setSearch(e.target.value)
-                }
-                autoComplete="off"
-              />
-            </div>
+        <div
+          className={styles.bookContainer}
+          style={{
+            backgroundImage: `url(${book})`,
+          }}
+        />
 
-            {/* EVENTS LIST */}
+        {/* ================================= */}
+        {/* CONTENT                            */}
+        {/* ================================= */}
 
-            {loading ? (
-              <div
-                className={styles.message}
-              >
-                LOADING EVENTS...
-              </div>
-            ) : filteredEvents.length > 0 ? (
-              <div
-                className={styles.eventsList}
-              >
-                {filteredEvents.map((event) => {
-                  const selected =
-                    selectedEvents.some(
-                      (item) =>
-                        item.id === event.id,
-                    );
+        <div className={styles.content}>
+          <div className={styles.eventsArea}>
 
-                  const active =
-                    activeEvent?.id === event.id;
+            {/* ================================= */}
+            {/* LEFT PAGE                         */}
+            {/* ================================= */}
 
-                  return (
-                    <button
-                      key={event.id}
-                      type="button"
-                      className={`${
-                        styles.eventItem
-                      } ${
-                        selected
-                          ? styles.selected
-                          : ""
-                      } ${
-                        active
-                          ? styles.active
-                          : ""
-                      }`}
-                      style={{
-                        backgroundImage: `url(${bg})`,
-                      }}
-                      onMouseEnter={() =>
-                        setActiveEvent(event)
-                      }
-                      onFocus={() =>
-                        setActiveEvent(event)
-                      }
-                      onClick={() =>
-                        handleEvent(event)
-                      }
-                    >
-                      <span>
-                        {event.name}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <div
-                className={styles.message}
-              >
-                NO EVENTS FOUND
-              </div>
-            )}
-          </div>
-
-          {/* ================================= */}
-          {/* RIGHT PAGE                        */}
-          {/* ================================= */}
-
-          <div className={styles.infoPage}>
-            <div className={styles.rightOuter}>
-
-              {/* ALWAYS VISIBLE */}
-
+            <div className={styles.eventsPage}>
               <h1
                 className={
-                  styles.eventHeading
+                  styles.chooseEventsHeading
                 }
               >
-                Event Title
+                Choose Events
               </h1>
 
-              {/* EVENT CONTENT */}
+              {/* SEARCH */}
 
-              {activeEvent ? (
+              <div
+                className={
+                  styles.searchContainer
+                }
+                style={{
+                  backgroundImage: `url(${searchBg})`,
+                }}
+              >
+                <input
+                  id="event-search"
+                  name="event-search"
+                  type="text"
+                  placeholder="SEARCH EVENTS"
+                  value={search}
+                  onChange={(e) =>
+                    setSearch(e.target.value)
+                  }
+                  autoComplete="off"
+                />
+              </div>
+
+              {/* EVENTS LIST */}
+
+              {loading ? (
                 <div
-                  className={styles.eventInfo}
+                  className={styles.message}
                 >
-                  {/* EVENT NAME */}
+                  LOADING EVENTS...
+                </div>
+              ) : filteredEvents.length > 0 ? (
+                <div
+                  className={styles.eventsList}
+                >
+                  {filteredEvents.map((event) => {
+                    const selected =
+                      selectedEvents.some(
+                        (item) =>
+                          item.id === event.id,
+                      );
 
-                  <h2
-                    className={
-                      styles.eventTitle
-                    }
-                  >
-                    {activeEvent.name}
-                  </h2>
+                    const active =
+                      activeEvent?.id === event.id;
 
-                  {/* DESCRIPTION */}
+                    return (
+                      <button
+                        key={event.id}
+                        type="button"
+                        className={`${
+                          styles.eventItem
+                        } ${
+                          selected
+                            ? styles.selected
+                            : ""
+                        } ${
+                          active
+                            ? styles.active
+                            : ""
+                        }`}
+                        style={{
+                          backgroundImage: `url(${bg})`,
+                        }}
+                        onMouseEnter={() =>
+                          setActiveEvent(event)
+                        }
+                        onFocus={() =>
+                          setActiveEvent(event)
+                        }
+                        onClick={() =>
+                          handleEvent(event)
+                        }
+                      >
+                        <span>
+                          {event.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div
+                  className={styles.message}
+                >
+                  NO EVENTS FOUND
+                </div>
+              )}
+            </div>
 
-                  <p
-                    className={
-                      styles.eventDescription
-                    }
-                  >
-                    {activeEvent.about}
-                  </p>
+            {/* ================================= */}
+            {/* RIGHT PAGE                        */}
+            {/* ================================= */}
 
-                  {/* ADD / REMOVE */}
+            <div className={styles.infoPage}>
+              <div className={styles.rightOuter}>
 
-                  <button
-                    type="button"
-                    className={
-                      styles.eventActionButton
-                    }
-                    style={{
-                      backgroundImage: `url(${btn})`,
-                    }}
-                    onClick={() =>
-                      handleEvent(activeEvent)
-                    }
-                  >
-                    {selectedEvents.some(
-                      (event) =>
-                        event.id ===
-                        activeEvent.id,
-                    )
-                      ? "REMOVE"
-                      : "ADD"}
-                  </button>
+                {/* ALWAYS VISIBLE */}
 
-                  {/* NAVIGATION */}
+                <h1
+                  className={
+                    styles.eventHeading
+                  }
+                >
+                  Event Title
+                </h1>
 
+                {/* EVENT CONTENT */}
+
+                {activeEvent ? (
                   <div
-                    className={
-                      styles.eventNavigation
-                    }
+                    className={styles.eventInfo}
                   >
-                    <button
-                      type="button"
-                      onClick={
-                        goToPreviousEvent
-                      }
-                      aria-label="Previous event"
+                    {/* EVENT NAME */}
+
+                    <h2
                       className={
-                        styles.navArrow
+                        styles.eventTitle
                       }
                     >
-                      ‹
+                      {activeEvent.name}
+                    </h2>
+
+                    {/* DESCRIPTION */}
+
+                    <p
+                      className={
+                        styles.eventDescription
+                      }
+                    >
+                      {activeEvent.about}
+                    </p>
+
+                    {/* ADD / REMOVE */}
+
+                    <button
+                      type="button"
+                      className={
+                        styles.eventActionButton
+                      }
+                      style={{
+                        backgroundImage: `url(${btn})`,
+                      }}
+                      onClick={() =>
+                        handleEvent(activeEvent)
+                      }
+                    >
+                      {selectedEvents.some(
+                        (event) =>
+                          event.id ===
+                          activeEvent.id,
+                      )
+                        ? "REMOVE"
+                        : "ADD"}
                     </button>
+
+                    {/* NAVIGATION */}
 
                     <div
                       className={
-                        styles.pageNumbers
+                        styles.eventNavigation
                       }
                     >
-                      {filteredEvents.length <=
-                      3 ? (
-                        filteredEvents.map(
-                          (event, index) => (
-                            <button
-                              key={event.id}
-                              type="button"
-                              className={`${
-                                styles.pageNumber
-                              } ${
-                                index ===
-                                currentIndex
-                                  ? styles.currentPage
-                                  : ""
-                              }`}
-                              onClick={() =>
-                                goToPage(
-                                  index,
-                                )
-                              }
-                            >
-                              {index + 1}
-                            </button>
-                          ),
-                        )
-                      ) : (
-                        pageOffsets.map(
-                          (offset) => {
-                            const pageIndex =
-                              (currentIndex +
-                                offset +
-                                filteredEvents.length) %
-                              filteredEvents.length;
+                      <button
+                        type="button"
+                        onClick={
+                          goToPreviousEvent
+                        }
+                        aria-label="Previous event"
+                        className={
+                          styles.navArrow
+                        }
+                      >
+                        ‹
+                      </button>
 
-                            return (
+                      <div
+                        className={
+                          styles.pageNumbers
+                        }
+                      >
+                        {filteredEvents.length <=
+                        3 ? (
+                          filteredEvents.map(
+                            (event, index) => (
                               <button
-                                key={offset}
+                                key={event.id}
                                 type="button"
                                 className={`${
                                   styles.pageNumber
                                 } ${
-                                  offset === 0
+                                  index ===
+                                  currentIndex
                                     ? styles.currentPage
                                     : ""
                                 }`}
                                 onClick={() =>
                                   goToPage(
-                                    pageIndex,
+                                    index,
                                   )
                                 }
                               >
-                                {pageIndex + 1}
+                                {index + 1}
                               </button>
-                            );
-                          },
-                        )
-                      )}
-                    </div>
+                            ),
+                          )
+                        ) : (
+                          pageOffsets.map(
+                            (offset) => {
+                              const pageIndex =
+                                (currentIndex +
+                                  offset +
+                                  filteredEvents.length) %
+                                filteredEvents.length;
 
-                    <button
-                      type="button"
-                      onClick={goToNextEvent}
-                      aria-label="Next event"
-                      className={
-                        styles.navArrow
-                      }
-                    >
-                      ›
-                    </button>
+                              return (
+                                <button
+                                  key={offset}
+                                  type="button"
+                                  className={`${
+                                    styles.pageNumber
+                                  } ${
+                                    offset === 0
+                                      ? styles.currentPage
+                                      : ""
+                                  }`}
+                                  onClick={() =>
+                                    goToPage(
+                                      pageIndex,
+                                    )
+                                  }
+                                >
+                                  {pageIndex + 1}
+                                </button>
+                              );
+                            },
+                          )
+                        )}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={goToNextEvent}
+                        aria-label="Next event"
+                        className={
+                          styles.navArrow
+                        }
+                      >
+                        ›
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div
-                  className={
-                    styles.emptyInfo
-                  }
-                >
-                  <p>
-                    HOVER OVER AN EVENT
-                    <br />
-                    TO VIEW DETAILS
-                  </p>
-                </div>
-              )}
+                ) : (
+                  <div
+                    className={
+                      styles.emptyInfo
+                    }
+                  >
+                    <p>
+                      HOVER OVER AN EVENT
+                      <br />
+                      TO VIEW DETAILS
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
+
+        {/* ================================= */}
+        {/* CONFIRM BUTTON                     */}
+        {/* ================================= */}
+
+        <button
+          type="button"
+          className={styles.confirmButton}
+          onClick={handleSubmit}
+          disabled={selectedEvents.length === 0}
+        >
+          CONFIRM
+        </button>
       </div>
-    </div>
+
+      {/* =================================== */}
+      {/* CONFIRMATION MODAL                  */}
+      {/* =================================== */}
+
+      {confirmModal && (
+        <ConfirmModal
+          onCancel={() =>
+            setConfirmModal(false)
+          }
+          selectedEvents={selectedEvents}
+          userData={userData}
+        />
+      )}
+    </>
   );
 }
