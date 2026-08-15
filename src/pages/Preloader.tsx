@@ -17,7 +17,7 @@ const TEXT_LINES = [
 // TIMINGS
 // ---------------------------------------------------------
 
-const PAINT_DURATION = 10000;
+const PAINT_DURATION = 7000;
 
 const PAINT_STAGGER = 500;
 const STAGGER_RANDOM = 50;
@@ -31,7 +31,6 @@ export default function Preloader({
   onEnter,
 }: PreloaderProps) {
   const [loaded, setLoaded] = useState(false);
-
   const [visibleLines, setVisibleLines] = useState(0);
 
   /*
@@ -183,8 +182,8 @@ export default function Preloader({
         setVisibleLines(index + 1);
 
         /*
-         * Give React time to actually mount
-         * the SVG and its animation.
+         * Give React time to mount the SVG
+         * and its animation.
          */
         await wait(50);
 
@@ -206,8 +205,7 @@ export default function Preloader({
           /*
            * The 4th line has now mounted.
            *
-           * Start a completely independent 3-second
-           * countdown.
+           * Start the independent 3-second countdown.
            *
            * PAINT_DURATION has NO involvement here.
            */
@@ -367,9 +365,17 @@ export default function Preloader({
                       >
                         <animate
                           ref={(el) => {
+                            /*
+                             * React gives SVGElement | null,
+                             * while our ref expects
+                             * SVGAnimateElement | null.
+                             */
                             paintAnimRefs.current[
                               index
-                            ] = el;
+                            ] =
+                              el as
+                                | SVGAnimateElement
+                                | null;
                           }}
                           attributeName="intercept"
                           from="-18"
