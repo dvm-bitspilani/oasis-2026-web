@@ -1,7 +1,7 @@
 .preloader {
   position: fixed;
   inset: 0;
-  z-index: 99999;
+  z-index: 40;
 
   display: flex;
   align-items: center;
@@ -14,7 +14,6 @@
 
   overflow: hidden;
 }
-
 /* =========================================================
    ARABIAN NIGHT SKY
 ========================================================= */

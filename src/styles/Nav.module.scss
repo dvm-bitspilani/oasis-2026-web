@@ -6,10 +6,10 @@
   height: 10vh;
   display: flex;
   align-items: center;
-  justify-content: space-between; // circle goes left, rectangle goes right
+  justify-content: space-between;
   padding: 0 24px;
-  z-index: 5;
   margin-left: 5%;
+  z-index: 5;
 }
 
 .rectangle {
@@ -23,9 +23,6 @@
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  // The sand motion now lives inside the SVG itself (animated feTurbulence /
-  // feDisplacementMap in navSan.svg), so this stays a plain background-image —
-  // no overlay canvas, no extra DOM.
   background-image: url("../assets/navSan.svg");
   font-family: "Lentera Ramadhan", sans-serif;
   color: #eed8af;
@@ -60,6 +57,18 @@ a {
   font-family: "Ramadhan", sans-serif;
 }
 
+.rectangle a {
+  display: inline-block;
+  transition: transform 200ms ease, text-shadow 200ms ease;
+  transform-origin: center;
+
+  &:hover,
+  &:focus-visible {
+    transform: scale(1.15);
+    text-shadow: 0 0 10px rgba(238, 216, 175, 0.7);
+  }
+}
+
 @media (max-width: 650px) {
   .container {
     top: auto;
@@ -70,7 +79,7 @@ a {
     height: auto;
     margin-left: 0;
     padding: 0;
-    justify-content: center; // only one child visible now, center it
+    justify-content: center;
   }
 
   .circle {
@@ -83,11 +92,10 @@ a {
     min-width: 45vw;
     justify-content: center;
     align-items: center;
-    padding: 0.75rem 3.5rem; // room for the flanking decor
+    padding: 0.75rem 3.5rem;
     margin-right: 0;
-    background-image: var(--nav-mobile-bg); // swap to navMobile.png on mobile
+    background-image: var(--nav-mobile-bg);
 
-    // decorative flourish, left of "Home"
     &::before,
     &::after {
       content: "";
@@ -109,23 +117,11 @@ a {
 
     &::after {
       right: 1.5rem;
-      transform: translateY(-50%) scaleX(-1); // mirror so it flanks symmetrically
+      transform: translateY(-50%) scaleX(-1);
     }
 
     a:not(:first-child) {
       display: none;
     }
-  }
-}
-
-.rectangle a {
-  display: inline-block;
-  transition: transform 200ms ease, text-shadow 200ms ease;
-  transform-origin: center;
-
-  &:hover,
-  &:focus-visible {
-    transform: scale(1.15);
-    text-shadow: 0 0 10px rgba(238, 216, 175, 0.7);
   }
 }
