@@ -14,6 +14,7 @@ import rightbottom from "../../../assets/registration/reg/rightbottom.png";
 import lefttop from "../../../assets/registration/reg/lefttop.png";
 import righttop from "../../../assets/registration/reg/righttop.png";
 import book from "../../../assets/registration/reg/book.png";
+import buttonBg from "../../../assets/registration/reg/buttonbg.png";
 
 import statesData from "./Register/cities.json";
 
@@ -61,6 +62,9 @@ const registrationSchema = yup.object({
   city: yup
     .string()
     .required("City is required"),
+    dob: yup
+  .string()
+  .required("Date of birth is required"),
 });
 
 type FormData = yup.InferType<
@@ -147,6 +151,7 @@ export default function Reg({
       year: "",
       state: "",
       city: "",
+      dob:"",
     },
   });
 
@@ -499,6 +504,7 @@ export default function Reg({
               )}
               disabled
               placeholder={userEmail}
+             
             />
 
             {errors.email_id && (
@@ -601,6 +607,20 @@ export default function Reg({
             }
           >
             {/* COLLEGE */}
+{/* DOB */}
+
+<Reginput
+  title="DATE OF BIRTH"
+  type="date"
+  registration={register("dob")}
+/>
+
+{errors.dob && (
+  <p className={styles.error}>
+    {errors.dob.message}
+  </p>
+)}
+
 
             <Reginput title="COLLEGE NAME">
               <Controller
@@ -834,6 +854,9 @@ export default function Reg({
 
             <button
               type="submit"
+              style={{
+          backgroundImage: `url(${buttonBg})`,
+        }}
               className={
                 styles.nextButton
               }
