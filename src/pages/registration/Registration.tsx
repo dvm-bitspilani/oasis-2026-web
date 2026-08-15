@@ -2,7 +2,7 @@ import { Helmet } from "react-helmet-async";
 import styles from "./Registration.module.scss";
 
 import Instructions from "../../pages/registration/components/Instructions/Instructions";
-import Register from "../../pages/registration/components/reg";
+import Register from "../registration/components/Register/Register";
 import Events from "../../pages/registration/components/Events/Events";
 
 import { useState } from "react";

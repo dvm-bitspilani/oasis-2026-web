@@ -1,42 +1,77 @@
 // import * as yup from "yup";
 // import { yupResolver } from "@hookform/resolvers/yup";
 // import Select from "react-select";
-// // import Field from "/svgs/registration/field2.svg";
-// import styles from "./Register.module.scss";
-// import { useEffect, useState, forwardRef, useRef } from "react";
+// import { useEffect, useState } from "react";
 // import { useForm, Controller } from "react-hook-form";
 // import axios from "axios";
-// import statesData from "./cities.json";
-// // import Left from "/svgs/registration/leftarr.svg";
-// // import Right from "/svgs/registration/rightarr.svg";
-// // import DropDown from "/svgs/registration/dropdown.svg";
 
-// const stateOptions = statesData.map((item) => ({
-//   value: item.state,
-//   label: item.state,
-// }));
+// import styles from "./reg.module.scss";
+// import Reginput from "./Reginput";
 
-// const registrationSchema = yup.object({
-//   name: yup.string().required("Name is required"),
-//   email_id: yup.string().email("Invalid email"),
-//   gender: yup.string().required("Gender is required"),
-//   phone: yup
-//     .string()
-//     .matches(/^[1-9]\d{9}$/, "Invalid number")
-//     .required("Mobile number is required"),
-//   college_id: yup.string().required("College is required"),
-//   year: yup.string().required("Field is required"),
-//   state: yup.string().required("State is required"),
-//   city: yup.string().required("City is required"),
-// });
+// import RegBg from "../../../assets/registration/reg/RegBg.png";
+// import leftbottom from "../../../assets/registration/reg/leftbottom.png";
+// import rightbottom from "../../../assets/registration/reg/rightbottom.png";
+// import lefttop from "../../../assets/registration/reg/lefttop.png";
+// import righttop from "../../../assets/registration/reg/righttop.png";
+// import book from "../../../assets/registration/reg/book.png";
+// import buttonBg from "../../../assets/registration/reg/buttonbg.png";
 
-// type FormData = yup.InferType<typeof registrationSchema>;
+// import statesData from "./Register/cities.json";
 
-// type PropsType = {
+// interface RegProps {
 //   onClickNext: () => void;
 //   userEmail: string;
 //   setUserData: React.Dispatch<React.SetStateAction<any>>;
-// };
+// }
+
+// /* ---------------- VALIDATION ---------------- */
+
+// const registrationSchema = yup.object({
+//   name: yup
+//     .string()
+//     .required("Name is required"),
+
+//   email_id: yup
+//     .string()
+//     .email("Invalid email"),
+
+//   gender: yup
+//     .string()
+//     .required("Gender is required"),
+
+//   phone: yup
+//     .string()
+//     .matches(
+//       /^[1-9]\d{9}$/,
+//       "Invalid number"
+//     )
+//     .required("Mobile number is required"),
+
+//   college_id: yup
+//     .string()
+//     .required("College is required"),
+
+//   year: yup
+//     .string()
+//     .required("Field is required"),
+
+//   state: yup
+//     .string()
+//     .required("State is required"),
+
+//   city: yup
+//     .string()
+//     .required("City is required"),
+//     dob: yup
+//   .string()
+//   .required("Date of birth is required"),
+// });
+
+// type FormData = yup.InferType<
+//   typeof registrationSchema
+// >;
+
+// /* ---------------- OPTIONS ---------------- */
 
 // type GenderOption = {
 //   value: "M" | "F" | "O";
@@ -44,638 +79,870 @@
 // };
 
 // const genderOptions: GenderOption[] = [
-//   { value: "M", label: "Male" },
-//   { value: "F", label: "Female" },
-//   { value: "O", label: "Other" },
+//   {
+//     value: "M",
+//     label: "Male",
+//   },
+//   {
+//     value: "F",
+//     label: "Female",
+//   },
+//   {
+//     value: "O",
+//     label: "Other",
+//   },
 // ];
 
-// const Register = forwardRef<HTMLDivElement, PropsType>(  
-//   function RegisterComponent(props, ref) {
-//     const { onClickNext, userEmail, setUserData } = props;
-//     const [selectedState, setSelectedState] = useState("");
-//     const [availableCities, setAvailableCities] = useState<
-//       { value: string; label: string }[]
-//     >([]);
-//     const [collegeOptions, setCollegeOptions] = useState<
-//       { value: string; label: string }[]
-//     >([]);
-//     const [inputValue, setInputValue] = useState("");
-
-//     const dropDownRef = useRef<(HTMLImageElement | null)[]>([]);
-    
-//     useEffect(() => {
-//       axios
-//         .get("https://bits-oasis.org/2025/main/registrations/get_college/")
-//         .then((response) => {
-//           setCollegeOptions(
-//             response.data.data.map((college: { id: number; name: string }) => ({
-//               value: String(college.id),
-//               label: college.name,
-//             }))
-//           );
-//         })
-//         .catch((error) => console.error("Error fetching colleges:", error));
-//     }, []);
-
-//     const getAvailableCities = (stateName: string) =>
-//       (statesData.find((item) => item.state === stateName)?.cities ?? []).map(
-//         (city) => ({ value: city, label: city })
-//       );
-
-//     useEffect(() => {
-//       setAvailableCities(getAvailableCities(selectedState));
-//     }, [selectedState]);
-
-//     const {
-//       register,
-//       handleSubmit,
-//       formState: { errors },
-//       setValue,
-//       control,
-//       reset,
-//       watch,
-//     } = useForm<FormData>({
-//       resolver: yupResolver(registrationSchema as any),
-//       defaultValues: {
-//         name: "",
-//         email_id: userEmail,
-//         gender: "",
-//         phone: "",
-//         college_id: "",
-//         year: "",
-//         state: "",
-//         city: "",
-//       },
-//     });
-
-// useEffect(() => {
-//   const savedData = localStorage.getItem("registrationFormData");
-//   if (savedData) {
-//     try {
-//       const parsedData = JSON.parse(savedData);
-//       reset({
-//         ...parsedData,
-//         email_id: userEmail,
-//       });
-//       if (parsedData.state) {
-//         setSelectedState(parsedData.state);
-//       }
-//     } catch (err) {
-//       console.error("Failed to parse local storage data:", err);
-//       localStorage.removeItem("registrationFormData");
-//     }
-//   }
-// }, [reset, userEmail]);
-//     useEffect(() => {
-//   const subscription = watch((value) => {
-//     localStorage.setItem("registrationFormData", JSON.stringify(value));
-//   });
-
-//   return () => subscription.unsubscribe();
-// }, [watch]);
-
-//     const getFilteredOptions = (input: string) => {
-//       if (!input) return stateOptions;
-//       const inputLower = input.toLowerCase();
-//       const startsWith = stateOptions.filter((opt) =>
-//         opt.label.toLowerCase().startsWith(inputLower)
-//       );
-//       const contains = stateOptions.filter(
-//         (opt) =>
-//           !opt.label.toLowerCase().startsWith(inputLower) &&
-//           opt.label.toLowerCase().includes(inputLower)
-//       );
-//       return [...startsWith, ...contains];
-//     };
-//     const isTablet = window.matchMedia(
-//       "(max-width: 1200px) and (max-aspect-ratio: 1.45) "
-//     ).matches;
-//     const isMobile = window.matchMedia(
-//       "(max-width: 1200px) and (max-aspect-ratio: 0.75) "
-//     ).matches;
-//     const customStyle = {
-//       control: (provided: any) => ({
-//         ...provided,
-//         outline: "none",
-//         border: "none",
-//         height: "100%",
-//         width: "100%",
-//         textAlign: "center",
-//         borderRadius: "0",
-//         boxShadow: "none",
-//         cursor: "pointer",
-//       }),
-//       noOptionsMessage: (provided: any, state: any) => ({
-//         ...provided,
-//         backgroundColor: state.isFocused ? "#FFF9E9" : "#131313CC",
-//         color: state.isFocused ? "#1E1E1E" : "#FFF9E9",
-//         textAlign: "center",
-//         cursor: "pointer",
-//         padding: "0.5vw 0",
-//         display: "flex",
-//         alignItems: "center",
-//         justifyContent: "center",
-//         font: `100 ${
-//           isMobile ? 4.2 : isTablet ? 3.2 : 1.5
-//         }vw Abhaya Libre Extrabold`,
-//         "&:hover": {
-//           backgroundColor: state.isFocused ? "#FFF9E9" : "#1E1E1E",
-//         },
-//       }),
-//       dropdownIndicator: () => ({
-//         display: "none",
-//       }),
-//       indicatorSeparator: () => ({
-//         display: "none",
-//       }),
-//       placeholder: (provided: any, state: any) => ({
-//         ...provided,
-//         width: "100%",
-//         height: "100%",
-//         color: "#e2dccb",
-//         font: `100 ${
-//           isMobile ? 4.2 : isTablet ? 3.2 : 1.5
-//         }vw Abhaya Libre Extrabold`,
-//         display: state.hasValue || state.isFocused ? "none" : "flex",
-//         alignItems: "center",
-//         justifyContent: "center",
-//       }),
-//       input: (provided: any) => ({
-//         ...provided,
-//         position: "absolute",
-//         top: "50%",
-//         left: "50%",
-//         maxWidth: "65%",
-//         overflow: "hidden",
-//         transform: "translate(-50%, -50%)",
-//       }),
-//       singleValue: (provided: any) => ({
-//         ...provided,
-//         position: "absolute",
-//         top: "50%",
-//         left: "50%",
-//         transform: "translate(-50%, -50%)",
-//         width: "65%",
-//       }),
-//       valueContainer: () => ({
-//         width: "100%",
-//         height: "100%",
-//         color: "#e2dccb",
-//         font: `100 ${
-//           isMobile ? 4.2 : isTablet ? 3.2 : 1.5
-//         }vw Abhaya Libre Extrabold`,
-//       }),
-//       menuPortal: (provided: any) => ({
-//         ...provided,
-//         zIndex: 9999,
-//       }),
-//       menu: (provided: any) => ({
-//         ...provided,
-//         zIndex: 4,
-//         backgroundColor: "#1E1E1E",
-//         maxHeight: `${isMobile ? 40 : isTablet ? 30 : 10}vw`,
-//         overflow: "hidden",
-//         scrollbarWidth: "none",
-//         "::-webkit-scrollbar": {
-//           display: "none",
-//         },
-//         border: "1px solid #FFF9E9",
-//         borderRadius: "5px",
-//       }),
-//       menuList: (provided: any) => ({
-//         ...provided,
-//         zIndex: 10,
-//         maxHeight: `${isMobile ? 40 : isTablet ? 30 : 10}vw`,
-//         scrollbarWidth: "none",
-//         "::-webkit-scrollbar": {
-//           display: "none",
-//         },
-//       }),
-//       option: (provided: any, state: any) => ({
-//         ...provided,
-//         backgroundColor: state.isFocused ? "#FFF9E9" : "#131313CC",
-//         color: state.isFocused ? "#1E1E1E" : "#FFF9E9",
-//         textAlign: "center",
-//         cursor: "pointer",
-//         padding: "0.5vw 0",
-//         display: "flex",
-//         alignItems: "center",
-//         justifyContent: "center",
-//         font: `100 ${
-//           isMobile ? 4.4 : isTablet ? 3.2 : 1.5
-//         }vw Abhaya Libre Extrabold`,
-//         "&:hover": {
-//           backgroundColor: state.isFocused ? "#FFF9E9" : "#1E1E1E",
-//         },
-//       }),
-//     };
-
-//     const onSubmit = (data: any) => {
-//       console.log("Form Data:", data);
-//       setUserData({
-//         ...data,
-//         email_id: userEmail,
-//       });
-//       onClickNext();
-      
-//       localStorage.removeItem("registrationFormData");
-//     };
-
-//     return (
-//       <div className={styles.registerContainer} ref={ref}>
-//         <form
-//           autoComplete="off"
-//           onSubmit={handleSubmit(onSubmit)}
-//           className={styles.registrationForm}
-//         >
-//           <div className={styles.formColumns}>
-//             <div className={styles.left}>
-//               <div className={styles.name}>
-//                 <div className={styles.sameline}>
-//                   <img src={null} alt="Glow" />
-//                   <label>NAME</label>
-//                   <img src={null} alt="Glow" />
-//                 </div>
-//                 <div className={styles.clouds}>
-//                   <img src={null} alt="Field" className={styles.fieldImg} />
-//                   <input {...register("name")} />
-//                 </div>
-//                 <p className={styles.error}>{errors.name?.message}</p>
-//               </div>
-
-//               <div className={styles.email}>
-//                 <div className={styles.sameline}>
-//                   <img src={null} alt="Glow" />
-//                   <label>EMAIL </label>
-//                   <img src={null} alt="Glow" />
-//                 </div>
-//                 <div className={styles.clouds}>
-//                   <img src={null} alt="Field" className={styles.fieldImg} />
-//                   <input value={userEmail} disabled placeholder={userEmail} />
-//                 </div>
-//                 <p className={styles.error}>{errors.email_id?.message}</p>
-//               </div>
-
-//               <div className={styles.gender}>
-//                 <div className={styles.sameline}>
-//                   <img src={null} alt="Glow" />
-//                   <label>GENDER</label>
-//                   <img src={null} alt="Glow" />
-//                 </div>
-//                 <div className={styles.clouds}>
-//                   <img src={null} alt="Field" className={styles.fieldImg} />
-
-//                   <Controller
-//                     name="gender"
-//                     control={control}
-//                     render={({ field }) => (
-//                       <Select<GenderOption, false>
-//                         {...field}
-//                         menuPortalTarget={document.body}
-//                         options={genderOptions}
-//                         styles={customStyle}
-//                         onChange={(val) => field.onChange(val?.value || "")}
-//                         value={
-//                           genderOptions.find(
-//                             (opt) => opt.value === field.value
-//                           ) || null
-//                         }
-//                         unstyled
-//                         placeholder="--SELECT--"
-//                         className={styles["react-select-container"]}
-//                         classNamePrefix="react-select"
-//                         onMenuOpen={() => {
-//                           dropDownRef.current[0]!.classList.add(
-//                             styles.rotateDropDown
-//                           );
-//                         }}
-//                         onMenuClose={() => {
-//                           dropDownRef.current[0]!.classList.remove(
-//                             styles.rotateDropDown
-//                           );
-//                         }}
-//                       />
-//                     )}
-//                   />
-
-//                   <img
-//                     src={null}
-//                     alt="dropDown"
-//                     className={styles.dropDown}
-//                     ref={(el) => {
-//                       dropDownRef.current[0] = el;
-//                     }}
-//                   />
-//                 </div>
-//                 <p className={styles.error}>{errors.gender?.message}</p>
-//               </div>
-
-//               <div className={styles.mobile}>
-//                 <div className={styles.sameline}>
-//                   <img src={null} alt="Glow" />
-//                   <label>MOBILE NUMBER </label>
-//                   <img src={null} alt="Glow" />
-//                 </div>
-//                 <div className={styles.clouds}>
-//                   <img src={null} alt="Field" className={styles.fieldImg} />
-//                   <input {...register("phone")} />
-//                 </div>
-//                 <p className={styles.error}>{errors.phone?.message}</p>
-//               </div>
-//             </div>
-
-//             <div className={styles.right}>
-//               <div className={styles.college}>
-//                 <div className={styles.sameline}>
-//                   <img src={null} alt="Glow" />
-//                   <label>COLLEGE NAME </label>
-//                   <img src={null} alt="Glow" />
-//                 </div>
-//                 <div className={styles.clouds}>
-//                   <img src={null} alt="Field" className={styles.fieldImg} />
-//                   <Controller
-//                     name="college_id"
-//                     control={control}
-//                     render={({ field }) => (
-//                       <Select
-//                         {...field}
-//                         menuPortalTarget={document.body}
-//                         options={collegeOptions}
-//                         styles={customStyle}
-//                         onChange={(val) => field.onChange(val?.value || "")}
-//                         value={
-//                           field.value
-//                             ? collegeOptions.find(
-//                                 (c) => c.value === field.value
-//                               ) || null
-//                             : null
-//                         }
-//                         unstyled
-//                         placeholder="--SELECT--"
-//                         className={styles["react-select-container"]}
-//                         classNamePrefix="react-select"
-//                         onMenuOpen={() => {
-//                           setTimeout(() => {
-//                             dropDownRef.current[1]!.classList.add(
-//                               styles.rotateDropDown
-//                             );
-//                           }, 100);
-//                         }}
-//                         onMenuClose={() => {
-//                           dropDownRef.current[1]!.classList.remove(
-//                             styles.rotateDropDown
-//                           );
-//                         }}
-//                       />
-//                     )}
-//                   />
-//                   <img
-//                     src={null}
-//                     alt="dropDown"
-//                     className={styles.dropDown}
-//                     ref={(el) => {
-//                       dropDownRef.current[1] = el;
-//                     }}
-//                   />
-//                 </div>
-//                 <p className={styles.error}>{errors.college_id?.message}</p>
-//               </div>
-
-//               <div className={styles.year}>
-//                 <div className={styles.sameline}>
-//                   <img src={null} alt="Glow" />
-//                   <label>YEAR OF STUDY </label>
-//                   <img src={null} alt="Glow" />
-//                 </div>
-//                 <div className={styles.clouds}>
-//                   <img src={null} alt="Field" className={styles.fieldImg} />
-//                   <fieldset
-//                     className={styles.radioGroup}
-//                     aria-label="Year of Study"
-//                   >
-//                     {["1", "2", "3", "4", "5"].map((year) => (
-//                       <label key={year} className={styles.radioLabel}>
-//                         <input
-//                           type="radio"
-//                           value={year}
-//                           {...register("year")}
-//                           className={styles.radioInput}
-//                         />
-//                         <span className={styles.yearNumber}>{year}</span>
-//                       </label>
-//                     ))}
-//                   </fieldset>
-//                 </div>
-//                 <p className={styles.error}>{errors.year?.message}</p>
-//               </div>
-
-//               <div className={styles.states}>
-//                 <div className={styles.sameline}>
-//                   <img src={null} alt="Glow" />
-//                   <label>STATE</label>
-//                   <img src={null}  alt="Glow" />
-//                 </div>
-//                 <div className={styles.clouds}>
-//                   <img src={null}  alt="Field" className={styles.fieldImg} />
-//                   <Controller
-//                     name="state"
-//                     control={control}
-//                     render={({ field }) => (
-//                       <Select
-//                         {...field}
-//                         menuPortalTarget={document.body}
-//                         unstyled
-//                         options={getFilteredOptions(inputValue)}
-//                         styles={customStyle}
-//                         onInputChange={(value) => setInputValue(value)}
-//                         filterOption={() => true}
-//                         value={
-//                           field.value
-//                             ? stateOptions.find(
-//                                 (option) => option.value === field.value
-//                               ) || null
-//                             : null
-//                         }
-//                         onChange={(option) => {
-//                           const val = option?.value || "";
-//                           field.onChange(val);
-//                           setSelectedState(val);
-//                           setValue("city", "", { shouldValidate: true });
-//                         }}
-//                         placeholder="--SELECT--"
-//                         className={styles["react-select-container"]}
-//                         classNamePrefix="react-select"
-//                         onMenuOpen={() => {
-//                           dropDownRef.current[2]!.classList.add(
-//                             styles.rotateDropDown
-//                           );
-//                         }}
-//                         onMenuClose={() => {
-//                           dropDownRef.current[2]!.classList.remove(
-//                             styles.rotateDropDown
-//                           );
-//                         }}
-//                       />
-//                     )}
-//                   />
-//                   <img
-//                     src={null}
-//                     alt="dropDown"
-//                     className={styles.dropDown}
-//                     ref={(el) => {
-//                       dropDownRef.current[2] = el;
-//                     }}
-//                   />
-//                 </div>
-//                 <p className={styles.error}>{errors.state?.message}</p>
-//               </div>
-
-//               <div className={styles.city}>
-//                 <div className={styles.sameline}>
-//                   <img src={null} alt="Glow" />
-//                   <label>CITY </label>
-//                   <img src={null} alt="Glow" />
-//                 </div>
-//                 <div className={styles.clouds}>
-//                   <img src={null} alt="Field" className={styles.fieldImg} />
-//                   <Controller
-//                     name="city"
-//                     control={control}
-//                     render={({ field }) => (
-//                       <Select
-//                         {...field}
-//                         menuPortalTarget={document.body}
-//                         menuPlacement="top"
-//                         options={availableCities}
-//                         styles={customStyle}
-//                         isDisabled={!selectedState}
-//                         onChange={(val) => field.onChange(val?.value || "")}
-//                         value={
-//                           field.value
-//                             ? availableCities.find(
-//                                 (c) => c.value === field.value
-//                               ) || null
-//                             : null
-//                         }
-//                         unstyled
-//                         placeholder="--SELECT--"
-//                         className={styles["react-select-container"]}
-//                         classNamePrefix="react-select"
-//                         onMenuOpen={() => {
-//                           dropDownRef.current[3]!.classList.add(
-//                             styles.rotateDropDown
-//                           );
-//                         }}
-//                         onMenuClose={() => {
-//                           dropDownRef.current[3]!.classList.remove(
-//                             styles.rotateDropDown
-//                           );
-//                         }}
-//                       />
-//                     )}
-//                   />
-//                   <img
-//                     src={null}
-//                     alt="dropDown"
-//                     className={styles.dropDown}
-//                     ref={(el) => {
-//                       dropDownRef.current[3] = el;
-//                     }}
-//                   />
-//                 </div>
-//                 <p className={styles.error}>{errors.city?.message}</p>
-//               </div>
-//             </div>
-//           </div>
-//         </form>
-
-//         <button
-//           className={styles.confirmButton}
-//           type="submit"
-//           onClick={handleSubmit(onSubmit)}
-//         >
-//           <svg
-//             width="98"
-//             height="8"
-//             viewBox="0 0 98 8"
-//             fill="none"
-//             xmlns="http://www.w3.org/2000/svg"
-//             className={styles.confirmIcon}
-//             aria-label="Next"
-//           >
-//             <path
-//               d="M-0.000976562 4.07317C2.77052 4.07317 73.6558 6.02439 91.9262 7L96.999 4.07317L91.9262 1L-0.000976562 4.07317Z"
-//               fill="white"
-//               stroke="white"
-//               strokeWidth="0.16"
-//             />
-//           </svg>
-//           NEXT
-//           <svg
-//             width="98"
-//             height="8"
-//             viewBox="0 0 98 8"
-//             fill="none"
-//             xmlns="http://www.w3.org/2000/svg"
-//             className={styles.confirmIcon}
-//             aria-label="Next"
-//           >
-//             <path
-//               d="M-0.000976562 4.07317C2.77052 4.07317 73.6558 6.02439 91.9262 7L96.999 4.07317L91.9262 1L-0.000976562 4.07317Z"
-//               fill="white"
-//               stroke="white"
-//               strokeWidth="0.16"
-//             />
-//           </svg>
-//         </button>
-//       </div>
-//     );
-//   }
+// const stateOptions = statesData.map(
+//   (item) => ({
+//     value: item.state,
+//     label: item.state,
+//   })
 // );
 
-// export default Register;
+// /* ---------------- COMPONENT ---------------- */
+
+// export default function Reg({
+//   onClickNext,
+//   userEmail,
+//   setUserData,
+// }: RegProps) {
+//   const [selectedState, setSelectedState] =
+//     useState("");
+
+//   const [
+//     availableCities,
+//     setAvailableCities,
+//   ] = useState<
+//     { value: string; label: string }[]
+//   >([]);
+
+//   const [
+//     collegeOptions,
+//     setCollegeOptions,
+//   ] = useState<
+//     { value: string; label: string }[]
+//   >([]);
+
+//   const [inputValue, setInputValue] =
+//     useState("");
+
+//   /* ---------------- FORM ---------------- */
+
+//   const {
+//     register,
+//     handleSubmit,
+//     control,
+//     formState: { errors },
+//     setValue,
+//     reset,
+//     watch,
+//   } = useForm<FormData>({
+//     resolver: yupResolver(
+//       registrationSchema as any
+//     ),
+
+//     defaultValues: {
+//       name: "",
+//       email_id: userEmail,
+//       gender: "",
+//       phone: "",
+//       college_id: "",
+//       year: "",
+//       state: "",
+//       city: "",
+//       dob:"",
+//     },
+//   });
+
+//   /* ---------------- COLLEGE API ---------------- */
+
+//   useEffect(() => {
+//     axios
+//       .get(
+//         "https://bits-oasis.org/2026/main/registrations/get_college/"
+//       )
+//       .then((response) => {
+//         console.log(
+//           "COLLEGE API RESPONSE:",
+//           response.data
+//         );
+
+//         setCollegeOptions(
+//           response.data.map(
+//             (college: {
+//               id: number;
+//               name: string;
+//             }) => ({
+//               value: String(college.id),
+//               label: college.name,
+//             })
+//           )
+//         );
+//       })
+//       .catch((error) => {
+//         console.error(
+//           "COLLEGE API ERROR:",
+//           error
+//         );
+
+//         console.error(
+//           "RESPONSE:",
+//           error.response?.data
+//         );
+//       });
+//   }, []);
+
+//   /* ---------------- UPDATE EMAIL ---------------- */
+
+//   useEffect(() => {
+//     reset((currentValues) => ({
+//       ...currentValues,
+//       email_id: userEmail,
+//     }));
+//   }, [userEmail, reset]);
+
+//   /* ---------------- CITIES ---------------- */
+
+//   const getAvailableCities = (
+//     stateName: string
+//   ) =>
+//     (
+//       statesData.find(
+//         (item) =>
+//           item.state === stateName
+//       )?.cities ?? []
+//     ).map((city) => ({
+//       value: city,
+//       label: city,
+//     }));
+
+//   useEffect(() => {
+//     setAvailableCities(
+//       getAvailableCities(selectedState)
+//     );
+//   }, [selectedState]);
+
+//   /* ---------------- LOCAL STORAGE ---------------- */
+
+//   useEffect(() => {
+//     const savedData =
+//       localStorage.getItem(
+//         "registrationFormData"
+//       );
+
+//     if (savedData) {
+//       try {
+//         const parsedData =
+//           JSON.parse(savedData);
+
+//         reset({
+//           ...parsedData,
+//           email_id: userEmail,
+//         });
+
+//         if (parsedData.state) {
+//           setSelectedState(
+//             parsedData.state
+//           );
+//         }
+//       } catch (err) {
+//         console.error(
+//           "Failed to parse local storage data:",
+//           err
+//         );
+
+//         localStorage.removeItem(
+//           "registrationFormData"
+//         );
+//       }
+//     }
+//   }, [reset, userEmail]);
+
+//   useEffect(() => {
+//     const subscription = watch(
+//       (value) => {
+//         localStorage.setItem(
+//           "registrationFormData",
+//           JSON.stringify(value)
+//         );
+//       }
+//     );
+
+//     return () =>
+//       subscription.unsubscribe();
+//   }, [watch]);
+
+//   /* ---------------- STATE SEARCH ---------------- */
+
+//   const getFilteredOptions = (
+//     input: string
+//   ) => {
+//     if (!input) return stateOptions;
+
+//     const inputLower =
+//       input.toLowerCase();
+
+//     const startsWith =
+//       stateOptions.filter((opt) =>
+//         opt.label
+//           .toLowerCase()
+//           .startsWith(inputLower)
+//       );
+
+//     const contains =
+//       stateOptions.filter(
+//         (opt) =>
+//           !opt.label
+//             .toLowerCase()
+//             .startsWith(inputLower) &&
+//           opt.label
+//             .toLowerCase()
+//             .includes(inputLower)
+//       );
+
+//     return [
+//       ...startsWith,
+//       ...contains,
+//     ];
+//   };
+
+//   /* ---------------- SELECT STYLES ---------------- */
+
+//   const customStyle = {
+//     control: (provided: any) => ({
+//       ...provided,
+//       outline: "none",
+//       border: "none",
+//       boxShadow: "none",
+//       width: "100%",
+//       minHeight: "100%",
+//       height: "100%",
+//       background: "transparent",
+//       cursor: "pointer",
+//     }),
+
+//     valueContainer: (
+//       provided: any
+//     ) => ({
+//       ...provided,
+//       width: "100%",
+//       height: "100%",
+//       padding: "0",
+//       background: "transparent",
+//     }),
+
+//     input: (
+//       provided: any
+//     ) => ({
+//       ...provided,
+//       margin: "0",
+//       padding: "0",
+//       color: "#38170B",
+//     }),
+
+//     singleValue: (
+//       provided: any
+//     ) => ({
+//       ...provided,
+//       color: "#38170B",
+//     }),
+
+//     placeholder: (
+//       provided: any
+//     ) => ({
+//       ...provided,
+//       color: "#777",
+//     }),
+
+//     indicatorSeparator: () => ({
+//       display: "none",
+//     }),
+
+//     dropdownIndicator: (
+//       provided: any
+//     ) => ({
+//       ...provided,
+//       color: "#38170B",
+//     }),
+
+//     menuPortal: (
+//       provided: any
+//     ) => ({
+//       ...provided,
+//       zIndex: 9999,
+//     }),
+//   };
+
+//   /* ---------------- SUBMIT ---------------- */
+
+//   const onSubmit = (
+//     data: FormData
+//   ) => {
+//     console.log(
+//       "FORM DATA:",
+//       data
+//     );
+
+//     const finalData = {
+//       ...data,
+//       email_id: userEmail,
+//     };
+
+//     console.log(
+//       "FINAL USER DATA:",
+//       finalData
+//     );
+
+//     /*
+//      * Save registration data.
+//      * Registration.tsx receives this through
+//      * setUserData and passes it to Events.
+//      */
+//     setUserData(finalData);
+
+//     /*
+//      * This calls:
+//      *
+//      * Registration.tsx -> toEventPage()
+//      * -> setCurrentPage(3)
+//      * -> <Events />
+//      */
+//     onClickNext();
+
+//     localStorage.removeItem(
+//       "registrationFormData"
+//     );
+//   };
+
+//   /* ---------------- UI ---------------- */
+
+//   return (
+//     <div
+//       className={styles.registerContainer}
+//       style={{
+//         backgroundImage: `url(${RegBg})`,
+//       }}
+//     >
+//       {/* DECORATIONS */}
+
+//       <img
+//         src={leftbottom}
+//         className={styles.leftbottom}
+//         alt="leftbottom"
+//       />
+
+//       <img
+//         src={lefttop}
+//         className={styles.lefttop}
+//         alt="lefttop"
+//       />
+
+//       <img
+//         src={rightbottom}
+//         className={styles.rightbottom}
+//         alt="rightbottom"
+//       />
+
+//       <img
+//         src={righttop}
+//         className={styles.righttop}
+//         alt="righttop"
+//       />
+
+//       {/* BOOK */}
+
+//       <div
+//         className={styles.bookContainer}
+//         style={{
+//           backgroundImage: `url(${book})`,
+//         }}
+//       >
+//         <form
+//           className={styles.formContainer}
+//           onSubmit={handleSubmit(
+//             onSubmit
+//           )}
+//           autoComplete="off"
+//         >
+//           {/* LEFT PAGE */}
+
+//           <div
+//             className={styles.formLeft}
+//           >
+//             <h2
+//               className={styles.regTitle}
+//             >
+//               Registration
+//             </h2>
+
+//             {/* NAME */}
+
+//             <Reginput
+//               title="NAME"
+//               registration={register(
+//                 "name"
+//               )}
+//             />
+
+//             {errors.name && (
+//               <p
+//                 className={
+//                   styles.error
+//                 }
+//               >
+//                 {errors.name.message}
+//               </p>
+//             )}
+
+//             {/* EMAIL */}
+
+//             <Reginput
+//               title="EMAIL"
+//               registration={register(
+//                 "email_id"
+//               )}
+//               disabled
+//               placeholder={userEmail}
+             
+//             />
+
+//             {errors.email_id && (
+//               <p
+//                 className={
+//                   styles.error
+//                 }
+//               >
+//                 {
+//                   errors.email_id
+//                     .message
+//                 }
+//               </p>
+//             )}
+
+//             {/* MOBILE */}
+
+//             <Reginput
+//               title="MOBILE NUMBER"
+//               registration={register(
+//                 "phone"
+//               )}
+//               type="tel"
+//             />
+
+//             {errors.phone && (
+//               <p
+//                 className={
+//                   styles.error
+//                 }
+//               >
+//                 {errors.phone.message}
+//               </p>
+//             )}
+
+//             {/* GENDER */}
+
+//             <Reginput title="GENDER">
+//               <Controller
+//                 name="gender"
+//                 control={control}
+//                 render={({
+//                   field,
+//                 }) => (
+//                   <Select<
+//                     GenderOption,
+//                     false
+//                   >
+//                     {...field}
+//                     options={
+//                       genderOptions
+//                     }
+//                     styles={
+//                       customStyle
+//                     }
+//                     classNamePrefix="regselect"
+//                     placeholder="SELECT GENDER"
+//                     value={
+//                       genderOptions.find(
+//                         (option) =>
+//                           option.value ===
+//                           field.value
+//                       ) || null
+//                     }
+//                     onChange={(
+//                       option
+//                     ) =>
+//                       field.onChange(
+//                         option?.value ||
+//                           ""
+//                       )
+//                     }
+//                     menuPortalTarget={
+//                       document.body
+//                     }
+//                   />
+//                 )}
+//               />
+//             </Reginput>
+
+//             {errors.gender && (
+//               <p
+//                 className={
+//                   styles.error
+//                 }
+//               >
+//                 {
+//                   errors.gender
+//                     .message
+//                 }
+//               </p>
+//             )}
+//           </div>
+
+//           {/* RIGHT PAGE */}
+
+//           <div
+//             className={
+//               styles.formRight
+//             }
+//           >
+//             {/* COLLEGE */}
+// {/* DOB */}
+
+// <Reginput
+//   title="DATE OF BIRTH"
+//   type="date"
+//   registration={register("dob")}
+// />
+
+// {errors.dob && (
+//   <p className={styles.error}>
+//     {errors.dob.message}
+//   </p>
+// )}
 
 
+//             <Reginput title="COLLEGE NAME">
+//               <Controller
+//                 name="college_id"
+//                 control={control}
+//                 render={({
+//                   field,
+//                 }) => (
+//                   <Select
+//                     {...field}
+//                     options={
+//                       collegeOptions
+//                     }
+//                     styles={
+//                       customStyle
+//                     }
+//                     classNamePrefix="regselect"
+//                     placeholder="SELECT COLLEGE"
+//                     value={
+//                       collegeOptions.find(
+//                         (college) =>
+//                           college.value ===
+//                           field.value
+//                       ) || null
+//                     }
+//                     onChange={(
+//                       option
+//                     ) =>
+//                       field.onChange(
+//                         option?.value ||
+//                           ""
+//                       )
+//                     }
+//                     menuPortalTarget={
+//                       document.body
+//                     }
+//                   />
+//                 )}
+//               />
+//             </Reginput>
 
+//             {errors.college_id && (
+//               <p
+//                 className={
+//                   styles.error
+//                 }
+//               >
+//                 {
+//                   errors.college_id
+//                     .message
+//                 }
+//               </p>
+//             )}
+
+//             {/* YEAR */}
+
+//             <Reginput title="YEAR OF STUDY">
+//               <div
+//                 className={
+//                   styles.yearOptions
+//                 }
+//               >
+//                 {[
+//                   "1",
+//                   "2",
+//                   "3",
+//                   "4",
+//                   "5",
+//                 ].map((year) => (
+//                   <label key={year}>
+//                     <input
+//                       type="radio"
+//                       value={year}
+//                       {...register(
+//                         "year"
+//                       )}
+//                     />
+//                     <span>
+//                       {year}
+//                     </span>
+//                   </label>
+//                 ))}
+//               </div>
+//             </Reginput>
+
+//             {errors.year && (
+//               <p
+//                 className={
+//                   styles.error
+//                 }
+//               >
+//                 {
+//                   errors.year.message
+//                 }
+//               </p>
+//             )}
+
+//             {/* STATE */}
+
+//             <Reginput title="STATE">
+//               <Controller
+//                 name="state"
+//                 control={control}
+//                 render={({
+//                   field,
+//                 }) => (
+//                   <Select
+//                     {...field}
+//                     options={getFilteredOptions(
+//                       inputValue
+//                     )}
+//                     styles={
+//                       customStyle
+//                     }
+//                     classNamePrefix="regselect"
+//                     placeholder="SELECT STATE"
+//                     value={
+//                       stateOptions.find(
+//                         (state) =>
+//                           state.value ===
+//                           field.value
+//                       ) || null
+//                     }
+//                     onInputChange={(
+//                       value
+//                     ) =>
+//                       setInputValue(
+//                         value
+//                       )
+//                     }
+//                     filterOption={() =>
+//                       true
+//                     }
+//                     onChange={(
+//                       option
+//                     ) => {
+//                       const value =
+//                         option?.value ||
+//                         "";
+
+//                       field.onChange(
+//                         value
+//                       );
+
+//                       setSelectedState(
+//                         value
+//                       );
+
+//                       setValue(
+//                         "city",
+//                         ""
+//                       );
+//                     }}
+//                     menuPortalTarget={
+//                       document.body
+//                     }
+//                   />
+//                 )}
+//               />
+//             </Reginput>
+
+//             {errors.state && (
+//               <p
+//                 className={
+//                   styles.error
+//                 }
+//               >
+//                 {
+//                   errors.state
+//                     .message
+//                 }
+//               </p>
+//             )}
+
+//             {/* CITY */}
+
+//             <Reginput title="CITY">
+//               <Controller
+//                 name="city"
+//                 control={control}
+//                 render={({
+//                   field,
+//                 }) => (
+//                   <Select
+//                     {...field}
+//                     options={
+//                       availableCities
+//                     }
+//                     styles={
+//                       customStyle
+//                     }
+//                     classNamePrefix="regselect"
+//                     placeholder="SELECT CITY"
+//                     isDisabled={
+//                       !selectedState
+//                     }
+//                     value={
+//                       availableCities.find(
+//                         (city) =>
+//                           city.value ===
+//                           field.value
+//                       ) || null
+//                     }
+//                     onChange={(
+//                       option
+//                     ) =>
+//                       field.onChange(
+//                         option?.value ||
+//                           ""
+//                       )
+//                     }
+//                     menuPortalTarget={
+//                       document.body
+//                     }
+//                   />
+//                 )}
+//               />
+//             </Reginput>
+
+//             {errors.city && (
+//               <p
+//                 className={
+//                   styles.error
+//                 }
+//               >
+//                 {errors.city.message}
+//               </p>
+//             )}
+
+//             {/* NEXT */}
+
+//             <button
+//               type="submit"
+//               style={{
+//           backgroundImage: `url(${buttonBg})`,
+//         }}
+//               className={
+//                 styles.nextButton
+//               }
+//             >
+//               NEXT
+//             </button>
+//           </div>
+//         </form>
+//       </div>
+//     </div>
+//   );
+// }
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Select from "react-select";
-// import Field from "/svgs/registration/field2.svg";
-import styles from "./Register.module.scss";
-import { useEffect, useState, forwardRef } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
+
+import styles from "./register.module.scss";
+import Reginput from "./reginput";
+
+import RegBg from "../../../../assets/registration/reg/RegBg.png";
+import leftbottom from "../../../../assets/registration/reg/leftbottom.png";
+import rightbottom from "../../../../assets/registration/reg/rightbottom.png";
+import lefttop from "../../../../assets/registration/reg/lefttop.png";
+import righttop from "../../../../assets/registration/reg/righttop.png";
+import book from "../../../../assets/registration/reg/book.png";
+import buttonBg from "../../../../assets/registration/reg/buttonbg.png";
+
 import statesData from "./cities.json";
-// import Left from "/svgs/registration/leftarr.svg";
-// import Right from "/svgs/registration/rightarr.svg";
-// import DropDown from "/svgs/registration/dropdown.svg";
 
-const stateOptions = statesData.map((item) => ({
-  value: item.state,
-  label: item.state,
-}));
-
-const registrationSchema = yup.object({
-  name: yup.string().required("Name is required"),
-  email_id: yup.string().email("Invalid email"),
-  gender: yup.string().required("Gender is required"),
-  phone: yup
-    .string()
-    .matches(/^[1-9]\d{9}$/, "Invalid number")
-    .required("Mobile number is required"),
-  college_id: yup.string().required("College is required"),
-  year: yup.string().required("Field is required"),
-  state: yup.string().required("State is required"),
-  city: yup.string().required("City is required"),
-});
-
-type FormData = yup.InferType<typeof registrationSchema>;
-
-type PropsType = {
+interface RegProps {
   onClickNext: () => void;
   userEmail: string;
   setUserData: React.Dispatch<React.SetStateAction<any>>;
-};
+}
+
+/* ---------------- VALIDATION ---------------- */
+
+const registrationSchema = yup.object({
+  name: yup
+    .string()
+    .required("Name is required"),
+
+  email_id: yup
+    .string()
+    .email("Invalid email"),
+
+  gender: yup
+    .string()
+    .required("Gender is required"),
+
+  phone: yup
+    .string()
+    .matches(
+      /^[1-9]\d{9}$/,
+      "Invalid number"
+    )
+    .required("Mobile number is required"),
+
+  college_id: yup
+    .string()
+    .required("College is required"),
+
+  year: yup
+    .string()
+    .required("Field is required"),
+
+  state: yup
+    .string()
+    .required("State is required"),
+
+  city: yup
+    .string()
+    .required("City is required"),
+    dob: yup
+  .string()
+  .required("Date of birth is required"),
+});
+
+type FormData = yup.InferType<
+  typeof registrationSchema
+>;
+
+/* ---------------- OPTIONS ---------------- */
 
 type GenderOption = {
   value: "M" | "F" | "O";
@@ -683,709 +950,808 @@ type GenderOption = {
 };
 
 const genderOptions: GenderOption[] = [
-  { value: "M", label: "Male" },
-  { value: "F", label: "Female" },
-  { value: "O", label: "Other" },
+  {
+    value: "M",
+    label: "Male",
+  },
+  {
+    value: "F",
+    label: "Female",
+  },
+  {
+    value: "O",
+    label: "Other",
+  },
 ];
 
-const Register = forwardRef<HTMLDivElement, PropsType>(
-  function RegisterComponent(props, ref) {
-    const { onClickNext, userEmail, setUserData } = props;
+const stateOptions = statesData.map(
+  (item) => ({
+    value: item.state,
+    label: item.state,
+  })
+);
 
-    const [selectedState, setSelectedState] = useState("");
-    const [availableCities, setAvailableCities] = useState<
-      { value: string; label: string }[]
-    >([]);
-    const [collegeOptions, setCollegeOptions] = useState<
-      { value: string; label: string }[]
-    >([]);
-    const [inputValue, setInputValue] = useState("");
+/* ---------------- COMPONENT ---------------- */
 
-    // useEffect(() => {
-    //   axios
-    //     .get("https://bits-oasis.org/2026/main/registrations/get_college/")
-    //     .then((response) => {
-    //       setCollegeOptions(
-    //         response.data.data.map(
-    //           (college: { id: number; name: string }) => ({
-    //             value: String(college.id),
-    //             label: college.name,
-    //           })
-    //         )
-    //       );
-    //     })
-    //     .catch((error) => console.error("Error fetching colleges:", error)
-        
-    //   );
-    // }, []);
+export default function Reg({
+  onClickNext,
+  userEmail,
+  setUserData,
+}: RegProps) {
+  const [selectedState, setSelectedState] =
+    useState("");
 
-    useEffect(() => {
-  axios
-    .get("https://bits-oasis.org/2026/main/registrations/get_college/")
-    .then((response) => {
-      console.log("COLLEGE API RESPONSE:", response.data);
+  const [
+    availableCities,
+    setAvailableCities,
+  ] = useState<
+    { value: string; label: string }[]
+  >([]);
 
-      setCollegeOptions(
-        response.data.map(
-          (college: { id: number; name: string }) => ({
-            value: String(college.id),
-            label: college.name,
-          })
-        )
+  const [
+    collegeOptions,
+    setCollegeOptions,
+  ] = useState<
+    { value: string; label: string }[]
+  >([]);
+
+  const [inputValue, setInputValue] =
+    useState("");
+
+  /* ---------------- FORM ---------------- */
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    setValue,
+    reset,
+    watch,
+  } = useForm<FormData>({
+    resolver: yupResolver(
+      registrationSchema as any
+    ),
+
+    defaultValues: {
+      name: "",
+      email_id: userEmail,
+      gender: "",
+      phone: "",
+      college_id: "",
+      year: "",
+      state: "",
+      city: "",
+      dob:"",
+    },
+  });
+
+  /* ---------------- COLLEGE API ---------------- */
+
+  useEffect(() => {
+    axios
+      .get(
+        "https://bits-oasis.org/2026/main/registrations/get_college/"
+      )
+      .then((response) => {
+        console.log(
+          "COLLEGE API RESPONSE:",
+          response.data
+        );
+
+        setCollegeOptions(
+          response.data.map(
+            (college: {
+              id: number;
+              name: string;
+            }) => ({
+              value: String(college.id),
+              label: college.name,
+            })
+          )
+        );
+      })
+      .catch((error) => {
+        console.error(
+          "COLLEGE API ERROR:",
+          error
+        );
+
+        console.error(
+          "RESPONSE:",
+          error.response?.data
+        );
+      });
+  }, []);
+
+  /* ---------------- UPDATE EMAIL ---------------- */
+
+  useEffect(() => {
+    reset((currentValues) => ({
+      ...currentValues,
+      email_id: userEmail,
+    }));
+  }, [userEmail, reset]);
+
+  /* ---------------- CITIES ---------------- */
+
+  const getAvailableCities = (
+    stateName: string
+  ) =>
+    (
+      statesData.find(
+        (item) =>
+          item.state === stateName
+      )?.cities ?? []
+    ).map((city) => ({
+      value: city,
+      label: city,
+    }));
+
+  useEffect(() => {
+    setAvailableCities(
+      getAvailableCities(selectedState)
+    );
+  }, [selectedState]);
+
+  /* ---------------- LOCAL STORAGE ---------------- */
+
+  useEffect(() => {
+    const savedData =
+      localStorage.getItem(
+        "registrationFormData"
       );
-    })
-    .catch((error) => {
-      console.error("COLLEGE API ERROR:", error);
-      console.error("RESPONSE:", error.response?.data);
-    });
-}, []);
-    const getAvailableCities = (stateName: string) =>
-      (statesData.find((item) => item.state === stateName)?.cities ?? []).map(
-        (city) => ({
-          value: city,
-          label: city,
-        })
-      );
 
-    useEffect(() => {
-      setAvailableCities(getAvailableCities(selectedState));
-    }, [selectedState]);
+    if (savedData) {
+      try {
+        const parsedData =
+          JSON.parse(savedData);
 
-    const {
-      register,
-      handleSubmit,
-      formState: { errors },
-      setValue,
-      control,
-      reset,
-      watch,
-    } = useForm<FormData>({
-      resolver: yupResolver(registrationSchema as any),
-      defaultValues: {
-        name: "",
-        email_id: userEmail,
-        gender: "",
-        phone: "",
-        college_id: "",
-        year: "",
-        state: "",
-        city: "",
-      },
-    });
+        reset({
+          ...parsedData,
+          email_id: userEmail,
+        });
 
-    useEffect(() => {
-      const savedData = localStorage.getItem("registrationFormData");
-
-      if (savedData) {
-        try {
-          const parsedData = JSON.parse(savedData);
-
-          reset({
-            ...parsedData,
-            email_id: userEmail,
-          });
-
-          if (parsedData.state) {
-            setSelectedState(parsedData.state);
-          }
-        } catch (err) {
-          console.error("Failed to parse local storage data:", err);
-          localStorage.removeItem("registrationFormData");
+        if (parsedData.state) {
+          setSelectedState(
+            parsedData.state
+          );
         }
-      }
-    }, [reset, userEmail]);
+      } catch (err) {
+        console.error(
+          "Failed to parse local storage data:",
+          err
+        );
 
-    useEffect(() => {
-      const subscription = watch((value) => {
+        localStorage.removeItem(
+          "registrationFormData"
+        );
+      }
+    }
+  }, [reset, userEmail]);
+
+  useEffect(() => {
+    const subscription = watch(
+      (value) => {
         localStorage.setItem(
           "registrationFormData",
           JSON.stringify(value)
         );
-      });
+      }
+    );
 
-      return () => subscription.unsubscribe();
-    }, [watch]);
+    return () =>
+      subscription.unsubscribe();
+  }, [watch]);
 
-    const getFilteredOptions = (input: string) => {
-      if (!input) return stateOptions;
+  /* ---------------- STATE SEARCH ---------------- */
 
-      const inputLower = input.toLowerCase();
+  const getFilteredOptions = (
+    input: string
+  ) => {
+    if (!input) return stateOptions;
 
-      const startsWith = stateOptions.filter((opt) =>
-        opt.label.toLowerCase().startsWith(inputLower)
+    const inputLower =
+      input.toLowerCase();
+
+    const startsWith =
+      stateOptions.filter((opt) =>
+        opt.label
+          .toLowerCase()
+          .startsWith(inputLower)
       );
 
-      const contains = stateOptions.filter(
+    const contains =
+      stateOptions.filter(
         (opt) =>
-          !opt.label.toLowerCase().startsWith(inputLower) &&
-          opt.label.toLowerCase().includes(inputLower)
+          !opt.label
+            .toLowerCase()
+            .startsWith(inputLower) &&
+          opt.label
+            .toLowerCase()
+            .includes(inputLower)
       );
 
-      return [...startsWith, ...contains];
+    return [
+      ...startsWith,
+      ...contains,
+    ];
+  };
+
+  /* ---------------- SELECT STYLES ---------------- */
+
+  const customStyle = {
+    control: (provided: any) => ({
+      ...provided,
+      outline: "none",
+      border: "none",
+      boxShadow: "none",
+      width: "100%",
+      minHeight: "100%",
+      height: "100%",
+      background: "transparent",
+      cursor: "pointer",
+    }),
+
+    valueContainer: (
+      provided: any
+    ) => ({
+      ...provided,
+      width: "100%",
+      height: "100%",
+      padding: "0",
+      background: "transparent",
+    }),
+
+    input: (
+      provided: any
+    ) => ({
+      ...provided,
+      margin: "0",
+      padding: "0",
+      color: "#38170B",
+    }),
+
+    singleValue: (
+      provided: any
+    ) => ({
+      ...provided,
+      color: "#38170B",
+    }),
+
+    placeholder: (
+      provided: any
+    ) => ({
+      ...provided,
+      color: "#777",
+    }),
+
+    indicatorSeparator: () => ({
+      display: "none",
+    }),
+
+    dropdownIndicator: (
+      provided: any
+    ) => ({
+      ...provided,
+      color: "#38170B",
+    }),
+
+    menuPortal: (
+      provided: any
+    ) => ({
+      ...provided,
+      zIndex: 9999,
+    }),
+
+    menu: (
+      provided: any
+    ) => ({
+      ...provided,
+      marginTop: 4,
+    }),
+
+    menuList: (
+      provided: any
+    ) => ({
+      ...provided,
+      maxHeight: 260,
+      padding: 4,
+    }),
+  };
+
+  /* ---------------- SUBMIT ---------------- */
+
+  const onSubmit = (
+    data: FormData
+  ) => {
+    console.log(
+      "FORM DATA:",
+      data
+    );
+
+    const finalData = {
+      ...data,
+      email_id: userEmail,
     };
 
-    const isTablet = window.matchMedia(
-      "(max-width: 1200px) and (max-aspect-ratio: 1.45)"
-    ).matches;
+    console.log(
+      "FINAL USER DATA:",
+      finalData
+    );
 
-    const isMobile = window.matchMedia(
-      "(max-width: 1200px) and (max-aspect-ratio: 0.75)"
-    ).matches;
+    /*
+     * Save registration data.
+     * Registration.tsx receives this through
+     * setUserData and passes it to Events.
+     */
+    setUserData(finalData);
 
-    const customStyle = {
-      control: (provided: any) => ({
-        ...provided,
-        outline: "none",
-        border: "none",
-        height: "100%",
-        width: "100%",
-        textAlign: "center",
-        borderRadius: "0",
-        boxShadow: "none",
-        cursor: "pointer",
-      }),
+    /*
+     * This calls:
+     *
+     * Registration.tsx -> toEventPage()
+     * -> setCurrentPage(3)
+     * -> <Events />
+     */
+    onClickNext();
 
-      noOptionsMessage: (provided: any, state: any) => ({
-        ...provided,
-        backgroundColor: state.isFocused ? "#FFF9E9" : "#131313CC",
-        color: state.isFocused ? "#1E1E1E" : "#FFF9E9",
-        textAlign: "center",
-        cursor: "pointer",
-        padding: "0.5vw 0",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        font: `100 ${
-          isMobile ? 4.2 : isTablet ? 3.2 : 1.5
-        }vw Abhaya Libre Extrabold`,
-        "&:hover": {
-          backgroundColor: state.isFocused ? "#FFF9E9" : "#1E1E1E",
-        },
-      }),
+    localStorage.removeItem(
+      "registrationFormData"
+    );
+  };
 
-      dropdownIndicator: () => ({
-        display: "none",
-      }),
+  /* ---------------- UI ---------------- */
 
-      indicatorSeparator: () => ({
-        display: "none",
-      }),
+  return (
+    <div
+      className={styles.registerContainer}
+      style={{
+        backgroundImage: `url(${RegBg})`,
+      }}
+    >
+      {/* DECORATIONS */}
 
-      placeholder: (provided: any, state: any) => ({
-        ...provided,
-        width: "100%",
-        height: "100%",
-        color: "#e2dccb",
-        font: `100 ${
-          isMobile ? 4.2 : isTablet ? 3.2 : 1.5
-        }vw Abhaya Libre Extrabold`,
-        display: state.hasValue || state.isFocused ? "none" : "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }),
+      <img
+        src={leftbottom}
+        className={styles.leftbottom}
+        alt="leftbottom"
+      />
 
-      input: (provided: any) => ({
-        ...provided,
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        maxWidth: "65%",
-        overflow: "hidden",
-        transform: "translate(-50%, -50%)",
-      }),
+      <img
+        src={lefttop}
+        className={styles.lefttop}
+        alt="lefttop"
+      />
 
-      singleValue: (provided: any) => ({
-        ...provided,
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: "65%",
-      }),
+      <img
+        src={rightbottom}
+        className={styles.rightbottom}
+        alt="rightbottom"
+      />
 
-      valueContainer: () => ({
-        width: "100%",
-        height: "100%",
-        color: "#e2dccb",
-        font: `100 ${
-          isMobile ? 4.2 : isTablet ? 3.2 : 1.5
-        }vw Abhaya Libre Extrabold`,
-      }),
+      <img
+        src={righttop}
+        className={styles.righttop}
+        alt="righttop"
+      />
 
-      menuPortal: (provided: any) => ({
-        ...provided,
-        zIndex: 9999,
-      }),
+      {/* BOOK */}
 
-      menu: (provided: any) => ({
-        ...provided,
-        zIndex: 4,
-        backgroundColor: "#1E1E1E",
-        maxHeight: `${isMobile ? 40 : isTablet ? 30 : 10}vw`,
-        overflow: "hidden",
-        scrollbarWidth: "none",
-        "::-webkit-scrollbar": {
-          display: "none",
-        },
-        border: "1px solid #FFF9E9",
-        borderRadius: "5px",
-      }),
-
-      menuList: (provided: any) => ({
-        ...provided,
-        zIndex: 10,
-        maxHeight: `${isMobile ? 40 : isTablet ? 30 : 10}vw`,
-        scrollbarWidth: "none",
-        "::-webkit-scrollbar": {
-          display: "none",
-        },
-      }),
-
-      option: (provided: any, state: any) => ({
-        ...provided,
-        backgroundColor: state.isFocused ? "#FFF9E9" : "#131313CC",
-        color: state.isFocused ? "#1E1E1E" : "#FFF9E9",
-        textAlign: "center",
-        cursor: "pointer",
-        padding: "0.5vw 0",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        font: `100 ${
-          isMobile ? 4.4 : isTablet ? 3.2 : 1.5
-        }vw Abhaya Libre Extrabold`,
-        "&:hover": {
-          backgroundColor: state.isFocused ? "#FFF9E9" : "#1E1E1E",
-        },
-      }),
-    };
-
-    const onSubmit = (data: any) => {
-      console.log("Form Data:", data);
-
-      setUserData({
-        ...data,
-        email_id: userEmail,
-      });
-
-      onClickNext();
-
-      localStorage.removeItem("registrationFormData");
-    };
-
-    return (
-      <div className={styles.registerContainer} ref={ref}>
+      <div
+        className={styles.bookContainer}
+        style={{
+          backgroundImage: `url(${book})`,
+        }}
+      >
         <form
+          className={styles.formContainer}
+          onSubmit={handleSubmit(
+            onSubmit
+          )}
           autoComplete="off"
-          onSubmit={handleSubmit(onSubmit)}
-          className={styles.registrationForm}
         >
-          <div className={styles.formColumns}>
-            <div className={styles.left}>
-              <div className={styles.name}>
-                <div className={styles.sameline}>
-                  <img src={null} alt="Glow" />
-                  <label htmlFor="name">NAME</label>
-                  <img src={null} alt="Glow" />
-                </div>
+          {/* LEFT PAGE */}
 
-                <div className={styles.clouds}>
-                  <img
-                    src={null}
-                    alt="Field"
-                    className={styles.fieldImg}
-                  />
-                  <input
-                    id="name"
-                    autoComplete="name"
-                    {...register("name")}
-                  />
-                </div>
+          <div
+            className={styles.formLeft}
+          >
+            <h2
+              className={styles.regTitle}
+            >
+              Registration
+            </h2>
 
-                <p className={styles.error}>{errors.name?.message}</p>
-              </div>
+            {/* NAME */}
 
-              <div className={styles.email}>
-                <div className={styles.sameline}>
-                  <img src={null} alt="Glow" />
-                  <label htmlFor="email">EMAIL </label>
-                  <img src={null} alt="Glow" />
-                </div>
+            <Reginput
+              title="NAME"
+              registration={register(
+                "name"
+              )}
+            />
 
-                <div className={styles.clouds}>
-                  <img
-                    src={null}
-                    alt="Field"
-                    className={styles.fieldImg}
-                  />
-                  <input
-                    id="email"
-                    value={userEmail}
-                    disabled
-                    placeholder={userEmail}
-                    autoComplete="email"
-                  />
-                </div>
+            {errors.name && (
+              <p
+                className={
+                  styles.error
+                }
+              >
+                {errors.name.message}
+              </p>
+            )}
 
-                <p className={styles.error}>
-                  {errors.email_id?.message}
-                </p>
-              </div>
+            {/* EMAIL */}
 
-              <div className={styles.gender}>
-                <div className={styles.sameline}>
-                  <img src={null} alt="Glow" />
-                  <label htmlFor="gender">GENDER</label>
-                  <img src={null} alt="Glow" />
-                </div>
+            <Reginput
+              title="EMAIL"
+              registration={register(
+                "email_id"
+              )}
+              disabled
+              placeholder={userEmail}
+             
+            />
 
-                <div className={styles.clouds}>
-                  <img
-                    src={null}
-                    alt="Field"
-                    className={styles.fieldImg}
-                  />
+            {errors.email_id && (
+              <p
+                className={
+                  styles.error
+                }
+              >
+                {
+                  errors.email_id
+                    .message
+                }
+              </p>
+            )}
 
-                  <Controller
-                    name="gender"
-                    control={control}
-                    render={({ field }) => (
-                      <Select<GenderOption, false>
-                        {...field}
-                        inputId="gender"
-                        menuPortalTarget={document.body}
-                        options={genderOptions}
-                        styles={customStyle}
-                        onChange={(val) =>
-                          field.onChange(val?.value || "")
-                        }
-                        value={
-                          genderOptions.find(
-                            (opt) => opt.value === field.value
-                          ) || null
-                        }
-                        unstyled
-                        placeholder="--SELECT--"
-                        className={
-                          styles["react-select-container"]
-                        }
-                        classNamePrefix="react-select"
-                      />
-                    )}
-                  />
+            {/* MOBILE */}
 
-                  <img
-                    src={null}
-                    alt="dropDown"
-                    className={styles.dropDown}
-                  />
-                </div>
+            <Reginput
+              title="MOBILE NUMBER"
+              registration={register(
+                "phone"
+              )}
+              type="tel"
+            />
 
-                <p className={styles.error}>
-                  {errors.gender?.message}
-                </p>
-              </div>
+            {errors.phone && (
+              <p
+                className={
+                  styles.error
+                }
+              >
+                {errors.phone.message}
+              </p>
+            )}
 
-              <div className={styles.mobile}>
-                <div className={styles.sameline}>
-                  <img src={null} alt="Glow" />
-                  <label htmlFor="phone">MOBILE NUMBER </label>
-                  <img src={null} alt="Glow" />
-                </div>
+            {/* GENDER */}
 
-                <div className={styles.clouds}>
-                  <img
-                    src={null}
-                    alt="Field"
-                    className={styles.fieldImg}
-                  />
-                  <input
-                    id="phone"
-                    autoComplete="tel"
-                    {...register("phone")}
-                  />
-                </div>
-
-                <p className={styles.error}>
-                  {errors.phone?.message}
-                </p>
-              </div>
-            </div>
-
-            <div className={styles.right}>
-              <div className={styles.college}>
-                <div className={styles.sameline}>
-                  <img src={null} alt="Glow" />
-                  <label htmlFor="college">COLLEGE NAME </label>
-                  <img src={null} alt="Glow" />
-                </div>
-
-                <div className={styles.clouds}>
-                  <img
-                    src={null}
-                    alt="Field"
-                    className={styles.fieldImg}
-                  />
-
-                  <Controller
-                    name="college_id"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        inputId="college"
-                        menuPortalTarget={document.body}
-                        options={collegeOptions}
-                        styles={customStyle}
-                        onChange={(val) =>
-                          field.onChange(val?.value || "")
-                        }
-                        value={
-                          field.value
-                            ? collegeOptions.find(
-                                (c) => c.value === field.value
-                              ) || null
-                            : null
-                        }
-                        unstyled
-                        placeholder="--SELECT--"
-                        className={
-                          styles["react-select-container"]
-                        }
-                        classNamePrefix="react-select"
-                      />
-                    )}
-                  />
-
-                  <img
-                    src={null}
-                    alt="dropDown"
-                    className={styles.dropDown}
-                  />
-                </div>
-
-                <p className={styles.error}>
-                  {errors.college_id?.message}
-                </p>
-              </div>
-
-              <div className={styles.year}>
-                <div className={styles.sameline}>
-                  <img src={null} alt="Glow" />
-                  <label>YEAR OF STUDY </label>
-                  <img src={null} alt="Glow" />
-                </div>
-
-                <div className={styles.clouds}>
-                  <img
-                    src={null}
-                    alt="Field"
-                    className={styles.fieldImg}
-                  />
-
-                  <fieldset
-                    className={styles.radioGroup}
-                    aria-label="Year of Study"
+            <Reginput title="GENDER">
+              <Controller
+                name="gender"
+                control={control}
+                render={({
+                  field,
+                }) => (
+                  <Select<
+                    GenderOption,
+                    false
                   >
-                    {["1", "2", "3", "4", "5"].map((year) => (
-                      <label
-                        key={year}
-                        className={styles.radioLabel}
-                        htmlFor={`year-${year}`}
-                      >
-                        <input
-                          id={`year-${year}`}
-                          type="radio"
-                          value={year}
-                          {...register("year")}
-                          className={styles.radioInput}
-                        />
-                        <span className={styles.yearNumber}>
-                          {year}
-                        </span>
-                      </label>
-                    ))}
-                  </fieldset>
-                </div>
-
-                <p className={styles.error}>
-                  {errors.year?.message}
-                </p>
-              </div>
-
-              <div className={styles.states}>
-                <div className={styles.sameline}>
-                  <img src={null} alt="Glow" />
-                  <label htmlFor="state">STATE</label>
-                  <img src={null} alt="Glow" />
-                </div>
-
-                <div className={styles.clouds}>
-                  <img
-                    src={null}
-                    alt="Field"
-                    className={styles.fieldImg}
-                  />
-
-                  <Controller
-                    name="state"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        inputId="state"
-                        menuPortalTarget={document.body}
-                        unstyled
-                        options={getFilteredOptions(inputValue)}
-                        styles={customStyle}
-                        onInputChange={(value) =>
-                          setInputValue(value)
-                        }
-                        filterOption={() => true}
-                        value={
+                    {...field}
+                    options={
+                      genderOptions
+                    }
+                    styles={
+                      customStyle
+                    }
+                    classNamePrefix="regselect"
+                    placeholder="SELECT GENDER"
+                    value={
+                      genderOptions.find(
+                        (option) =>
+                          option.value ===
                           field.value
-                            ? stateOptions.find(
-                                (option) =>
-                                  option.value === field.value
-                              ) || null
-                            : null
-                        }
-                        onChange={(option) => {
-                          const val = option?.value || "";
-
-                          field.onChange(val);
-                          setSelectedState(val);
-
-                          setValue("city", "", {
-                            shouldValidate: true,
-                          });
-                        }}
-                        placeholder="--SELECT--"
-                        className={
-                          styles["react-select-container"]
-                        }
-                        classNamePrefix="react-select"
-                      />
-                    )}
+                      ) || null
+                    }
+                    onChange={(
+                      option
+                    ) =>
+                      field.onChange(
+                        option?.value ||
+                          ""
+                      )
+                    }
+                    menuPortalTarget={
+                      document.body
+                    }
                   />
+                )}
+              />
+            </Reginput>
 
-                  <img
-                    src={null}
-                    alt="dropDown"
-                    className={styles.dropDown}
-                  />
-                </div>
+            {errors.gender && (
+              <p
+                className={
+                  styles.error
+                }
+              >
+                {
+                  errors.gender
+                    .message
+                }
+              </p>
+            )}
+          </div>
 
-                <p className={styles.error}>
-                  {errors.state?.message}
-                </p>
-              </div>
+          {/* RIGHT PAGE */}
 
-              <div className={styles.city}>
-                <div className={styles.sameline}>
-                  <img src={null} alt="Glow" />
-                  <label htmlFor="city">CITY </label>
-                  <img src={null} alt="Glow" />
-                </div>
+          <div
+            className={
+              styles.formRight
+            }
+          >
+            {/* COLLEGE */}
+{/* DOB */}
 
-                <div className={styles.clouds}>
-                  <img
-                    src={null}
-                    alt="Field"
-                    className={styles.fieldImg}
-                  />
+<Reginput
+  title="DATE OF BIRTH"
+  type="date"
+  registration={register("dob")}
+/>
 
-                  <Controller
-                    name="city"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        inputId="city"
-                        menuPortalTarget={document.body}
-                        menuPlacement="top"
-                        options={availableCities}
-                        styles={customStyle}
-                        isDisabled={!selectedState}
-                        onChange={(val) =>
-                          field.onChange(val?.value || "")
-                        }
-                        value={
+{errors.dob && (
+  <p className={styles.error}>
+    {errors.dob.message}
+  </p>
+)}
+
+
+            <Reginput title="COLLEGE NAME">
+              <Controller
+                name="college_id"
+                control={control}
+                render={({
+                  field,
+                }) => (
+                  <Select
+                    {...field}
+                    options={
+                      collegeOptions
+                    }
+                    styles={
+                      customStyle
+                    }
+                    classNamePrefix="regselect"
+                    placeholder="SELECT COLLEGE"
+                    value={
+                      collegeOptions.find(
+                        (college) =>
+                          college.value ===
                           field.value
-                            ? availableCities.find(
-                                (c) => c.value === field.value
-                              ) || null
-                            : null
-                        }
-                        unstyled
-                        placeholder="--SELECT--"
-                        className={
-                          styles["react-select-container"]
-                        }
-                        classNamePrefix="react-select"
-                      />
-                    )}
+                      ) || null
+                    }
+                    onChange={(
+                      option
+                    ) =>
+                      field.onChange(
+                        option?.value ||
+                          ""
+                      )
+                    }
+                    menuPortalTarget={
+                      document.body
+                    }
                   />
+                )}
+              />
+            </Reginput>
 
-                  <img
-                    src={null}
-                    alt="dropDown"
-                    className={styles.dropDown}
-                  />
-                </div>
+            {errors.college_id && (
+              <p
+                className={
+                  styles.error
+                }
+              >
+                {
+                  errors.college_id
+                    .message
+                }
+              </p>
+            )}
 
-                <p className={styles.error}>
-                  {errors.city?.message}
-                </p>
+            {/* YEAR */}
+
+            <Reginput title="YEAR OF STUDY">
+              <div
+                className={
+                  styles.yearOptions
+                }
+              >
+                {[
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                ].map((year) => (
+                  <label key={year}>
+                    <input
+                      type="radio"
+                      value={year}
+                      {...register(
+                        "year"
+                      )}
+                    />
+                    <span>
+                      {year}
+                    </span>
+                  </label>
+                ))}
               </div>
-            </div>
+            </Reginput>
+
+            {errors.year && (
+              <p
+                className={
+                  styles.error
+                }
+              >
+                {
+                  errors.year.message
+                }
+              </p>
+            )}
+
+            {/* STATE */}
+
+            <Reginput title="STATE">
+              <Controller
+                name="state"
+                control={control}
+                render={({
+                  field,
+                }) => (
+                  <Select
+                    {...field}
+                    options={getFilteredOptions(
+                      inputValue
+                    )}
+                    styles={
+                      customStyle
+                    }
+                    classNamePrefix="regselect"
+                    placeholder="SELECT STATE"
+                    value={
+                      stateOptions.find(
+                        (state) =>
+                          state.value ===
+                          field.value
+                      ) || null
+                    }
+                    onInputChange={(
+                      value
+                    ) =>
+                      setInputValue(
+                        value
+                      )
+                    }
+                    filterOption={() =>
+                      true
+                    }
+                    onChange={(
+                      option
+                    ) => {
+                      const value =
+                        option?.value ||
+                        "";
+
+                      field.onChange(
+                        value
+                      );
+
+                      setSelectedState(
+                        value
+                      );
+
+                      setValue(
+                        "city",
+                        ""
+                      );
+                    }}
+                    menuPortalTarget={
+                      document.body
+                    }
+                  />
+                )}
+              />
+            </Reginput>
+
+            {errors.state && (
+              <p
+                className={
+                  styles.error
+                }
+              >
+                {
+                  errors.state
+                    .message
+                }
+              </p>
+            )}
+
+            {/* CITY */}
+
+            <Reginput title="CITY">
+              <Controller
+                name="city"
+                control={control}
+                render={({
+                  field,
+                }) => (
+                  <Select
+                    {...field}
+                    options={
+                      availableCities
+                    }
+                    styles={
+                      customStyle
+                    }
+                    classNamePrefix="regselect"
+                    placeholder="SELECT CITY"
+                    isDisabled={
+                      !selectedState
+                    }
+                    value={
+                      availableCities.find(
+                        (city) =>
+                          city.value ===
+                          field.value
+                      ) || null
+                    }
+                    onChange={(
+                      option
+                    ) =>
+                      field.onChange(
+                        option?.value ||
+                          ""
+                      )
+                    }
+                    menuPortalTarget={
+                      document.body
+                    }
+                  />
+                )}
+              />
+            </Reginput>
+
+            {errors.city && (
+              <p
+                className={
+                  styles.error
+                }
+              >
+                {errors.city.message}
+              </p>
+            )}
+
+            {/* NEXT */}
+
+            <button
+              type="submit"
+              style={{
+          backgroundImage: `url(${buttonBg})`,
+        }}
+              className={
+                styles.nextButton
+              }
+            >
+              NEXT
+            </button>
           </div>
         </form>
-
-        <button
-          className={styles.confirmButton}
-          type="submit"
-          onClick={handleSubmit(onSubmit)}
-        >
-          <svg
-            width="98"
-            height="8"
-            viewBox="0 0 98 8"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className={styles.confirmIcon}
-            aria-label="Next"
-          >
-            <path
-              d="M-0.000976562 4.07317C2.77052 4.07317 73.6558 6.02439 91.9262 7L96.999 4.07317L91.9262 1L-0.000976562 4.07317Z"
-              fill="white"
-              stroke="white"
-              strokeWidth="0.16"
-            />
-          </svg>
-
-          NEXT
-
-          <svg
-            width="98"
-            height="8"
-            viewBox="0 0 98 8"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className={styles.confirmIcon}
-            aria-label="Next"
-          >
-            <path
-              d="M-0.000976562 4.07317C2.77052 4.07317 73.6558 6.02439 91.9262 7L96.999 4.07317L91.9262 1L-0.000976562 4.07317Z"
-              fill="white"
-              stroke="white"
-              strokeWidth="0.16"
-            />
-          </svg>
-        </button>
       </div>
-    );
-  }
-);
-
-export default Register;
+    </div>
+  );
+}

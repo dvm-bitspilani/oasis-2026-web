@@ -149,7 +149,7 @@
 
 
 import styles from "./Reginput.module.scss";
-import inputBg from "../../../assets/registration/reg/inputBg.png";
+import inputBg from "../../../../assets/registration/reg/inputBg.png";
 import type { ReactNode } from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
 

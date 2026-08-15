@@ -4,7 +4,7 @@ import Registration from "../pages/registration//Registration";
 import Home from "../pages/Home";
 import About from "../pages/About";
 import ComingSoon from "../pages/ComingSoon";
-import Reg from "../pages/registration/components/reg"
+import Reg from "../pages/registration/components/Register/register"
 import Events from "../pages/registration/components/Events/Events"
 export default function AppRoutes() {
   return (
