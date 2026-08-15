@@ -2,11 +2,12 @@
 
 // .eventsContainer {
 //   margin: 0 0 0vw 24vw;
+//  display: flex;
 //   flex-direction: column;
 //   align-items: flex-start;
 //   width: 100%;
 //   height: 65svh;
-//   z-index: 4;
+//   z-index: 4000;
 
 //   .headingCont {
 //     display: flex;
@@ -434,126 +435,8 @@
 //     }
 //   }
 // }
-
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.registerContainer {
-  width: 100vw;
-  min-height: 100vh;
-
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-
-  position: relative;
-
-  overflow: hidden;
-}
-
-/* ========================================= */
-/* DECORATIONS                               */
-/* ========================================= */
-
-.leftbottom {
-  position: absolute;
-
-  left: -5%;
-  bottom: -10%;
-
-  width: 20%;
-
-  scale: 1.5;
-
-  pointer-events: none;
-}
-
-.rightbottom {
-  position: absolute;
-
-  right: -10%;
-  bottom: -5%;
-
-  width: 30%;
-
-  object-fit: contain;
-
-  pointer-events: none;
-}
-
-.lefttop {
-  position: absolute;
-
-  left: -22%;
-  top: -22%;
-
-  pointer-events: none;
-}
-
-.righttop {
-  position: absolute;
-
-  right: 0;
-  top: 3%;
-
-  pointer-events: none;
-}
-
-/* ========================================= */
-/* BOOK                                      */
-/* ========================================= */
-
-.bookContainer {
-  position: absolute;
-
-  top: 52%;
-  left: 50%;
-
-  transform: translate(-50%, -50%);
-
-  width: 75vw;
-
-  aspect-ratio: 1.4;
-
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-
-  z-index: 100;
-}
-
-.formLeft {
-    display: flex;
-
-    flex-direction: column;
-    align-items: center;
-
-    width: 50%;
-    height: 100%;
-
-    .regTitle {
-      margin: 0;
-
-      font-size: 5rem;
-
-      z-index: 200;
-
-      font-family: "Syamsiah", sans-serif;
-
-      font-weight: 500;
-
-      color: #6c1700;
-    }
-  }
-
-.formContainer {
-  display: flex;
-
-  width: 100%;
-  height: 100%;
-
-  padding: 50px 55px 60px;}
+// .hello{
+//   height: 100vh;
+//   width: 100vw;
+//   color: black;
+// }

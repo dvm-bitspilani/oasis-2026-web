@@ -65,3 +65,10 @@
 // }
 
 // export default EventsModal;
+import React from 'react'
+
+export default function EventsModal() {
+  return (
+    <div>EventsModal</div>
+  )
+}

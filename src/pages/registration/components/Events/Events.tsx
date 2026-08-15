@@ -111,9 +111,12 @@
 //   useEffect(() => {
 //     sessionStorage.removeItem("selectedEvents");
 //     axios
-//       .get("https://bits-oasis.org/2026/main/registrations/events_details/")
+
+//       .get("https://bits-oasis.org/2026/main/registrations/web_ev/")
 //       .then((response) => {
 //         setEventsOptions(response.data);
+//         console.log(response);
+
 //       })
 //       .catch((error) => console.error("Error fetching events:", error));
 //   }, []);
@@ -598,75 +601,16 @@
 // });
 
 // export default Events;
+// import styles from "./Events.module.scss"
+// export default function EventsReg(){
+//     return(
+//       <h1 className={styles.hello}>EVENTS</h1>
+//     )
+// }
+import React from 'react'
 
-import { useEffect, useState } from "react";
-import axios from "axios";
-import styles from "./Events.module.scss";
-
-import RegBg from "../../../../assets/registration/reg/RegBg.png";
-import leftbottom from "../../../../assets/registration/reg/leftbottom.png";
-import lefttop from "../../../../assets/registration/reg/lefttop.png";
-import rightbottom from "../../../../assets/registration/reg/rightbottom.png";
-import righttop from "../../../../assets/registration/reg/righttop.png";
-import book from "../../../../assets/registration/reg/book.png";
-
-export default function EventsReg() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    axios
-      .get<Event[]>(
-        "https://bits-oasis.org/2026/main/registrations/web_events/"
-      )
-      .then((response) => {
-        setEvents(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching events:", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
+export default function Events() {
   return (
-    <div
-      className={styles.registerContainer}
-      style={{
-        backgroundImage: `url(${RegBg})`,
-      }}
-    >
-      <img
-        src={leftbottom}
-        className={styles.leftbottom}
-        alt="leftbottom"
-      />
-
-      <img
-        src={lefttop}
-        className={styles.lefttop}
-        alt="lefttop"
-      />
-
-      <img
-        src={rightbottom}
-        className={styles.rightbottom}
-        alt="rightbottom"
-      />
-
-      <img
-        src={righttop}
-        className={styles.righttop}
-        alt="righttop"
-      />
-
-      <div
-        className={styles.bookContainer}
-        style={{
-          backgroundImage: `url(${book})`,
-        }}
-      />
-    </div>
-  );
+    <div>Events</div>
+  )
 }
