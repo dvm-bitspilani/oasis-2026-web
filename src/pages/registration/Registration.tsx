@@ -1,5 +1,3 @@
-
-
 import { Helmet } from "react-helmet-async";
 import styles from "./Registration.module.scss";
 
@@ -60,25 +58,9 @@ const Registration = ({ goToPage }: RegistrationProps) => {
     setCurrentPage(3);
   };
 
-  const backButtonHandler = () => {
-    switch (currentPage) {
-      case 1:
-        goToPage("/");
-        break;
-
-      case 2:
-        toFirstPage();
-        break;
-
-      case 3:
-        toRegPage();
-        break;
-    }
-  };
-
   function redirectWithPost(
     url: string,
-    data: { [key: string]: string }
+    data: { [key: string]: string },
   ) {
     const form = document.createElement("form");
 
@@ -101,64 +83,55 @@ const Registration = ({ goToPage }: RegistrationProps) => {
     form.submit();
   }
 
+  const handleSuccess = (response: any) => {
+    const idToken = response.credential;
 
+    console.log(response);
 
+    axios
+      .post(
+        "https://bits-oasis.org/2026/main/registrations/google-reg/",
+        {
+          id_token: idToken,
+        },
+      )
+      .then((res) => {
+        setCookies("id_token", idToken);
 
+        if (res.data.exists) {
+          setCookies("user-auth", res.data);
+          setCookies(
+            "Authorization",
+            res.data.tokens.access,
+          );
 
+          redirectWithPost(
+            "https://bits-oasis.org/2026/main/registrations/",
+            {
+              token: res.data.tokens.access,
+            },
+          );
 
+          setUserEmail(res.data.email);
+        } else {
+          setCookies("user-auth", res.data);
 
+          setUserEmail(res.data.email);
 
-
-
-
-
-
-
-
-
-
-  const handleSuccess = (response: any) =>{
-        const idToken = response.credential;
-        console.log(response);
-      axios
-        .post(
-          "https://bits-oasis.org/2026/main/registrations/google-reg/",
-          {
-            id_token: idToken,
+          if (res.data.email) {
+            toRegPage();
           }
-        )
-        .then((res) => {
-          setCookies("id_token", idToken);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
-          if (res.data.exists) {
-            setCookies("user-auth", res.data);
-            setCookies("Authorization", res.data.tokens.access);
+  console.log("CURRENT PAGE:", currentPage);
 
-            redirectWithPost(
-              "https://bits-oasis.org/2026/main/registrations/",
-              {
-                token: res.data.tokens.access,
-              }
-            );
-
-            setUserEmail(res.data.email);
-          } else {
-            setCookies("user-auth", res.data);
-
-            setUserEmail(res.data.email);
-
-            if (res.data.email) {
-              toRegPage();
-            }
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    };
-console.log("CURRENT PAGE:", currentPage);
   return (
-    <div className={styles.instrback}>
+    <div>
       <Helmet>
         <title>Registration | OASIS 2026</title>
 
@@ -222,22 +195,23 @@ console.log("CURRENT PAGE:", currentPage);
 
       <BreadCrumb data={breadcrumbJsonLd} />
 
-      {/* Simple back button */}
-      <button
-        onClick={backButtonHandler}
-        className={styles.backBtn}
-      >
-        BACK
-      </button>
+      {/* =====================================================
+          PAGE 1 — INSTRUCTIONS
+          RegBg.png is only applied here
+      ===================================================== */}
 
-      {/* PAGE 1 */}
       {currentPage === 1 && (
-        <Instructions
-          onGoogleSignIn={handleSuccess}
-        />
+        <div className={styles.instrback}>
+          <Instructions
+            onGoogleSignIn={handleSuccess}
+          />
+        </div>
       )}
 
-      {/* PAGE 2 */}
+      {/* =====================================================
+          PAGE 2 — REGISTRATION
+      ===================================================== */}
+
       {currentPage === 2 && (
         <Register
           onClickNext={toEventPage}
@@ -246,7 +220,10 @@ console.log("CURRENT PAGE:", currentPage);
         />
       )}
 
-      {/* PAGE 3 */}
+      {/* =====================================================
+          PAGE 3 — EVENTS
+      ===================================================== */}
+
       {currentPage === 3 && (
         <Events
           userData={userData}

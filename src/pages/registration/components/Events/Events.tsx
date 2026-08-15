@@ -4,13 +4,6 @@ import axios from "axios";
 
 import styles from "./Events.module.scss";
 
-// import thumb from "/svgs/registration/scrollThumb.svg";
-// import ScrollBar from "/svgs/registration/scroll-bar.svg";
-// import Left from "/svgs/registration/leftarr.svg";
-// import Right from "/svgs/registration/rightarr.svg";
-// import info from "/images/registration/information.png"
-// import info2 from "/images/registration/info3.png"
-
 import ConfirmModal from "../ConfirmModal/ConfirmModal";
 import EventsModal from "../EventsModal/EventsModal";
 import { useGSAP } from "@gsap/react";
