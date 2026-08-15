@@ -114,6 +114,8 @@ export default function Preloader({ assets = [], onEnter }: PreloaderProps) {
   // =========================================================
 
   useEffect(() => {
+    let cancelled = false;
+
     if (assets.length === 0) {
       setLoaded(true);
       return;
@@ -124,7 +126,7 @@ export default function Preloader({ assets = [], onEnter }: PreloaderProps) {
     const handleLoaded = () => {
       loadedCount++;
 
-      if (loadedCount >= assets.length) {
+      if (loadedCount >= assets.length && !cancelled) {
         setLoaded(true);
       }
     };
@@ -137,6 +139,10 @@ export default function Preloader({ assets = [], onEnter }: PreloaderProps) {
 
       img.src = src;
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, [assets]);
 
   const showLine = (index: number) => {
@@ -285,10 +291,42 @@ export default function Preloader({ assets = [], onEnter }: PreloaderProps) {
 
   // =========================================================
   // AUTO-ADVANCE TO HOME
+  //
+  // NOTE: `fadingOut` must NOT be in the dependency array here.
+  // The old version had [ready, fadingOut, onEnter] as deps, which
+  // caused this exact bug:
+  //
+  //   1. ready flips true -> effect runs -> setFadingOut(true) is
+  //      called and a 400ms setTimeout(onEnter) is scheduled.
+  //   2. Because fadingOut is a dependency, React re-runs this
+  //      effect as soon as fadingOut changes. Before re-running,
+  //      it fires the previous cleanup: clearTimeout(timer).
+  //   3. That cancels the onEnter() timer almost immediately —
+  //      long before the 400ms elapses.
+  //   4. The effect re-runs with fadingOut now true, so the guard
+  //      `if (!ready || fadingOut) return;` bails out immediately.
+  //      No new timer is ever scheduled.
+  //
+  //   Net effect: onEnter() never fires. `entered` in the parent
+  //   never flips true. <Preloader /> stays mounted forever —
+  //   the CSS .fadeOut animation still finishes on its own (it's
+  //   a plain CSS keyframe, not tied to the cancelled JS timer),
+  //   so it visually disappears, but the position:fixed,
+  //   inset: 0, z-index: 99999 wrapper div is still sitting on
+  //   top of the whole page, invisible, eating every click meant
+  //   for Nav (or anything else) underneath it.
+  //
+  // Fix: use a ref as a "has this already started" guard instead
+  // of a state dependency, so the effect only ever runs once per
+  // `ready` transition and never re-triggers itself.
   // =========================================================
 
+  const hasStartedExit = useRef(false);
+
   useEffect(() => {
-    if (!ready || fadingOut) return;
+    if (!ready || hasStartedExit.current) return;
+
+    hasStartedExit.current = true;
 
     setFadingOut(true);
 
@@ -297,7 +335,8 @@ export default function Preloader({ assets = [], onEnter }: PreloaderProps) {
     }, FADE_OUT);
 
     return () => clearTimeout(timer);
-  }, [ready, fadingOut, onEnter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
 
   // =========================================================
   // RENDER
