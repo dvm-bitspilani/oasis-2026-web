@@ -6,9 +6,8 @@
   flex-direction: column;
   align-items: center;
 
-  padding: 3vw 5vw;
-
   box-sizing: border-box;
+  padding: 3vw 5vw;
 
   color: white;
 }
@@ -23,7 +22,6 @@
   color: #ffffff;
 
   font-family: "Ibarra Real Nova SemiBold", serif;
-
   font-size: clamp(2rem, 3vw, 4rem);
 
   text-align: center;
@@ -33,27 +31,24 @@
 /* MAIN CONTENT                              */
 /* ========================================= */
 
-.content {
+.mainContent {
   width: min(1100px, 90vw);
 
   display: flex;
-
   align-items: stretch;
 
   gap: 3vw;
 }
 
 /* ========================================= */
-/* LEFT PANEL                                */
+/* LEFT SIDE                                 */
 /* ========================================= */
 
-.leftPanel {
-  width: 40%;
+.leftSide {
+  width: 45%;
 
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
 }
 
@@ -63,9 +58,7 @@
 
 .search {
   width: 100%;
-
   height: 3.3vw;
-
   min-height: 45px;
 
   margin-bottom: 1.5vw;
@@ -78,7 +71,6 @@
     0 0 10px rgba(229, 195, 132, 0.35);
 
   display: flex;
-
   align-items: center;
 
   box-sizing: border-box;
@@ -86,7 +78,6 @@
 
 .search input {
   width: 100%;
-
   height: 100%;
 
   padding: 0 1.5vw;
@@ -94,7 +85,6 @@
   box-sizing: border-box;
 
   border: none;
-
   outline: none;
 
   background: transparent;
@@ -113,23 +103,23 @@
 }
 
 /* ========================================= */
-/* CATEGORY LIST                             */
+/* EVENTS LIST - ONE COLUMN                  */
 /* ========================================= */
 
-.categoryList {
+.eventsList {
   width: 100%;
 
-  height: 28vw;
-
-  max-height: 50svh;
-
-  overflow-y: auto;
+  height: 32vw;
+  max-height: 55svh;
 
   display: flex;
-
   flex-direction: column;
+  align-items: center;
 
   gap: 1vw;
+
+  overflow-y: auto;
+  overflow-x: hidden;
 
   padding: 0.5vw;
 
@@ -138,28 +128,25 @@
   scrollbar-width: none;
 }
 
-.categoryList::-webkit-scrollbar {
+.eventsList::-webkit-scrollbar {
   display: none;
 }
 
 /* ========================================= */
-/* CATEGORY ITEM                             */
+/* EVENT ITEM                                */
 /* ========================================= */
 
-.categoryItem {
+.eventItem {
+  flex: 0 0 auto;
+
   width: 100%;
+  height: 4vw;
 
-  min-height: 4vw;
-
-  padding: 0.8vw 1.2vw;
-
-  box-sizing: border-box;
+  min-height: 45px;
 
   display: flex;
-
   align-items: center;
-
-  justify-content: space-between;
+  justify-content: center;
 
   border: 1px solid rgba(237, 237, 237, 0.7);
 
@@ -168,70 +155,74 @@
   cursor: pointer;
 
   transition:
-    background 0.25s ease,
-    border 0.25s ease,
-    transform 0.25s ease;
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.categoryItem:hover {
-  background: rgba(229, 195, 132, 0.12);
+.eventItem:hover {
+  transform: translateX(5px);
+
+  background: rgba(229, 195, 132, 0.18);
 
   border-color: #e5c384;
-
-  transform: translateX(5px);
 }
 
-.activeCategory {
-  background: rgba(229, 195, 132, 0.2);
+.eventItem.selected {
+  background: rgba(229, 195, 132, 0.25);
 
   border-color: #e5c384;
-
-  transform: translateX(5px);
 }
 
-.categoryItem span {
+/* ========================================= */
+/* EVENT BUTTON                              */
+/* ========================================= */
+
+.eventButton {
+  width: 100%;
+  height: 100%;
+
+  padding: 0.5vw;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
   color: white;
+
+  cursor: pointer;
 
   font-family:
     "Ibarra Real Nova SemiBold",
     serif;
 
-  font-size: clamp(16px, 1.5vw, 24px);
+  font-size: clamp(13px, 1.1vw, 19px);
+
+  white-space: nowrap;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.activeCategory span {
+.eventItem:hover .eventButton {
   color: #e5c384;
 }
 
-.categoryItem small {
-  color: rgba(255, 255, 255, 0.6);
-
-  font-family:
-    "Ibarra Real Nova SemiBold",
-    serif;
-
-  font-size: clamp(12px, 0.9vw, 16px);
-}
-
-.categorySelected {
-  border-color: rgba(229, 195, 132, 0.8);
-}
-
 /* ========================================= */
-/* RIGHT DESCRIPTION                         */
+/* RIGHT INFO PANEL                          */
 /* ========================================= */
 
-.descriptionPanel {
-  width: 60%;
+.rightSide {
+  width: 55%;
 
-  min-height: 30vw;
+  min-height: 32vw;
 
   padding: 3vw;
 
   box-sizing: border-box;
 
   border: 2px solid #ededed;
-
   border-radius: 10px;
 
   background: rgba(0, 0, 0, 0.75);
@@ -242,37 +233,28 @@
     0 0 15px rgba(229, 195, 132, 0.25);
 
   display: flex;
-
   flex-direction: column;
-
-  position: relative;
 
   overflow: hidden;
 }
 
 /* ========================================= */
-/* CATEGORY HEADING                          */
+/* EVENT INFO                                */
 /* ========================================= */
 
-.categoryHeading {
+.eventCategory {
+  margin-bottom: 1vw;
+
   color: #e5c384;
 
   font-family:
     "Ibarra Real Nova SemiBold",
     serif;
 
-  font-size: clamp(14px, 1vw, 18px);
+  font-size: clamp(13px, 1vw, 18px);
 
   letter-spacing: 0.15em;
-
-  text-transform: uppercase;
-
-  margin-bottom: 1vw;
 }
-
-/* ========================================= */
-/* EVENT HEADING                             */
-/* ========================================= */
 
 .eventHeading {
   margin: 0 0 1.5vw;
@@ -286,11 +268,7 @@
   font-size: clamp(26px, 2.5vw, 42px);
 }
 
-/* ========================================= */
-/* DESCRIPTION                               */
-/* ========================================= */
-
-.description {
+.eventDescription {
   margin: 0;
 
   color: #ededed;
@@ -331,13 +309,11 @@
 
 .addButton {
   background: #fff6dd;
-
   color: #000;
 }
 
 .removeButton {
   background: transparent;
-
   color: white;
 }
 
@@ -347,111 +323,27 @@
 }
 
 /* ========================================= */
-/* EVENT NAVIGATION                          */
+/* EMPTY RIGHT SIDE                          */
 /* ========================================= */
 
-.eventNavigation {
+.emptyInfo {
   width: 100%;
-
-  margin-top: 2vw;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 2vw;
-}
-
-/* ========================================= */
-/* ARROWS                                    */
-/* ========================================= */
-
-.arrow {
-  width: 3vw;
-
-  height: 3vw;
-
-  min-width: 35px;
-
-  min-height: 35px;
-
-  border: 1px solid rgba(237, 237, 237, 0.6);
-
-  border-radius: 50%;
-
-  background: transparent;
-
-  color: white;
-
-  font-size: clamp(18px, 1.5vw, 26px);
-
-  cursor: pointer;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.arrow:hover {
-  background: #fff6dd;
-
-  color: #000;
-
-  transform: scale(1.08);
-}
-
-/* ========================================= */
-/* EVENT NUMBER                              */
-/* ========================================= */
-
-.eventNumber {
-  min-width: 50px;
-
-  text-align: center;
-
-  color: rgba(255, 255, 255, 0.7);
-
-  font-family:
-    "Ibarra Real Nova SemiBold",
-    serif;
-
-  font-size: clamp(14px, 1vw, 18px);
-}
-
-/* ========================================= */
-/* PLACEHOLDER                               */
-/* ========================================= */
-
-.placeholder {
-  width: 100%;
-
   height: 100%;
 
   min-height: 25vw;
 
   display: flex;
-
   flex-direction: column;
 
   align-items: center;
-
   justify-content: center;
 
   text-align: center;
 
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
-.placeholder h2 {
+.emptyInfo h2 {
   margin: 0 0 1vw;
 
   color: #ededed;
@@ -463,7 +355,7 @@
   font-size: clamp(24px, 2vw, 34px);
 }
 
-.placeholder p {
+.emptyInfo p {
   margin: 0;
 
   color: #ededed;
@@ -520,6 +412,24 @@
 }
 
 /* ========================================= */
+/* NO EVENTS                                 */
+/* ========================================= */
+
+.noEvents {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+
+  font-family: "Abhaya Libre", serif;
+
+  font-size: 1.2rem;
+}
+
+/* ========================================= */
 /* MOBILE                                    */
 /* ========================================= */
 
@@ -534,7 +444,7 @@
     font-size: 8vw;
   }
 
-  .content {
+  .mainContent {
     width: 90vw;
 
     flex-direction: column;
@@ -542,7 +452,8 @@
     gap: 5vw;
   }
 
-  .leftPanel {
+  .leftSide,
+  .rightSide {
     width: 100%;
   }
 
@@ -558,35 +469,41 @@
     font-size: 4vw;
   }
 
-  .categoryList {
-    height: 45svh;
+  /* ONE COLUMN ON MOBILE TOO */
+  .eventsList {
+    width: 100%;
+
+    height: 50vw;
+    max-height: 50svh;
 
     gap: 2vw;
+
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
-  .categoryItem {
-    min-height: 13vw;
+  .eventItem {
+    width: 100%;
 
-    padding: 2vw 4vw;
+    height: 12vw;
+    min-height: 50px;
+
+    flex-shrink: 0;
   }
 
-  .categoryItem span {
-    font-size: 5vw;
-  }
+  .eventButton {
+    padding: 2vw;
 
-  .categoryItem small {
     font-size: 3.5vw;
   }
 
-  .descriptionPanel {
-    width: 100%;
-
-    min-height: 60vw;
+  .rightSide {
+    min-height: 55vw;
 
     padding: 6vw;
   }
 
-  .categoryHeading {
+  .eventCategory {
     font-size: 3.5vw;
 
     margin-bottom: 3vw;
@@ -598,7 +515,7 @@
     margin-bottom: 4vw;
   }
 
-  .description {
+  .eventDescription {
     font-size: 4vw;
 
     line-height: 1.6;
@@ -610,24 +527,6 @@
 
     padding: 3vw;
 
-    font-size: 4vw;
-  }
-
-  .eventNavigation {
-    margin-top: 5vw;
-
-    gap: 5vw;
-  }
-
-  .arrow {
-    width: 10vw;
-
-    height: 10vw;
-
-    font-size: 5vw;
-  }
-
-  .eventNumber {
     font-size: 4vw;
   }
 
