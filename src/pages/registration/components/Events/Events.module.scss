@@ -113,8 +113,6 @@
   flex-direction: column;
   align-items: center;
 
- 
-
   min-width: 0;
 
   background: transparent;
@@ -212,17 +210,34 @@
   overflow-y: auto;
   overflow-x: hidden;
 
-  padding: 0;
+  padding: 0 0.5vw 0 0;
 
   box-sizing: border-box;
 
   background: transparent;
 
-  scrollbar-width: none;
+  /* VISIBLE SCROLLBAR */
+  scrollbar-width: thin;
+  scrollbar-color: #a86618 transparent;
 }
 
+/* Chrome / Edge / Safari */
+
 .eventsList::-webkit-scrollbar {
-  display: none;
+  width: 6px;
+}
+
+.eventsList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.eventsList::-webkit-scrollbar-thumb {
+  background: #a86618;
+  border-radius: 10px;
+}
+
+.eventsList::-webkit-scrollbar-thumb:hover {
+  background: #6c1700;
 }
 
 /* ========================================= */
@@ -340,7 +355,7 @@
 }
 
 /* ========================================= */
-/* CLICKED / SELECTED                       */
+/* CLICKED / SELECTED                        */
 /* ========================================= */
 
 .eventItem.selected {
@@ -512,17 +527,19 @@
 
   max-width: 450px;
 
+  height: 30vw;
+  min-height: 380px;
+  max-height: 520px;
+
   display: flex;
 
   flex-direction: column;
 
   align-items: center;
 
-  justify-content: center;
+  margin: 0 auto;
 
   text-align: center;
-
-  margin: 0 auto;
 
   animation: eventAppear 0.3s ease forwards;
 }
@@ -542,13 +559,40 @@
 }
 
 /* ========================================= */
+/* EVENT CONTENT                             */
+/* ========================================= */
+
+.eventContent {
+  width: 100%;
+
+  height: 12vw;
+  min-height: 150px;
+  max-height: 230px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: flex-start;
+
+  overflow: hidden;
+
+  flex-shrink: 0;
+}
+
+/* ========================================= */
 /* ACTUAL EVENT NAME                         */
 /* ========================================= */
 
 .eventTitle {
   width: 100%;
 
-  margin: 0 0 1.5vw;
+  height: 3.5vw;
+  min-height: 45px;
+
+  margin: 0 0 1vw;
 
   color: #38170b;
 
@@ -565,6 +609,14 @@
   position: relative;
 
   z-index: 6;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
 }
 
 /* ========================================= */
@@ -575,6 +627,9 @@
   width: 100%;
 
   max-width: 32vw;
+
+  height: 7vw;
+  min-height: 100px;
 
   margin: 0;
 
@@ -587,6 +642,32 @@
   line-height: 1.7;
 
   text-align: center;
+
+  overflow: hidden;
+}
+
+/* ========================================= */
+/* FIXED CONTROLS                            */
+/* ========================================= */
+
+.eventControls {
+  width: 100%;
+
+  height: 17vw;
+  min-height: 220px;
+  max-height: 290px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: flex-start;
+
+  flex-shrink: 0;
+
+  position: relative;
 }
 
 /* ========================================= */
@@ -602,7 +683,7 @@
 
   min-height: 55px;
 
-  margin: 2vw auto 0;
+  margin: 0 auto;
 
   padding: 0;
 
@@ -640,6 +721,8 @@
 
   -webkit-appearance: none;
 
+  flex-shrink: 0;
+
   transition:
     transform 0.25s ease,
     filter 0.25s ease;
@@ -666,7 +749,10 @@
 .eventNavigation {
   width: 100%;
 
-  margin-top: 2vw;
+  height: 5vw;
+  min-height: 55px;
+
+  margin-top: 1vw;
 
   display: flex;
 
@@ -675,6 +761,8 @@
   justify-content: center;
 
   gap: 1vw;
+
+  flex-shrink: 0;
 }
 
 /* ========================================= */
@@ -830,6 +918,101 @@
 }
 
 /* ========================================= */
+/* CONFIRM BUTTON                            */
+/* ========================================= */
+
+.confirmButton {
+  position: relative;
+
+  z-index: 20;
+
+  bottom: auto;
+
+  left: auto;
+
+  transform: none;
+
+  width: min(240px, 16vw);
+
+  height: 5vw;
+
+  min-width: 150px;
+
+  min-height: 55px;
+
+  margin: 1vw auto 0;
+
+  padding: 0;
+
+  border: none;
+
+  background-image: url("../../../../assets/registration/reg/btn.png");
+
+  background-position: center;
+
+  background-size: contain;
+
+  background-repeat: no-repeat;
+
+  background-color: transparent;
+
+  color: #fed59b;
+
+  font-family: "Cinzel", serif;
+
+  font-size: clamp(15px, 1.2vw, 22px);
+
+  font-weight: 700;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  appearance: none;
+
+  -webkit-appearance: none;
+
+  flex-shrink: 0;
+
+  transition:
+    transform 0.25s ease,
+    filter 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.confirmButton:hover {
+  transform: scale(1.08);
+
+  filter:
+    brightness(1.12)
+    drop-shadow(
+      0 0 10px rgba(254, 213, 155, 0.65)
+    );
+}
+
+.confirmButton:active {
+  transform: scale(0.96);
+}
+
+.confirmButton:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
+
+  filter: none;
+
+  transform: none;
+}
+
+/* ========================================= */
 /* MOBILE                                    */
 /* ========================================= */
 
@@ -914,7 +1097,23 @@
 
     gap: 2vw;
 
-    padding: 0;
+    padding: 0 1.5vw 0 0;
+
+    scrollbar-width: thin;
+    scrollbar-color: #a86618 transparent;
+  }
+
+  .eventsList::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .eventsList::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .eventsList::-webkit-scrollbar-thumb {
+    background: #a86618;
+    border-radius: 10px;
   }
 
   .eventItem {
@@ -963,6 +1162,7 @@
     width: 100%;
 
     min-height: 60vw;
+
     margin-left: 0;
 
     display: flex;
@@ -989,28 +1189,68 @@
   .eventInfo {
     width: 85%;
 
+    height: auto;
+
+    min-height: 100vw;
+
     max-width: none;
 
-    justify-content: center;
+    max-height: none;
+
+    justify-content: flex-start;
+  }
+
+  .eventContent {
+    width: 100%;
+
+    height: 50vw;
+
+    min-height: 0;
+
+    max-height: none;
+
+    flex-shrink: 0;
   }
 
   .eventTitle {
+    height: auto;
+
+    min-height: 12vw;
+
     margin-bottom: 4vw;
 
     font-size: clamp(1.7rem, 8vw, 3rem);
   }
 
   .eventDescription {
+    height: auto;
+
+    min-height: 25vw;
+
     max-width: 80vw;
 
     font-size: 3.7vw;
 
     line-height: 1.6;
+
+    overflow: hidden;
   }
 
   /* ========================================= */
   /* ADD / REMOVE                              */
   /* ========================================= */
+
+  .eventControls {
+    width: 100%;
+
+    height: auto;
+
+    min-height: 0;
+
+    max-height: none;
+
+    margin-top: 5vw;
+  }
 
   .eventActionButton {
     width: 48vw;
@@ -1021,7 +1261,7 @@
 
     min-height: 0;
 
-    margin-top: 5vw;
+    margin: 0;
 
     font-size: 4vw;
 
@@ -1035,6 +1275,12 @@
   /* ========================================= */
 
   .eventNavigation {
+    width: 100%;
+
+    height: 12vw;
+
+    min-height: 0;
+
     margin-top: 4vw;
 
     gap: 2vw;
@@ -1067,117 +1313,27 @@
   }
 
   /* ========================================= */
-  /* EMPTY                                    */
+  /* CONFIRM                                   */
   /* ========================================= */
 
-  .emptyInfo {
-    width: 85%;
-
-    flex: 1;
-  }
-}
-/* ========================================= */
-/* CONFIRM BUTTON                            */
-/* ========================================= */
-
-.confirmButton {
-  position: absolute;
-
-  z-index: 20;
-
-  bottom: 3.5%;
-  left: 50%;
-
-  transform: translateX(-50%);
-
-  width: min(240px, 16vw);
-  height: 5vw;
-
-  min-width: 150px;
-  min-height: 55px;
-
-  padding: 0;
-
-  border: none;
-
-  background-image: url("../../../../assets/registration/reg/btn.png");
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
-
-  background-color: transparent;
-
-  color: #fed59b;
-
-  font-family: "Cinzel", serif;
-
-  font-size: clamp(15px, 1.2vw, 22px);
-
-  font-weight: 700;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-
-  line-height: 1;
-
-  cursor: pointer;
-
-  appearance: none;
-  -webkit-appearance: none;
-
-  transition:
-    transform 0.25s ease,
-    filter 0.25s ease,
-    opacity 0.25s ease;
-}
-
-.confirmButton:hover {
-  transform: translateX(-50%) scale(1.08);
-
-  filter:
-    brightness(1.12)
-    drop-shadow(
-      0 0 10px rgba(254, 213, 155, 0.65)
-    );
-}
-
-.confirmButton:active {
-  transform: translateX(-50%) scale(0.96);
-}
-
-.confirmButton:disabled {
-  opacity: 0.45;
-
-  cursor: not-allowed;
-
-  filter: none;
-
-  transform: translateX(-50%);
-}
-
-/* ========================================= */
-/* MOBILE CONFIRM BUTTON                     */
-/* ========================================= */
-
-@media (max-width: 650px) {
   .confirmButton {
     position: relative;
 
     bottom: auto;
+
     left: auto;
 
     transform: none;
 
     width: 48vw;
+
     height: 14vw;
 
     min-width: 0;
+
     min-height: 0;
 
-    margin-top: 6vw;
+    margin-top: 5vw;
 
     font-size: 4vw;
   }
@@ -1193,15 +1349,30 @@
   .confirmButton:disabled {
     transform: none;
   }
+
+  /* ========================================= */
+  /* EMPTY                                    */
+  /* ========================================= */
+
+  .emptyInfo {
+    width: 85%;
+
+    flex: 1;
+  }
 }
 
+/* ========================================= */
+/* SHORT HEIGHT                              */
+/* ========================================= */
+
 @media (max-height: 800px) {
-  .infoPage{
+  .infoPage {
     padding-right: 100px;
     width: 50%;
     // background-color: #38170b;
   }
-  .eventsPage{
+
+  .eventsPage {
     padding-left: 100px;
   }
 }
