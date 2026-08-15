@@ -701,22 +701,44 @@ const Register = forwardRef<HTMLDivElement, PropsType>(
     >([]);
     const [inputValue, setInputValue] = useState("");
 
-    useEffect(() => {
-      axios
-        .get("https://bits-oasis.org/2025/main/registrations/get_college/")
-        .then((response) => {
-          setCollegeOptions(
-            response.data.data.map(
-              (college: { id: number; name: string }) => ({
-                value: String(college.id),
-                label: college.name,
-              })
-            )
-          );
-        })
-        .catch((error) => console.error("Error fetching colleges:", error));
-    }, []);
+    // useEffect(() => {
+    //   axios
+    //     .get("https://bits-oasis.org/2026/main/registrations/get_college/")
+    //     .then((response) => {
+    //       setCollegeOptions(
+    //         response.data.data.map(
+    //           (college: { id: number; name: string }) => ({
+    //             value: String(college.id),
+    //             label: college.name,
+    //           })
+    //         )
+    //       );
+    //     })
+    //     .catch((error) => console.error("Error fetching colleges:", error)
+        
+    //   );
+    // }, []);
 
+    useEffect(() => {
+  axios
+    .get("https://bits-oasis.org/2026/main/registrations/get_college/")
+    .then((response) => {
+      console.log("COLLEGE API RESPONSE:", response.data);
+
+      setCollegeOptions(
+        response.data.map(
+          (college: { id: number; name: string }) => ({
+            value: String(college.id),
+            label: college.name,
+          })
+        )
+      );
+    })
+    .catch((error) => {
+      console.error("COLLEGE API ERROR:", error);
+      console.error("RESPONSE:", error.response?.data);
+    });
+}, []);
     const getAvailableCities = (stateName: string) =>
       (statesData.find((item) => item.state === stateName)?.cities ?? []).map(
         (city) => ({

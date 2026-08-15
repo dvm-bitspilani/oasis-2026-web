@@ -1,0 +1,56 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-y: hidden;
+
+}
+.registerContainer {
+  width: 100vw;
+  min-height: 100vh;
+  background-size:cover;
+  background-repeat: no-repeat;
+  position: relative;
+}
+.leftbottom{
+    position: absolute;
+    left: 0%;
+    bottom: 0%;
+    width: 20%;
+}
+
+
+.rightbottom{
+    position: absolute;
+    right: -13%;
+    bottom: -5%;
+    width: 30%;
+    box-sizing: border-box;
+    object-fit: contain;
+}
+
+.lefttop{
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.righttop{
+    position: absolute;
+    right: 0;
+    top: 3%;
+}
+.bookContainer{
+    position: absolute;
+top: 52%;
+left: 50%;
+transform: translate(-50%,-50%);
+    height: 95%;
+    width: fit-content;
+
+    aspect-ratio: 1.4;
+    background-size: contain;
+    object-fit: contain;
+    background-repeat: no-repeat;
+    z-index: 100;
+}

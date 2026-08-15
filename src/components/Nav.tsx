@@ -7,7 +7,7 @@ import navMobNav from "../assets/navMobNav.png";
 
 const LINKS = [
   { label: "Home", to: "/" },
-  { label: "Contacts", to: "/comingsoon" },
+  { label: "reg", to: "/reg" },
   { label: "Events", to: "/comingsoon" },
   { label: "About Us", to: "/about" },
   { label: "Register", to: "/register" },
