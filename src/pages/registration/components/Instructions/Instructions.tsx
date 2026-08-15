@@ -80,7 +80,7 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
         {detailInst && (
           <InstructionModal onCancel={() => setdetailInst(false)} />
         )}
-        <div className={styles.content} ref={ref}>
+        <div className={styles.content} >
           <div className={styles.headingCont}>
             <h3 className={styles.heading}>INSTRUCTIONS</h3>
           </div>
