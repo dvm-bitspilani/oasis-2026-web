@@ -228,3 +228,62 @@
     }
   }
 }
+
+@media screen and (max-width: 1201px) {
+  .content {
+    width: 65vw;
+    margin: 0;
+    left: 20%;
+  }
+
+  .lefttop {
+    left: -25%;
+    top: -25%;
+  }
+
+  .leftbottom {
+    left: -5%;
+    bottom: -5%;
+    scale: 1.75;
+  }
+}
+
+@media screen and (max-width: 1025px) {
+  .content {
+    width: 80vw;
+    left: 10%;
+  }
+
+  .lefttop {
+    left: -30%;
+    top: -10%;
+    scale: 0.6;
+  }
+
+  .righttop {
+    scale: 0.6;
+  }
+}
+
+@media screen and (max-width: 769px) {
+  .content {
+    width: 90vw;
+    left: 5%;
+  }
+
+  .leftbottom,
+  .lefttop,
+  .rightbottom,
+  .righttop {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 577px) {
+  .content {
+    width: max-content;
+    left: 0%;
+    background-size: contain;
+    scale: 0.9;
+  }
+}
