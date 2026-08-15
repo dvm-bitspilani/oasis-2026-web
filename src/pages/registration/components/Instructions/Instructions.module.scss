@@ -4,19 +4,18 @@
   z-index: 2;
   position: absolute;
   top: 0;
-  left: 10%;
+  left: 15%;
   display: flex;
   align-items: center;
   flex-direction: column;
   gap: 20px;
   height: 100svh;
-  width: 30vw;
-  padding: 0 200px;
+  width: 50vw;
   // margin-bottom: 5vw;
   background-image: url(/instructionsScroll.png);
-  background-position: center;
+  //background-position: center;
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: cover;
 
   .headingCont {
     display: flex;
@@ -40,7 +39,7 @@
     font-size: 1.5rem;
     font-weight: 700;
     color: #38170B;
-    margin: 0 0 0 30px;
+    padding: 0 150px;
   }
 
   .instr {
@@ -49,7 +48,7 @@
     justify-content: center;
     gap: 12px;
     list-style: none;
-    margin: 0 0 0 20px;
+    padding: 0 150px;
 
     li {
       position: relative;
@@ -155,6 +154,35 @@
         clamp(1rem, 2vw + 0.5rem, 2rem) clamp(1rem, 2vw + 0.5rem, 2rem);
     }
   }
+}
+
+.leftbottom{
+    position: absolute;
+    left: -5%;
+    bottom: -10%;
+    width: 20%;
+    scale: 1.5;
+}
+
+
+.rightbottom{
+    position: absolute;
+    right: -7%;
+    bottom: -5%;
+    width: 30%;
+    object-fit: contain;
+}
+
+.lefttop{
+    position: absolute;
+    left: -18%;
+    top: -22%;
+}
+
+.righttop{
+    position: absolute;
+    right: 0;
+    top: 3%;
 }
 @media (max-width: 1200px) and (max-aspect-ratio: 0.75) {
   .content {

@@ -6,7 +6,7 @@ export default function reginput() {
     <div className={styles.registerContainer} 
      style={{backgroundImage:`url(${inputBg})`}}
     >
-<input type="text" />
+      <input type="text" />
     </div>
   )
 }

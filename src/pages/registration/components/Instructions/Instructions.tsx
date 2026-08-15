@@ -68,6 +68,11 @@ import { useState } from "react";
 import styles from "./Instructions.module.scss";
 import { GoogleLogin } from "@react-oauth/google";
 import InstructionModal from "../InstructionModal/InstructionModal";
+
+import leftbottom from "../../../../assets/registration/reg/leftbottom.png"
+import rightbottom from "../../../../assets/registration/reg/rightbottom.png"
+import lefttop from "../../../../assets/registration/reg/lefttop.png"
+import righttop from "../../../../assets/registration/reg/righttop.png"
 interface InstructionsProps {
   onGoogleSignIn: (response: any) => void;
 }
@@ -80,20 +85,25 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
         {detailInst && (
           <InstructionModal onCancel={() => setdetailInst(false)} />
         )}
-        <div className={styles.content} >
+        <img src={leftbottom} className={styles.leftbottom} alt="leftbottom" />
+        <img src={lefttop} className={styles.lefttop} alt="lefttop" />
+        <img src={rightbottom} className={styles.rightbottom} alt="rightbottom" />
+        <img src={righttop} className={styles.righttop} alt="righttop" />
+        <div className={styles.content}>
           <div className={styles.headingCont}>
-            <h3 className={styles.heading}>INSTRUCTIONS</h3>
+            <h3 className={styles.heading}>Registration</h3>
           </div>
+          <h5>INSTRUCTIONS</h5>
           <ul className={styles.instr}>
             <li>
               Complete the registration form with all required details. You'll
               be able to login through your registered email id when required.
             </li>
-            <li>All team members are required to register separately.</li>
             <li>All prof shows are free. </li>
+            <li>All team members are required to register separately.</li>
             <li>
-              For further details contact, Ujjwal Kansal: <a href="tel:+919991520330">+91 99915 20330</a>,
-              Sneha: <a href="tel:+919026855597">+91 90268 55597</a>
+              For further details contact, Parimal: <a href="tel:8638304074">8638304074</a>,
+              Ishita: <a href="tel:7804051996">7804051996</a>
             </li>
             <li>
               For detailed Instructions{" "}
@@ -102,7 +112,6 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
           </ul>
 
           <button className={styles.googleButton} onClick={onGoogleSignIn}>
-            Sign in with Google
           </button>
         </div>
       </>
