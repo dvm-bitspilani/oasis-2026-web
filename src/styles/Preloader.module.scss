@@ -10,7 +10,7 @@
   background: #000;
   color: #e8e3d8;
 
-  font-family: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  font-family: "Syamsiah", sans-serif;
 
   overflow: hidden;
 }
@@ -33,21 +33,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 
   width: 100%;
   text-align: center;
 }
 
+/* Container for the two lines that appear together */
+.lineGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+}
+
+/* Each line is now part of the normal vertical layout,
+   instead of all occupying the exact same absolute position */
 .lineSvg {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) scale(1.04);
+  display: block;
 
   width: min(90vw, 900px);
   height: auto;
 
   opacity: 0;
+
+  transform: scale(1.04);
 }
 
 // Shared type styling for both layers
@@ -57,7 +69,7 @@
   font-size: 34px;
   letter-spacing: 0.14em;
 
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
 }
 
 .pathText {
@@ -73,7 +85,7 @@
   opacity: 0;
 }
 
-// --- Phase 1: text fades + settles in (no glow yet) ---
+// --- Phase 1: text fades + settles in ---
 .phase-in {
   animation: lineIn 1.6s ease-out forwards;
 }
@@ -81,18 +93,19 @@
 @keyframes lineIn {
   0% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(1.04);
+    transform: scale(1.04);
   }
+
   100% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
   }
 }
 
 // --- Phase 2: glow blooms in behind the settled text ---
 .phase-glow {
   opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
+  transform: scale(1);
 
   .glowText {
     animation: glowBloom 0.9s ease-out forwards;
@@ -107,6 +120,7 @@
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 0.85;
   }
@@ -116,6 +130,7 @@
   0% {
     fill: #e8e3d8;
   }
+
   100% {
     fill: #fffdf5;
   }
@@ -124,7 +139,7 @@
 // --- Phase 3: hold, fully glowing ---
 .phase-hold {
   opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
+  transform: scale(1);
 
   .glowText {
     opacity: 0.85;
@@ -152,11 +167,12 @@
 @keyframes lineOut {
   0% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
   }
+
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.98);
+    transform: scale(0.98);
   }
 }
 
@@ -164,6 +180,7 @@
   0% {
     opacity: 0.85;
   }
+
   100% {
     opacity: 0;
   }

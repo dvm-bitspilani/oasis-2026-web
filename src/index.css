@@ -33,3 +33,8 @@ a {
   font-family: "Ramadhan";
   src: url(./assets/fonts/Lentera\ Ramadhan.ttf);
 }
+
+@font-face {
+  font-family: "Syamsiah";
+  src: url(./assets/fonts/Syamsiah\ Arabic.ttf);
+}
