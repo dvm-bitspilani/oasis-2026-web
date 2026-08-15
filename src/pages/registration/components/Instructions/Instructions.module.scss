@@ -28,18 +28,38 @@
       font-family: "Syamsiah", sans-serif;
       font-weight: 500;
       color: #6C1700;
-      font-size: 5.5rem;
+      font-size: 6rem;
       margin: 15vh 0 0;
+
+      &::selection {
+        background-color: #7A2E1C;
+        color: #F3E4C3;
+      }
+
+      &::-moz-selection {
+        background-color: #7A2E1C;
+        color: #F3E4C3;
+      }
     }
   }
 
   h5 {
     align-self: flex-start;
     font-family: "Cinzel", sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
     color: #38170B;
     padding: 0 150px;
+
+    &::selection {
+      background-color: #7A2E1C;
+      color: #F3E4C3;
+    }
+
+    &::-moz-selection {
+      background-color: #7A2E1C;
+      color: #F3E4C3;
+    }
   }
 
   .instr {
@@ -56,6 +76,17 @@
       color: #432611;
       text-align: left;
       font-family: "EB", sans-serif;
+      font-size: 1.25rem;
+
+      &::selection {
+        background-color: #7A2E1C;
+        color: #F3E4C3;
+      }
+
+      &::-moz-selection {
+        background-color: #7A2E1C;
+        color: #F3E4C3;
+      }
 
       &::before {
         content: "";
@@ -109,64 +140,6 @@
   }
 }  
 
-@media (max-width: 1200px) and (max-aspect-ratio: 1.45) {
-  .content {
-    margin-top: 3vh;
-    height: 100svh;
-    .headingCont {
-      margin: 1.4 * 1vw 0 1.4 * 3vw 0;
-      img {
-        height: 4vw;
-      }
-      .heading {
-        font-size: clamp(1.5rem, 3.5vw + 0.1rem, 5rem);
-      }
-    }
-    .instr {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 12px;
-      list-style: none;
-      margin: 0 0 0 20px;
-
-      li {
-        position: relative;
-        padding-left: 34px;
-        color: #432611;
-        text-align: left;
-        font-family: "EB", sans-serif;
-
-        &::before {
-          content: "";
-          position: absolute;
-          left: 0;
-          top: 0.25em;
-          width: 22px;
-          height: 22px;
-          background: url("/game-icons_magic-lamp.svg") center / contain no-repeat;
-        }
-
-        a {
-          color: #432611;
-          font-family: "EB", sans-serif;
-        }
-
-        span {
-          cursor: pointer;
-          text-decoration: underline;
-        }
-      }
-    }
-    .googleButton {
-      margin-top: clamp(2rem, 2vw + 2rem, 4rem);
-      font-size: clamp(1rem, 3vw + 0.1rem, 5rem);
-      padding: clamp(1rem, 2vw + 0.5rem, 2rem) clamp(2rem, 6vw + 0.5rem, 8rem)
-        clamp(1rem, 2vw + 0.5rem, 2rem) clamp(1rem, 2vw + 0.5rem, 2rem);
-    }
-  }
-}
-
 .leftbottom{
     position: absolute;
     left: -5%;
@@ -195,54 +168,34 @@
     right: 0;
     top: 3%;
 }
-@media (max-width: 1200px) and (max-aspect-ratio: 0.75) {
+
+.book {
+  position: absolute;
+  top: -12%;
+  right: 3%;
+  scale: 0.65;
+  z-index: 20;
+}
+
+@media screen and (max-width: 1401px) {
   .content {
-    margin-top: 3vh;
-    .headingCont {
-      margin: 1.4 * 1vw 0 1.4 * 3vw 0;
-      img {
-        height: 3vw;
-      }
-      .heading {
-        font-size: clamp(1rem, 5vw + 0.1rem, 8rem);
-      }
-    }
-    .instr {
-      width: 80vw;
-      max-height: 80svh;
-      gap: 4vw;
-      list-style: none;
+    width: 65vw;
+  }
 
-      li {
-        position: relative;
-        padding-left: 6vw;
-        color: #432611;
-        text-align: left;
-        font: 400 clamp(1rem, 4vw + 0.1rem, 4rem) "Shippori Mincho";
+  .book {
+    scale: 0.5;
+    top: -15%;
+    right: -7%;
+  }
 
-        &::before {
-          content: "";
-          position: absolute;
-          left: 0;
-          top: 0.25em;
-          width: 4vw;
-          height: 4vw;
-          background: url("/game-icons_magic-lamp.svg") center / contain no-repeat;
-        }
-      }
-    }
-    .googleButton {
-      margin-top: clamp(1rem, 2vw + 0rem, 3rem);
-      font-size: clamp(1rem, 2vw + 0.1rem, 1.3rem);
-      padding: clamp(1rem, 2vw + 0.5rem, 2rem) clamp(2rem, 4vw + 0.5rem, 6rem)
-        clamp(1rem, 2vw + 0.5rem, 2rem) clamp(1rem, 2vw + 0.5rem, 2rem);
-    }
+  .googleButton {
+    scale: 1.5;
   }
 }
 
 @media screen and (max-width: 1201px) {
   .content {
-    width: 65vw;
+    width: 80vw;
     margin: 0;
     left: 20%;
   }
@@ -257,12 +210,16 @@
     bottom: -5%;
     scale: 1.75;
   }
+
+  .book {
+    display: none;
+  }
 }
 
-@media screen and (max-width: 1025px) {
+@media screen and (max-width: 1075px) {
   .content {
-    width: 80vw;
     left: 10%;
+    background-image: url(/instructionsScrollLong.png);
   }
 
   .lefttop {
@@ -273,6 +230,10 @@
 
   .righttop {
     scale: 0.6;
+  }
+
+  .googleButton {
+    scale: 2;
   }
 }
 
@@ -292,9 +253,15 @@
 
 @media screen and (max-width: 577px) {
   .content {
-    width: max-content;
-    left: 0%;
-    background-size: contain;
-    scale: 0.9;
+    width: 95vw;
+    left: 3%;
+
+    .instr {
+    padding: 0 100px;
+    }
+
+    .googleButton {
+      scale: 2.5;
+    }
   }
 }
