@@ -610,12 +610,6 @@ import rightbottom from "../../../../assets/registration/reg/rightbottom.png";
 import righttop from "../../../../assets/registration/reg/righttop.png";
 import book from "../../../../assets/registration/reg/book.png";
 
-interface Event {
-  id: number;
-  name: string;
-  about: string;
-}
-
 export default function EventsReg() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -672,20 +666,7 @@ export default function EventsReg() {
         style={{
           backgroundImage: `url(${book})`,
         }}
-      >
-        {loading ? (
-          <p>Loading events...</p>
-        ) : (
-          <div className={styles.eventsList}>
-            {events.map((event) => (
-              <div key={event.id} className={styles.event}>
-                <h3>{event.name}</h3>
-                <p>{event.about}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      />
     </div>
   );
 }
