@@ -599,6 +599,8 @@
 
 // export default Events;
 
+import { useEffect, useState } from "react";
+import axios from "axios";
 import styles from "./Events.module.scss";
 
 import RegBg from "../../../../assets/registration/reg/RegBg.png";
@@ -608,7 +610,32 @@ import rightbottom from "../../../../assets/registration/reg/rightbottom.png";
 import righttop from "../../../../assets/registration/reg/righttop.png";
 import book from "../../../../assets/registration/reg/book.png";
 
+interface Event {
+  id: number;
+  name: string;
+  about: string;
+}
+
 export default function EventsReg() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios
+      .get<Event[]>(
+        "https://bits-oasis.org/2026/main/registrations/web_events/"
+      )
+      .then((response) => {
+        setEvents(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching events:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <div
       className={styles.registerContainer}
@@ -645,7 +672,20 @@ export default function EventsReg() {
         style={{
           backgroundImage: `url(${book})`,
         }}
-      />
+      >
+        {loading ? (
+          <p>Loading events...</p>
+        ) : (
+          <div className={styles.eventsList}>
+            {events.map((event) => (
+              <div key={event.id} className={styles.event}>
+                <h3>{event.name}</h3>
+                <p>{event.about}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
