@@ -111,7 +111,7 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
             </li>
           </ul>
 
-           <div>
+           <div className={styles.googleButton}>
           <GoogleLogin
             onSuccess={onGoogleSignIn}
             onError={() => console.log("Login Failed")}
@@ -120,7 +120,6 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
             size="large"
             text="signin_with"
             width={window.innerWidth < 500 ? "200" : "350"}
-            className={styles.googleButton}
           />
         </div>
         </div>
