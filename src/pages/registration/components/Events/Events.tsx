@@ -109,10 +109,7 @@ const TEST_EVENTS: Event[] = [
 /* COMPONENT                                 */
 /* ========================================= */
 
-export default function Events({
-  userData,
-  setUserData,
-}: EventsProps) {
+export default function Events() {
   const [events, setEvents] = useState<Event[]>([]);
   const [search, setSearch] = useState("");
 
@@ -163,6 +160,16 @@ export default function Events({
   }, []);
 
   /* ========================================= */
+  /* AUTO SHOW FIRST EVENT                    */
+  /* ========================================= */
+
+  useEffect(() => {
+    if (!loading && events.length > 0) {
+      setActiveEvent(events[0]);
+    }
+  }, [loading, events]);
+
+  /* ========================================= */
   /* SEARCH                                    */
   /* ========================================= */
 
@@ -171,6 +178,26 @@ export default function Events({
       .toLowerCase()
       .includes(search.trim().toLowerCase()),
   );
+
+  /* ========================================= */
+  /* KEEP ACTIVE EVENT VALID AFTER SEARCH     */
+  /* ========================================= */
+
+  useEffect(() => {
+    if (filteredEvents.length === 0) {
+      setActiveEvent(null);
+      return;
+    }
+
+    if (
+      !activeEvent ||
+      !filteredEvents.some(
+        (event) => event.id === activeEvent.id,
+      )
+    ) {
+      setActiveEvent(filteredEvents[0]);
+    }
+  }, [search, events]);
 
   /* ========================================= */
   /* SELECT / REMOVE EVENT                     */
@@ -448,12 +475,7 @@ export default function Events({
           {/* RIGHT PAGE                        */}
           {/* ================================= */}
 
-          <div
-            className={styles.infoPage}
-            onMouseLeave={() =>
-              setActiveEvent(null)
-            }
-          >
+          <div className={styles.infoPage}>
             <div className={styles.rightOuter}>
 
               {/* ALWAYS VISIBLE */}
