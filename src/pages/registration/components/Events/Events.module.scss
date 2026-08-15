@@ -1,86 +1,224 @@
 .eventsContainer {
-  width: 100%;
-  min-height: 100svh;
+  position: relative;
+
+  width: 100vw;
+  height: 100svh;
+
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  color: #e2dccb;
+
+  font-family:
+    "Abhaya Libre",
+    serif;
+
+  z-index: 3;
+}
+
+/* ========================================= */
+/* REGISTER DECORATIONS                      */
+/* ========================================= */
+
+.leftbottom,
+.lefttop,
+.rightbottom,
+.righttop {
+  position: absolute;
+
+  pointer-events: none;
+
+  z-index: 1;
+
+  user-select: none;
+}
+
+/* Bottom left */
+
+.leftbottom {
+  left: 0;
+  bottom: 0;
+
+  width: 24vw;
+
+  height: auto;
+}
+
+/* Top left */
+
+.lefttop {
+  left: 0;
+  top: 0;
+
+  width: 20vw;
+
+  height: auto;
+}
+
+/* Bottom right */
+
+.rightbottom {
+  right: 0;
+  bottom: 0;
+
+  width: 24vw;
+
+  height: auto;
+}
+
+/* Top right */
+
+.righttop {
+  right: 0;
+  top: 0;
+
+  width: 20vw;
+
+  height: auto;
+}
+
+/* ========================================= */
+/* BOOK                                      */
+/* ========================================= */
+
+.bookContainer {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: 82vw;
+  height: 88svh;
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+
+  pointer-events: none;
+
+  z-index: 2;
+}
+
+/* ========================================= */
+/* CONTENT                                   */
+/* ========================================= */
+
+.content {
+  position: relative;
+
+  width: 62vw;
+  height: 70svh;
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  box-sizing: border-box;
-  padding: 3vw 5vw;
-
-  color: white;
+  z-index: 5;
 }
 
 /* ========================================= */
-/* HEADING                                   */
+/* TITLE                                     */
 /* ========================================= */
 
-.heading {
-  margin: 0 0 3vw;
+.titleRow {
+  width: 100%;
 
-  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  font-family: "Ibarra Real Nova SemiBold", serif;
-  font-size: clamp(2rem, 3vw, 4rem);
+  gap: 1vw;
+
+  margin-bottom: 1vw;
+}
+
+.titleRow h1 {
+  margin: 0;
+
+  color: #fff9e9;
+
+  font:
+    100 2.2vw
+    "Abhaya Libre Extrabold",
+    serif;
+
+  letter-spacing: 0.08em;
 
   text-align: center;
+
+  white-space: nowrap;
+
+  text-shadow:
+    0 0 6px rgba(229, 195, 132, 0.54);
 }
 
-/* ========================================= */
-/* MAIN CONTENT                              */
-/* ========================================= */
+.titleGlow {
+  width: 7vw;
 
-.mainContent {
-  width: min(1100px, 90vw);
+  height: 1px;
 
-  display: flex;
-  align-items: stretch;
+  background: #fff9e9;
 
-  gap: 3vw;
-}
-
-/* ========================================= */
-/* LEFT SIDE                                 */
-/* ========================================= */
-
-.leftSide {
-  width: 45%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  box-shadow:
+    0 0 6px rgba(229, 195, 132, 0.7);
 }
 
 /* ========================================= */
 /* SEARCH                                    */
 /* ========================================= */
 
-.search {
-  width: 100%;
-  height: 3.3vw;
-  min-height: 45px;
+.searchContainer {
+  position: relative;
 
-  margin-bottom: 1.5vw;
+  width: 28vw;
 
-  border: 1px solid #ededed;
-
-  background: rgba(0, 0, 0, 0.4);
-
-  box-shadow:
-    0 0 10px rgba(229, 195, 132, 0.35);
+  aspect-ratio: 5.8223;
 
   display: flex;
   align-items: center;
+  justify-content: center;
 
-  box-sizing: border-box;
+  margin-bottom: 1vw;
 }
 
-.search input {
-  width: 100%;
+.searchContainer::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  /*
+   * Same cloud/field treatment used by Register.
+   * If your field SVG has a different filename,
+   * change only this URL.
+   */
+  background:
+    url("/svgs/registration/field2.svg")
+    center / contain no-repeat;
+
+  pointer-events: none;
+
+  z-index: -1;
+}
+
+.searchContainer input {
+  width: 90%;
   height: 100%;
 
-  padding: 0 1.5vw;
+  margin: 0 auto;
+
+  padding: 0;
 
   box-sizing: border-box;
 
@@ -89,39 +227,73 @@
 
   background: transparent;
 
-  color: white;
+  text-align: center;
 
-  font-family:
-    "Ibarra Real Nova SemiBold",
+  color: #e2dccb;
+
+  caret-color: #fff9e9;
+
+  font:
+    100 1.4vw
+    "Abhaya Libre Extrabold",
     serif;
-
-  font-size: clamp(14px, 1.4vw, 22px);
 }
 
-.search input::placeholder {
-  color: white;
+.searchContainer input::placeholder {
+  color: #e2dccb;
+
+  opacity: 1;
 }
 
 /* ========================================= */
-/* EVENTS LIST - ONE COLUMN                  */
+/* EVENTS AREA                               */
+/* ========================================= */
+
+.eventsArea {
+  width: 100%;
+
+  flex: 1;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 4vw;
+}
+
+/* ========================================= */
+/* LEFT PAGE                                 */
+/* ========================================= */
+
+.eventsPage {
+  width: 28vw;
+  height: 43svh;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+}
+
+/* ========================================= */
+/* EVENT LIST                                */
 /* ========================================= */
 
 .eventsList {
   width: 100%;
+  height: 100%;
 
-  height: 32vw;
-  max-height: 55svh;
+  overflow-y: auto;
 
   display: flex;
   flex-direction: column;
+
   align-items: center;
 
-  gap: 1vw;
+  gap: 0.45vw;
 
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  padding: 0.5vw;
+  padding: 0.4vw;
 
   box-sizing: border-box;
 
@@ -137,147 +309,202 @@
 /* ========================================= */
 
 .eventItem {
-  flex: 0 0 auto;
+  position: relative;
 
   width: 100%;
-  height: 4vw;
 
-  min-height: 45px;
+  min-height: 3vw;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid rgba(237, 237, 237, 0.7);
-
-  background: rgba(0, 0, 0, 0.35);
-
-  cursor: pointer;
-
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.eventItem:hover {
-  transform: translateX(5px);
-
-  background: rgba(229, 195, 132, 0.18);
-
-  border-color: #e5c384;
-}
-
-.eventItem.selected {
-  background: rgba(229, 195, 132, 0.25);
-
-  border-color: #e5c384;
-}
-
-/* ========================================= */
-/* EVENT BUTTON                              */
-/* ========================================= */
-
-.eventButton {
-  width: 100%;
-  height: 100%;
-
-  padding: 0.5vw;
+  padding: 0.5vw 1vw;
 
   border: none;
-  outline: none;
 
   background: transparent;
 
-  color: white;
+  color: #e2dccb;
 
   cursor: pointer;
 
-  font-family:
-    "Ibarra Real Nova SemiBold",
+  font:
+    100 1.25vw
+    "Abhaya Libre Extrabold",
     serif;
 
-  font-size: clamp(13px, 1.1vw, 19px);
+  text-align: center;
 
-  white-space: nowrap;
+  transition:
+    color 0.25s ease,
+    filter 0.25s ease,
+    transform 0.25s ease;
+}
+
+.eventItem::before {
+  content: "";
+
+  position: absolute;
+
+  left: 5%;
+  right: 5%;
+
+  bottom: 0;
+
+  height: 1px;
+
+  background: rgba(226, 220, 203, 0.4);
+
+  transition:
+    left 0.25s ease,
+    right 0.25s ease,
+    background 0.25s ease;
+}
+
+.eventItem:hover {
+  color: #fff9e9;
+
+  transform: translateX(0.3vw);
+
+  text-shadow:
+    0 0 6px rgba(229, 195, 132, 0.54);
+}
+
+.eventItem:hover::before {
+  left: 0;
+  right: 0;
+
+  background: #e5c384;
+}
+
+.eventItem.selected {
+  color: #181818;
+
+  background: #e2dccb;
+
+  text-shadow: none;
+}
+
+.eventItem.selected::before {
+  display: none;
+}
+
+.eventItem span {
+  display: block;
+
+  width: 100%;
 
   overflow: hidden;
+
   text-overflow: ellipsis;
-}
 
-.eventItem:hover .eventButton {
-  color: #e5c384;
+  white-space: nowrap;
 }
 
 /* ========================================= */
-/* RIGHT INFO PANEL                          */
+/* SELECTED COUNT                            */
 /* ========================================= */
 
-.rightSide {
-  width: 55%;
+.selectedCount {
+  flex-shrink: 0;
 
-  min-height: 32vw;
+  margin-top: 0.6vw;
 
-  padding: 3vw;
+  color: #fff9e9;
+
+  font:
+    100 1.05vw
+    "Abhaya Libre Extrabold",
+    serif;
+
+  letter-spacing: 0.08em;
+
+  text-shadow:
+    0 0 6px rgba(229, 195, 132, 0.54);
+}
+
+/* ========================================= */
+/* RIGHT PAGE                                */
+/* ========================================= */
+
+.infoPage {
+  width: 28vw;
+  height: 43svh;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
 
   box-sizing: border-box;
 
-  border: 2px solid #ededed;
-  border-radius: 10px;
-
-  background: rgba(0, 0, 0, 0.75);
-
-  backdrop-filter: blur(10px);
-
-  box-shadow:
-    0 0 15px rgba(229, 195, 132, 0.25);
-
-  display: flex;
-  flex-direction: column;
-
-  overflow: hidden;
+  color: #e2dccb;
 }
 
 /* ========================================= */
 /* EVENT INFO                                */
 /* ========================================= */
 
-.eventCategory {
-  margin-bottom: 1vw;
+.eventInfo {
+  width: 100%;
 
-  color: #e5c384;
+  height: 100%;
 
-  font-family:
-    "Ibarra Real Nova SemiBold",
-    serif;
+  display: flex;
 
-  font-size: clamp(13px, 1vw, 18px);
+  flex-direction: column;
 
-  letter-spacing: 0.15em;
+  justify-content: center;
+
+  align-items: center;
+
+  text-align: center;
+
+  padding: 3vw;
+
+  box-sizing: border-box;
 }
 
-.eventHeading {
-  margin: 0 0 1.5vw;
+.eventCategory {
+  margin-bottom: 0.7vw;
 
-  color: #ededed;
+  color: #f8d990;
 
-  font-family:
+  font:
+    100 1vw
     "Abhaya Libre Extrabold",
     serif;
 
-  font-size: clamp(26px, 2.5vw, 42px);
+  letter-spacing: 0.2em;
+
+  text-shadow:
+    0 0 6px rgba(229, 195, 132, 0.54);
 }
 
-.eventDescription {
+.eventInfo h2 {
+  margin: 0 0 1vw;
+
+  color: #fff9e9;
+
+  font:
+    100 2.3vw
+    "Abhaya Libre Extrabold",
+    serif;
+
+  text-shadow:
+    0 0 6px rgba(229, 195, 132, 0.35);
+}
+
+.eventInfo p {
+  max-width: 24vw;
+
   margin: 0;
 
-  color: #ededed;
+  color: #e2dccb;
 
-  font-family: "Abhaya Libre", serif;
+  font:
+    100 1.15vw
+    "Abhaya Libre",
+    serif;
 
-  font-size: clamp(16px, 1.2vw, 20px);
-
-  line-height: 1.7;
+  line-height: 1.5;
 }
 
 /* ========================================= */
@@ -286,53 +513,59 @@
 
 .addButton,
 .removeButton {
-  width: 12vw;
+  width: 10vw;
 
-  min-width: 140px;
+  min-width: 120px;
 
-  margin: auto auto 0;
+  margin-top: 1.8vw;
 
-  padding: 0.8vw;
-
-  border: 1px solid #ededed;
+  padding: 0.7vw;
 
   cursor: pointer;
 
-  font-family: "Abhaya Libre", serif;
-
-  font-size: clamp(14px, 1.2vw, 20px);
+  font:
+    100 1.1vw
+    "Abhaya Libre Extrabold",
+    serif;
 
   transition:
-    transform 0.2s ease,
-    background 0.2s ease;
+    filter 0.3s ease,
+    transform 0.3s ease;
 }
 
 .addButton {
-  background: #fff6dd;
-  color: #000;
+  border: none;
+
+  background: #fff9e9;
+
+  color: #181818;
 }
 
 .removeButton {
+  border: 1px solid #e2dccb;
+
   background: transparent;
-  color: white;
+
+  color: #fff9e9;
 }
 
 .addButton:hover,
 .removeButton:hover {
   transform: scale(1.04);
+
+  filter: brightness(0.8);
 }
 
 /* ========================================= */
-/* EMPTY RIGHT SIDE                          */
+/* EMPTY INFO                                */
 /* ========================================= */
 
 .emptyInfo {
   width: 100%;
   height: 100%;
 
-  min-height: 25vw;
-
   display: flex;
+
   flex-direction: column;
 
   align-items: center;
@@ -344,89 +577,229 @@
 }
 
 .emptyInfo h2 {
-  margin: 0 0 1vw;
+  margin: 0 0 0.8vw;
 
-  color: #ededed;
+  color: #fff9e9;
 
-  font-family:
+  font:
+    100 2vw
     "Abhaya Libre Extrabold",
     serif;
-
-  font-size: clamp(24px, 2vw, 34px);
 }
 
 .emptyInfo p {
   margin: 0;
 
-  color: #ededed;
+  color: #e2dccb;
 
-  font-family: "Abhaya Libre", serif;
-
-  font-size: clamp(15px, 1.1vw, 18px);
-}
-
-/* ========================================= */
-/* SELECTED COUNT                            */
-/* ========================================= */
-
-.selectedCount {
-  margin-top: 1vw;
-
-  color: white;
-
-  font-family:
-    "Ibarra Real Nova SemiBold",
+  font:
+    100 1.1vw
+    "Abhaya Libre",
     serif;
 
-  font-size: clamp(14px, 1.2vw, 20px);
+  line-height: 1.6;
 }
 
 /* ========================================= */
-/* SUBMIT                                    */
+/* MESSAGE                                   */
+/* ========================================= */
+
+.message {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  color: #e2dccb;
+
+  font:
+    100 1.2vw
+    "Abhaya Libre Extrabold",
+    serif;
+}
+
+/* ========================================= */
+/* CONFIRM BUTTON                             */
 /* ========================================= */
 
 .confirmButton {
-  width: 18vw;
+  position: absolute;
 
-  min-width: 180px;
+  bottom: 2vw;
 
-  margin-top: 1.5vw;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  z-index: 6;
+
+  width: 22vw;
+
+  margin: 2vw 0;
 
   padding: 1vw;
 
   border: none;
 
+  outline: none;
+
   background:
     center / contain no-repeat
     url("/svgs/registration/button-banner.svg");
 
-  color: white;
+  color: #fff;
 
-  font-family:
+  cursor: pointer;
+
+  font:
+    100 1.5vw
     "Abhaya Libre Extrabold",
     serif;
 
-  font-size: clamp(16px, 1.4vw, 22px);
-
-  cursor: pointer;
-}
-
-/* ========================================= */
-/* NO EVENTS                                 */
-/* ========================================= */
-
-.noEvents {
-  width: 100%;
-
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  color: white;
+  transition: filter 0.3s;
+}
 
-  font-family: "Abhaya Libre", serif;
+.confirmButton:hover {
+  filter: brightness(0.8);
+}
 
-  font-size: 1.2rem;
+.confirmButton:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
+
+  filter: grayscale(0.3);
+}
+
+/* ========================================= */
+/* TABLET                                    */
+/* ========================================= */
+
+@media (max-width: 1200px) and (max-aspect-ratio: 1.45) {
+  .eventsContainer {
+    width: 100%;
+    height: 100svh;
+
+    margin: 0;
+
+    overflow: hidden;
+  }
+
+  .lefttop {
+    width: 28vw;
+  }
+
+  .righttop {
+    width: 28vw;
+  }
+
+  .leftbottom {
+    width: 32vw;
+  }
+
+  .rightbottom {
+    width: 32vw;
+  }
+
+  .bookContainer {
+    width: 95vw;
+
+    height: 90svh;
+  }
+
+  .content {
+    width: 78vw;
+
+    height: 70svh;
+  }
+
+  .titleRow h1 {
+    font-size: 3.2vw;
+  }
+
+  .titleGlow {
+    width: 12vw;
+  }
+
+  .searchContainer {
+    width: 70vw;
+  }
+
+  .searchContainer input {
+    font-size: 3.2vw;
+  }
+
+  .eventsArea {
+    gap: 4vw;
+  }
+
+  .eventsPage,
+  .infoPage {
+    width: 35vw;
+
+    height: 42svh;
+  }
+
+  .eventItem {
+    min-height: 5vw;
+
+    font-size: 2.8vw;
+  }
+
+  .selectedCount {
+    font-size: 2.5vw;
+  }
+
+  .eventCategory {
+    font-size: 2.5vw;
+  }
+
+  .eventInfo h2 {
+    font-size: 4.5vw;
+  }
+
+  .eventInfo p {
+    max-width: 30vw;
+
+    font-size: 2.5vw;
+  }
+
+  .addButton,
+  .removeButton {
+    width: 30vw;
+
+    padding: 1.5vw;
+
+    font-size: 2.8vw;
+  }
+
+  .emptyInfo h2 {
+    font-size: 4vw;
+  }
+
+  .emptyInfo p {
+    font-size: 2.5vw;
+  }
+
+  .confirmButton {
+    width: 55vw;
+
+    padding: 1.5vw;
+
+    font-size: 3vw;
+
+    bottom: 3vw;
+  }
 }
 
 /* ========================================= */
@@ -435,87 +808,131 @@
 
 @media (max-width: 650px) {
   .eventsContainer {
-    padding: 6vw 4vw;
-  }
-
-  .heading {
-    margin-bottom: 6vw;
-
-    font-size: 8vw;
-  }
-
-  .mainContent {
-    width: 90vw;
-
-    flex-direction: column;
-
-    gap: 5vw;
-  }
-
-  .leftSide,
-  .rightSide {
-    width: 100%;
-  }
-
-  .search {
-    height: 12vw;
-
-    margin-bottom: 3vw;
-  }
-
-  .search input {
-    padding: 0 4vw;
-
-    font-size: 4vw;
-  }
-
-  /* ONE COLUMN ON MOBILE TOO */
-  .eventsList {
-    width: 100%;
-
-    height: 50vw;
-    max-height: 50svh;
-
-    gap: 2vw;
+    height: 100svh;
 
     overflow-y: auto;
-    overflow-x: hidden;
+
+    padding: 8vw 0 25vw;
+
+    justify-content: flex-start;
   }
 
-  .eventItem {
-    width: 100%;
-
-    height: 12vw;
-    min-height: 50px;
-
-    flex-shrink: 0;
+  .lefttop {
+    width: 40vw;
   }
 
-  .eventButton {
-    padding: 2vw;
-
-    font-size: 3.5vw;
+  .righttop {
+    width: 40vw;
   }
 
-  .rightSide {
-    min-height: 55vw;
-
-    padding: 6vw;
+  .leftbottom {
+    width: 45vw;
   }
 
-  .eventCategory {
-    font-size: 3.5vw;
-
-    margin-bottom: 3vw;
+  .rightbottom {
+    width: 45vw;
   }
 
-  .eventHeading {
-    font-size: 7vw;
+  .bookContainer {
+    width: 125vw;
+
+    height: 90svh;
+
+    opacity: 0.9;
+  }
+
+  .content {
+    width: 88vw;
+
+    height: auto;
+
+    min-height: 100svh;
+  }
+
+  .titleRow {
+    margin-bottom: 5vw;
+
+    gap: 2vw;
+  }
+
+  .titleRow h1 {
+    font-size: 6.5vw;
+  }
+
+  .titleGlow {
+    width: 10vw;
+  }
+
+  .searchContainer {
+    width: 87vw;
 
     margin-bottom: 4vw;
   }
 
-  .eventDescription {
+  .searchContainer input {
+    font-size: 4.2vw;
+  }
+
+  .eventsArea {
+    width: 87vw;
+
+    flex-direction: column;
+
+    gap: 6vw;
+  }
+
+  .eventsPage,
+  .infoPage {
+    width: 87vw;
+
+    height: auto;
+  }
+
+  .eventsPage {
+    height: 42svh;
+  }
+
+  .eventsList {
+    gap: 1.2vw;
+  }
+
+  .eventItem {
+    min-height: 10vw;
+
+    padding: 2vw;
+
+    font-size: 4.2vw;
+  }
+
+  .selectedCount {
+    margin-top: 2vw;
+
+    font-size: 3.8vw;
+  }
+
+  .infoPage {
+    min-height: 50vw;
+  }
+
+  .eventInfo {
+    padding: 6vw;
+  }
+
+  .eventCategory {
+    margin-bottom: 2vw;
+
+    font-size: 3.5vw;
+  }
+
+  .eventInfo h2 {
+    font-size: 7vw;
+
+    margin-bottom: 3vw;
+  }
+
+  .eventInfo p {
+    max-width: 75vw;
+
     font-size: 4vw;
 
     line-height: 1.6;
@@ -528,21 +945,35 @@
     padding: 3vw;
 
     font-size: 4vw;
+
+    margin-top: 5vw;
   }
 
-  .selectedCount {
-    margin-top: 3vw;
+  .emptyInfo {
+    min-height: 40vw;
+  }
 
+  .emptyInfo h2 {
+    font-size: 6vw;
+  }
+
+  .emptyInfo p {
+    font-size: 3.5vw;
+  }
+
+  .message {
     font-size: 4vw;
   }
 
   .confirmButton {
-    width: 60vw;
+    position: fixed;
 
-    margin-top: 4vw;
+    width: 70vw;
+
+    bottom: 3vw;
 
     padding: 3vw;
 
-    font-size: 5vw;
+    font-size: 5.2vw;
   }
 }

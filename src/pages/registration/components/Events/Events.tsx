@@ -1,8 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 import styles from "./Events.module.scss";
 
 import ConfirmModal from "../ConfirmModal/ConfirmModal";
+
+import RegBg from "../../../../assets/registration/reg/RegBg.png";
+import leftbottom from "../../../../assets/registration/reg/leftbottom.png";
+import lefttop from "../../../../assets/registration/reg/lefttop.png";
+import rightbottom from "../../../../assets/registration/reg/rightbottom.png";
+import righttop from "../../../../assets/registration/reg/righttop.png";
+import book from "../../../../assets/registration/reg/book.png";
 
 interface Event {
   id: number;
@@ -15,87 +23,11 @@ interface EventsProps {
   setUserData?: React.Dispatch<React.SetStateAction<any>>;
 }
 
-const TEST_EVENTS: Event[] = [
-  {
-    id: 1,
-    name: "Battle Dance",
-    about:
-      "A high-energy dance battle where performers compete against each other and showcase their creativity, musicality and choreography.",
-  },
-  {
-    id: 2,
-    name: "Solo Dance",
-    about:
-      "A solo performance where dancers get the stage to themselves and express their unique style and personality.",
-  },
-  {
-    id: 3,
-    name: "Group Dance",
-    about:
-      "A team-based dance performance where synchronization, formations and collective creativity take center stage.",
-  },
-  {
-    id: 4,
-    name: "Classical Dance",
-    about:
-      "A celebration of classical dance forms combining traditional movements, storytelling and artistic expression.",
-  },
-  {
-    id: 5,
-    name: "Solo Singing",
-    about:
-      "A vocal performance where singers compete individually and showcase their voice, expression and musicality.",
-  },
-  {
-    id: 6,
-    name: "Battle of Bands",
-    about:
-      "Bands go head-to-head with their best performances and compete to win over the audience.",
-  },
-  {
-    id: 7,
-    name: "Instrumental",
-    about:
-      "A showcase of instrumental talent featuring musicians performing their favorite compositions.",
-  },
-  {
-    id: 8,
-    name: "Street Play",
-    about:
-      "A powerful theatrical performance designed to engage audiences through storytelling, acting and social themes.",
-  },
-  {
-    id: 9,
-    name: "Stage Play",
-    about:
-      "A traditional theatrical performance combining acting, dialogue, stagecraft and storytelling.",
-  },
-  {
-    id: 10,
-    name: "Mono Act",
-    about:
-      "A solo theatrical performance where one actor takes on the challenge of carrying the entire story.",
-  },
-  {
-    id: 11,
-    name: "Debate",
-    about:
-      "Participants present arguments, challenge opposing viewpoints and demonstrate their communication and reasoning skills.",
-  },
-  {
-    id: 12,
-    name: "Quiz",
-    about:
-      "Put your knowledge to the test with challenging questions across a wide range of topics.",
-  },
-];
-
 export default function Events({
   userData,
   setUserData,
 }: EventsProps) {
-  const [events] = useState<Event[]>(TEST_EVENTS);
-
+  const [events, setEvents] = useState<Event[]>([]);
   const [search, setSearch] = useState("");
 
   const [selectedEvents, setSelectedEvents] = useState<
@@ -108,11 +40,42 @@ export default function Events({
   const [confirmModal, setConfirmModal] =
     useState(false);
 
+  const [loading, setLoading] = useState(true);
+
+  /* ========================================= */
+  /* FETCH EVENTS                              */
+  /* ========================================= */
+
+  useEffect(() => {
+    axios
+      .get<Event[]>(
+        "https://bits-oasis.org/2026/main/registrations/events_details/",
+      )
+      .then((response) => {
+        console.log("EVENT API RESPONSE:", response.data);
+        setEvents(response.data);
+      })
+      .catch((error) => {
+        console.error("EVENT API ERROR:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  /* ========================================= */
+  /* SEARCH                                    */
+  /* ========================================= */
+
   const filteredEvents = events.filter((event) =>
     event.name
       .toLowerCase()
       .includes(search.trim().toLowerCase()),
   );
+
+  /* ========================================= */
+  /* SELECT EVENT                              */
+  /* ========================================= */
 
   const handleEvent = (event: Event) => {
     const alreadySelected = selectedEvents.some(
@@ -120,14 +83,14 @@ export default function Events({
     );
 
     if (alreadySelected) {
-      setSelectedEvents(
-        selectedEvents.filter(
+      setSelectedEvents((previous) =>
+        previous.filter(
           (item) => item.id !== event.id,
         ),
       );
     } else {
-      setSelectedEvents([
-        ...selectedEvents,
+      setSelectedEvents((previous) => [
+        ...previous,
         {
           id: event.id,
           name: event.name,
@@ -136,15 +99,15 @@ export default function Events({
     }
   };
 
-  const handleEventHover = (event: Event) => {
-    setActiveEvent(event);
-  };
-
-  const closeEventInfo = () => {
-    setActiveEvent(null);
-  };
+  /* ========================================= */
+  /* SUBMIT                                    */
+  /* ========================================= */
 
   const handleSubmit = () => {
+    if (selectedEvents.length === 0) {
+      return;
+    }
+
     if (setUserData) {
       setUserData((previousData: any) => ({
         ...previousData,
@@ -159,150 +122,227 @@ export default function Events({
 
   return (
     <>
-      <div className={styles.eventsContainer}>
-        <h1 className={styles.heading}>
-          CHOOSE EVENTS
-        </h1>
+      <div
+        className={styles.eventsContainer}
+        style={{
+          backgroundImage: `url(${RegBg})`,
+        }}
+      >
+        {/* ================================= */}
+        {/* REGISTER DECORATION                */}
+        {/* ================================= */}
 
-        <div className={styles.mainContent}>
-          {/* LEFT SIDE */}
+        <img
+          src={leftbottom}
+          className={styles.leftbottom}
+          alt=""
+        />
 
-          <div className={styles.leftSide}>
-            {/* SEARCH */}
+        <img
+          src={lefttop}
+          className={styles.lefttop}
+          alt=""
+        />
 
-            <div className={styles.search}>
-              <input
-                id="event-search"
-                name="event-search"
-                type="text"
-                placeholder="SEARCH HERE"
-                value={search}
-                onChange={(e) =>
-                  setSearch(e.target.value)
-                }
-                autoComplete="off"
-              />
-            </div>
+        <img
+          src={rightbottom}
+          className={styles.rightbottom}
+          alt=""
+        />
 
-            {/* EVENTS */}
+        <img
+          src={righttop}
+          className={styles.righttop}
+          alt=""
+        />
 
-            <div className={styles.eventsList}>
-              {filteredEvents.length > 0 ? (
-                filteredEvents.map((event) => {
-                  const selected =
-                    selectedEvents.some(
-                      (item) =>
-                        item.id === event.id,
-                    );
+        {/* ================================= */}
+        {/* BOOK                              */}
+        {/* ================================= */}
 
-                  return (
-                    <div
-                      key={event.id}
-                      className={`${styles.eventItem} ${
-                        selected
-                          ? styles.selected
-                          : ""
-                      }`}
-                      onMouseEnter={() =>
-                        handleEventHover(event)
-                      }
-                    >
-                      <button
-                        type="button"
-                        className={
-                          styles.eventButton
-                        }
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEvent(event);
-                        }}
-                      >
-                        {event.name}
-                      </button>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className={styles.noEvents}>
-                  No events found
-                </div>
-              )}
-            </div>
+        <div
+          className={styles.bookContainer}
+          style={{
+            backgroundImage: `url(${book})`,
+          }}
+        />
 
-            {/* SELECTED COUNT */}
+        {/* ================================= */}
+        {/* CONTENT                           */}
+        {/* ================================= */}
 
-            <div className={styles.selectedCount}>
-              {selectedEvents.length} EVENTS SELECTED
-            </div>
+        <div className={styles.content}>
 
-            {/* SUBMIT */}
-
-            <button
-              type="button"
-              className={styles.confirmButton}
-              onClick={handleSubmit}
-            >
-              SUBMIT
-            </button>
+          {/* TITLE */}
+          <div className={styles.titleRow}>
+            <span className={styles.titleGlow} />
+            <h1>CHOOSE EVENTS</h1>
+            <span className={styles.titleGlow} />
           </div>
 
-          {/* RIGHT SIDE */}
+          {/* ================================= */}
+          {/* SEARCH                            */}
+          {/* ================================= */}
 
-          <div
-            className={styles.rightSide}
-            onMouseLeave={closeEventInfo}
-          >
-            {activeEvent ? (
-              <>
-                <div className={styles.eventCategory}>
-                  EVENT
+          <div className={styles.searchContainer}>
+            <input
+              id="event-search"
+              name="event-search"
+              type="text"
+              placeholder="SEARCH EVENTS"
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+              autoComplete="off"
+            />
+          </div>
+
+          {/* ================================= */}
+          {/* EVENTS                            */}
+          {/* ================================= */}
+
+          <div className={styles.eventsArea}>
+
+            {/* LEFT PAGE */}
+            <div className={styles.eventsPage}>
+
+              {loading ? (
+                <div className={styles.message}>
+                  LOADING EVENTS...
                 </div>
+              ) : filteredEvents.length > 0 ? (
+                <div className={styles.eventsList}>
+                  {filteredEvents.map((event) => {
+                    const selected =
+                      selectedEvents.some(
+                        (item) =>
+                          item.id === event.id,
+                      );
 
-                <h2 className={styles.eventHeading}>
-                  {activeEvent.name}
-                </h2>
+                    return (
+                      <button
+                        key={event.id}
+                        type="button"
+                        className={`${styles.eventItem} ${
+                          selected
+                            ? styles.selected
+                            : ""
+                        }`}
+                        onMouseEnter={() =>
+                          setActiveEvent(event)
+                        }
+                        onFocus={() =>
+                          setActiveEvent(event)
+                        }
+                        onClick={() =>
+                          handleEvent(event)
+                        }
+                      >
+                        <span>
+                          {event.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className={styles.message}>
+                  NO EVENTS FOUND
+                </div>
+              )}
 
-                <p className={styles.eventDescription}>
-                  {activeEvent.about}
-                </p>
+              {/* SELECTED COUNT */}
 
-                <button
-                  type="button"
-                  className={
-                    selectedEvents.some(
+              <div className={styles.selectedCount}>
+                {selectedEvents.length} EVENTS SELECTED
+              </div>
+
+            </div>
+
+            {/* RIGHT PAGE */}
+            <div
+              className={styles.infoPage}
+              onMouseLeave={() =>
+                setActiveEvent(null)
+              }
+            >
+
+              {activeEvent ? (
+                <div className={styles.eventInfo}>
+
+                  <div className={styles.eventCategory}>
+                    EVENT
+                  </div>
+
+                  <h2>
+                    {activeEvent.name}
+                  </h2>
+
+                  <p>
+                    {activeEvent.about}
+                  </p>
+
+                  <button
+                    type="button"
+                    className={
+                      selectedEvents.some(
+                        (event) =>
+                          event.id ===
+                          activeEvent.id,
+                      )
+                        ? styles.removeButton
+                        : styles.addButton
+                    }
+                    onClick={() =>
+                      handleEvent(activeEvent)
+                    }
+                  >
+                    {selectedEvents.some(
                       (event) =>
                         event.id ===
                         activeEvent.id,
                     )
-                      ? styles.removeButton
-                      : styles.addButton
-                  }
-                  onClick={() =>
-                    handleEvent(activeEvent)
-                  }
-                >
-                  {selectedEvents.some(
-                    (event) =>
-                      event.id ===
-                      activeEvent.id,
-                  )
-                    ? "REMOVE"
-                    : "ADD"}
-                </button>
-              </>
-            ) : (
-              <div className={styles.emptyInfo}>
-                <h2>EVENT INFO</h2>
+                      ? "REMOVE"
+                      : "ADD"}
+                  </button>
 
-                <p>
-                  Hover over an event to see its
-                  details.
-                </p>
-              </div>
-            )}
+                </div>
+              ) : (
+                <div className={styles.emptyInfo}>
+                  <h2>EVENT INFO</h2>
+
+                  <p>
+                    HOVER OVER AN EVENT
+                    <br />
+                    TO VIEW DETAILS
+                  </p>
+                </div>
+              )}
+
+            </div>
+
           </div>
         </div>
+
+        {/* ================================= */}
+        {/* CONFIRM BUTTON                     */}
+        {/* ================================= */}
+
+        <button
+          type="button"
+          className={styles.confirmButton}
+          onClick={handleSubmit}
+          disabled={selectedEvents.length === 0}
+        >
+          <span>CONFIRM</span>
+        </button>
+
       </div>
+
+      {/* =================================== */}
+      {/* CONFIRM MODAL                       */}
+      {/* =================================== */}
 
       {confirmModal && (
         <ConfirmModal
