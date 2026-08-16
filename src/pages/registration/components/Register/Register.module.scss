@@ -1,728 +1,3 @@
-// // * {
-// //   margin: 0;
-// //   padding: 0;
-// //   box-sizing: border-box;
-// // }
-// // .registerContainer {
-// //   width: 100vw;
-// //   min-height: 100vh;
-// //   background-size: cover;
-// //   background-repeat: no-repeat;
-// //   position: relative;
-// //   overflow: hidden;
-// // }
-// // .leftbottom {
-// //   position: absolute;
-// //   left: -5%;
-// //   bottom: -10%;
-// //   width: 20%;
-// //   scale: 1.5;
-// // }
-
-// // .rightbottom {
-// //   position: absolute;
-// //   right: -10%;
-// //   bottom: -5%;
-// //   width: 30%;
-// //   object-fit: contain;
-// // }
-
-// // .lefttop {
-// //   position: absolute;
-// //   left: -22%;
-// //   top: -22%;
-// // }
-
-// // .righttop {
-// //   position: absolute;
-// //   right: 0;
-// //   top: 3%;
-// // }
-// // .bookContainer {
-// //   position: absolute;
-// //   top: 52%;
-// //   left: 50%;
-// //   transform: translate(-50%, -50%);
-// //   height: fit-content;
-// //   width: 75vw;
-// //   aspect-ratio: 1.4;
-// //   background-size: contain;
-// //   object-fit: contain;
-// //   background-repeat: no-repeat;
-// //   z-index: 100;
-// // }
-
-// // .formContainer {
-// //   display: flex;
-// //     width: 100%;
-// //     height: 100%;
-// //     padding: 50px 55px 60px;
-
-// //   .formLeft {
-// //     display: flex;
-// //     flex-direction: column;
-// //     align-items: center;
-// //     width: 50%;
-// //     height: 100%;
-
-// //     .regTitle{
-// //         font-size: 5rem;
-// //         z-index: 200;
-// //         font-family: "Syamsiah", sans-serif;
-// //         font-weight: 500;
-// //         color: #6C1700;
-        
-// //     }
-// //   }
-// //   .formRight {
-// //     display: flex;
-// //     align-items: center;
-// //     flex-direction: column;
-// //     width: 50%;
-// //     height: 100%;
-// //   }
-
-// // }
-
-
-
-
-
-
-
-// // .regselect__control {
-// //   background: transparent !important;
-// //   border: none !important;
-// //   box-shadow: none !important;
-// //   min-height: 0 !important;
-// //   width: 100% !important;
-// // }
-
-// // .regselect__control:hover {
-// //   border: none !important;
-// // }
-
-// // .regselect__value-container {
-// //   background: transparent !important;
-// //   padding: 0 !important;
-// // }
-
-// // .regselect__placeholder {
-// //   color: #777 !important;
-// // }
-
-// // .regselect__single-value {
-// //   color: #38170B !important;
-// // }
-
-// // .regselect__input-container {
-// //   background: transparent !important;
-// //   margin: 0 !important;
-// //   padding: 0 !important;
-// // }
-
-// // .regselect__input {
-// //   background: transparent !important;
-// //   border: none !important;
-// //   box-shadow: none !important;
-// //   width: auto !important;
-// //   height: auto !important;
-// // }
-
-// // .regselect__indicators {
-// //   background: transparent !important;
-// // }
-
-// // .regselect__indicator-separator {
-// //   background: rgba(56, 23, 11, 0.3) !important;
-// // }
-
-// // .regselect__indicator {
-// //   color: #38170B !important;
-// // }
-
-// // .regselect__indicator:hover {
-// //   color: #38170B !important;
-// // }
-
-// // .regselect__menu {
-// //   z-index: 100;
-// // }
-
-
-// * {
-//   margin: 0;
-//   padding: 0;
-//   box-sizing: border-box;
-// }
-
-// .registerContainer {
-//   width: 100vw;
-//   min-height: 100vh;
-
-//   background-size: cover;
-//   background-repeat: no-repeat;
-//   background-position: center;
-
-//   position: relative;
-
-//   overflow: hidden;
-// }
-
-// /* ========================================= */
-// /* DECORATIONS                               */
-// /* ========================================= */
-
-// .leftbottom {
-//   position: absolute;
-
-//   left: -5%;
-//   bottom: -10%;
-
-//   width: 20%;
-
-//   scale: 1.5;
-
-//   pointer-events: none;
-// }
-
-// .rightbottom {
-//   position: absolute;
-
-//   right: -10%;
-//   bottom: -5%;
-
-//   width: 30%;
-
-//   object-fit: contain;
-
-//   pointer-events: none;
-// }
-
-// .lefttop {
-//   position: absolute;
-
-//   left: -22%;
-//   top: -22%;
-
-//   pointer-events: none;
-// }
-
-// .righttop {
-//   position: absolute;
-
-//   right: 0;
-//   top: 3%;
-
-//   pointer-events: none;
-// }
-
-// /* ========================================= */
-// /* BOOK                                      */
-// /* ========================================= */
-
-// .bookContainer {
-//   position: absolute;
-
-//   top: 52%;
-//   left: 50%;
-
-//   transform: translate(-50%, -50%);
-
-//   width: 75vw;
-
-//   aspect-ratio: 1.4;
-
-//   background-size: contain;
-//   background-repeat: no-repeat;
-//   background-position: center;
-
-//   z-index: 100;
-// }
-
-// /* ========================================= */
-// /* FORM                                      */
-// /* ========================================= */
-
-// .formContainer {
-//   display: flex;
-
-//   width: 100%;
-//   height: 100%;
-
-//   padding: 50px 55px 60px;
-
-//   /* --------------------------------------- */
-//   /* LEFT PAGE                               */
-//   /* --------------------------------------- */
-
-//   .formLeft {
-//     display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     width: 50%;
-//     height: 90%;
-
-//     .regTitle {
-//       margin-top: 2rem;
-//       font-size: 5rem;
-//       z-index: 200;
-//       font-family: "Syamsiah", sans-serif;
-//       font-weight: 500;
-//       color: #6c1700;
-//     }
-//   }
-
-//   /* --------------------------------------- */
-//   /* RIGHT PAGE                              */
-//   /* --------------------------------------- */
-
-//   .formRight {
-//     margin-top: 2rem;
-//     display: flex;
-
-//     align-items: center;
-
-//     flex-direction: column;
-
-//     width: 50%;
-//     height: 90%;
-//   }
-// }
-
-// /* ========================================= */
-// /* YEAR                                      */
-// /* ========================================= */
-// .yearOptions {
-//   width: 80%;
-//   height: 40%;
-
-//   display: flex;
-//   flex-direction: row;
-//   flex-wrap: nowrap;
-
-//   align-items: center;
-//   justify-content: center;
-
-//   gap: 2vw;
-// }
-
-// .yearOptions label {
-//   display: flex;
-//   flex-direction: row;
-//   align-items: center;
-//   justify-content: center;
-
-//   gap: 0.4vw;
-
-//   flex: 0 0 auto;
-
-//   font-family: "Cinzel", sans-serif;
-//   font-size: clamp(12px, 1vw, 18px);
-
-//   color: #38170b;
-
-//   cursor: pointer;
-//   white-space: nowrap;
-// }
-
-// .yearOptions input {
-//   appearance: none;
-//   -webkit-appearance: none;
-
-//   width: 22px;
-//   height: 22px;
-
-//   flex: 0 0 22px;
-
-//   margin: 0;
-
-//   border: 2px solid #38170b;
-//   border-radius: 50%;
-
-//   background: transparent;
-
-//   cursor: pointer;
-
-//   position: relative;
-// }
-
-// /* Selected dot */
-// .yearOptions input:checked::before {
-//   content: "";
-
-//   position: absolute;
-
-//   width: 10px;
-//   height: 10px;
-
-//   top: 50%;
-//   left: 50%;
-
-//   transform: translate(-50%, -50%);
-
-//   border-radius: 50%;
-
-//   background: #6c1700;
-// }
-
-// /* ========================================= */
-// /* ERRORS                                    */
-// /* ========================================= */
-
-// .error {
-//   margin-top: 3px;
-
-//   color: #8b0000;
-
-//   font-family: "Cinzel", sans-serif;
-
-//   font-size: 0.75rem;
-
-//   text-align: center;
-// }
-
-// /* ========================================= */
-// /* NEXT BUTTON                               */
-// /* ========================================= */
-
-
-// .nextButton {
-//   width: min(220px, 17vw);
-//   height: 5vw;
-//   min-width: 150px;
-//   min-height: 55px;
-//   margin: 2vw auto 0;
-//   padding: 0;
-//   border: none;
-//   background-color: transparent;
-//   background-position: center;
-//   background-size: contain;
-//   background-repeat: no-repeat;
-
-//   color: #FED59B;
-
-//   font-family: "Cinzel", serif;
-
-//   font-size: clamp(15px, 1.2vw, 22px);
-
-//   font-weight: 700;
-
-//   cursor: pointer;
-
-//   display: flex;
-
-//   align-items: center;
-
-//   justify-content: center;
-
-//   text-align: center;
-
-//   line-height: 1;
-
-//   appearance: none;
-
-//   -webkit-appearance: none;
-
-//   transition:
-//     transform 0.25s ease,
-//     filter 0.25s ease;
-
-// }
-
-// .nextButton:hover {
-//   text-decoration: underline;
-// }
-
-// /* ========================================= */
-// /* REACT SELECT GLOBAL STYLES                */
-// /* ========================================= */
-
-// :global(.regselect__control) {
-//   background: transparent !important;
-
-//   border: none !important;
-
-//   box-shadow: none !important;
-// }
-
-// :global(.regselect__control:hover) {
-//   border: none !important;
-
-//   box-shadow: none !important;
-// }
-
-// :global(.regselect__control--is-focused) {
-//   border: none !important;
-
-//   box-shadow: none !important;
-// }
-
-// :global(.regselect__value-container) {
-//   background: transparent !important;
-
-//   padding: 0 !important;
-// }
-
-// :global(.regselect__placeholder) {
-//   color: #777 !important;
-// }
-
-// :global(.regselect__single-value) {
-//   color: #38170b !important;
-// }
-
-// :global(.regselect__input-container) {
-//   background: transparent !important;
-
-//   margin: 0 !important;
-//   padding: 0 !important;
-// }
-
-// :global(.regselect__input) {
-//   background: transparent !important;
-
-//   border: none !important;
-
-//   box-shadow: none !important;
-// }
-
-// :global(.regselect__indicators) {
-//   background: transparent !important;
-// }
-
-// :global(.regselect__indicator-separator) {
-//   background: rgba(56, 23, 11, 0.3) !important;
-// }
-
-// :global(.regselect__indicator) {
-//   color: #38170b !important;
-// }
-
-// :global(.regselect__indicator:hover) {
-//   color: #38170b !important;
-// }
-
-// :global(.regselect__menu) {
-//   z-index: 1000 !important;
-// }
-
-// /* ========================================= */
-// /* MOBILE                                    */
-// /* ========================================= */
-
-// @media (max-width: 900px) {
-//   .bookContainer {
-//     width: 95vw;
-//   }
-
-//   .formContainer {
-//     padding: 30px 35px 40px;
-
-//     .formLeft {
-//       .regTitle {
-//         font-size: 3rem;
-//       }
-//     }
-//   }
-
-//   .lefttop {
-//     width: 40%;
-//   }
-
-//   .righttop {
-//     width: 30%;
-//   }
-
-//   .leftbottom {
-//     width: 25%;
-//   }
-
-//   .rightbottom {
-//     width: 35%;
-//   }
-// }
-
-// @media (max-width: 600px) {
-//   .registerContainer {
-//     min-height: 100svh;
-//   }
-
-//   .bookContainer {
-//     width: 110vw;
-
-//     top: 50%;
-//   }
-
-//   .formContainer {
-//     padding: 25px 25px 30px;
-
-//     .formLeft,
-//     .formRight {
-//       width: 50%;
-//     }
-
-//     .formLeft {
-//       .regTitle {
-//         font-size: 2.2rem;
-//       }
-//     }
-//   }
-// }
-
-
-// * {
-//   margin: 0;
-//   padding: 0;
-//   box-sizing: border-box;
-// }
-// .registerContainer {
-//   width: 100vw;
-//   min-height: 100vh;
-//   background-size: cover;
-//   background-repeat: no-repeat;
-//   position: relative;
-//   overflow: hidden;
-// }
-// .leftbottom {
-//   position: absolute;
-//   left: -5%;
-//   bottom: -10%;
-//   width: 20%;
-//   scale: 1.5;
-// }
-
-// .rightbottom {
-//   position: absolute;
-//   right: -10%;
-//   bottom: -5%;
-//   width: 30%;
-//   object-fit: contain;
-// }
-
-// .lefttop {
-//   position: absolute;
-//   left: -22%;
-//   top: -22%;
-// }
-
-// .righttop {
-//   position: absolute;
-//   right: 0;
-//   top: 3%;
-// }
-// .bookContainer {
-//   position: absolute;
-//   top: 52%;
-//   left: 50%;
-//   transform: translate(-50%, -50%);
-//   height: fit-content;
-//   width: 75vw;
-//   aspect-ratio: 1.4;
-//   background-size: contain;
-//   object-fit: contain;
-//   background-repeat: no-repeat;
-//   z-index: 100;
-// }
-
-// .formContainer {
-//   display: flex;
-//     width: 100%;
-//     height: 100%;
-//     padding: 50px 55px 60px;
-
-//   .formLeft {
-//     display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     width: 50%;
-//     height: 100%;
-
-//     .regTitle{
-//         font-size: 5rem;
-//         z-index: 200;
-//         font-family: "Syamsiah", sans-serif;
-//         font-weight: 500;
-//         color: #6C1700;
-        
-//     }
-//   }
-//   .formRight {
-//     display: flex;
-//     align-items: center;
-//     flex-direction: column;
-//     width: 50%;
-//     height: 100%;
-//   }
-
-// }
-
-
-
-
-
-
-
-// .regselect__control {
-//   background: transparent !important;
-//   border: none !important;
-//   box-shadow: none !important;
-//   min-height: 0 !important;
-//   width: 100% !important;
-// }
-
-// .regselect__control:hover {
-//   border: none !important;
-// }
-
-// .regselect__value-container {
-//   background: transparent !important;
-//   padding: 0 !important;
-// }
-
-// .regselect__placeholder {
-//   color: #777 !important;
-// }
-
-// .regselect__single-value {
-//   color: #38170B !important;
-// }
-
-// .regselect__input-container {
-//   background: transparent !important;
-//   margin: 0 !important;
-//   padding: 0 !important;
-// }
-
-// .regselect__input {
-//   background: transparent !important;
-//   border: none !important;
-//   box-shadow: none !important;
-//   width: auto !important;
-//   height: auto !important;
-// }
-
-// .regselect__indicators {
-//   background: transparent !important;
-// }
-
-// .regselect__indicator-separator {
-//   background: rgba(56, 23, 11, 0.3) !important;
-// }
-
-// .regselect__indicator {
-//   color: #38170B !important;
-// }
-
-// .regselect__indicator:hover {
-//   color: #38170B !important;
-// }
-
-// .regselect__menu {
-//   z-index: 100;
-// }
-
-
 * {
   margin: 0;
   padding: 0;
@@ -824,48 +99,78 @@
   height: 100%;
 
   padding: 50px 55px 60px;
+}
 
-  /* --------------------------------------- */
-  /* LEFT PAGE                               */
-  /* --------------------------------------- */
+/* ----------------------------------------- */
+/* LEFT PAGE                                 */
+/* ----------------------------------------- */
 
-  .formLeft {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 50%;
-    height: 90%;
+.formLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
-    .regTitle {
-      margin-top: 2rem;
-      font-size: 5rem;
-      z-index: 200;
-      font-family: "Syamsiah", sans-serif;
-      font-weight: 500;
-      color: #6c1700;
-    }
-  }
+  width: 50%;
+  height: 90%;
+}
 
-  /* --------------------------------------- */
-  /* RIGHT PAGE                              */
-  /* --------------------------------------- */
+/* ----------------------------------------- */
+/* RIGHT PAGE                                */
+/* ----------------------------------------- */
 
-  .formRight {
-    margin-top: 2rem;
-    display: flex;
+.formRight {
+  margin-top: 2rem;
 
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
-    flex-direction: column;
+  width: 50%;
+  height: 90%;
+}
 
-    width: 50%;
-    height: 90%;
-  }
+/* ----------------------------------------- */
+/* MOBILE COLUMN                             */
+/*                                           */
+/* Applied instead of .formLeft/.formRight   */
+/* by the isMobile check in Register.tsx.    */
+/* display:contents dissolves the wrapper so */
+/* every field becomes a direct flex item of */
+/* .formContainer and flows as one column —  */
+/* which is what lets the sticky heading and */
+/* pinned button work without a DOM change.  */
+/* ----------------------------------------- */
+
+.formColumn {
+  display: contents;
+}
+
+/* ========================================= */
+/* REGISTRATION TITLE                        */
+/*                                           */
+/* Top level (not nested under .formLeft) so */
+/* it keeps its type styles when the mobile  */
+/* column class replaces that wrapper.       */
+/* ========================================= */
+
+.regTitle {
+  margin-top: 2rem;
+
+  font-family: "Syamsiah", sans-serif;
+
+  font-size: 5rem;
+
+  font-weight: 500;
+
+  color: #6c1700;
+
+  z-index: 200;
 }
 
 /* ========================================= */
 /* YEAR                                      */
 /* ========================================= */
+
 .yearOptions {
   width: 80%;
   height: 40%;
@@ -968,7 +273,6 @@
 /* NEXT BUTTON                               */
 /* ========================================= */
 
-
 .nextButton {
   width: min(320px, 20vw);
 
@@ -1023,10 +327,14 @@
     filter 0.25s ease;
 }
 
-.nextButton:hover {
-  transform: scale(1.06);
+/* pointer devices only — touch screens latch :hover
+   onto the last tapped element and leave it stuck */
+@media (hover: hover) and (pointer: fine) {
+  .nextButton:hover {
+    transform: scale(1.06);
 
-  filter: brightness(1.1) drop-shadow(0 0 8px rgba(254, 213, 155, 0.55));
+    filter: brightness(1.1) drop-shadow(0 0 8px rgba(254, 213, 155, 0.55));
+  }
 }
 
 .nextButton:active {
@@ -1106,28 +414,227 @@
   z-index: 1000 !important;
 }
 
-/* ========================================= */
-/* MOBILE                                    */
-/* ========================================= */
+/* =========================================================== */
+/* MOBILE (<=900px)                                             */
+/*                                                               */
+/* Mirrors the Events page:                                      */
+/*                                                               */
+/*   - .registerContainer is a fixed, non-scrolling 100svh box   */
+/*     with no margin or padding, so nothing pushes the book     */
+/*     down and leaves a strip at the top.                       */
+/*                                                               */
+/*   - .bookContainer is pinned at top:52% / left:13vw,          */
+/*     92vw x 78vh, flat 180% 100% / left top crop. It overruns  */
+/*     the right edge on purpose.                                */
+/*                                                               */
+/*   - .formContainer is inset with --lp-* onto the page's       */
+/*     printed area (same numbers as the Events left page), so   */
+/*     fields no longer cross the gold border.                   */
+/*                                                               */
+/*   - Inside it: heading pinned top, fields scroll between,     */
+/*     NEXT pinned bottom — the Events heading/list/CONFIRM      */
+/*     arrangement, done with sticky so the TSX stays as is.     */
+/* =========================================================== */
 
 @media (max-width: 900px) {
-  .bookContainer {
-    width: 95vw;
+  .registerContainer {
+    /* Where the form box sits within the book.
+       Same values as the Events left page — nudge
+       --lp-left / --lp-width if fields sit outside
+       the gold border. */
+    --lp-top: 6%;
+    --lp-left: 16%;
+    --lp-width: 66%;
+    --lp-height: 88%;
+
+    /* 100% - (--lp-top + --lp-height); used by the
+       fixed NEXT button below */
+    --lp-bottom: 6%;
+
+    /* Sticky band heights. Keep these in sync with the
+       heading and button sizes below — they're also the
+       border insets that clip the scrolling fields. */
+    --hdr-height: 46px;
+    --ftr-height: 56px;
+
+    height: 100svh;
+    min-height: 100svh;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
   }
 
+  .bookContainer {
+    position: absolute;
+
+    top: 52%;
+    left: 13vw;
+    transform: translateY(-50%);
+
+    width: 92vw;
+    height: 78vh;
+
+    aspect-ratio: auto;
+
+    background-size: 180% 100%;
+    background-position: left top;
+    background-repeat: no-repeat;
+
+    overflow: hidden;
+  }
+
+  /* ========================================= */
+  /* FORM BOX — pinned onto the printed page,   */
+  /* scrolls internally                         */
+  /* ========================================= */
+
   .formContainer {
-    padding: 30px 35px 40px;
+    position: absolute;
 
-    .formLeft {
-      .regTitle {
-        font-size: 3rem;
+    top: var(--lp-top);
+    left: var(--lp-left);
+    width: var(--lp-width);
+    height: var(--lp-height);
 
-      }
-    }
+    box-sizing: border-box;
+
+    flex-direction: column;
+    gap: 10px;
+
+    padding: 0;
+
+    /*
+      THIS is what removes the need for a background band.
+
+      A scroll container clips its content at the PADDING box,
+      and border area never scrolls — so these transparent
+      borders carve out a strip at the top and bottom that
+      scrolled fields are clipped away in. The heading and
+      NEXT button then sit in those strips over bare
+      parchment, with nothing behind them, exactly like
+      Events' heading and CONFIRM.
+    */
+    border-top: var(--hdr-height) solid transparent;
+    border-bottom: var(--ftr-height) solid transparent;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+
+    /* native bar hidden, same as the Events list */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .formContainer::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* ========================================= */
+  /* FIELD COLUMN                               */
+  /* Targets the fields themselves, which are   */
+  /* direct children now that .formColumn is    */
+  /* display: contents.                         */
+  /* ========================================= */
+
+  .formColumn > * {
+    width: 100%;
+
+    margin-left: auto;
+    margin-right: auto;
+
+    flex-shrink: 0;
+  }
+
+  /* ========================================= */
+  /* HEADING — sits in the top strip carved     */
+  /* out by .formContainer's border, over bare  */
+  /* parchment. No background: the fields are   */
+  /* clipped before they reach it.              */
+  /*                                            */
+  /* position: fixed resolves against           */
+  /* .bookContainer, because that element is    */
+  /* transformed (translateY) and a transformed */
+  /* ancestor becomes the containing block for  */
+  /* fixed descendants. That's what takes the   */
+  /* heading out of the scroller without a      */
+  /* wrapper div. Keep the transform on         */
+  /* .bookContainer or this will anchor to the  */
+  /* viewport instead.                          */
+  /* ========================================= */
+
+  .regTitle {
+    position: fixed;
+
+    top: var(--lp-top);
+    left: var(--lp-left);
+    width: var(--lp-width);
+    height: var(--hdr-height);
+
+    z-index: 10;
+
+    margin: 0 !important;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: clamp(1.2rem, 6vw, 1.7rem);
+    line-height: 1;
+    text-align: center;
+
+    background: none;
+
+    pointer-events: none;
+  }
+
+  .yearOptions {
+    width: 100%;
+    height: auto;
+
+    padding: 4px 0;
+
+    gap: 4vw;
+  }
+
+  /* ========================================= */
+  /* NEXT — sits in the bottom strip, same      */
+  /* mechanism as the heading. Transparent, so  */
+  /* the parchment shows around the button art. */
+  /* ========================================= */
+
+  .formColumn > .nextButton {
+    position: fixed;
+
+    left: var(--lp-left);
+    width: var(--lp-width);
+    height: var(--ftr-height);
+
+    /* 100% - (--lp-top + --lp-height) */
+    bottom: var(--lp-bottom);
+
+    z-index: 10;
+
+    min-width: 0;
+    min-height: 0;
+
+    margin: 0;
+    padding: 0;
+
+    background-color: transparent;
+    background-size: contain;
+
+    font-size: 0.95rem;
   }
 
   .lefttop {
-    width: 40%;
+    width: 45%;
   }
 
   .righttop {
@@ -1139,124 +646,27 @@
   }
 
   .rightbottom {
-    width: 35%;
+    width: 30%;
   }
 }
+
+/* =========================================================== */
+/* SMALL MOBILE (<=600px)                                       */
+/*                                                               */
+/* No --lp-* overrides on purpose: the book crop is the same     */
+/* 180% 100% / left top at every mobile width, so the fractions  */
+/* set above already land correctly.                             */
+/* =========================================================== */
 
 @media (max-width: 600px) {
   .registerContainer {
-    min-height: 100svh;
+    --hdr-height: 40px;
+    --ftr-height: 50px;
   }
 
   .bookContainer {
-    width: 110vw;
-
-    top: 50%;
-  }
-
-  .formContainer {
-    padding: 25px ;
-
-    .formLeft,
-    .formRight {
-      width: 50%;
-    }
-
-    .formLeft {
-      .regTitle {
-        font-size: 2.2rem;
-      }
-    }
-  }
-}
-@media (max-width: 900px) {
-  .registerContainer {
-    overflow: hidden;
-    height: 100svh;
-  }
-
-  .bookContainer {
-    /* same crop that worked: 92vw wide, pinned near the left
-       edge so wood shows on the left and the book runs flush
-       to the right (no wood on the right side) */
-    position: absolute;
-    top: 52%;
     left: 8vw;
-    transform: translateY(-50%);
 
-    width: 92vw;
-    height: 78vh;
-
-    background-size: 180% 100%;
-    background-position: left top;
-
-    overflow: hidden;
-  }
-
-  .formContainer {
-    position: absolute;
-    inset: 0;
-
-    width: 80%;
-    height: 100%;
-    box-sizing: border-box;
-
-    flex-direction: column;
-
-    padding: 78px 30px 30px;
-
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-
-    .formLeft,
-    .formRight {
-      width: 100%;
-      height: auto;
-      flex-shrink: 0;
-
-      align-items: center;
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-    }
-
-    .formLeft {
-      .regTitle {
-        margin-top: 0;
-        font-size: 2.3rem;
-        text-align: center;
-      }
-    }
-
-    .formRight {
-      margin-top: 30px;
-    }
-  }
-
-  .yearOptions {
-    width: 100%;
-    height: auto;
-    padding: 6px 0;
-  }
-
-  .nextButton {
-    margin: 20px auto 10px;
-  }
-
-  .lefttop { width: 45%; }
-  .righttop { width: 30%; }
-  .leftbottom { width: 25%; }
-  .rightbottom { width: 30%; }
-}
-
-@media (max-width: 600px) {
-  .registerContainer {
-    height: 100svh;
-  }
-
-  .bookContainer {
-    left: 4vw;
     width: 98vw;
     height: 74vh;
 
@@ -1264,311 +674,10 @@
   }
 
   .formContainer {
-    padding: 65px 22px 25px;
-
-    .formLeft {
-      .regTitle {
-        font-size: 1.9rem;
-      }
-    }
-  }
-}
-@media (max-width: 900px) {
-  .registerContainer {
-    overflow: hidden;
-    height: 100svh;
+    gap: 8px;
   }
 
-  .bookContainer {
-    position: absolute;
-    top: 52%;
-    left: 13vw;
-    transform: translateY(-50%);
-
-    width: 92vw;
-    height: 78vh;
-
-    background-size: 180% 100%;
-    background-position: left top;
-
-    overflow: hidden;
-  }
-
-  .formContainer {
-    position: absolute;
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-
-    flex-direction: column;
-    gap: 14px;
-
-    padding: 0 0 20px;
-
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-
-    .formLeft,
-    .formRight {
-      display: contents;
-    }
-
-    > * {
-      width: 78%;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .regTitle {
-      position: sticky;
-      top: 0;
-      z-index: 5;
-
-      margin: 0 auto;
-      padding: 16px 0 10px;
-
-      font-size: 1.9rem;
-      text-align: center;
-
-      background: linear-gradient(
-        to bottom,
-        rgba(234, 213, 168, 0.97) 78%,
-        rgba(234, 213, 168, 0)
-      );
-    }
-  }
-
-  .yearOptions {
-    width: 100%;
-    height: auto;
-    padding: 4px 0;
-  }
-
-  .nextButton {
-    margin: 12px auto 4px;
-  }
-
-  .lefttop { width: 45%; }
-  .righttop { width: 30%; }
-  .leftbottom { width: 25%; }
-  .rightbottom { width: 30%; }
-}
-
-@media (max-width: 600px) {
-  .registerContainer {
-    height: 100svh;
-  }
-
-  .bookContainer {
-    left: 8vw;
-    width: 98vw;
-    height: 74vh;
-
-    background-size: 180% 100%;
-  }
-
-  .formContainer {
-    > * {
-      width: 84%;
-    }
-
-    .regTitle {
-      width: 84%;
-      padding: 12px 0 8px;
-      font-size: 1.5rem;
-    }
-  }
-  .formContainer {
-    position: absolute;
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-
-    flex-direction: column;
-    gap: 14px;
-
-    padding: 0 0 20px;
-
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-
-    /* Tells the browser "don't scroll content underneath the
-       sticky header" — this is the actual fix for the auto-scroll
-       hiding NAME behind the title on load/focus. */
-    scroll-padding-top: 56px;
-
-    .formLeft,
-    .formRight {
-      display: contents;
-    }
-
-    > * {
-      width: 78%;
-      margin-left: auto;
-      margin-right: auto;
-
-      /* belt-and-suspenders per-field version of the same thing,
-         for browsers that respect this over the container-level
-         scroll-padding-top */
-      scroll-margin-top: 56px;
-    }
-
-    .regTitle {
-      position: sticky;
-      top: 0;
-      z-index: 5;
-
-      margin: 0 auto !important;
-      padding: 16px 0 10px;
-
-      font-size: 1.9rem;
-      text-align: center;
-
-      background: linear-gradient(
-        to bottom,
-        rgba(234, 213, 168, 0.97) 78%,
-        rgba(234, 213, 168, 0)
-      );
-    }
-  }
-}
-@media (max-width: 900px) {
-  .registerContainer {
-    overflow: hidden;
-    height: 100svh;
-  }
-
-  .bookContainer {
-    position: absolute;
-    top: 52%;
-    left: 13vw;
-    transform: translateY(-50%);
-
-    width: 92vw;
-    height: 78vh;
-
-    background-size: 180% 100%;
-    background-position: left top;
-
-    overflow: hidden;
-  }
-
-  .formContainer {
-    position: absolute;
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-
-    flex-direction: column;
-    gap: 14px;
-
-    padding: 0 0 20px;
-
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-
-    /* keeps any scroll-into-view (focus, autofill, browser scroll
-       restoration) from landing content underneath the sticky
-       header — reserves 56px of "no-go" space at the top of the
-       scrollable area */
-    scroll-padding-top: 56px;
-
-    .formLeft,
-    .formRight {
-      display: contents;
-    }
-
-    > * {
-      width: 78%;
-      margin-left: auto;
-      margin-right: auto;
-
-      scroll-margin-top: 56px;
-    }
-
-    .regTitle {
-      position: sticky;
-      top: 0;
-      z-index: 5;
-
-      margin: 0 auto !important;
-      padding: 16px 0 10px;
-
-      font-size: 1.9rem;
-      text-align: center;
-
-      /* no background — heading is just transparent text now */
-      background: none;
-    }
-
-    /* Since the heading no longer has a backing color, fields
-       scrolling upward would visually pass "through" it. This is
-       the actual fix for that: a plain, non-sticky spacer that
-       sits right after the sticky title and reserves height equal
-       to it, combined with a hard clip on formContainer so nothing
-       can render above the sticky title's own box in the first
-       place — content stops exactly at its lower edge instead of
-       sliding behind it. */
-    .regTitle::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -1px;
-      height: 1px;
-    }
-  }
-
-  .yearOptions {
-    width: 100%;
-    height: auto;
-    padding: 4px 0;
-  }
-
-  .nextButton {
-    margin: 12px auto 4px;
-  }
-
-  .lefttop { width: 45%; }
-  .righttop { width: 30%; }
-  .leftbottom { width: 25%; }
-  .rightbottom { width: 30%; }
-}
-
-@media (max-width: 600px) {
-  .registerContainer {
-    height: 100svh;
-  }
-
-  .bookContainer {
-    left: 8vw;
-    width: 98vw;
-    height: 74vh;
-
-    background-size: 180% 100%;
-  }
-
-  .formContainer {
-    scroll-padding-top: 48px;
-
-    > * {
-      width: 84%;
-      scroll-margin-top: 48px;
-    }
-
-    .regTitle {
-      width: 84%;
-      padding: 12px 0 8px;
-      font-size: 1.5rem;
-    }
+  .formColumn > .nextButton {
+    font-size: 0.85rem;
   }
 }
