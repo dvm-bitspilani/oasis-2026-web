@@ -15,7 +15,6 @@ import RegBtn from "../assets/regBtn.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
 import camelLand from "../assets/camelLand.png";
-import { useTransition } from "../context/TransitionProvider";
 
 import instagramIcon from "../assets/links/instagram.png";
 import twitterIcon from "../assets/links/twitter.png";
@@ -233,12 +232,6 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile]);
 
-  const handleRegisterClick = (
-    e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>,
-  ) => {
-    e.preventDefault();
-    navigateWithTransition("/register");
-  };
 
   return (
     <div className={styles.container} ref={containerRef}>
@@ -342,7 +335,6 @@ export default function Home() {
               y="68"
               width="12"
               height="12"
-              className={styles.socialLink}
               className={styles.socialLink}
             />
           </a>
