@@ -122,7 +122,7 @@ export default function Preloader({ assets = [], onEnter }: PreloaderProps) {
     <div className={styles.preloader}>
       <div
        className={styles.background}
-       style={{ backgroundImage: `url(${bg})`, opacity: 0.5 }}>
+       style={{ backgroundImage: `url(${bg})`}}>
        </div>
       <div className={styles.vignette} />
 
