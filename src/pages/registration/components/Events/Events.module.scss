@@ -55,16 +55,6 @@
   width: 20vw;
 }
 
-/* ========================================= */
-/* BOOK FRAME                                */
-/* Wraps bookContainer + content so mobile   */
-/* can share one exact coordinate box between */
-/* the book art and the UI on top of it.     */
-/* On desktop this is display:contents, so   */
-/* it's invisible to layout — bookContainer  */
-/* and content behave exactly as before.     */
-/* ========================================= */
-
 .bookFrame {
   display: contents;
 }
@@ -101,6 +91,7 @@
   display: flex;
   justify-content: center;
 }
+
 
 /* ========================================= */
 /* EVENTS AREA                               */
@@ -302,8 +293,8 @@
    */
   top: 0;
 
-  width: 3.5vw;
-  height: 3.5vw;
+  width: 2.5vw;
+  height: 2.5vw;
 
   min-width: 100px;
   min-height: 100px;
@@ -323,13 +314,11 @@
 }
 
 .scrollbarWheel:hover {
-  scale: 1.01;
 }
 
 .scrollbarWheelDragging {
   cursor: grabbing;
 
-  scale: 1.12;
 }
 
 /* ========================================= */
@@ -1113,6 +1102,21 @@
   cursor: not-allowed;
   filter: none;
   transform: translateX(-50%);
+}
+
+/* ========================================= */
+/* SHORT VIEWPORTS (desktop only)            */
+/* ========================================= */
+
+@media (max-height: 800px) and (min-width: 901px) {
+  .infoPage {
+    padding-right: 100px;
+    width: 50%;
+    // background-color: #38170b;
+  }
+  .eventsPage {
+    padding-left: 100px;
+  }
 }
 
 /* =========================================================== */
