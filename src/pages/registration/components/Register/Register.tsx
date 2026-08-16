@@ -981,7 +981,6 @@ export default function Reg({
   const [selectedState, setSelectedState] =
     useState("");
 
-  const [availableCities, setAvailableCities] = useState<
   const [
     availableCities,
     setAvailableCities,
@@ -989,7 +988,6 @@ export default function Reg({
     { value: string; label: string }[]
   >([]);
 
-  const [collegeOptions, setCollegeOptions] = useState<
   const [
     collegeOptions,
     setCollegeOptions,
