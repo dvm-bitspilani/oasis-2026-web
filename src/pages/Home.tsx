@@ -6,7 +6,7 @@ import styles from "../styles/Home.module.scss";
 
 import bg from "../assets/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg";
 import sandImg from "../assets/sandImg.png";
-import sandMob from "../assets/sandMob.png";
+import sandMob from "../assets/sandmobile.png";
 import cloudSmall from "../assets/cloudSmall.svg";
 import cloudBig from "../assets/cloudBig.svg";
 import cloudThree from "../assets/cloudThree.svg";
