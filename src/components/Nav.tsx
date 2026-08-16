@@ -1,15 +1,14 @@
-import { NavLink } from "react-router-dom";
+import { NavLink} from "react-router-dom";
 import styles from "../styles/Nav.module.scss";
 import navLine from "../assets/hamLine.svg";
 import { useTransition } from "../context/TransitionProvider";
-import navMobile from "../assets/navMobile.png";
-import navMobNav from "../assets/navMobNav.png";
 
 const LINKS = [
   { label: "Home", to: "/" },
-  { label: "Contacts", to: "/comingsoon" },
-  { label: "Events", to: "/comingsoon" },
+  { label: "reg", to: "/reg" },
+  { label: "Events", to: "/eventsReg" },
   { label: "About Us", to: "/about" },
+  { label: "Register", to: "/register" },
 ];
 
 export default function Nav() {
@@ -24,19 +23,11 @@ export default function Nav() {
   };
 
   return (
-    <div
-      className={styles.container}
-      style={
-        {
-          "--nav-mobile-bg": `url(${navMobile})`,
-          "--nav-mobile-nav-decor": `url(${navMobNav})`,
-        } as React.CSSProperties
-      }
-    >
+    <div className={styles.container}>
       <div className={styles.circle}>
-        <img src={navLine} alt="" />
-        <img src={navLine} alt="" />
-        <img src={navLine} alt="" />
+        <img src={navLine} />
+        <img src={navLine} />
+        <img src={navLine} />
       </div>
 
       <div className={styles.rectangle}>

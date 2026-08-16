@@ -80,16 +80,12 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
       const cloudEls =
         mode === "full"
-          ? Array.from(
-              document.querySelectorAll<HTMLElement>(CLOUD_SELECTOR),
-            )
+          ? Array.from(document.querySelectorAll<HTMLElement>(CLOUD_SELECTOR))
           : [];
 
       const fadeEls =
         mode === "full"
-          ? Array.from(
-              document.querySelectorAll<HTMLElement>(FADE_SELECTOR),
-            )
+          ? Array.from(document.querySelectorAll<HTMLElement>(FADE_SELECTOR))
           : [];
 
       while (layer.firstChild) {
@@ -140,11 +136,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         const STRAIGHT_T = 0.55; // how far down the line stays straight before curling
         const HOOK_T = 0.85; // how close to the end the hook control sits
 
-        const buildPath = (
-          r: CloudRig,
-          endY: number,
-          sag: number,
-        ) => {
+        const buildPath = (r: CloudRig, endY: number, sag: number) => {
           const control1Y = TOP_Y + (endY - TOP_Y) * STRAIGHT_T;
           const control2Y = TOP_Y + (endY - TOP_Y) * HOOK_T;
 
@@ -154,10 +146,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         };
 
         rigs.forEach((r) => {
-          r.path.setAttribute(
-            "d",
-            buildPath(r, START_LEN, START_SAG),
-          );
+          r.path.setAttribute("d", buildPath(r, START_LEN, START_SAG));
 
           gsap.set(r.path, { opacity: 0 });
         });
@@ -199,11 +188,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
                 onUpdate: () => {
                   const p = state.fall;
 
-                  const endY = gsap.utils.interpolate(
-                    START_LEN,
-                    r.hookY,
-                    p,
-                  );
+                  const endY = gsap.utils.interpolate(START_LEN, r.hookY, p);
 
                   const sag = gsap.utils.interpolate(
                     START_SAG,
@@ -225,11 +210,8 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
                   const drawP = Math.min(p / 0.6, 1);
 
-                  gsap.set(r.path, {
-                    strokeDasharray: currentLen,
-                    strokeDashoffset:
-                      currentLen * (1 - drawP),
-                  });
+                  r.path.style.strokeDasharray = `${currentLen}`;
+                  r.path.style.strokeDashoffset = `${currentLen * (1 - drawP)}`;
                 },
               },
               i * 0.045,
@@ -239,17 +221,9 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
                 {
                   duration: 0.05,
                   onUpdate: function () {
-                    const overshoot =
-                      -Math.sin(this.progress() * Math.PI) * 10;
+                    const overshoot = -Math.sin(this.progress() * Math.PI) * 10;
 
-                    r.path.setAttribute(
-                      "d",
-                      buildPath(
-                        r,
-                        r.hookY,
-                        overshoot,
-                      ),
-                    );
+                    r.path.setAttribute("d", buildPath(r, r.hookY, overshoot));
                   },
                 },
                 ">-0.03",
@@ -266,20 +240,9 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
                   duration: 0.05,
                   ease: "power3.out",
                   onUpdate: function () {
-                    const sag = gsap.utils.interpolate(
-                      5,
-                      0,
-                      this.progress(),
-                    );
+                    const sag = gsap.utils.interpolate(5, 0, this.progress());
 
-                    r.path.setAttribute(
-                      "d",
-                      buildPath(
-                        r,
-                        r.hookY,
-                        sag,
-                      ),
-                    );
+                    r.path.setAttribute("d", buildPath(r, r.hookY, sag));
 
                     gsap.set(r.path, {
                       strokeDashoffset: 0,
@@ -290,8 +253,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
               );
           });
 
-          const liftDistance =
-            window.innerHeight * 1.3;
+          const liftDistance = window.innerHeight * 1.3;
 
           tl.to(
             rigs.map((r) => r.group),
@@ -315,18 +277,14 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           );
         }
 
-        const cloudsDuration =
-          tl.duration() || 0.5;
+        const cloudsDuration = tl.duration() || 0.5;
 
-        const SINK_DISTANCE =
-          window.innerHeight;
+        const SINK_DISTANCE = window.innerHeight;
 
-        const FOREGROUND_DURATION =
-          cloudsDuration * 1.0;
+        const FOREGROUND_DURATION = cloudsDuration * 1.0;
 
         // Moon is faster than the castle
-        const MOON_DURATION =
-          cloudsDuration * 1.2;
+        const MOON_DURATION = cloudsDuration * 1.2;
 
         const WOBBLE_AMPLITUDE_X = 10;
         const WOBBLE_AMPLITUDE_ROT = 2;
@@ -363,19 +321,14 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
                 let rot = 0;
 
                 if (wobble) {
-                  const wobblePhase =
-                    p * Math.PI * WOBBLE_CYCLES;
+                  const wobblePhase = p * Math.PI * WOBBLE_CYCLES;
 
-                  const wobbleEnvelope =
-                    Math.sin(
-                      Math.min(p / 0.15, 1) *
-                        (Math.PI / 2),
-                    );
+                  const wobbleEnvelope = Math.sin(
+                    Math.min(p / 0.15, 1) * (Math.PI / 2),
+                  );
 
                   x =
-                    Math.sin(wobblePhase) *
-                    WOBBLE_AMPLITUDE_X *
-                    wobbleEnvelope;
+                    Math.sin(wobblePhase) * WOBBLE_AMPLITUDE_X * wobbleEnvelope;
 
                   rot =
                     Math.sin(wobblePhase) *
@@ -447,26 +400,16 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         };
 
         if (castleEl) {
-          applyDrownWobble(
-            castleEl,
-            FOREGROUND_DURATION,
-            SINK_DISTANCE,
-            {
-              xPercent: -50,
-            },
-          );
+          applyDrownWobble(castleEl, FOREGROUND_DURATION, SINK_DISTANCE, {
+            xPercent: -50,
+          });
         }
 
         // Moon moves faster and has NO wobble
         if (moonEl) {
-          applyDrown(
-            moonEl,
-            MOON_DURATION,
-            SINK_DISTANCE,
-            {
-              xPercent: -50,
-            },
-          );
+          applyDrown(moonEl, MOON_DURATION, SINK_DISTANCE, {
+            xPercent: -50,
+          });
         }
 
         // CHANGED: pass scaleX: -1 through so the sand's CSS mirror
@@ -476,12 +419,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         // a transform without the mirror and the sand visibly flipped and
         // jumped the instant a nav link was clicked.
         if (sandEl) {
-          applyDrown(
-            sandEl,
-            FOREGROUND_DURATION,
-            SINK_DISTANCE * 0.02,
-            undefined,
-          );
+          applyDrown(sandEl, FOREGROUND_DURATION, SINK_DISTANCE * 0.02);
         }
 
         if (fadeEls.length > 0) {
@@ -496,10 +434,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           );
         }
 
-        if (
-          doorLeftRef.current &&
-          doorRightRef.current
-        ) {
+        if (doorLeftRef.current && doorRightRef.current) {
           if (mode === "full") {
             const introEnd = tl.duration();
             const DOOR_START_DELAY = 0.8;
@@ -526,8 +461,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
               doorLeftRef.current,
               {
                 xPercent: 0,
-                duration:
-                  DOOR_CLOSE_DURATION_DOORS_ONLY,
+                duration: DOOR_CLOSE_DURATION_DOORS_ONLY,
                 ease: "power2.in",
               },
               DOOR_START_DELAY_DOORS_ONLY,
@@ -535,8 +469,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
               doorRightRef.current,
               {
                 xPercent: 0,
-                duration:
-                  DOOR_CLOSE_DURATION_DOORS_ONLY,
+                duration: DOOR_CLOSE_DURATION_DOORS_ONLY,
                 ease: "power2.in",
               },
               DOOR_START_DELAY_DOORS_ONLY,
@@ -546,7 +479,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       }, rootRef);
 
       return () => {
-        ctx.revert();
+        // ctx.revert();
 
         while (layer.firstChild) {
           layer.removeChild(layer.firstChild);
@@ -555,13 +488,8 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
     }, [mode]);
 
     return (
-      <div
-        ref={rootRef}
-        className={styles.root}
-      >
-        <div
-          className={styles.stringLayerWrap}
-        >
+      <div ref={rootRef} className={styles.root}>
+        <div className={styles.stringLayerWrap}>
           <svg
             ref={layerRef}
             className={styles.stringLayer}

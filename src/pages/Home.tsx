@@ -15,6 +15,7 @@ import RegBtn from "../assets/regBtn.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
 import camelLand from "../assets/camelLand.png";
+import { useTransition } from "../context/TransitionProvider";
 
 import instagramIcon from "../assets/links/instagram.png";
 import twitterIcon from "../assets/links/twitter.png";
@@ -33,19 +34,79 @@ type Cloud = {
 const MOBILE_BREAKPOINT = 650;
 
 const CLOUDS_DESKTOP: Cloud[] = [
-  { src: cloudSmall, top: "35%", left: "-20%", width: "20%", duration: 240 },
-  { src: cloudBig, top: "12%", left: "10%", width: "24%", duration: 320 },
-  { src: cloudThree, top: "22%", left: "40%", width: "18%", duration: 200 },
-  { src: cloudSmall, top: "42%", left: "65%", width: "15%", duration: 180 },
-  { src: cloudBig, top: "8%", left: "90%", width: "22%", duration: 380 },
+  {
+    src: cloudSmall,
+    top: "35%",
+    left: "-20%",
+    width: "20%",
+    duration: 240,
+  },
+  {
+    src: cloudBig,
+    top: "12%",
+    left: "10%",
+    width: "24%",
+    duration: 320,
+  },
+  {
+    src: cloudThree,
+    top: "22%",
+    left: "40%",
+    width: "18%",
+    duration: 200,
+  },
+  {
+    src: cloudSmall,
+    top: "42%",
+    left: "65%",
+    width: "15%",
+    duration: 180,
+  },
+  {
+    src: cloudBig,
+    top: "8%",
+    left: "90%",
+    width: "22%",
+    duration: 380,
+  },
 ];
 
 const CLOUDS_MOBILE: Cloud[] = [
-  { src: cloudSmall, top: "30%", left: "-25%", width: "50%", duration: 240 },
-  { src: cloudBig, top: "8%", left: "5%", width: "60%", duration: 320 },
-  { src: cloudThree, top: "18%", left: "40%", width: "45%", duration: 200 },
-  { src: cloudSmall, top: "38%", left: "60%", width: "40%", duration: 180 },
-  { src: cloudBig, top: "5%", left: "85%", width: "55%", duration: 380 },
+  {
+    src: cloudSmall,
+    top: "30%",
+    left: "-25%",
+    width: "50%",
+    duration: 240,
+  },
+  {
+    src: cloudBig,
+    top: "8%",
+    left: "5%",
+    width: "60%",
+    duration: 320,
+  },
+  {
+    src: cloudThree,
+    top: "18%",
+    left: "40%",
+    width: "45%",
+    duration: 200,
+  },
+  {
+    src: cloudSmall,
+    top: "38%",
+    left: "60%",
+    width: "40%",
+    duration: 180,
+  },
+  {
+    src: cloudBig,
+    top: "5%",
+    left: "85%",
+    width: "55%",
+    duration: 380,
+  },
 ];
 const bgImg = window.innerWidth < 650 ? sandMob : sandImg;
 const MOON_CLOUD_TINT =
@@ -172,6 +233,13 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile]);
 
+  const handleRegisterClick = (
+    e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>,
+  ) => {
+    e.preventDefault();
+    navigateWithTransition("/register");
+  };
+
   return (
     <div className={styles.container} ref={containerRef}>
       <div data-transition-fade>
@@ -237,7 +305,7 @@ export default function Home() {
       </div>
 
       <div className={styles.oasisLogo} data-transition-fade>
-        <img src={LogoOasis} alt="" />
+        <img src={LogoOasis} alt="Oasis" />
       </div>
 
       <div className={styles.regBtn} data-transition-fade>
@@ -275,6 +343,7 @@ export default function Home() {
               width="12"
               height="12"
               className={styles.socialLink}
+              className={styles.socialLink}
             />
           </a>
           <a
@@ -289,6 +358,7 @@ export default function Home() {
               width="12"
               height="12"
               className={styles.socialLink}
+              className={styles.socialLink}
             />
           </a>
           <a href="" target="_blank" rel="noreferrer">
@@ -299,12 +369,14 @@ export default function Home() {
               width="12"
               height="12"
               className={styles.socialLink}
+              className={styles.socialLink}
             />
           </a>
           <a
-            href="https://www.linkedin.com/company/oasis24-bits-pilani/"
+            href="#"
             target="_blank"
             rel="noreferrer"
+            onClick={(e) => e.preventDefault()}
           >
             <image
               href={twitterIcon}
@@ -312,6 +384,7 @@ export default function Home() {
               y="23"
               width="12"
               height="12"
+              className={styles.socialLink}
               className={styles.socialLink}
             />
           </a>

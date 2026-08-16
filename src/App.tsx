@@ -1,6 +1,6 @@
 import { useState } from "react";
 import AppRoutes from "./routes/AppRoutes";
-import Preloader from "./pages/Preloader";
+ import Preloader from "./pages/Preloader"; 
 
 import camel from "./assets/camelLand.png";
 import camel1 from "./assets/camel1.svg";
