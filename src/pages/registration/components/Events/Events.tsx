@@ -1,4 +1,3 @@
-
 import {
   useEffect,
   useRef,
@@ -128,6 +127,44 @@ const MOBILE_BREAKPOINT = 900;
 const Events = forwardRef<HTMLDivElement, EventsProps>(
   ({ userData, setUserData }, ref) => {
     const [events] = useState<Event[]>(TEST_EVENTS);
+
+    /* ========================================= */
+    /* VIEWPORT WIDTH                            */
+    /*                                           */
+    /* Single source of truth for "are we on     */
+    /* mobile". Everything width-dependent below */
+    /* reads this instead of window.innerWidth,  */
+    /* so the tree actually re-renders when the  */
+    /* viewport crosses the breakpoint.          */
+    /* ========================================= */
+
+    const [isMobile, setIsMobile] = useState<boolean>(
+      () =>
+        typeof window !== "undefined" &&
+        window.innerWidth < MOBILE_BREAKPOINT
+    );
+
+    useEffect(() => {
+      const handleViewportResize = () => {
+        setIsMobile(
+          window.innerWidth < MOBILE_BREAKPOINT
+        );
+      };
+
+      handleViewportResize();
+
+      window.addEventListener(
+        "resize",
+        handleViewportResize
+      );
+
+      return () => {
+        window.removeEventListener(
+          "resize",
+          handleViewportResize
+        );
+      };
+    }, []);
 
     /* ========================================= */
     /* LIST / SCROLL REFS                        */
@@ -569,10 +606,17 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
     }, [search, events]);
 
     /* ========================================= */
-    /* ⭐ SYNC RIGHT PAGE -> LEFT PAGE            */
+    /* SYNC RIGHT PAGE -> LEFT PAGE              */
+    /*                                           */
+    /* Desktop only: on mobile the right page    */
+    /* isn't rendered, so there's nothing to     */
+    /* sync from, and the auto-scroll would      */
+    /* fight the user's own scrolling.           */
     /* ========================================= */
 
     useEffect(() => {
+      if (isMobile) return;
+
       if (!activeEvent) return;
 
       const activeButton =
@@ -582,16 +626,11 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
 
       if (!activeButton) return;
 
-      /*
-       * If the RIGHT page changes event,
-       * find the same event on the LEFT
-       * and smoothly bring it into view.
-       */
       activeButton.scrollIntoView({
         behavior: "smooth",
         block: "nearest",
       });
-    }, [activeEvent]);
+    }, [activeEvent, isMobile]);
 
     /* ========================================= */
     /* SELECT / REMOVE EVENT                     */
@@ -645,10 +684,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
     ) => {
       setActiveEvent(event);
 
-      if (
-        window.innerWidth <
-        MOBILE_BREAKPOINT
-      ) {
+      if (isMobile) {
         setEventsModal(true);
       }
     };
@@ -660,10 +696,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
     const handleEventItemClick = (
       event: Event
     ) => {
-      if (
-        window.innerWidth <
-        MOBILE_BREAKPOINT
-      ) {
+      if (isMobile) {
         /*
          * Mobile:
          * Open details modal.
@@ -977,7 +1010,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                                 }
 
                                 /*
-                                 * ⭐ Store the DOM
+                                 * Store the DOM
                                  * element for this event.
                                  */
                                 ref={(el) => {
@@ -996,7 +1029,8 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                                       : ""
                                   }
                                   ${
-                                    active
+                                    active &&
+                                    !isMobile
                                       ? styles.active
                                       : ""
                                   }
@@ -1007,20 +1041,28 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                                 }}
 
                                 /*
-                                 * Hovering on the
-                                 * LEFT page changes
-                                 * the RIGHT page.
+                                 * Hovering on the LEFT page
+                                 * changes the RIGHT page.
+                                 * Skipped on mobile, where
+                                 * there is no right page and
+                                 * touch fires a phantom hover.
                                  */
-                                onMouseEnter={() =>
-                                  setActiveEvent(
-                                    event
-                                  )
+                                onMouseEnter={
+                                  isMobile
+                                    ? undefined
+                                    : () =>
+                                        setActiveEvent(
+                                          event
+                                        )
                                 }
 
-                                onFocus={() =>
-                                  setActiveEvent(
-                                    event
-                                  )
+                                onFocus={
+                                  isMobile
+                                    ? undefined
+                                    : () =>
+                                        setActiveEvent(
+                                          event
+                                        )
                                 }
 
                                 onClick={() =>
@@ -1101,244 +1143,273 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                       NO EVENTS FOUND
                     </div>
                   )}
+
+                  {/* ================================= */}
+                  {/* CONFIRM — MOBILE ONLY              */}
+                  {/*                                    */}
+                  {/* On mobile the right page isn't     */}
+                  {/* rendered, so CONFIRM lives here as */}
+                  {/* a normal flow sibling below the    */}
+                  {/* list — exactly like the original.  */}
+                  {/* ================================= */}
+
+                  {isMobile && (
+                    <button
+                      type="button"
+                      className={
+                        styles.confirmButton
+                      }
+                      onClick={
+                        handleSubmit
+                      }
+                      disabled={
+                        selectedEvents.length ===
+                        0
+                      }
+                    >
+                      CONFIRM
+                    </button>
+                  )}
                 </div>
 
                 {/* ================================= */}
-                {/* RIGHT PAGE                         */}
+                {/* RIGHT PAGE — DESKTOP ONLY          */}
                 {/* ================================= */}
 
-                <div
-                  className={
-                    styles.infoPage
-                  }
-                >
+                {!isMobile && (
                   <div
                     className={
-                      styles.rightOuter
+                      styles.infoPage
                     }
                   >
-                    <h1
+                    <div
                       className={
-                        styles.eventHeading
+                        styles.rightOuter
                       }
                     >
-                      Event Title
-                    </h1>
-
-                    {activeEvent ? (
-                      <div
+                      <h1
                         className={
-                          styles.eventInfo
+                          styles.eventHeading
                         }
                       >
-                        {/* EVENT CONTENT */}
+                        Event Title
+                      </h1>
 
+                      {activeEvent ? (
                         <div
                           className={
-                            styles.eventContent
+                            styles.eventInfo
                           }
                         >
-                          <h2
-                            className={
-                              styles.eventTitle
-                            }
-                          >
-                            {
-                              activeEvent.name
-                            }
-                          </h2>
-
-                          <p
-                            className={
-                              styles.eventDescription
-                            }
-                          >
-                            {
-                              activeEvent.about
-                            }
-                          </p>
-                        </div>
-
-                        {/* FIXED CONTROLS */}
-
-                        <div
-                          className={
-                            styles.eventControls
-                          }
-                        >
-                          {/* ADD / REMOVE */}
-
-                          <button
-                            type="button"
-                            className={
-                              styles.eventActionButton
-                            }
-                            style={{
-                              backgroundImage: `url(${btn})`,
-                            }}
-                            onClick={() =>
-                              handleEvent(
-                                activeEvent
-                              )
-                            }
-                          >
-                            {selectedEvents.some(
-                              (event) =>
-                                event.id ===
-                                activeEvent.id
-                            )
-                              ? "REMOVE"
-                              : "ADD"}
-                          </button>
-
-                          {/* NAVIGATION */}
+                          {/* EVENT CONTENT */}
 
                           <div
                             className={
-                              styles.eventNavigation
+                              styles.eventContent
                             }
                           >
-                            {/* PREVIOUS */}
+                            <h2
+                              className={
+                                styles.eventTitle
+                              }
+                            >
+                              {
+                                activeEvent.name
+                              }
+                            </h2>
+
+                            <p
+                              className={
+                                styles.eventDescription
+                              }
+                            >
+                              {
+                                activeEvent.about
+                              }
+                            </p>
+                          </div>
+
+                          {/* FIXED CONTROLS */}
+
+                          <div
+                            className={
+                              styles.eventControls
+                            }
+                          >
+                            {/* ADD / REMOVE */}
 
                             <button
                               type="button"
-                              onClick={
-                                goToPreviousEvent
-                              }
-                              aria-label="Previous event"
                               className={
-                                styles.navArrow
+                                styles.eventActionButton
+                              }
+                              style={{
+                                backgroundImage: `url(${btn})`,
+                              }}
+                              onClick={() =>
+                                handleEvent(
+                                  activeEvent
+                                )
                               }
                             >
-                              ‹
+                              {selectedEvents.some(
+                                (event) =>
+                                  event.id ===
+                                  activeEvent.id
+                              )
+                                ? "REMOVE"
+                                : "ADD"}
                             </button>
 
-                            {/* PAGE NUMBERS */}
+                            {/* NAVIGATION */}
 
                             <div
                               className={
-                                styles.pageNumbers
+                                styles.eventNavigation
                               }
                             >
-                              {filteredEvents.length <=
-                              3
-                                ? filteredEvents.map(
-                                    (
-                                      event,
-                                      index
-                                    ) => (
-                                      <button
-                                        key={
-                                          event.id
-                                        }
-                                        type="button"
-                                        className={`
-                                          ${styles.pageNumber}
-                                          ${
-                                            index ===
-                                            currentIndex
-                                              ? styles.currentPage
-                                              : ""
-                                          }
-                                        `}
-                                        onClick={() =>
-                                          goToPage(
-                                            index
-                                          )
-                                        }
-                                      >
-                                        {index +
-                                          1}
-                                      </button>
-                                    )
-                                  )
-                                : pageOffsets.map(
-                                    (offset) => {
-                                      const pageIndex =
-                                        (currentIndex +
-                                          offset +
-                                          filteredEvents.length) %
-                                        filteredEvents.length;
+                              {/* PREVIOUS */}
 
-                                      return (
+                              <button
+                                type="button"
+                                onClick={
+                                  goToPreviousEvent
+                                }
+                                aria-label="Previous event"
+                                className={
+                                  styles.navArrow
+                                }
+                              >
+                                ‹
+                              </button>
+
+                              {/* PAGE NUMBERS */}
+
+                              <div
+                                className={
+                                  styles.pageNumbers
+                                }
+                              >
+                                {filteredEvents.length <=
+                                3
+                                  ? filteredEvents.map(
+                                      (
+                                        event,
+                                        index
+                                      ) => (
                                         <button
                                           key={
-                                            offset
+                                            event.id
                                           }
                                           type="button"
                                           className={`
                                             ${styles.pageNumber}
                                             ${
-                                              offset ===
-                                              0
+                                              index ===
+                                              currentIndex
                                                 ? styles.currentPage
                                                 : ""
                                             }
                                           `}
                                           onClick={() =>
                                             goToPage(
-                                              pageIndex
+                                              index
                                             )
                                           }
                                         >
-                                          {pageIndex +
+                                          {index +
                                             1}
                                         </button>
-                                      );
-                                    }
-                                  )}
+                                      )
+                                    )
+                                  : pageOffsets.map(
+                                      (offset) => {
+                                        const pageIndex =
+                                          (currentIndex +
+                                            offset +
+                                            filteredEvents.length) %
+                                          filteredEvents.length;
+
+                                        return (
+                                          <button
+                                            key={
+                                              offset
+                                            }
+                                            type="button"
+                                            className={`
+                                              ${styles.pageNumber}
+                                              ${
+                                                offset ===
+                                                0
+                                                  ? styles.currentPage
+                                                  : ""
+                                              }
+                                            `}
+                                            onClick={() =>
+                                              goToPage(
+                                                pageIndex
+                                              )
+                                            }
+                                          >
+                                            {pageIndex +
+                                              1}
+                                          </button>
+                                        );
+                                      }
+                                    )}
+                              </div>
+
+                              {/* NEXT */}
+
+                              <button
+                                type="button"
+                                onClick={
+                                  goToNextEvent
+                                }
+                                aria-label="Next event"
+                                className={
+                                  styles.navArrow
+                                }
+                              >
+                                ›
+                              </button>
                             </div>
 
-                            {/* NEXT */}
+                            {/* CONFIRM */}
 
                             <button
                               type="button"
-                              onClick={
-                                goToNextEvent
-                              }
-                              aria-label="Next event"
                               className={
-                                styles.navArrow
+                                styles.confirmButton
+                              }
+                              onClick={
+                                handleSubmit
+                              }
+                              disabled={
+                                selectedEvents.length ===
+                                0
                               }
                             >
-                              ›
+                              CONFIRM
                             </button>
                           </div>
-
-                          {/* CONFIRM */}
-
-                          <button
-                            type="button"
-                            className={
-                              styles.confirmButton
-                            }
-                            onClick={
-                              handleSubmit
-                            }
-                            disabled={
-                              selectedEvents.length ===
-                              0
-                            }
-                          >
-                            CONFIRM
-                          </button>
                         </div>
-                      </div>
-                    ) : (
-                      <div
-                        className={
-                          styles.emptyInfo
-                        }
-                      >
-                        <p>
-                          HOVER OVER AN EVENT
-                          <br />
-                          TO VIEW DETAILS
-                        </p>
-                      </div>
-                    )}
+                      ) : (
+                        <div
+                          className={
+                            styles.emptyInfo
+                          }
+                        >
+                          <p>
+                            HOVER OVER AN EVENT
+                            <br />
+                            TO VIEW DETAILS
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -1364,7 +1435,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         {/* EVENT DETAILS MODAL — MOBILE       */}
         {/* =================================== */}
 
-        {eventsModal && (
+        {isMobile && eventsModal && (
           <EventsModal
             handleEvent={() =>
               handleEvent(

@@ -102,14 +102,6 @@
   justify-content: center;
 }
 
-/*
-  confirmButton now lives inside .content (see Events.tsx) so that
-  on mobile it can be positioned relative to the same book-frame box
-  as everything else. On desktop, .content's footprint is effectively
-  the same as .eventsContainer's centered content area, so bottom:3.5%
-  / left:50% below still lands in the same visual spot as before.
-*/
-
 /* ========================================= */
 /* EVENTS AREA                               */
 /* ========================================= */
@@ -264,6 +256,7 @@
 /* ========================================= */
 /* CUSTOM SCROLLBAR                          */
 /* ========================================= */
+
 .customScrollbar {
   position: relative;
 
@@ -338,6 +331,11 @@
 
   scale: 1.12;
 }
+
+/* ========================================= */
+/* EVENT ITEM                                */
+/* ========================================= */
+
 .eventItem {
   position: relative;
 
@@ -387,16 +385,12 @@
 }
 
 /* ========================================= */
-/* RED GRADIENT FILL — solid vector shape      */
-/* (clip-path, not raster mask), so it fills   */
-/* the full interior and never distorts while  */
-/* wiping in.                                  */
-/*                                             */
-/* NOTE: tweak the polygon() points below to   */
-/* match your inputBg.png's exact silhouette — */
-/* this is an approximation of the elongated   */
-/* hexagon/chevron shape from the screenshot.  */
+/* RED GRADIENT FILL                          */
+/* Masked to inputBgFilled.png's silhouette   */
+/* and revealed with clip-path (not scaleX),  */
+/* so the mask is never squished.             */
 /* ========================================= */
+
 .eventItem::before {
   content: "";
 
@@ -405,8 +399,8 @@
 
   background: radial-gradient(
     circle at center,
-    #671C07 0%,
-    #400E00 100%
+    #671c07 0%,
+    #400e00 100%
   );
 
   -webkit-mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
@@ -419,8 +413,6 @@
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
 
-  /* transparent until hovered/selected — reveal via clip-path,
-     not scaleX, so the mask is never squished/distorted */
   -webkit-clip-path: inset(0 100% 0 0);
   clip-path: inset(0 100% 0 0);
 
@@ -431,6 +423,7 @@
     -webkit-clip-path 0.45s ease,
     clip-path 0.45s ease;
 }
+
 /* ========================================= */
 /* EVENT LABEL                               */
 /* ========================================= */
@@ -461,14 +454,11 @@
 }
 
 /* ========================================= */
-/* HOVER — only the item under the cursor      */
-/* ========================================= */
-
-/* ========================================= */
 /* HOVER + ACTIVE                            */
 /* ========================================= */
 
-.eventItem:hover,
+/* ACTIVE — set from JS (desktop only) */
+
 .eventItem.active {
   transform: scale(1.06);
 
@@ -479,13 +469,11 @@
     );
 }
 
-.eventItem:hover::before,
 .eventItem.active::before {
   -webkit-clip-path: inset(0 0 0 0);
   clip-path: inset(0 0 0 0);
 }
 
-.eventItem:hover span,
 .eventItem.active span {
   transform: scale(1.04);
 
@@ -495,7 +483,52 @@
 
   text-shadow:
     0 0 6px rgba(254, 213, 155, 0.8);
-} 
+}
+
+/* ========================================= */
+/* HOVER — pointer devices only.              */
+/*                                            */
+/* Touch screens emulate :hover on tap and    */
+/* then leave it stuck on the last item until */
+/* you tap elsewhere, so on a phone one row   */
+/* stayed filled and scaled up. This query    */
+/* keeps hover off touch entirely.            */
+/* ========================================= */
+
+@media (hover: hover) and (pointer: fine) {
+  .eventItem:hover {
+    transform: scale(1.06);
+
+    filter:
+      brightness(1.08)
+      drop-shadow(
+        0 0 8px rgba(229, 195, 132, 0.55)
+      );
+  }
+
+  .eventItem:hover::before {
+    -webkit-clip-path: inset(0 0 0 0);
+    clip-path: inset(0 0 0 0);
+  }
+
+  .eventItem:hover span {
+    transform: scale(1.04);
+
+    letter-spacing: 0.04em;
+
+    color: #fed59b;
+
+    text-shadow:
+      0 0 6px rgba(254, 213, 155, 0.8);
+  }
+
+  .eventItem.selected:hover {
+    transform: scale(1.08);
+
+    filter: brightness(1.15) drop-shadow(0 0 14px rgba(254, 213, 155, 0.85));
+  }
+}
+
 /* ========================================= */
 /* SELECTED — persists after click,           */
 /* independent of hover                       */
@@ -523,16 +556,6 @@
 }
 
 /* ========================================= */
-/* SELECTED + HOVER                         */
-/* ========================================= */
-
-.eventItem.selected:hover {
-  transform: scale(1.08);
-
-  filter: brightness(1.15) drop-shadow(0 0 14px rgba(254, 213, 155, 0.85));
-}
-
-/* ========================================= */
 /* SELECTED ANIMATION                        */
 /* ========================================= */
 
@@ -553,6 +576,7 @@
 .eventItem:active {
   transform: scale(0.97);
 }
+
 /* ========================================= */
 /* MESSAGE                                   */
 /* ========================================= */
@@ -611,8 +635,6 @@
 .rightOuter {
   width: 100%;
   height: 100%;
-
-  // margin-left: 10%;
 
   display: flex;
   flex-direction: column;
@@ -1093,78 +1115,61 @@
   transform: translateX(-50%);
 }
 
-/* ========================================= */
-/* SHORT VIEWPORTS (desktop only)            */
-/* ========================================= */
-
-@media (max-height: 800px) and (min-width: 901px) {
-  .infoPage {
-    padding-right: 100px;
-    width: 50%;
-    // background-color: #38170b;
-  }
-  .eventsPage {
-    padding-left: 100px;
-  }
-}
-
 /* =========================================================== */
 /* MOBILE (<=900px)                                             */
 /*                                                               */
-/* THE CORE IDEA:                                                */
-/* .bookFrame becomes a real, sized box (instead of              */
-/* display:contents). .bookContainer and .content are both       */
-/* absolutely positioned at inset:0 *inside* that one box, so     */
-/* they share the exact same coordinate system — the book art     */
-/* and the heading/search/list can no longer drift apart.         */
-/*                                                                 */
-/* .bookContainer is zoomed in (background-size > 100%) and       */
-/* shifted (background-position) so the frame shows mostly the    */
-/* LEFT page, a sliver of background around the frame edges       */
-/* (via padding on .eventsContainer), and a sliver of the right   */
-/* page peeking at the frame's right/bottom edge.                 */
-/*                                                                 */
-/* .eventsPage is then positioned with percentages *of that same  */
-/* frame* so its box lands exactly on the book's left-page area.  */
-/*                                                                 */
-/* TUNING: --book-zoom-x / --book-zoom-y / --book-pos-x /         */
-/* --book-pos-y control how the book art is cropped, and          */
-/* --lp-top / --lp-left / --lp-width / --lp-height control where  */
-/* the left-page content box sits. These were estimated from a    */
-/* screenshot, not the real asset — nudge them to match yours.    */
+/* Book framing copied from Register.module.scss:                */
+/*                                                               */
+/*   - .eventsContainer is a fixed 100svh box with overflow      */
+/*     hidden. It does NOT scroll and has no margin or padding,  */
+/*     so nothing can push the book down — this is what removes  */
+/*     the white strip at the top.                               */
+/*                                                               */
+/*   - .bookFrame is the register page's .bookContainer: an      */
+/*     absolutely positioned 92vw x 78vh box at top:52% /        */
+/*     left:13vw, vertically centred with translateY(-50%).      */
+/*     It runs off the right edge on purpose, so the visible     */
+/*     book is flush right with wood showing only on the left.   */
+/*                                                               */
+/*   - .bookContainer (the art) fills that frame with the same   */
+/*     flat crop: background-size 180% 100%, position left top.  */
+/*                                                               */
+/*   - .content overlays the frame exactly, and .eventsPage is   */
+/*     pinned onto the left page with the --lp-* percentages.    */
+/*     Those four values are the only ones to nudge if the       */
+/*     content doesn't sit perfectly on the page.                */
 /* =========================================================== */
 
 @media (max-width: 900px) {
   .eventsContainer {
-    // CSS custom properties used by the rules below —
-    // tune these to match your actual book.png.
+    /*
+      Where the left-page content box sits within the frame.
 
-    // How the book art is cropped inside the frame.
-    // Increase zoom / lower pos-x to crop further into the
-    // left page and away from any spine/gutter decoration.
-    --book-zoom-x: 260%;
-    --book-zoom-y: 140%;
-    --book-pos-x: 14%;
-    --book-pos-y: 46%;
+      These are fractions of .bookFrame, and the book art is
+      anchored to the frame's left edge with the same
+      180% 100% crop at every mobile width — so one set of
+      values works for the whole range and the ≤600px block
+      deliberately does NOT override them.
 
-    // Where the left-page content box sits within the frame.
-    --lp-top: 10%;
-    --lp-left: 8%;
-    --lp-width: 62%;
-    --lp-height: 80%;
+      Nudge --lp-left / --lp-width first if the rows sit
+      outside the gold border on the page.
+    */
+    --lp-top: 6%;
+    --lp-left: 16%;
+    --lp-width: 66%;
+    --lp-height: 88%;
 
+    /* Fixed-height, non-scrolling shell — no margin/padding,
+       so the book cannot be pushed away from the top. */
+    height: 100svh;
     min-height: 100svh;
-    height: auto;
 
-    overflow-y: auto;
-    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
+    overflow: hidden;
 
-    padding: 6vw 4vw 10vw;
+    display: block;
 
     background-size: cover;
     background-position: center;
@@ -1179,52 +1184,48 @@
   }
 
   /* ========================================= */
-  /* BOOK FRAME — the single shared coordinate  */
-  /* box for the book art + all UI on top of it */
+  /* BOOK FRAME — same box as register's        */
+  /* .bookContainer on mobile                   */
   /* ========================================= */
 
   .bookFrame {
     display: block;
 
-    position: relative;
+    position: absolute;
+    top: 52%;
+    left: 13vw;
+    transform: translateY(-50%);
 
-    width: min(94vw, 460px);
-    aspect-ratio: 0.78;
+    width: 92vw;
+    height: 78vh;
 
-    margin: 5vw auto 0;
+    margin: 0;
 
-    flex-shrink: 0;
+    overflow: hidden;
+
+    z-index: 4;
   }
 
-  /* subtle edge shading to suggest stacked pages,
-     independent of the exact book.png crop */
+  /* the old page-edge gradient belonged to the centred card
+     layout; the frame now runs off-screen on the right */
   .bookFrame::after {
-    content: "";
-
-    position: absolute;
-    top: 2%;
-    right: 0;
-    bottom: 2%;
-
-    width: 5%;
-
-    background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.22));
-
-    pointer-events: none;
+    content: none;
   }
 
   /* ========================================= */
-  /* BOOK ART — zoomed/cropped so the left page */
-  /* dominates, with the right page just        */
-  /* peeking at the edge                        */
+  /* BOOK ART — flat crop, same values as       */
+  /* register's mobile book                     */
   /* ========================================= */
 
   .bookContainer {
     position: absolute;
     inset: 0;
 
-    background-size: var(--book-zoom-x) var(--book-zoom-y);
-    background-position: var(--book-pos-x) var(--book-pos-y);
+    width: 100%;
+    height: 100%;
+
+    background-size: 180% 100%;
+    background-position: left top;
     background-repeat: no-repeat;
   }
 
@@ -1241,6 +1242,8 @@
 
     padding: 0;
     display: block;
+
+    z-index: 5;
   }
 
   .eventsArea {
@@ -1256,13 +1259,13 @@
   }
 
   /* ========================================= */
-  /* LEFT PAGE — pinned to the book's left page */
-  /* using the shared frame coordinates.        */
-  /* Flex column: heading + search are fixed,   */
-  /* the list scrolls internally (flex: 1), and */
-  /* CONFIRM is a normal flow item AFTER the    */
-  /* list — so it can never overlap it and      */
-  /* never scrolls with it.                     */
+  /* LEFT PAGE — pinned onto the book's left    */
+  /* page using the shared frame coordinates.   */
+  /* Heading + search are fixed, the list       */
+  /* scrolls internally (flex: 1), and CONFIRM  */
+  /* is a normal flow item AFTER the list — so  */
+  /* it can never overlap it and never scrolls  */
+  /* with it.                                   */
   /* ========================================= */
 
   .eventsPage {
@@ -1272,6 +1275,8 @@
     left: var(--lp-left);
     width: var(--lp-width);
     height: var(--lp-height);
+
+    margin-left: 0;
 
     padding: 2.5vw 2vw;
     box-sizing: border-box;
@@ -1297,6 +1302,7 @@
     height: 8vw;
     min-height: 30px;
 
+    margin-right: 0;
     margin-bottom: 2vw;
 
     background-size: contain;
@@ -1347,17 +1353,31 @@
   }
 
   .eventItem {
-    width: 100%;
+    /* small inset so the filled state never touches
+       the page's printed border */
+    width: 96%;
 
     height: 8vw;
 
     min-height: 32px;
 
+    /* the base rule indents items to clear the wheel;
+       on mobile the wheel already has its own column */
+    margin: 0 auto;
+
     padding: 0 2.5vw;
 
     font-size: 2.7vw;
 
-    background-size: contain;
+    /*
+      MUST stay 100% 100% to match the ::before mask.
+
+      With `contain` the outline art shrank to preserve its
+      aspect ratio while the red fill still stretched to the
+      full button box — so the fill rendered wider than the
+      frame it sits in. Both now map to the same rectangle.
+    */
+    background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
   }
@@ -1370,6 +1390,44 @@
     line-height: 1;
   }
 
+  /* ========================================= */
+  /* NO SCALING, NO ANIMATION ON MOBILE         */
+  /*                                            */
+  /* Rows are already full-width inside a       */
+  /* narrow page, so any scale made the         */
+  /* highlighted row wider than its neighbours. */
+  /* The gradient fill + gold text carry the    */
+  /* state on their own here, and the fill      */
+  /* appears instantly instead of wiping in.    */
+  /* ========================================= */
+
+  .eventItem,
+  .eventItem.active,
+  .eventItem.selected,
+  .eventItem:active {
+    transform: none;
+
+    animation: none;
+
+    transition: none;
+  }
+
+  .eventItem::before,
+  .eventItem.active::before,
+  .eventItem.selected::before {
+    transition: none;
+  }
+
+  .eventItem span,
+  .eventItem.active span,
+  .eventItem.selected span {
+    transform: none;
+
+    letter-spacing: 0.02em;
+
+    transition: none;
+  }
+
   .message {
     flex: 1 1 auto;
 
@@ -1379,18 +1437,10 @@
   }
 
   /* ========================================= */
-  /* RIGHT PAGE — no longer used for content on */
-  /* mobile; the book art itself (zoomed in     */
-  /* .bookContainer above) already shows a bit  */
-  /* of the blank right page peeking past the   */
-  /* spine, which is all that's needed here.    */
+  /* RIGHT PAGE — not rendered on mobile (see   */
+  /* the isMobile guard in Events.tsx). Kept    */
+  /* hidden here as a belt-and-braces fallback. */
   /* ========================================= */
-
-  .infoPage {
-    min-height: 60vw;
-
-    padding: 0;
-  }
 
   .infoPage {
     display: none;
@@ -1433,14 +1483,16 @@
 
   /* ========================================= */
   /* CONFIRM BUTTON — normal flex-flow item,    */
-  /* always below the (scrollable) list, never  */
-  /* overlapping it, never scrolling with it.   */
+  /* always below the (scrollable) list.        */
   /* ========================================= */
 
   .confirmButton {
     position: static;
 
     flex-shrink: 0;
+
+    bottom: auto;
+    left: auto;
 
     transform: none;
 
@@ -1470,9 +1522,28 @@
 
 /* =========================================================== */
 /* SMALL MOBILE (<=600px)                                       */
+/* Same step-down the register page makes at this width.        */
 /* =========================================================== */
 
 @media (max-width: 600px) {
+  /*
+    No --lp-* overrides here on purpose: the book crop is the
+    same 180% 100% / left top at every mobile width, so the
+    fractions set in the 900px block already land correctly.
+    Overriding them here is what pushed the rows outside the
+    page border.
+  */
+
+  .bookFrame {
+    left: 8vw;
+    width: 98vw;
+    height: 74vh;
+  }
+
+  .bookContainer {
+    background-size: 180% 100%;
+  }
+
   .eventInfo {
     width: 85%;
     max-width: none;
@@ -1496,43 +1567,42 @@
   }
 
   .confirmButton {
-    width: 48vw;
-    height: 14vw;
+    width: 60%;
+    height: 12vw;
     min-width: 0;
     min-height: 0;
-    margin-top: 6vw;
-    font-size: 2.5vw;
+    margin: 4vw auto 0;
+    font-size: 3vw;
   }
 }
 
 /* ========================================= */
-/* SHORT HEIGHT                              */
+/* SHORT DESKTOP WINDOWS                     */
+/* Both queries carry min-width: 901px so     */
+/* they can never reach the mobile layout.    */
 /* ========================================= */
 
 @media (max-height: 800px) and (min-width: 901px) {
   .infoPage {
     padding-right: 35px;
     width: 50%;
-    // background-color: #38170b;
   }
+
   .eventsPage {
     padding-left: 100px;
   }
 }
 
-/* ========================================= */
-/* VERY SHORT DESKTOP WINDOWS                */
-/* ========================================= */
-
-@media (max-height: 900px)  {
-
-  .infoPage{
+@media (max-height: 900px) and (min-width: 901px) {
+  .infoPage {
     margin-right: 6%;
   }
-  .eventsPage{
+
+  .eventsPage {
     margin-left: 4%;
-  }x
-  .searchContainer{
+  }
+
+  .searchContainer {
     width: 90%;
     margin-right: 10%;
   }
