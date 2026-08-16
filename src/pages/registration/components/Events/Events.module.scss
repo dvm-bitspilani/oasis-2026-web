@@ -510,7 +510,8 @@
 }
 
 .eventItem.selected::before {
-  transform: scaleX(1);
+  -webkit-clip-path: inset(0 0 0 0);
+  clip-path: inset(0 0 0 0);
 }
 
 .eventItem.selected span {
@@ -780,23 +781,23 @@
 /* ========================================= */
 
 .eventControls {
-  width: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 70%;
 
+  width: 100%;
   height: 17vw;
   min-height: 220px;
   max-height: 290px;
 
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
 
-  justify-content: flex-start;
-
   flex-shrink: 0;
-
-  position: relative;
+  z-index: 20;
 }
 
 /* ========================================= */
@@ -804,52 +805,39 @@
 /* ========================================= */
 
 .eventActionButton {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+
   width: min(320px, 20vw);
-
   height: 5vw;
-
   min-width: 150px;
-
   min-height: 55px;
 
-  margin: 0 auto;
-
+  margin: 0;
   padding: 0;
 
   border: none;
-
   background-color: transparent;
-
   background-position: center;
-
   background-size: contain;
-
   background-repeat: no-repeat;
 
   color: #fed59b;
-
   font-family: "Cinzel", serif;
-
   font-size: clamp(15px, 1.2vw, 22px);
-
   font-weight: 700;
 
   cursor: pointer;
-
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
   text-align: center;
-
   line-height: 1;
 
   appearance: none;
-
   -webkit-appearance: none;
-
   flex-shrink: 0;
 
   transition:
@@ -858,13 +846,12 @@
 }
 
 .eventActionButton:hover {
-  transform: scale(1.06);
-
+  transform: translateX(-50%) scale(1.06);
   filter: brightness(1.1) drop-shadow(0 0 8px rgba(254, 213, 155, 0.55));
 }
 
 .eventActionButton:active {
-  transform: scale(0.96);
+  transform: translateX(-50%) scale(0.96);
 }
 
 /* ========================================= */
@@ -872,19 +859,20 @@
 /* ========================================= */
 
 .eventNavigation {
-  width: 100%;
+  position: absolute;
+  top: 6vw;
+  left: 50%;
+  transform: translateX(-50%);
 
+  width: 100%;
   height: 5vw;
   min-height: 55px;
 
-  margin-top: 1vw;
+  margin: 0;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
   gap: 1vw;
 
   flex-shrink: 0;
@@ -1048,49 +1036,38 @@
 
 .confirmButton {
   position: absolute;
-
   z-index: 20;
 
-  bottom: 3.5%;
+  bottom: 0;
   left: 50%;
-
   transform: translateX(-50%);
 
   width: min(240px, 16vw);
   height: 5vw;
-
   min-width: 150px;
   min-height: 55px;
 
   padding: 0;
-
   border: none;
 
   background-image: url("../../../../assets/registration/reg/btn.png");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
-
   background-color: transparent;
 
   color: #fed59b;
-
   font-family: "Cinzel", serif;
-
   font-size: clamp(15px, 1.2vw, 22px);
-
   font-weight: 700;
 
   display: flex;
   align-items: center;
   justify-content: center;
-
   text-align: center;
-
   line-height: 1;
 
   cursor: pointer;
-
   appearance: none;
   -webkit-appearance: none;
 
@@ -1102,7 +1079,6 @@
 
 .confirmButton:hover {
   transform: translateX(-50%) scale(1.08);
-
   filter: brightness(1.12) drop-shadow(0 0 10px rgba(254, 213, 155, 0.65));
 }
 
@@ -1112,11 +1088,8 @@
 
 .confirmButton:disabled {
   opacity: 0.45;
-
   cursor: not-allowed;
-
   filter: none;
-
   transform: translateX(-50%);
 }
 
@@ -1558,7 +1531,7 @@
   }
   .eventsPage{
     margin-left: 4%;
-  }
+  }x
   .searchContainer{
     width: 90%;
     margin-right: 10%;
