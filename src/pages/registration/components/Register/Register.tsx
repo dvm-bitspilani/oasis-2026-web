@@ -1223,7 +1223,7 @@ export default function Reg({
       provided: any
     ) => ({
       ...provided,
-      color: "#777",
+      color: "#6C1700",
     }),
 
     indicatorSeparator: () => ({
@@ -1448,6 +1448,7 @@ export default function Reg({
                     }
                     classNamePrefix="regselect"
                     placeholder="SELECT GENDER"
+                      menuPlacement="top"
                     value={
                       genderOptions.find(
                         (option) =>
@@ -1698,6 +1699,7 @@ export default function Reg({
                     styles={
                       customStyle
                     }
+                    menuPlacement="top"
                     classNamePrefix="regselect"
                     placeholder="SELECT CITY"
                     isDisabled={

@@ -1056,7 +1056,20 @@
 
   box-shadow: none !important;
 }
+:global(.regselect__control--is-disabled) {
+  background: transparent !important;
+  border: none !important;
+  opacity: 1 !important;
+  color: #6c1700;
+}
 
+:global(.regselect__control--is-disabled .regselect__placeholder) {
+  color: #6c1700 !important;
+  font-family: "Cinzel", sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  opacity: 1 !important;
+}
 :global(.regselect__value-container) {
   background: transparent !important;
 
@@ -1064,7 +1077,7 @@
 }
 
 :global(.regselect__placeholder) {
-  color: #777 !important;
+  color: #6c1700 !important;
 }
 
 :global(.regselect__single-value) {
