@@ -876,7 +876,7 @@ import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 
-import styles from "./register.module.scss";
+import styles from "./Register.module.scss";
 import Reginput from "./reginput";
 
 import RegBg from "../../../../assets/registration/reg/RegBg.png";

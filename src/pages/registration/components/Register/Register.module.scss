@@ -970,19 +970,29 @@
 
 
 .nextButton {
-  width: min(220px, 17vw);
+  width: min(320px, 20vw);
+
   height: 5vw;
+
   min-width: 150px;
+
   min-height: 55px;
-  margin: 2vw auto 0;
+
+  margin: 0 auto;
+
   padding: 0;
+
   border: none;
+
   background-color: transparent;
+
   background-position: center;
+
   background-size: contain;
+
   background-repeat: no-repeat;
 
-  color: #FED59B;
+  color: #fed59b;
 
   font-family: "Cinzel", serif;
 
@@ -1006,14 +1016,21 @@
 
   -webkit-appearance: none;
 
+  flex-shrink: 0;
+
   transition:
     transform 0.25s ease,
     filter 0.25s ease;
-
 }
 
 .nextButton:hover {
-  text-decoration: underline;
+  transform: scale(1.06);
+
+  filter: brightness(1.1) drop-shadow(0 0 8px rgba(254, 213, 155, 0.55));
+}
+
+.nextButton:active {
+  transform: scale(0.96);
 }
 
 /* ========================================= */
