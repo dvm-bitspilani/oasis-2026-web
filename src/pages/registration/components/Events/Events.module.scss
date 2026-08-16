@@ -55,16 +55,6 @@
   width: 20vw;
 }
 
-/* ========================================= */
-/* BOOK FRAME                                */
-/* Wraps bookContainer + content so mobile   */
-/* can share one exact coordinate box between */
-/* the book art and the UI on top of it.     */
-/* On desktop this is display:contents, so   */
-/* it's invisible to layout — bookContainer  */
-/* and content behave exactly as before.     */
-/* ========================================= */
-
 .bookFrame {
   display: contents;
 }
@@ -102,13 +92,6 @@
   justify-content: center;
 }
 
-/*
-  confirmButton now lives inside .content (see Events.tsx) so that
-  on mobile it can be positioned relative to the same book-frame box
-  as everything else. On desktop, .content's footprint is effectively
-  the same as .eventsContainer's centered content area, so bottom:3.5%
-  / left:50% below still lands in the same visual spot as before.
-*/
 
 /* ========================================= */
 /* EVENTS AREA                               */
@@ -309,8 +292,8 @@
    */
   top: 0;
 
-  width: 3.5vw;
-  height: 3.5vw;
+  width: 2.5vw;
+  height: 2.5vw;
 
   min-width: 100px;
   min-height: 100px;
@@ -330,13 +313,11 @@
 }
 
 .scrollbarWheel:hover {
-  scale: 1.01;
 }
 
 .scrollbarWheelDragging {
   cursor: grabbing;
 
-  scale: 1.12;
 }
 .eventItem {
   position: relative;
@@ -386,17 +367,6 @@
     filter 0.3s ease;
 }
 
-/* ========================================= */
-/* RED GRADIENT FILL — solid vector shape      */
-/* (clip-path, not raster mask), so it fills   */
-/* the full interior and never distorts while  */
-/* wiping in.                                  */
-/*                                             */
-/* NOTE: tweak the polygon() points below to   */
-/* match your inputBg.png's exact silhouette — */
-/* this is an approximation of the elongated   */
-/* hexagon/chevron shape from the screenshot.  */
-/* ========================================= */
 .eventItem::before {
   content: "";
 
@@ -418,9 +388,6 @@
   mask-position: center;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
-
-  /* transparent until hovered/selected — reveal via clip-path,
-     not scaleX, so the mask is never squished/distorted */
   -webkit-clip-path: inset(0 100% 0 0);
   clip-path: inset(0 100% 0 0);
 
@@ -1108,40 +1075,8 @@
   }
 }
 
-/* =========================================================== */
-/* MOBILE (<=900px)                                             */
-/*                                                               */
-/* THE CORE IDEA:                                                */
-/* .bookFrame becomes a real, sized box (instead of              */
-/* display:contents). .bookContainer and .content are both       */
-/* absolutely positioned at inset:0 *inside* that one box, so     */
-/* they share the exact same coordinate system — the book art     */
-/* and the heading/search/list can no longer drift apart.         */
-/*                                                                 */
-/* .bookContainer is zoomed in (background-size > 100%) and       */
-/* shifted (background-position) so the frame shows mostly the    */
-/* LEFT page, a sliver of background around the frame edges       */
-/* (via padding on .eventsContainer), and a sliver of the right   */
-/* page peeking at the frame's right/bottom edge.                 */
-/*                                                                 */
-/* .eventsPage is then positioned with percentages *of that same  */
-/* frame* so its box lands exactly on the book's left-page area.  */
-/*                                                                 */
-/* TUNING: --book-zoom-x / --book-zoom-y / --book-pos-x /         */
-/* --book-pos-y control how the book art is cropped, and          */
-/* --lp-top / --lp-left / --lp-width / --lp-height control where  */
-/* the left-page content box sits. These were estimated from a    */
-/* screenshot, not the real asset — nudge them to match yours.    */
-/* =========================================================== */
-
 @media (max-width: 900px) {
   .eventsContainer {
-    // CSS custom properties used by the rules below —
-    // tune these to match your actual book.png.
-
-    // How the book art is cropped inside the frame.
-    // Increase zoom / lower pos-x to crop further into the
-    // left page and away from any spine/gutter decoration.
     --book-zoom-x: 260%;
     --book-zoom-y: 140%;
     --book-pos-x: 14%;

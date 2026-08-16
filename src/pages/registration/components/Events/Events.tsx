@@ -1,10 +1,10 @@
-
-import {
+import React, {
   useEffect,
   useRef,
   useState,
   forwardRef,
 } from "react";
+import axios from "axios";
 
 import styles from "./Events.module.scss";
 
@@ -37,85 +37,6 @@ interface EventsProps {
 }
 
 /* ========================================= */
-/* TEST DATA                                 */
-/* ========================================= */
-
-const TEST_EVENTS: Event[] = [
-  {
-    id: 1,
-    name: "Battle Dance",
-    about:
-      "A high-energy dance battle where performers compete against each other and showcase their creativity, musicality and choreography.",
-  },
-  {
-    id: 2,
-    name: "Solo Dance",
-    about:
-      "A solo performance where dancers get the stage to themselves and express their unique style and personality.",
-  },
-  {
-    id: 3,
-    name: "Group Dance",
-    about:
-      "A team-based dance performance where synchronization, formations and collective creativity take center stage.",
-  },
-  {
-    id: 4,
-    name: "Classical Dance",
-    about:
-      "A celebration of classical dance forms combining traditional movements, storytelling and artistic expression.",
-  },
-  {
-    id: 5,
-    name: "Solo Singing",
-    about:
-      "A vocal performance where singers compete individually and showcase their voice, expression and musicality.",
-  },
-  {
-    id: 6,
-    name: "Battle of Bands",
-    about:
-      "Bands go head-to-head with their best performances and compete to win over the audience.",
-  },
-  {
-    id: 7,
-    name: "Instrumental",
-    about:
-      "A showcase of instrumental talent featuring musicians performing their favorite compositions.",
-  },
-  {
-    id: 8,
-    name: "Street Play",
-    about:
-      "A powerful theatrical performance designed to engage audiences through storytelling, acting and social themes.",
-  },
-  {
-    id: 9,
-    name: "Stage Play",
-    about:
-      "A traditional theatrical performance combining acting, dialogue, stagecraft and storytelling.",
-  },
-  {
-    id: 10,
-    name: "Mono Act",
-    about:
-      "A solo theatrical performance where one actor takes on the challenge of carrying the entire story.",
-  },
-  {
-    id: 11,
-    name: "Debate",
-    about:
-      "Participants present arguments, challenge opposing viewpoints and demonstrate their communication and reasoning skills.",
-  },
-  {
-    id: 12,
-    name: "Quiz",
-    about:
-      "Put your knowledge to the test with challenging questions across a wide range of topics.",
-  },
-];
-
-/* ========================================= */
 /* MOBILE BREAKPOINT                         */
 /* ========================================= */
 
@@ -127,7 +48,13 @@ const MOBILE_BREAKPOINT = 900;
 
 const Events = forwardRef<HTMLDivElement, EventsProps>(
   ({ userData, setUserData }, ref) => {
-    const [events] = useState<Event[]>(TEST_EVENTS);
+    /* ========================================= */
+    /* EVENTS DATA — fetched from the backend,   */
+    /* falls back to TEST_EVENTS on failure/empty */
+    /* ========================================= */
+
+    const [events, setEvents] = useState<Event[]>([]);
+    const [loading, setLoading] = useState(true);
 
     /* ========================================= */
     /* LIST / SCROLL REFS                        */
@@ -192,9 +119,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
     /* ========================================= */
 
     const [activeEvent, setActiveEvent] =
-      useState<Event | null>(
-        TEST_EVENTS[0] || null
-      );
+      useState<Event | null>(null);
 
     /* ========================================= */
     /* MODALS                                    */
@@ -205,6 +130,50 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
 
     const [eventsModal, setEventsModal] =
       useState(false);
+
+    /* ========================================= */
+    /* FETCH EVENTS                              */
+    /* ========================================= */
+
+    useEffect(() => {
+      axios
+        .get<Event[]>(
+          "https://bits-oasis.org/2026/main/registrations/events_details/"
+        )
+        .then((response) => {
+          console.log(
+            "EVENT API RESPONSE:",
+            response.data
+          );
+
+          if (Array.isArray(response.data)) {
+            setEvents(response.data);
+          } else {
+            setEvents([]);
+          }
+        })
+        .catch((error) => {
+          console.error(
+            "EVENT API ERROR:",
+            error
+          );
+
+          setEvents([]);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, []);
+
+    /* ========================================= */
+    /* AUTO SHOW FIRST EVENT ONCE LOADED         */
+    /* ========================================= */
+
+    useEffect(() => {
+      if (!loading && events.length > 0) {
+        setActiveEvent((current) => current ?? events[0]);
+      }
+    }, [loading, events]);
 
     /* ========================================= */
     /* FILTER EVENTS                             */
@@ -939,7 +908,15 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
 
                   {/* EVENTS LIST */}
 
-                  {filteredEvents.length >
+                  {loading ? (
+                    <div
+                      className={
+                        styles.message
+                      }
+                    >
+                      LOADING EVENTS...
+                    </div>
+                  ) : filteredEvents.length >
                   0 ? (
                     <div
                       className={
