@@ -598,7 +598,7 @@
     align-items: center;
     justify-content: center;
 
-    font-size: clamp(1.2rem, 6vw, 1.7rem);
+    font-size: clamp(1.6rem, 8vw, 2.4rem);
     line-height: 1;
     text-align: center;
 
@@ -673,7 +673,7 @@
 
 @media (max-width: 600px) {
   .registerContainer {
-    --hdr-height: 40px;
+    --hdr-height: 60px;
     --ftr-height: 50px;
   }
 
