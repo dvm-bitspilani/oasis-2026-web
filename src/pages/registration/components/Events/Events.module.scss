@@ -1595,6 +1595,14 @@
   .eventsPage {
     padding-left: 100px;
   }
+  .scrollbarLine{
+    height: 80%;
+  }
+  .eventControls{
+    top:55% ;
+    height:10vh ;
+  }
+  
 }
 
 @media (max-height: 900px) and (min-width: 901px) {
