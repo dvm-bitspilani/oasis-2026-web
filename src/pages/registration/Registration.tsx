@@ -35,6 +35,8 @@ import closedBook from "/closedBook.png";
 import Syamsiah from "../../assets/fonts/Syamsiah Arabic.ttf";
 import EB from "../../assets/fonts/EBGaramond-Medium.ttf";
 import Cinzel from "../../assets/fonts/Cinzel-VariableFont_wght.ttf";
+import Scroll1 from "/instructionsScroll.png";
+import Scroll2 from "/instructionsScrollLong.png";
 
 const registrationAssets = [
   RegBg,
@@ -54,7 +56,9 @@ const registrationAssets = [
   closedBook,
   Syamsiah,
   EB,
-  Cinzel
+  Cinzel,
+  Scroll1,
+  Scroll2
 ];
 
 // interface RegistrationProps {
