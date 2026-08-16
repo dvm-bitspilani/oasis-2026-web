@@ -5,10 +5,9 @@ import { useTransition } from "../context/TransitionProvider";
 
 const LINKS = [
   { label: "Home", to: "/" },
-  { label: "reg", to: "/reg" },
-  { label: "Events", to: "/eventsReg" },
-  { label: "About Us", to: "/about" },
-  { label: "Register", to: "/register" },
+  { label: "Events", to: "/comingsoon" },
+  { label: "About Us", to: "/comingsoon" },
+  { label: "Contact Us", to: "/comingsoon" },
 ];
 
 export default function Nav() {

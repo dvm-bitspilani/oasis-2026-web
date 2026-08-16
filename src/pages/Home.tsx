@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 
 import styles from "../styles/Home.module.scss";
+
 import bg from "../assets/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg";
 import sandImg from "../assets/sandImg.png";
 import sandMob from "../assets/sandMob.png";
@@ -107,16 +109,20 @@ const CLOUDS_MOBILE: Cloud[] = [
     duration: 380,
   },
 ];
+
 const bgImg = window.innerWidth < 650 ? sandMob : sandImg;
+
 const MOON_CLOUD_TINT =
   "brightness(0.35) sepia(1) hue-rotate(20deg) saturate(5)";
 
 export default function Home() {
+  const navigate = useNavigate();
+
   const containerRef = useRef<HTMLDivElement>(null);
   const camelRef = useRef(null);
   const cloudsRef = useRef<HTMLDivElement>(null);
   const cloudRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const castleRef = useRef<HTMLDivElement>(null); // NEW
+  const castleRef = useRef<HTMLDivElement>(null);
 
   const moonRef = useRef<HTMLDivElement>(null);
   const portholeRef = useRef<HTMLDivElement>(null);
@@ -128,31 +134,35 @@ export default function Home() {
   );
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
+    const onResize = () =>
+      setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
+
     window.addEventListener("resize", onResize);
+
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
   const CLOUDS = isMobile ? CLOUDS_MOBILE : CLOUDS_DESKTOP;
 
-  // NEW: on landing, rise the castle up from below its resting spot.
-  // Because .sand (z-index 3) sits above .castle (z-index 2), the sand
-  // naturally masks the bottom of the castle while it's still low, so
-  // rising it up reads as "emerging out of the sand" with no clip-path.
+  // Castle entrance animation
   useEffect(() => {
     const castleEl = castleRef.current;
+
     if (!castleEl) return;
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
         castleEl,
-        { yPercent: 60, opacity: 0 },
+        {
+          yPercent: 60,
+          opacity: 0,
+        },
         {
           yPercent: 0,
           opacity: 1,
           duration: 1.8,
           ease: "power3.out",
-          delay: 0.3, // small pause after page load before it rises
+          delay: 0.3,
         },
       );
     });
@@ -160,7 +170,7 @@ export default function Home() {
     return () => ctx.revert();
   }, []);
 
-  // Drives the real clouds.
+  // Drives the real clouds
   useEffect(() => {
     const ctx = gsap.context(() => {
       cloudRefs.current.forEach((cloud, i) => {
@@ -187,6 +197,7 @@ export default function Home() {
     }, cloudsRef);
 
     return () => ctx.revert();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile]);
 
@@ -219,6 +230,7 @@ export default function Home() {
 
       cloudRefs.current.forEach((real, i) => {
         const overlay = overlayCloudRefs.current[i];
+
         if (real && overlay) {
           overlay.style.transform = real.style.transform;
         }
@@ -228,10 +240,11 @@ export default function Home() {
     };
 
     raf = requestAnimationFrame(tick);
+
     return () => cancelAnimationFrame(raf);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile]);
-
 
   return (
     <div className={styles.container} ref={containerRef}>
@@ -250,8 +263,11 @@ export default function Home() {
         <img src={bgImg} className={styles.sandImg} alt="" />
       </div>
 
-      {/* CHANGED: added castleRef */}
-      <div className={styles.castle} data-castle-drown ref={castleRef}>
+      <div
+        className={styles.castle}
+        data-castle-drown
+        ref={castleRef}
+      >
         <img src={Castle} className={styles.castleImg} alt="" />
       </div>
 
@@ -261,7 +277,11 @@ export default function Home() {
             key={i}
             className={styles.cloud}
             data-cloud-string
-            style={{ top: c.top, left: c.left, width: c.width }}
+            style={{
+              top: c.top,
+              left: c.left,
+              width: c.width,
+            }}
             ref={(el) => {
               cloudRefs.current[i] = el;
             }}
@@ -271,12 +291,26 @@ export default function Home() {
         ))}
       </div>
 
-      <div className={styles.moon} data-moon-shrink ref={moonRef}>
-        <img src={Moon} className={styles.moonImg} alt="" />
+      <div
+        className={styles.moon}
+        data-moon-shrink
+        ref={moonRef}
+      >
+        <img
+          src={Moon}
+          className={styles.moonImg}
+          alt=""
+        />
       </div>
 
-      <div className={styles.moonCloudOverlay} ref={portholeRef}>
-        <div className={styles.moonCloudOverlayInner} ref={portholeInnerRef}>
+      <div
+        className={styles.moonCloudOverlay}
+        ref={portholeRef}
+      >
+        <div
+          className={styles.moonCloudOverlayInner}
+          ref={portholeInnerRef}
+        >
           {CLOUDS.map((c, i) => (
             <div
               key={i}
@@ -297,15 +331,27 @@ export default function Home() {
         </div>
       </div>
 
-      <div className={styles.oasisLogo} data-transition-fade>
+      <div
+        className={styles.oasisLogo}
+        data-transition-fade
+      >
         <img src={LogoOasis} alt="Oasis" />
       </div>
 
-      <div className={styles.regBtn} data-transition-fade>
-        <img src={RegBtn} alt="" />
+      {/* REGISTER BUTTON */}
+      <div
+        className={styles.regBtn}
+        data-transition-fade
+        onClick={() => navigate("/register")}
+      >
+        <img src={RegBtn} alt="Register" />
       </div>
 
-      <div ref={camelRef} className={styles.camelLand} data-transition-fade>
+      <div
+        ref={camelRef}
+        className={styles.camelLand}
+        data-transition-fade
+      >
         <img src={camelLand} alt="" />
       </div>
 
@@ -324,6 +370,7 @@ export default function Home() {
             height="100"
             className={styles.socialLink}
           />
+
           <a
             href="https://www.instagram.com/bitsoasis/"
             target="_blank"
@@ -338,6 +385,7 @@ export default function Home() {
               className={styles.socialLink}
             />
           </a>
+
           <a
             href="https://www.linkedin.com/company/oasis24-bits-pilani/"
             target="_blank"
@@ -352,7 +400,12 @@ export default function Home() {
               className={styles.socialLink}
             />
           </a>
-          <a href="" target="_blank" rel="noreferrer">
+
+          <a
+            href=""
+            target="_blank"
+            rel="noreferrer"
+          >
             <image
               href={youtubeIcon}
               x="53"
@@ -362,6 +415,7 @@ export default function Home() {
               className={styles.socialLink}
             />
           </a>
+
           <a
             href="#"
             target="_blank"
