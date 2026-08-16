@@ -709,11 +709,11 @@ export default function Reg({
 }: RegProps) {
   const [selectedState, setSelectedState] = useState("");
 
-  const [availableCities, setAvailableCities] = useState
+  const [availableCities, setAvailableCities] = useState<
     { value: string; label: string }[]
   >([]);
 
-  const [collegeOptions, setCollegeOptions] = useState
+  const [collegeOptions, setCollegeOptions] = useState<
     { value: string; label: string }[]
   >([]);
 

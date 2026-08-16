@@ -409,11 +409,6 @@
     #400E00 100%
   );
 
-  /*
-   * Solid filled silhouette of inputBg.png's exact
-   * outline shape — traces every curve/notch precisely,
-   * unlike an approximated clip-path polygon.
-   */
   -webkit-mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
   mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
 
@@ -424,14 +419,17 @@
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
 
-  /* transparent until hovered/selected */
-  transform: scaleX(0);
-  transform-origin: left center;
+  /* transparent until hovered/selected — reveal via clip-path,
+     not scaleX, so the mask is never squished/distorted */
+  -webkit-clip-path: inset(0 100% 0 0);
+  clip-path: inset(0 100% 0 0);
 
   z-index: 0;
   pointer-events: none;
 
-  transition: transform 0.45s ease;
+  transition:
+    -webkit-clip-path 0.45s ease,
+    clip-path 0.45s ease;
 }
 /* ========================================= */
 /* EVENT LABEL                               */
@@ -483,7 +481,8 @@
 
 .eventItem:hover::before,
 .eventItem.active::before {
-  transform: scaleX(1);
+  -webkit-clip-path: inset(0 0 0 0);
+  clip-path: inset(0 0 0 0);
 }
 
 .eventItem:hover span,
@@ -496,7 +495,7 @@
 
   text-shadow:
     0 0 6px rgba(254, 213, 155, 0.8);
-}
+} 
 /* ========================================= */
 /* SELECTED — persists after click,           */
 /* independent of hover                       */
