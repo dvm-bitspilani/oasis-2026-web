@@ -147,7 +147,7 @@
 .chooseEventsHeading {
   width: 100%;
 
-  margin: 0 0 1.5vw;
+  margin: 0 0 3vw;
 
   color: #6c1700;
 
@@ -218,11 +218,22 @@
 /* EVENTS LIST                               */
 /* ========================================= */
 
-.eventsList {
-  width: 100%;
+.eventsScrollArea {
+  position: relative;
 
+  width: 100%;
   height: 28vw;
   max-height: 55svh;
+
+  display: flex;
+  align-items: stretch;
+
+  box-sizing: border-box;
+}
+
+.eventsList {
+  width: calc(100% - 1.8vw);
+  height: 100%;
 
   display: flex;
   flex-direction: column;
@@ -238,58 +249,119 @@
 
   background: transparent;
 
-  /* VISIBLE SCROLLBAR */
-  scrollbar-width: thin;
-  scrollbar-color: #a86618 transparent;
+  /* Native scrollbar is replaced by the custom line + wheel. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
 }
-
-/* Chrome / Edge / Safari */
 
 .eventsList::-webkit-scrollbar {
-  width: 6px;
-}
-
-.eventsList::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.eventsList::-webkit-scrollbar-thumb {
-  background: #a86618;
-  border-radius: 10px;
-}
-
-.eventsList::-webkit-scrollbar-thumb:hover {
-  background: #6c1700;
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* ========================================= */
-/* EVENT ITEM                                */
+/* CUSTOM SCROLLBAR                          */
 /* ========================================= */
+.customScrollbar {
+  position: relative;
 
+  width: 3vw;
+  min-width: 40px;
+
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  user-select: none;
+}
+
+.scrollbarLine {
+  position: absolute;
+
+  top: 0;
+  left: 50%;
+
+  width: 50%;
+  height: 100%;
+
+  transform: translateX(-50%);
+
+  object-fit: fill;
+
+  pointer-events: none;
+}
+
+.scrollbarWheel {
+  position: absolute;
+
+  /*
+   * CENTER OF WHEEL = CENTER OF LINE
+   */
+  left: 43%;
+
+  /*
+   * scrollY controls this value
+   */
+  top: 0;
+
+  width: 3.5vw;
+  height: 3.5vw;
+
+  min-width: 100px;
+  min-height: 100px;
+
+  transform: translate(-50%, -50%);
+
+  cursor: grab;
+
+  touch-action: none;
+  user-select: none;
+
+  z-index: 10;
+
+  transition:
+    scale 0.15s ease,
+    filter 0.15s ease;
+}
+
+.scrollbarWheel:hover {
+  scale: 1.01;
+}
+
+.scrollbarWheelDragging {
+  cursor: grabbing;
+
+  scale: 1.12;
+}
 .eventItem {
   position: relative;
 
   flex: 0 0 auto;
 
-  width: 100%;
+  width: 90%;
 
   min-height: 42px;
   height: 3.5vw;
 
-  margin: 0;
+  margin-left: 5%;
   padding: 0 1vw;
 
   border: none;
 
   background-color: transparent;
+
   background-position: center;
-  background-size: contain;
+  background-size: 100% 100%;
   background-repeat: no-repeat;
 
   color: #38170b;
 
   font-family: "Cinzel", serif;
-
   font-size: clamp(12px, 1vw, 18px);
 
   cursor: pointer;
@@ -315,6 +387,53 @@
 }
 
 /* ========================================= */
+/* RED GRADIENT FILL — solid vector shape      */
+/* (clip-path, not raster mask), so it fills   */
+/* the full interior and never distorts while  */
+/* wiping in.                                  */
+/*                                             */
+/* NOTE: tweak the polygon() points below to   */
+/* match your inputBg.png's exact silhouette — */
+/* this is an approximation of the elongated   */
+/* hexagon/chevron shape from the screenshot.  */
+/* ========================================= */
+.eventItem::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background: radial-gradient(
+    circle at center,
+    #671C07 0%,
+    #400E00 100%
+  );
+
+  /*
+   * Solid filled silhouette of inputBg.png's exact
+   * outline shape — traces every curve/notch precisely,
+   * unlike an approximated clip-path polygon.
+   */
+  -webkit-mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
+  mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
+
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  /* transparent until hovered/selected */
+  transform: scaleX(0);
+  transform-origin: left center;
+
+  z-index: 0;
+  pointer-events: none;
+
+  transition: transform 0.45s ease;
+}
+/* ========================================= */
 /* EVENT LABEL                               */
 /* ========================================= */
 
@@ -334,29 +453,25 @@
 
   line-height: 1;
 
+  color: #38170b;
+
   transition:
     transform 0.3s ease,
     letter-spacing 0.3s ease,
-    text-shadow 0.3s ease;
+    text-shadow 0.3s ease,
+    color 0.3s ease;
 }
 
 /* ========================================= */
-/* HOVER / ACTIVE                            */
+/* HOVER — only the item under the cursor      */
+/* ========================================= */
+
+/* ========================================= */
+/* HOVER + ACTIVE                            */
 /* ========================================= */
 
 .eventItem:hover,
 .eventItem.active {
-  background-image:
-    linear-gradient(
-      90deg,
-      #fed59b 0%,
-      #e7ae65 45%,
-      #fed59b 100%
-    ),
-    url("../../../../assets/registration/reg/inputBg.png");
-
-  background-blend-mode: multiply;
-
   transform: scale(1.06);
 
   filter:
@@ -366,48 +481,45 @@
     );
 }
 
+.eventItem:hover::before,
+.eventItem.active::before {
+  transform: scaleX(1);
+}
+
 .eventItem:hover span,
 .eventItem.active span {
   transform: scale(1.04);
 
   letter-spacing: 0.04em;
 
-  text-shadow:
-    0 0 6px rgba(229, 195, 132, 0.7);
-}
+  color: #fed59b;
 
+  text-shadow:
+    0 0 6px rgba(254, 213, 155, 0.8);
+}
 /* ========================================= */
-/* CLICKED / SELECTED                        */
+/* SELECTED — persists after click,           */
+/* independent of hover                       */
 /* ========================================= */
 
 .eventItem.selected {
-  background-image:
-    linear-gradient(
-      90deg,
-      #fed59b 0%,
-      #d99a4a 45%,
-      #fed59b 100%
-    ),
-    url("../../../../assets/registration/reg/inputBg.png");
-
-  background-blend-mode: multiply;
-
   transform: scale(1.04);
 
-  filter:
-    brightness(1.12)
-    drop-shadow(
-      0 0 10px rgba(229, 195, 132, 0.65)
-    );
+  filter: brightness(1.12) drop-shadow(0 0 10px rgba(229, 195, 132, 0.65));
 
   animation: eventSelected 0.35s ease-out;
+}
+
+.eventItem.selected::before {
+  transform: scaleX(1);
 }
 
 .eventItem.selected span {
   letter-spacing: 0.04em;
 
-  text-shadow:
-    0 0 7px rgba(229, 195, 132, 0.8);
+  color: #fed59b;
+
+  text-shadow: 0 0 7px rgba(254, 213, 155, 0.8);
 }
 
 /* ========================================= */
@@ -417,11 +529,7 @@
 .eventItem.selected:hover {
   transform: scale(1.08);
 
-  filter:
-    brightness(1.15)
-    drop-shadow(
-      0 0 14px rgba(254, 213, 155, 0.85)
-    );
+  filter: brightness(1.15) drop-shadow(0 0 14px rgba(254, 213, 155, 0.85));
 }
 
 /* ========================================= */
@@ -445,7 +553,6 @@
 .eventItem:active {
   transform: scale(0.97);
 }
-
 /* ========================================= */
 /* MESSAGE                                   */
 /* ========================================= */
@@ -479,7 +586,8 @@
 
   min-height: 34vw;
 
-  padding-left: 25px;
+  padding-left: 35px;
+  padding-right: 35px;
 
   box-sizing: border-box;
 
@@ -549,9 +657,9 @@
 
   max-width: 450px;
 
-  height: 30vw;
+  height: auto;
   min-height: 380px;
-  max-height: 520px;
+  max-height: none;
 
   display: flex;
 
@@ -587,9 +695,9 @@
 .eventContent {
   width: 100%;
 
-  height: 12vw;
+  height: auto;
   min-height: 150px;
-  max-height: 230px;
+  max-height: none;
 
   display: flex;
 
@@ -599,7 +707,7 @@
 
   justify-content: flex-start;
 
-  overflow: hidden;
+  overflow: visible;
 
   flex-shrink: 0;
 }
@@ -611,10 +719,10 @@
 .eventTitle {
   width: 100%;
 
-  height: 3.5vw;
+  height: auto;
   min-height: 45px;
 
-  margin: 0 0 1vw;
+  margin: 1vw 0 1.5vw;
 
   color: #38170b;
 
@@ -650,7 +758,7 @@
 
   max-width: 32vw;
 
-  height: 7vw;
+  height: auto;
   min-height: 100px;
 
   margin: 0;
@@ -665,7 +773,7 @@
 
   text-align: center;
 
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* ========================================= */
@@ -753,11 +861,7 @@
 .eventActionButton:hover {
   transform: scale(1.06);
 
-  filter:
-    brightness(1.1)
-    drop-shadow(
-      0 0 8px rgba(254, 213, 155, 0.55)
-    );
+  filter: brightness(1.1) drop-shadow(0 0 8px rgba(254, 213, 155, 0.55));
 }
 
 .eventActionButton:active {
@@ -944,101 +1048,6 @@
 /* ========================================= */
 
 .confirmButton {
-  position: relative;
-
-  z-index: 20;
-
-  bottom: auto;
-
-  left: auto;
-
-  transform: none;
-
-  width: min(240px, 16vw);
-
-  height: 5vw;
-
-  min-width: 150px;
-
-  min-height: 55px;
-
-  margin: 1vw auto 0;
-
-  padding: 0;
-
-  border: none;
-
-  background-image: url("../../../../assets/registration/reg/btn.png");
-
-  background-position: center;
-
-  background-size: contain;
-
-  background-repeat: no-repeat;
-
-  background-color: transparent;
-
-  color: #fed59b;
-
-  font-family: "Cinzel", serif;
-
-  font-size: clamp(15px, 1.2vw, 22px);
-
-  font-weight: 700;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  text-align: center;
-
-  line-height: 1;
-
-  cursor: pointer;
-
-  appearance: none;
-
-  -webkit-appearance: none;
-
-  flex-shrink: 0;
-
-  transition:
-    transform 0.25s ease,
-    filter 0.25s ease,
-    opacity 0.25s ease;
-}
-
-.confirmButton:hover {
-  transform: scale(1.08);
-
-  filter:
-    brightness(1.12)
-    drop-shadow(
-      0 0 10px rgba(254, 213, 155, 0.65)
-    );
-}
-
-.confirmButton:active {
-  transform: scale(0.96);
-}
-
-.confirmButton:disabled {
-  opacity: 0.45;
-
-  cursor: not-allowed;
-
-  filter: none;
-
-  transform: none;
-}
-
-/* ========================================= */
-/* CONFIRM BUTTON                            */
-/* ========================================= */
-
-.confirmButton {
   position: absolute;
 
   z-index: 20;
@@ -1095,11 +1104,7 @@
 .confirmButton:hover {
   transform: translateX(-50%) scale(1.08);
 
-  filter:
-    brightness(1.12)
-    drop-shadow(
-      0 0 10px rgba(254, 213, 155, 0.65)
-    );
+  filter: brightness(1.12) drop-shadow(0 0 10px rgba(254, 213, 155, 0.65));
 }
 
 .confirmButton:active {
@@ -1231,11 +1236,7 @@
 
     width: 5%;
 
-    background: linear-gradient(
-      to right,
-      transparent,
-      rgba(0, 0, 0, 0.22)
-    );
+    background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.22));
 
     pointer-events: none;
   }
@@ -1338,19 +1339,39 @@
     font-size: 2.7vw;
   }
 
-  .eventsList {
+  .eventsScrollArea {
     width: 100%;
     height: auto;
 
     flex: 1 1 auto;
     min-height: 0;
     max-height: none;
+  }
 
-    gap: 1.3vw;
+  .eventsList {
+    width: calc(100% - 5vw);
+    height: 100%;
+
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
 
     gap: 2vw;
 
     padding: 0;
+  }
+
+  .customScrollbar {
+    width: 5vw;
+    min-width: 18px;
+    margin-left: 0.5vw;
+  }
+
+  .scrollbarWheel {
+    width: 7vw;
+    height: 7vw;
+    min-width: 24px;
+    min-height: 24px;
   }
 
   .eventItem {
@@ -1399,16 +1420,42 @@
     padding: 0;
   }
 
+  .infoPage {
+    display: none;
+  }
+
+  .eventNavigation {
+    margin-top: 4vw;
+    gap: 2vw;
+  }
+
+  .pageNumbers {
+    gap: 2.5vw;
+  }
+
+  .navArrow {
+    width: 9vw;
+    height: 11vw;
+    min-width: 0;
+    min-height: 0;
+    font-size: 12vw;
+  }
+
+  .pageNumber {
+    min-width: 6vw;
+    font-size: 6vw;
+  }
+
+  .pageNumber.currentPage {
+    font-size: 9vw;
+  }
+
   .rightOuter {
     width: 100%;
-
     min-height: 60vw;
     margin-left: 0;
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
   }
 
@@ -1453,257 +1500,36 @@
 /* SMALL MOBILE (<=600px)                                       */
 /* =========================================================== */
 
+@media (max-width: 600px) {
   .eventInfo {
     width: 85%;
-
     max-width: none;
-
     justify-content: center;
   }
 
   .eventTitle {
     margin-bottom: 4vw;
-
     font-size: clamp(1.7rem, 8vw, 3rem);
   }
 
   .eventDescription {
     max-width: 80vw;
-
     font-size: 3.7vw;
-
     line-height: 1.6;
   }
 
-  /* ========================================= */
-  /* ADD / REMOVE                              */
-  /* ========================================= */
-
-@media (max-width: 900px) {
-  .eventsContainer {
-    // Where the left-page content box sits within the frame.
-    --lp-top: 6%;
-    --lp-left: 15%;
-    --lp-width: 70%;
-    --lp-height: 91%;
-
-    min-width: 0;
-
-    min-height: 0;
-
-    margin-top: 5vw;
-
-    font-size: 4vw;
-
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-
-  .leftbottom,
-  .lefttop,
-  .rightbottom,
-  .righttop {
-    width: 26vw;
-  }
-
-  /* ========================================= */
-  /* BOOK FRAME — same recipe as register's     */
-  /* .bookContainer: absolute, pinned across    */
-  /* the viewport width, vertically centered.   */
-  /* ========================================= */
-
-  .eventNavigation {
-    margin-top: 4vw;
-
-    gap: 2vw;
-  }
-
-  .pageNumbers {
-    gap: 2.5vw;
-  }
-
-  .navArrow {
-    width: 9vw;
-
-    height: 11vw;
-
-    min-width: 0;
-
-    min-height: 0;
-
-    font-size: 12vw;
-  }
-
-  .pageNumber {
-    min-width: 6vw;
-
-    font-size: 6vw;
-  }
-
-  .pageNumber.currentPage {
-    font-size: 9vw;
-  }
-
-  /* ========================================= */
-  /* CONTENT — overlays the frame exactly       */
-  /* ========================================= */
-
-  .content {
-    position: absolute;
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    padding: 0;
-    display: block;
-  }
-
-  .eventsArea {
-    position: relative;
-
-    width: 100%;
-    height: 100%;
-
-    margin-top: 0;
-
-    display: block;
-    gap: 0;
-  }
-
-  /* ========================================= */
-  /* LEFT PAGE — pinned to the book's left page */
-  /* using the shared frame coordinates.        */
-  /* Flex column: heading + search are fixed,   */
-  /* the list scrolls internally (flex: 1), and */
-  /* CONFIRM is a normal flow item AFTER the    */
-  /* list — so it can never overlap it and      */
-  /* never scrolls with it.                     */
-  /* ========================================= */
-
-.confirmButton {
-  position: absolute;
-
-  z-index: 20;
-
-  bottom: 3.5%;
-  left: 50%;
-
-  transform: translateX(-50%);
-
-  width: min(240px, 16vw);
-  height: 5vw;
-
-  min-width: 150px;
-  min-height: 55px;
-
-  padding: 0;
-
-  border: none;
-
-  background-image: url("../../../../assets/registration/reg/btn.png");
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
-
-  background-color: transparent;
-
-  color: #fed59b;
-
-  font-family: "Cinzel", serif;
-
-  font-size: clamp(15px, 1.2vw, 22px);
-
-  font-weight: 700;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-
-  line-height: 1;
-
-  cursor: pointer;
-
-  appearance: none;
-  -webkit-appearance: none;
-
-  transition:
-    transform 0.25s ease,
-    filter 0.25s ease,
-    opacity 0.25s ease;
-}
-
-.confirmButton:hover {
-  transform: translateX(-50%) scale(1.08);
-
-  filter:
-    brightness(1.12)
-    drop-shadow(
-      0 0 10px rgba(254, 213, 155, 0.65)
-    );
-}
-
-.confirmButton:active {
-  transform: translateX(-50%) scale(0.96);
-}
-
-.confirmButton:disabled {
-  opacity: 0.45;
-
-  cursor: not-allowed;
-
-  filter: none;
-
-  transform: translateX(-50%);
-}
-
-/* ========================================= */
-/* MOBILE CONFIRM BUTTON                     */
-/* ========================================= */
-
-@media (max-width: 650px) {
-  .confirmButton {
-    position: static;
-
-    bottom: auto;
-    left: auto;
-
-    transform: none;
-
-    width: 48vw;
-    height: 14vw;
-
-    min-width: 0;
-    min-height: 0;
-
-    margin-top: 6vw;
-
-    font-size: 2.5vw;
-  }
-
-  .confirmButton:hover {
-    transform: scale(1.05);
-  }
-
-  .confirmButton:active {
-    transform: scale(0.96);
-  }
-
-  .confirmButton:disabled {
-    transform: none;
-  }
-
-  /* ========================================= */
-  /* EMPTY                                    */
-  /* ========================================= */
-
   .emptyInfo {
     width: 85%;
-
     flex: 1;
+  }
+
+  .confirmButton {
+    width: 48vw;
+    height: 14vw;
+    min-width: 0;
+    min-height: 0;
+    margin-top: 6vw;
+    font-size: 2.5vw;
   }
 }
 
@@ -1711,13 +1537,31 @@
 /* SHORT HEIGHT                              */
 /* ========================================= */
 
-@media (max-height: 800px) {
-  .infoPage{
-    padding-right: 100px;
+@media (max-height: 800px) and (min-width: 901px) {
+  .infoPage {
+    padding-right: 35px;
     width: 50%;
     // background-color: #38170b;
   }
-  .eventsPage{
+  .eventsPage {
     padding-left: 100px;
+  }
+}
+
+/* ========================================= */
+/* VERY SHORT DESKTOP WINDOWS                */
+/* ========================================= */
+
+@media (max-height: 900px)  {
+
+  .infoPage{
+    margin-right: 6%;
+  }
+  .eventsPage{
+    margin-left: 4%;
+  }
+  .searchContainer{
+    width: 90%;
+    margin-right: 10%;
   }
 }
