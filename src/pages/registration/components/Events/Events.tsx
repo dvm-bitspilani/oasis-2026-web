@@ -713,9 +713,6 @@
 // }
 
 
-
-
-
 import { useEffect, useState, forwardRef } from "react";
 import axios from "axios";
 
@@ -827,6 +824,12 @@ const TEST_EVENTS: Event[] = [
 ];
 
 /* ========================================= */
+/* MOBILE BREAKPOINT                         */
+/* ========================================= */
+
+const MOBILE_BREAKPOINT = 900;
+
+/* ========================================= */
 /* COMPONENT                                 */
 /* ========================================= */
 
@@ -860,7 +863,10 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
     const [confirmModal, setConfirmModal] = useState(false);
 
     /*
-      This is the old mobile event modal.
+      Event details modal.
+      On mobile (<900px) this is now the primary way of viewing
+      an event, since there's no room for the right page. On
+      desktop it stays unused (hover fills the right page instead).
     */
     const [eventsModal, setEventsModal] = useState(false);
 
@@ -931,18 +937,30 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
     };
 
     /* ========================================= */
-    /* SHOW EVENT                                 */
+    /* SHOW EVENT (opens modal on mobile)        */
     /* ========================================= */
 
     const showEvent = (event: Event) => {
       setActiveEvent(event);
 
-      /*
-        Open the modal on smaller screens.
-        The CSS can control the exact breakpoint.
-      */
-      if (window.innerWidth < 1200) {
+      if (window.innerWidth < MOBILE_BREAKPOINT) {
         setEventsModal(true);
+      }
+    };
+
+    /* ========================================= */
+    /* EVENT ITEM CLICK (mobile vs desktop)      */
+    /* ========================================= */
+
+    const handleEventItemClick = (event: Event) => {
+      if (window.innerWidth < MOBILE_BREAKPOINT) {
+        // Mobile: tapping an event opens the details modal.
+        // Selecting/deselecting happens from inside the modal.
+        showEvent(event);
+      } else {
+        // Desktop: click toggles selection directly,
+        // hover already fills the right page with details.
+        handleEvent(event);
       }
     };
 
@@ -1087,6 +1105,17 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
           />
 
           {/* ================================= */}
+          {/* BOOK FRAME                         */}
+          {/* Wraps the book art + content so    */}
+          {/* mobile can position content        */}
+          {/* directly on top of the book pages. */}
+          {/* On desktop this is a no-op         */}
+          {/* (display: contents).               */}
+          {/* ================================= */}
+
+          <div className={styles.bookFrame}>
+
+          {/* ================================= */}
           {/* BOOK                               */}
           {/* ================================= */}
 
@@ -1172,7 +1201,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                             setActiveEvent(event)
                           }
                           onClick={() =>
-                            handleEvent(event)
+                            handleEventItemClick(event)
                           }
                         >
                           <span>
@@ -1187,10 +1216,32 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                     NO EVENTS FOUND
                   </div>
                 )}
+
+                {/* ================================= */}
+                {/* CONFIRM BUTTON                     */}
+                {/* Lives here (after the list) so on  */}
+                {/* mobile it's a normal flex-flow     */}
+                {/* sibling of the scrollable list —   */}
+                {/* it can never overlap the list, and */}
+                {/* stays outside the scrolling area.  */}
+                {/* Desktop position is unaffected     */}
+                {/* (still absolute, still resolves    */}
+                {/* against .content — see SCSS).      */}
+                {/* ================================= */}
+
+                <button
+                  type="button"
+                  className={styles.confirmButton}
+                  onClick={handleSubmit}
+                  disabled={selectedEvents.length === 0}
+                >
+                  CONFIRM
+                </button>
               </div>
 
               {/* ================================= */}
-              {/* RIGHT PAGE                        */}
+              {/* RIGHT PAGE (hidden on mobile,      */}
+              {/* peeks as a sliver behind the spine)*/}
               {/* ================================= */}
 
               <div className={styles.infoPage}>
@@ -1353,19 +1404,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
               </div>
             </div>
           </div>
-
-          {/* ================================= */}
-          {/* CONFIRM BUTTON                     */}
-          {/* ================================= */}
-
-          <button
-            type="button"
-            className={styles.confirmButton}
-            onClick={handleSubmit}
-            disabled={selectedEvents.length === 0}
-          >
-            CONFIRM
-          </button>
+          </div>
         </div>
 
         {/* =================================== */}
@@ -1383,7 +1422,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         )}
 
         {/* =================================== */}
-        {/* EVENT DETAILS MODAL                  */}
+        {/* EVENT DETAILS MODAL (mobile)         */}
         {/* =================================== */}
 
         {eventsModal && (
