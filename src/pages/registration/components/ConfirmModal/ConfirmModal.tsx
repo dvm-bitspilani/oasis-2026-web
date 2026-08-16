@@ -473,33 +473,33 @@ const Confirmation = (props: PropsType) => {
   /* SCROLLBAR DRAG                            */
   /* ========================================= */
 
-  const handlewheelMouseDown = (
-    e:
-      | React.MouseEvent<HTMLImageElement>
-      | React.TouchEvent<HTMLImageElement>
-  ) => {
-    e.preventDefault();
+  // const handlewheelMouseDown = (
+  //   e:
+  //     | React.MouseEvent<HTMLImageElement>
+  //     | React.TouchEvent<HTMLImageElement>
+  // ) => {
+  //   e.preventDefault();
 
-    document.addEventListener(
-      "mousemove",
-      handlewheelDragMove
-    );
+  //   document.addEventListener(
+  //     "mousemove",
+  //     handlewheelDragMove
+  //   );
 
-    document.addEventListener(
-      "touchmove",
-      handlewheelDragMove
-    );
+  //   document.addEventListener(
+  //     "touchmove",
+  //     handlewheelDragMove
+  //   );
 
-    document.addEventListener(
-      "mouseup",
-      handlewheelDragEnd
-    );
+  //   document.addEventListener(
+  //     "mouseup",
+  //     handlewheelDragEnd
+  //   );
 
-    document.addEventListener(
-      "touchend",
-      handlewheelDragEnd
-    );
-  };
+  //   document.addEventListener(
+  //     "touchend",
+  //     handlewheelDragEnd
+  //   );
+  // };
 
   const handlewheelDragMove = (
     e: MouseEvent | TouchEvent
@@ -604,12 +604,12 @@ const Confirmation = (props: PropsType) => {
               }
               ref={scrollBarRef}
             >
-              <img
-                src={null}
+              {/* <img
+                // src={null}
                 alt="scrollbar"
                 className={styles.scrollBar}
-              />
-
+              /> */}
+{/* 
               <img
                 className={
                   styles.scrollBarThumb
@@ -624,7 +624,7 @@ const Confirmation = (props: PropsType) => {
                   handlewheelMouseDown
                 }
                 ref={thumbRef}
-              />
+              /> */}
             </div>
           </div>
 

@@ -11,12 +11,12 @@ import { useCookies } from "react-cookie";
 import axios from "axios";
 import BreadCrumb from "../../components/breadCrumb/BreadCrumb";
 
-interface RegistrationProps {
-  startAnimation: boolean;
-  goToPage: (path: string) => void;
-}
+// interface RegistrationProps {
+//   startAnimation: boolean;
+//   goToPage: (path: string) => void;
+// }
 
-const Registration = ({ goToPage }: RegistrationProps) => {
+const Registration = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [userEmail, setUserEmail] = useState("");
   const [userData, setUserData] = useState<any>(null);
@@ -46,9 +46,9 @@ const Registration = ({ goToPage }: RegistrationProps) => {
     ],
   };
 
-  const toFirstPage = () => {
-    setCurrentPage(1);
-  };
+  // const toFirstPage = () => {
+  //   setCurrentPage(1);
+  // };
 
   const toRegPage = () => {
     setCurrentPage(2);

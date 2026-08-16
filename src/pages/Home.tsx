@@ -350,7 +350,6 @@ export default function Home() {
               width="12"
               height="12"
               className={styles.socialLink}
-              className={styles.socialLink}
             />
           </a>
           <a href="" target="_blank" rel="noreferrer">
@@ -360,7 +359,6 @@ export default function Home() {
               y="25"
               width="12"
               height="12"
-              className={styles.socialLink}
               className={styles.socialLink}
             />
           </a>
@@ -376,7 +374,6 @@ export default function Home() {
               y="23"
               width="12"
               height="12"
-              className={styles.socialLink}
               className={styles.socialLink}
             />
           </a>
