@@ -215,3 +215,38 @@
       drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
   }
 }
+.regBtnLink {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.regBtnImg {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  transition:
+    transform 0.25s ease,
+    filter 0.25s ease;
+}
+
+.regBtnLink:hover .regBtnImg {
+  // transform: scale(1.08);
+
+  filter:
+    brightness(1.12)
+    drop-shadow(
+      0 0 12px rgba(254, 213, 155, 0.65)
+    );
+}
+
+.regBtnLink:active .regBtnImg {
+  transform: scale(0.96);
+}

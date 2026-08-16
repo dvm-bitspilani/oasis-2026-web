@@ -232,17 +232,34 @@
   overflow-y: auto;
   overflow-x: hidden;
 
-  padding: 0;
+  padding: 0 0.5vw 0 0;
 
   box-sizing: border-box;
 
   background: transparent;
 
-  scrollbar-width: none;
+  /* VISIBLE SCROLLBAR */
+  scrollbar-width: thin;
+  scrollbar-color: #a86618 transparent;
 }
 
+/* Chrome / Edge / Safari */
+
 .eventsList::-webkit-scrollbar {
-  display: none;
+  width: 6px;
+}
+
+.eventsList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.eventsList::-webkit-scrollbar-thumb {
+  background: #a86618;
+  border-radius: 10px;
+}
+
+.eventsList::-webkit-scrollbar-thumb:hover {
+  background: #6c1700;
 }
 
 /* ========================================= */
@@ -360,7 +377,7 @@
 }
 
 /* ========================================= */
-/* CLICKED / SELECTED                       */
+/* CLICKED / SELECTED                        */
 /* ========================================= */
 
 .eventItem.selected {
@@ -532,17 +549,19 @@
 
   max-width: 450px;
 
+  height: 30vw;
+  min-height: 380px;
+  max-height: 520px;
+
   display: flex;
 
   flex-direction: column;
 
   align-items: center;
 
-  justify-content: center;
+  margin: 0 auto;
 
   text-align: center;
-
-  margin: 0 auto;
 
   animation: eventAppear 0.3s ease forwards;
 }
@@ -562,13 +581,40 @@
 }
 
 /* ========================================= */
+/* EVENT CONTENT                             */
+/* ========================================= */
+
+.eventContent {
+  width: 100%;
+
+  height: 12vw;
+  min-height: 150px;
+  max-height: 230px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: flex-start;
+
+  overflow: hidden;
+
+  flex-shrink: 0;
+}
+
+/* ========================================= */
 /* ACTUAL EVENT NAME                         */
 /* ========================================= */
 
 .eventTitle {
   width: 100%;
 
-  margin: 0 0 1.5vw;
+  height: 3.5vw;
+  min-height: 45px;
+
+  margin: 0 0 1vw;
 
   color: #38170b;
 
@@ -585,6 +631,14 @@
   position: relative;
 
   z-index: 6;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
 }
 
 /* ========================================= */
@@ -595,6 +649,9 @@
   width: 100%;
 
   max-width: 32vw;
+
+  height: 7vw;
+  min-height: 100px;
 
   margin: 0;
 
@@ -607,6 +664,32 @@
   line-height: 1.7;
 
   text-align: center;
+
+  overflow: hidden;
+}
+
+/* ========================================= */
+/* FIXED CONTROLS                            */
+/* ========================================= */
+
+.eventControls {
+  width: 100%;
+
+  height: 17vw;
+  min-height: 220px;
+  max-height: 290px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: flex-start;
+
+  flex-shrink: 0;
+
+  position: relative;
 }
 
 /* ========================================= */
@@ -622,7 +705,7 @@
 
   min-height: 55px;
 
-  margin: 2vw auto 0;
+  margin: 0 auto;
 
   padding: 0;
 
@@ -660,6 +743,8 @@
 
   -webkit-appearance: none;
 
+  flex-shrink: 0;
+
   transition:
     transform 0.25s ease,
     filter 0.25s ease;
@@ -686,7 +771,10 @@
 .eventNavigation {
   width: 100%;
 
-  margin-top: 2vw;
+  height: 5vw;
+  min-height: 55px;
+
+  margin-top: 1vw;
 
   display: flex;
 
@@ -695,6 +783,8 @@
   justify-content: center;
 
   gap: 1vw;
+
+  flex-shrink: 0;
 }
 
 /* ========================================= */
@@ -847,6 +937,101 @@
   font-size: clamp(11px, 0.9vw, 16px);
 
   line-height: 1.6;
+}
+
+/* ========================================= */
+/* CONFIRM BUTTON                            */
+/* ========================================= */
+
+.confirmButton {
+  position: relative;
+
+  z-index: 20;
+
+  bottom: auto;
+
+  left: auto;
+
+  transform: none;
+
+  width: min(240px, 16vw);
+
+  height: 5vw;
+
+  min-width: 150px;
+
+  min-height: 55px;
+
+  margin: 1vw auto 0;
+
+  padding: 0;
+
+  border: none;
+
+  background-image: url("../../../../assets/registration/reg/btn.png");
+
+  background-position: center;
+
+  background-size: contain;
+
+  background-repeat: no-repeat;
+
+  background-color: transparent;
+
+  color: #fed59b;
+
+  font-family: "Cinzel", serif;
+
+  font-size: clamp(15px, 1.2vw, 22px);
+
+  font-weight: 700;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  appearance: none;
+
+  -webkit-appearance: none;
+
+  flex-shrink: 0;
+
+  transition:
+    transform 0.25s ease,
+    filter 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.confirmButton:hover {
+  transform: scale(1.08);
+
+  filter:
+    brightness(1.12)
+    drop-shadow(
+      0 0 10px rgba(254, 213, 155, 0.65)
+    );
+}
+
+.confirmButton:active {
+  transform: scale(0.96);
+}
+
+.confirmButton:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
+
+  filter: none;
+
+  transform: none;
 }
 
 /* ========================================= */
@@ -1163,7 +1348,9 @@
 
     gap: 1.3vw;
 
-    padding-right: 0.5vw;
+    gap: 2vw;
+
+    padding: 0;
   }
 
   .eventItem {
@@ -1207,7 +1394,22 @@
   /* ========================================= */
 
   .infoPage {
-    display: none;
+    min-height: 60vw;
+
+    padding: 0;
+  }
+
+  .rightOuter {
+    width: 100%;
+
+    min-height: 60vw;
+    margin-left: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
   }
 
   /* ========================================= */
@@ -1251,69 +1453,31 @@
 /* SMALL MOBILE (<=600px)                                       */
 /* =========================================================== */
 
-@media (max-width: 600px) {
-  .eventsContainer {
-    --lp-top: 9%;
-    --lp-left: 7%;
-    --lp-width: 64%;
-    --lp-height: 82%;
+  .eventInfo {
+    width: 85%;
 
-    padding: 7vw 3vw 8vw;
+    max-width: none;
+
+    justify-content: center;
   }
 
-  .leftbottom,
-  .lefttop,
-  .rightbottom,
-  .righttop {
-    width: 32vw;
+  .eventTitle {
+    margin-bottom: 4vw;
+
+    font-size: clamp(1.7rem, 8vw, 3rem);
   }
 
-  .bookFrame {
-    width: 96vw;
+  .eventDescription {
+    max-width: 80vw;
+
+    font-size: 3.7vw;
+
+    line-height: 1.6;
   }
 
-  .chooseEventsHeading {
-    font-size: clamp(1.15rem, 7vw, 1.7rem);
-  }
-
-  .searchContainer {
-    height: 10vw;
-  }
-
-  .searchContainer input {
-    font-size: 3.1vw;
-  }
-
-  .eventItem {
-    height: 10vw;
-
-    min-height: 32px;
-
-    font-size: 3.1vw;
-  }
-
-  .confirmButton {
-    height: 9vw;
-
-    font-size: 2.9vw;
-  }
-}
-
-/* =========================================================== */
-/* MOBILE (<=900px)                                             */
-/*                                                               */
-/* Book crop now mirrors register.module.scss's mobile book:     */
-/* a flat background-size / background-position pinned across    */
-/* the viewport (100vw x 82vh), instead of the old aspect-ratio  */
-/* box + zoom-variable approach. Tune background-size /          */
-/* background-position below to match your actual book.png, the  */
-/* same way you'd tune it in the register page.                  */
-/*                                                                 */
-/* .eventsPage still sits on top of the book via --lp-* percent   */
-/* vars, just re-anchored to the new frame shape. Everything      */
-/* else (search, scrollable list, confirm button, event details)  */
-/* is completely unchanged.                                       */
-/* =========================================================== */
+  /* ========================================= */
+  /* ADD / REMOVE                              */
+  /* ========================================= */
 
 @media (max-width: 900px) {
   .eventsContainer {
@@ -1323,18 +1487,13 @@
     --lp-width: 70%;
     --lp-height: 91%;
 
-    min-height: 100svh;
-    height: auto;
+    min-width: 0;
 
-    overflow-y: auto;
-    overflow-x: hidden;
+    min-height: 0;
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
+    margin-top: 5vw;
 
-    padding: 6vw 4vw 10vw;
+    font-size: 4vw;
 
     background-size: cover;
     background-position: center;
@@ -1354,30 +1513,36 @@
   /* the viewport width, vertically centered.   */
   /* ========================================= */
 
-  .bookFrame {
-    display: block;
+  .eventNavigation {
+    margin-top: 4vw;
 
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-
-    width: 100vw;
-    height: 82vh;
+    gap: 2vw;
   }
 
-  /* ========================================= */
-  /* BOOK ART — flat crop, matching register's  */
-  /* mobile book-size / book-position values    */
-  /* ========================================= */
+  .pageNumbers {
+    gap: 2.5vw;
+  }
 
-  .bookContainer {
-    position: absolute;
-    inset: 0;
+  .navArrow {
+    width: 9vw;
 
-    background-size: 150% 100%;
-    background-position: 8% top;
-    background-repeat: no-repeat;
+    height: 11vw;
+
+    min-width: 0;
+
+    min-height: 0;
+
+    font-size: 12vw;
+  }
+
+  .pageNumber {
+    min-width: 6vw;
+
+    font-size: 6vw;
+  }
+
+  .pageNumber.currentPage {
+    font-size: 9vw;
   }
 
   /* ========================================= */
@@ -1417,128 +1582,104 @@
   /* never scrolls with it.                     */
   /* ========================================= */
 
-  .eventsPage {
-    position: absolute;
+.confirmButton {
+  position: absolute;
 
-    top: var(--lp-top);
-    left: var(--lp-left);
-    width: var(--lp-width);
-    height: var(--lp-height);
+  z-index: 20;
 
-    padding: 2.5vw 2vw;
-    box-sizing: border-box;
+  bottom: 3.5%;
+  left: 50%;
 
-    overflow: hidden;
+  transform: translateX(-50%);
 
-    background: transparent;
-  }
+  width: min(240px, 16vw);
+  height: 5vw;
 
-  .chooseEventsHeading {
-    flex-shrink: 0;
+  min-width: 150px;
+  min-height: 55px;
 
-    margin: 0 0 2.5vw;
+  padding: 0;
 
-    font-size: clamp(1.2rem, 6vw, 1.7rem);
-  }
+  border: none;
 
-  .searchContainer {
-    flex-shrink: 0;
+  background-image: url("../../../../assets/registration/reg/btn.png");
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
 
-    width: 100%;
+  background-color: transparent;
 
-    height: 8vw;
-    min-height: 30px;
+  color: #fed59b;
 
-    margin-bottom: 2vw;
+  font-family: "Cinzel", serif;
 
-    background-size: contain;
-    background-repeat: no-repeat;
-  }
+  font-size: clamp(15px, 1.2vw, 22px);
 
-  .searchContainer input {
-    width: 100%;
+  font-weight: 700;
 
-    padding: 0 2.5vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    font-size: 2.7vw;
-  }
+  text-align: center;
 
-  .eventsList {
-    width: 100%;
-    height: auto;
+  line-height: 1;
 
-    flex: 1 1 auto;
-    min-height: 0;
-    max-height: none;
+  cursor: pointer;
 
-    gap: 1.3vw;
+  appearance: none;
+  -webkit-appearance: none;
 
-    padding-right: 0.5vw;
-  }
+  transition:
+    transform 0.25s ease,
+    filter 0.25s ease,
+    opacity 0.25s ease;
+}
 
-  .eventItem {
-    width: 100%;
+.confirmButton:hover {
+  transform: translateX(-50%) scale(1.08);
 
-    height: 8vw;
+  filter:
+    brightness(1.12)
+    drop-shadow(
+      0 0 10px rgba(254, 213, 155, 0.65)
+    );
+}
 
-    min-height: 32px;
+.confirmButton:active {
+  transform: translateX(-50%) scale(0.96);
+}
 
-    padding: 0 2.5vw;
+.confirmButton:disabled {
+  opacity: 0.45;
 
-    font-size: 2.7vw;
+  cursor: not-allowed;
 
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-  }
+  filter: none;
 
-  .eventItem span {
-    width: 100%;
+  transform: translateX(-50%);
+}
 
-    text-align: center;
+/* ========================================= */
+/* MOBILE CONFIRM BUTTON                     */
+/* ========================================= */
 
-    line-height: 1;
-  }
-
-  .message {
-    flex: 1 1 auto;
-
-    min-height: 60px;
-
-    font-size: 2.7vw;
-  }
-
-  /* ========================================= */
-  /* RIGHT PAGE — no longer used for content on */
-  /* mobile; the book art itself already shows  */
-  /* a bit of the blank right page peeking past */
-  /* the spine, which is all that's needed here.*/
-  /* ========================================= */
-
-  .infoPage {
-    display: none;
-  }
-
-  /* ========================================= */
-  /* CONFIRM BUTTON — normal flex-flow item,    */
-  /* always below the (scrollable) list, never  */
-  /* overlapping it, never scrolling with it.   */
-  /* ========================================= */
-
+@media (max-width: 650px) {
   .confirmButton {
     position: static;
 
-    flex-shrink: 0;
+    bottom: auto;
+    left: auto;
 
     transform: none;
 
-    width: 68%;
-    height: 8vw;
+    width: 48vw;
+    height: 14vw;
 
     min-width: 0;
-    min-height: 30px;
+    min-height: 0;
 
-    margin: 2.5vw auto 0;
+    margin-top: 6vw;
 
     font-size: 2.5vw;
   }
@@ -1554,71 +1695,29 @@
   .confirmButton:disabled {
     transform: none;
   }
+
+  /* ========================================= */
+  /* EMPTY                                    */
+  /* ========================================= */
+
+  .emptyInfo {
+    width: 85%;
+
+    flex: 1;
+  }
 }
 
-/* =========================================================== */
-/* SMALL MOBILE (<=600px)                                       */
-/* =========================================================== */
+/* ========================================= */
+/* SHORT HEIGHT                              */
+/* ========================================= */
 
-@media (max-width: 600px) {
-  .eventsContainer {
-    --lp-top: 5.5%;
-    --lp-left: 13%;
-    --lp-width: 74%;
-    --lp-height: 91%;
-
-    padding: 7vw 3vw 8vw;
+@media (max-height: 800px) {
+  .infoPage{
+    padding-right: 100px;
+    width: 50%;
+    // background-color: #38170b;
   }
-
-  .leftbottom,
-  .lefttop,
-  .rightbottom,
-  .righttop {
-    width: 32vw;
-  }
-
-  .bookFrame {
-    height: 78vh;
-  }
-
-  .bookContainer {
-    background-size: 165% 100%;
-    background-position: 6% top;
-  }
-
-  .chooseEventsHeading {
-    font-size: clamp(1.15rem, 7vw, 1.7rem);
-  }
-
-  .searchContainer {
-    height: 10vw;
-  }
-
-  .searchContainer input {
-    font-size: 3.1vw;
-  }
-
-  .eventItem {
-    height: 10vw;
-
-    min-height: 32px;
-
-    font-size: 3.1vw;
-  }
-
-  .confirmButton {
-    height: 9vw;
-
-    font-size: 2.9vw;
-  }
-  eventsContainer {
-    --lp-top: 5.5%;
-    --lp-left: 12%;
-    --lp-width: 66%;
-    --lp-height: 91%;
-}
- .bookContainer {
-    background-size: 190% 100%;
-    background-position: 3% top;
+  .eventsPage{
+    padding-left: 100px;
   }
 }

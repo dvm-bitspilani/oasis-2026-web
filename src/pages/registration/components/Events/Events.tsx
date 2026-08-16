@@ -714,7 +714,6 @@
 
 
 import { useEffect, useState, forwardRef } from "react";
-import axios from "axios";
 
 import styles from "./Events.module.scss";
 
@@ -743,10 +742,6 @@ interface EventsProps {
   userData?: any;
   setUserData?: React.Dispatch<React.SetStateAction<any>>;
 }
-
-/* ========================================= */
-/* DUMMY EVENTS                              */
-/* ========================================= */
 
 const TEST_EVENTS: Event[] = [
   {
@@ -839,11 +834,6 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
 
     const [search, setSearch] = useState("");
 
-    /*
-      Same functionality as last year's version:
-      selected events survive component changes during
-      the registration flow.
-    */
     const [selectedEvents, setSelectedEvents] = useState<
       { id: number; name: string }[]
     >(() => {
@@ -870,19 +860,11 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
     */
     const [eventsModal, setEventsModal] = useState(false);
 
-    /* ========================================= */
-    /* SEARCH                                    */
-    /* ========================================= */
-
     const filteredEvents = events.filter((event) =>
       event.name
         .toLowerCase()
         .includes(search.trim().toLowerCase())
     );
-
-    /* ========================================= */
-    /* KEEP ACTIVE EVENT VALID AFTER SEARCH      */
-    /* ========================================= */
 
     useEffect(() => {
       if (filteredEvents.length === 0) {
@@ -899,10 +881,6 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         setActiveEvent(filteredEvents[0]);
       }
     }, [search, events]);
-
-    /* ========================================= */
-    /* SELECT / REMOVE EVENT                     */
-    /* ========================================= */
 
     const handleEvent = (event: Event | null) => {
       if (!event) return;
@@ -922,9 +900,6 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
               },
             ];
 
-        /*
-          Same sessionStorage functionality as last year's code.
-        */
         sessionStorage.setItem(
           "selectedEvents",
           JSON.stringify(updatedEvents)
@@ -983,10 +958,6 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
       setActiveEvent(filteredEvents[nextIndex]);
     };
 
-    /* ========================================= */
-    /* PREVIOUS EVENT                            */
-    /* ========================================= */
-
     const goToPreviousEvent = () => {
       if (!activeEvent || filteredEvents.length === 0) {
         return;
@@ -1003,10 +974,6 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
       setActiveEvent(filteredEvents[previousIndex]);
     };
 
-    /* ========================================= */
-    /* GO TO PAGE                                */
-    /* ========================================= */
-
     const goToPage = (index: number) => {
       if (
         filteredEvents.length === 0 ||
@@ -1019,10 +986,6 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
       setActiveEvent(filteredEvents[index]);
     };
 
-    /* ========================================= */
-    /* CURRENT PAGE                              */
-    /* ========================================= */
-
     const currentIndex = activeEvent
       ? filteredEvents.findIndex(
           (event) => event.id === activeEvent.id
@@ -1031,26 +994,11 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
 
     const pageOffsets = [-1, 0, 1];
 
-    /* ========================================= */
-    /* SUBMIT / CONFIRM                         */
-    /* ========================================= */
-
     const handleSubmit = () => {
       if (selectedEvents.length === 0) {
         return;
       }
 
-      /*
-        IMPORTANT:
-
-        We do NOT directly call the backend here.
-
-        We put the selected event IDs into userData,
-        exactly like last year's implementation.
-
-        ConfirmModal / final registration submission
-        can then send userData to the backend.
-      */
       if (setUserData) {
         setUserData((previousData: any) => ({
           ...previousData,
@@ -1063,10 +1011,6 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
       setConfirmModal(true);
     };
 
-    /* ========================================= */
-    /* RENDER                                    */
-    /* ========================================= */
-
     return (
       <>
         <div
@@ -1076,9 +1020,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
             backgroundImage: `url(${RegBg})`,
           }}
         >
-          {/* ================================= */}
-          {/* DECORATIONS                        */}
-          {/* ================================= */}
+          {/* CORNER DECORATIONS */}
 
           <img
             src={leftbottom}
@@ -1126,16 +1068,12 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
             }}
           />
 
-          {/* ================================= */}
-          {/* CONTENT                            */}
-          {/* ================================= */}
+          {/* CONTENT */}
 
           <div className={styles.content}>
             <div className={styles.eventsArea}>
 
-              {/* ================================= */}
-              {/* LEFT PAGE                         */}
-              {/* ================================= */}
+              {/* LEFT PAGE */}
 
               <div className={styles.eventsPage}>
                 <h1 className={styles.chooseEventsHeading}>
@@ -1180,9 +1118,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                         <button
                           key={event.id}
                           type="button"
-                          className={`${
-                            styles.eventItem
-                          } ${
+                          className={`${styles.eventItem} ${
                             selected
                               ? styles.selected
                               : ""
@@ -1254,145 +1190,154 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                   {activeEvent ? (
                     <div className={styles.eventInfo}>
 
-                      {/* EVENT NAME */}
+                      {/* EVENT CONTENT */}
 
-                      <h2 className={styles.eventTitle}>
-                        {activeEvent.name}
-                      </h2>
+                      <div className={styles.eventContent}>
+                        <h2 className={styles.eventTitle}>
+                          {activeEvent.name}
+                        </h2>
 
-                      {/* DESCRIPTION */}
+                        <p className={styles.eventDescription}>
+                          {activeEvent.about}
+                        </p>
+                      </div>
 
-                      <p
-                        className={
-                          styles.eventDescription
-                        }
-                      >
-                        {activeEvent.about}
-                      </p>
+                      {/* FIXED CONTROLS */}
 
-                      {/* ADD / REMOVE */}
+                      <div className={styles.eventControls}>
 
-                      <button
-                        type="button"
-                        className={
-                          styles.eventActionButton
-                        }
-                        style={{
-                          backgroundImage: `url(${btn})`,
-                        }}
-                        onClick={() =>
-                          handleEvent(activeEvent)
-                        }
-                      >
-                        {selectedEvents.some(
-                          (event) =>
-                            event.id ===
-                            activeEvent.id
-                        )
-                          ? "REMOVE"
-                          : "ADD"}
-                      </button>
+                        {/* ADD / REMOVE */}
 
-                      {/* NAVIGATION */}
-
-                      <div
-                        className={
-                          styles.eventNavigation
-                        }
-                      >
                         <button
                           type="button"
-                          onClick={
-                            goToPreviousEvent
-                          }
-                          aria-label="Previous event"
                           className={
-                            styles.navArrow
+                            styles.eventActionButton
+                          }
+                          style={{
+                            backgroundImage: `url(${btn})`,
+                          }}
+                          onClick={() =>
+                            handleEvent(activeEvent)
                           }
                         >
-                          ‹
+                          {selectedEvents.some(
+                            (event) =>
+                              event.id ===
+                              activeEvent.id
+                          )
+                            ? "REMOVE"
+                            : "ADD"}
                         </button>
+
+                        {/* NAVIGATION */}
 
                         <div
                           className={
-                            styles.pageNumbers
+                            styles.eventNavigation
                           }
                         >
-                          {filteredEvents.length <=
-                          3 ? (
-                            filteredEvents.map(
-                              (event, index) => (
-                                <button
-                                  key={event.id}
-                                  type="button"
-                                  className={`${
-                                    styles.pageNumber
-                                  } ${
-                                    index ===
-                                    currentIndex
-                                      ? styles.currentPage
-                                      : ""
-                                  }`}
-                                  onClick={() =>
-                                    goToPage(index)
-                                  }
-                                >
-                                  {index + 1}
-                                </button>
-                              )
-                            )
-                          ) : (
-                            pageOffsets.map(
-                              (offset) => {
-                                const pageIndex =
-                                  (currentIndex +
-                                    offset +
-                                    filteredEvents.length) %
-                                  filteredEvents.length;
+                          <button
+                            type="button"
+                            onClick={
+                              goToPreviousEvent
+                            }
+                            aria-label="Previous event"
+                            className={
+                              styles.navArrow
+                            }
+                          >
+                            ‹
+                          </button>
 
-                                return (
-                                  <button
-                                    key={offset}
-                                    type="button"
-                                    className={`${
-                                      styles.pageNumber
-                                    } ${
-                                      offset === 0
-                                        ? styles.currentPage
-                                        : ""
-                                    }`}
-                                    onClick={() =>
-                                      goToPage(
-                                        pageIndex
-                                      )
-                                    }
-                                  >
-                                    {pageIndex + 1}
-                                  </button>
-                                );
-                              }
-                            )
-                          )}
+                          <div
+                            className={
+                              styles.pageNumbers
+                            }
+                          >
+                            {filteredEvents.length <= 3
+                              ? filteredEvents.map(
+                                  (event, index) => (
+                                    <button
+                                      key={event.id}
+                                      type="button"
+                                      className={`${
+                                        styles.pageNumber
+                                      } ${
+                                        index ===
+                                        currentIndex
+                                          ? styles.currentPage
+                                          : ""
+                                      }`}
+                                      onClick={() =>
+                                        goToPage(index)
+                                      }
+                                    >
+                                      {index + 1}
+                                    </button>
+                                  )
+                                )
+                              : pageOffsets.map(
+                                  (offset) => {
+                                    const pageIndex =
+                                      (currentIndex +
+                                        offset +
+                                        filteredEvents.length) %
+                                      filteredEvents.length;
+
+                                    return (
+                                      <button
+                                        key={offset}
+                                        type="button"
+                                        className={`${
+                                          styles.pageNumber
+                                        } ${
+                                          offset === 0
+                                            ? styles.currentPage
+                                            : ""
+                                        }`}
+                                        onClick={() =>
+                                          goToPage(
+                                            pageIndex
+                                          )
+                                        }
+                                      >
+                                        {pageIndex + 1}
+                                      </button>
+                                    );
+                                  }
+                                )}
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={goToNextEvent}
+                            aria-label="Next event"
+                            className={
+                              styles.navArrow
+                            }
+                          >
+                            ›
+                          </button>
                         </div>
+
+                        {/* CONFIRM */}
 
                         <button
                           type="button"
-                          onClick={goToNextEvent}
-                          aria-label="Next event"
                           className={
-                            styles.navArrow
+                            styles.confirmButton
+                          }
+                          onClick={handleSubmit}
+                          disabled={
+                            selectedEvents.length === 0
                           }
                         >
-                          ›
+                          CONFIRM
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <div
-                      className={
-                        styles.emptyInfo
-                      }
-                    >
+                    <div className={styles.emptyInfo}>
                       <p>
                         HOVER OVER AN EVENT
                         <br />
@@ -1402,14 +1347,13 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                   )}
                 </div>
               </div>
+
             </div>
           </div>
           </div>
         </div>
 
-        {/* =================================== */}
-        {/* FINAL CONFIRMATION MODAL             */}
-        {/* =================================== */}
+        {/* FINAL CONFIRMATION MODAL */}
 
         {confirmModal && (
           <ConfirmModal
