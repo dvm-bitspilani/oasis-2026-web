@@ -5,76 +5,286 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100svh;
   z-index: 1000;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.6);
 }
 
+/* ================================================= */
+/* SAME BOOK-PAGE FRAME AS THE CONFIRM MODAL          */
+/* (this modal only ever renders on mobile, so it     */
+/* uses the mobile frame directly instead of the      */
+/* desktop/mobile CSS-var switch ConfirmModal needs)  */
+/* ================================================= */
 .selectedEvents {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 1.5px solid #ededed;
+
+  // 0.4702 = 860 / 1829, the actual width:height ratio of modalFrameMobile.png.
+  // min() picks whichever of "88% of viewport width" or "the width that
+  // makes the frame exactly 82svh tall" is smaller, so the frame always
+  // fits inside the screen on both axes instead of overflowing it.
+  --modal-w: min(88vw, 82svh * 0.4702);
+
+  width: var(--modal-w);
+  aspect-ratio: 860 / 1829;
+  height: auto;
+
   border-radius: 8px;
   z-index: 1001;
-  padding: 7vw;
-  width: 80vw;
-  height: 80svh;
+
+  /* extra top padding so the heading clears the ornate flourish  */
+  /* built into the frame artwork instead of colliding with it,   */
+  /* and a bit more on the sides/bottom so nothing hugs the border */
+  padding: calc(var(--modal-w) * 0.21) calc(var(--modal-w) * 0.14)
+    calc(var(--modal-w) * 0.1);
+
   display: flex;
   flex-direction: column;
+
   box-shadow: 0px 0px 15.3px 0px #e5c3845e;
-  background-color: #000000e5;
-  backdrop-filter: blur(10px);
+
+  background-image: var(--modal-bg-mobile);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  overflow: hidden;
+
+  /* ============================================ */
+  /* CLOSE BUTTON — round dark chip behind a gold  */
+  /* icon so it reads against ANY part of the      */
+  /* busy border artwork, not just the plain paper */
+  /* ============================================ */
+  .close {
+    position: absolute;
+    top: calc(var(--modal-w) * 0.055);
+    right: calc(var(--modal-w) * 0.06);
+
+    width: calc(var(--modal-w) * 0.095);
+    height: calc(var(--modal-w) * 0.095);
+    min-width: 32px;
+    min-height: 32px;
+
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(20, 10, 5, 0.45);
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.35);
+
+    cursor: pointer;
+    z-index: 5;
+
+    transition:
+      transform 0.2s ease,
+      background 0.2s ease;
+
+    svg {
+      width: 42%;
+      height: 42%;
+    }
+
+    path {
+      fill: #fed59b;
+    }
+
+    &:active {
+      transform: scale(0.9);
+      background: rgba(20, 10, 5, 0.65);
+    }
+  }
 
   .heading {
-    color: #e2dccb;
-    font: 400 6vw "Abhaya Libre Extrabold";
+    flex-shrink: 0;
+
+    margin: 0 0 calc(var(--modal-w) * 0.03);
+
+    color: #3a2411;
+    font: 400 calc(var(--modal-w) * 0.075) "Syamsiah";
+    text-align: center;
+
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.25);
   }
+
   .description {
-    color: #e2dccb;
-    font: 400 4vw "Abhaya Libre";
-    margin: 1.5vw 0;
-    line-height: 1.5;
-    height: 80%;
-    overflow-y: scroll;
+    flex: 1 1 auto;
+    min-height: 0; // let the paragraph shrink to the space that's actually left, instead of forcing the box taller than the frame
+
+    margin: 0 0 calc(var(--modal-w) * 0.04);
+
+    color: #432611;
+    font: 400 calc(var(--modal-w) * 0.05) "EB";
+    line-height: 1.65;
+    letter-spacing: 0.5px;
+    text-align: center;
+
+    overflow-y: auto;
     scrollbar-width: none;
     &::-webkit-scrollbar {
       display: none;
     }
+
+    /* fade only the bottom edge as a scroll hint — a top fade   */
+    /* doesn't make sense here since there's nothing hidden      */
+    /* above the very first line, and it was washing that line   */
+    /* out for short descriptions that never even scroll         */
+    mask-image: linear-gradient(to bottom, #000 92%, transparent 100%);
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000 92%,
+      transparent 100%
+    );
   }
 
-  .confirmButton {
-    margin: auto auto 0 auto;
-    background-color: #fff6dd;
-    border: 1.5px solid #ededed;
-    border-radius: 2px;
-    color: #000;
-    width: 100%;
-    font: 400 4vw "DM Serif Text";
-    padding: 1vw 0;
-    cursor: pointer;
-  }
+  /* ============================================ */
+  /* SAME BANNER AS THE EVENT-LIST / CONFIRM MODAL */
+  /* BUTTONS — inputBg.png outline + inputBgFilled */
+  /* .png mask that reveals a red gradient fill    */
+  /* ============================================ */
+  .confirmButton,
   .removeButton {
-    margin: auto auto 0 auto;
+    flex-shrink: 0;
+
+    position: relative;
+
     width: 100%;
-    font: 400 4vw "DM Serif Text";
-    padding: 1vw 0;
+    height: calc(var(--modal-w) * 0.14);
+    min-height: 42px;
+
+    margin: calc(var(--modal-w) * 0.03) 0 0;
+    padding: 0 4%;
+
+    border: none;
+
+    background-color: transparent;
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+
+    color: #38170b;
+
+    font-family: "Cinzel", serif;
+    font-size: calc(var(--modal-w) * 0.05);
+    font-weight: 700;
+
     cursor: pointer;
-    border: 1.5px solid #ededed;
-    border-radius: 2px;
-    background: transparent;
-    color: #fff;
+
+    box-sizing: border-box;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+      transform 0.3s ease,
+      filter 0.3s ease;
+
+    /* red gradient fill, masked to the banner's silhouette */
+    &::before {
+      content: "";
+
+      position: absolute;
+      inset: 0;
+
+      background: radial-gradient(
+        circle at center,
+        #671c07 0%,
+        #400e00 100%
+      );
+
+      -webkit-mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
+      mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      -webkit-mask-position: center;
+      mask-position: center;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+
+      -webkit-clip-path: inset(0 100% 0 0);
+      clip-path: inset(0 100% 0 0);
+
+      z-index: 0;
+      pointer-events: none;
+
+      transition:
+        -webkit-clip-path 0.45s ease,
+        clip-path 0.45s ease;
+    }
+
+    span {
+      position: relative;
+
+      z-index: 2;
+
+      display: block;
+
+      width: 100%;
+
+      margin: 0;
+      padding: 0;
+
+      text-align: center;
+
+      line-height: 1;
+
+      color: inherit;
+
+      transition:
+        transform 0.3s ease,
+        letter-spacing 0.3s ease,
+        text-shadow 0.3s ease,
+        color 0.3s ease;
+    }
+
+    /* no :hover states — this modal is mobile-only, so the tap */
+    /* (:active) feedback below is what actually gets used      */
+    &:active {
+      transform: scale(0.97);
+    }
   }
 
-  .close {
-    position: absolute;
-    top: 4vw;
-    right: 2vw;
-    svg {
-      width: 8vw;
-      height: 8vw;
-      cursor: pointer;
+  /* ADD — plain banner outline, same as an unselected event item */
+  .confirmButton {
+    color: #38170b;
+  }
+
+  /* REMOVE — permanently in the "selected" state, i.e. already   */
+  /* filled + gold, same as the currently-active/selected event   */
+  /* item, since the event behind this button is already added   */
+  .removeButton {
+    transform: scale(1.02);
+
+    filter: brightness(1.1) drop-shadow(0 0 8px rgba(229, 195, 132, 0.5));
+
+    &::before {
+      -webkit-clip-path: inset(0 0 0 0);
+      clip-path: inset(0 0 0 0);
+    }
+
+    span {
+      letter-spacing: 0.04em;
+
+      color: #fed59b;
+
+      text-shadow: 0 0 7px rgba(254, 213, 155, 0.8);
+    }
+
+    &:active {
+      transform: scale(0.95);
     }
   }
 }

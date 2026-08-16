@@ -4,6 +4,7 @@ import styles from "./Registration.module.scss";
 import Instructions from "../../pages/registration/components/Instructions/Instructions";
 import Register from "../registration/components/Register/Register";
 import Events from "../../pages/registration/components/Events/Events";
+import Preloader from "../Preloader";
 
 import { useState } from "react";
 import { useCookies } from "react-cookie";
@@ -11,12 +12,58 @@ import { useCookies } from "react-cookie";
 import axios from "axios";
 import BreadCrumb from "../../components/breadCrumb/BreadCrumb";
 
+// =====================================================
+// ASSETS PRELOADED BEFORE THE REGISTRATION FLOW MOUNTS
+// Covers Instructions, Register, Events, and all their modals
+// (ConfirmModal, EventsModal, InstructionModal, Reginput)
+// =====================================================
+import RegBg from "../../assets/registration/reg/RegBg.png";
+import leftbottom from "../../assets/registration/reg/leftbottom.png";
+import rightbottom from "../../assets/registration/reg/rightbottom.png";
+import lefttop from "../../assets/registration/reg/lefttop.png";
+import righttop from "../../assets/registration/reg/righttop.png";
+import book from "../../assets/registration/reg/book.png";
+import buttonBg from "../../assets/registration/reg/buttonbg.png";
+import inputBg from "../../assets/registration/reg/inputBg.png";
+import btn from "../../assets/registration/reg/btn.png";
+import searchBg from "../../assets/registration/reg/searchBg.png";
+import line from "../../assets/registration/reg/line.png";
+import wheel from "../../assets/registration/reg/wheel.png";
+import modalFrame from "/modalFrame.png";
+import modalFrameMobile from "/modalFrameMobile.png";
+import closedBook from "/closedBook.png";
+import Syamsiah from "../../assets/fonts/Syamsiah Arabic.ttf";
+import EB from "../../assets/fonts/EBGaramond-Medium.ttf";
+import Cinzel from "../../assets/fonts/Cinzel-VariableFont_wght.ttf";
+
+const registrationAssets = [
+  RegBg,
+  leftbottom,
+  rightbottom,
+  lefttop,
+  righttop,
+  book,
+  buttonBg,
+  inputBg,
+  btn,
+  searchBg,
+  line,
+  wheel,
+  modalFrame,
+  modalFrameMobile,
+  closedBook,
+  Syamsiah,
+  EB,
+  Cinzel
+];
+
 // interface RegistrationProps {
 //   startAnimation: boolean;
 //   goToPage: (path: string) => void;
 // }
 
 const Registration = () => {
+  const [entered, setEntered] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [userEmail, setUserEmail] = useState("");
   const [userData, setUserData] = useState<any>(null);
@@ -195,40 +242,51 @@ const Registration = () => {
 
       <BreadCrumb data={breadcrumbJsonLd} />
 
-      {/* =====================================================
-          PAGE 1 — INSTRUCTIONS
-          RegBg.png is only applied here
-      ===================================================== */}
-
-      {currentPage === 1 && (
-        <div className={styles.instrback}>
-          <Instructions
-            onGoogleSignIn={handleSuccess}
-          />
-        </div>
-      )}
-
-      {/* =====================================================
-          PAGE 2 — REGISTRATION
-      ===================================================== */}
-
-      {currentPage === 2 && (
-        <Register
-          onClickNext={toEventPage}
-          userEmail={userEmail}
-          setUserData={setUserData}
+      {!entered && (
+        <Preloader
+          assets={registrationAssets}
+          onEnter={() => setEntered(true)}
         />
       )}
 
-      {/* =====================================================
-          PAGE 3 — EVENTS
-      ===================================================== */}
+      {entered && (
+        <>
+          {/* =====================================================
+              PAGE 1 — INSTRUCTIONS
+              RegBg.png is only applied here
+          ===================================================== */}
 
-      {currentPage === 3 && (
-        <Events
-          userData={userData}
-          setUserData={setUserData}
-        />
+          {currentPage === 1 && (
+            <div className={styles.instrback}>
+              <Instructions
+                onGoogleSignIn={handleSuccess}
+              />
+            </div>
+          )}
+
+          {/* =====================================================
+              PAGE 2 — REGISTRATION
+          ===================================================== */}
+
+          {currentPage === 2 && (
+            <Register
+              onClickNext={toEventPage}
+              userEmail={userEmail}
+              setUserData={setUserData}
+            />
+          )}
+
+          {/* =====================================================
+              PAGE 3 — EVENTS
+          ===================================================== */}
+
+          {currentPage === 3 && (
+            <Events
+              userData={userData}
+              setUserData={setUserData}
+            />
+          )}
+        </>
       )}
     </div>
   );
