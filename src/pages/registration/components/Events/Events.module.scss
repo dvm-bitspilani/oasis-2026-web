@@ -1110,13 +1110,21 @@
 
 @media (max-height: 800px) and (min-width: 901px) {
   .infoPage {
-    padding-right: 100px;
+    padding-right: 35px;
     width: 50%;
-    // background-color: #38170b;
   }
+
   .eventsPage {
     padding-left: 100px;
   }
+  .scrollbarLine{
+    height: 80%;
+  }
+  .eventControls{
+    top:55% ;
+    height:10vh ;
+  }
+  
 }
 
 /* =========================================================== */
