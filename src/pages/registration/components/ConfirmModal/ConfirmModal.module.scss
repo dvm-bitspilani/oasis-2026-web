@@ -7,7 +7,7 @@
   width: 100%;
   height: 100svh;
   z-index: 1000;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.6);
 }
 
 .selectedEvents {
@@ -15,41 +15,60 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 1.5px solid #ededed;
   border-radius: 8px;
   z-index: 1001;
-  padding: 2.3vw 3.7vw;
+  padding: 5vw 6vw 4vw;
   width: 50vw;
+  aspect-ratio: 1536 / 1024;
   display: flex;
   flex-direction: column;
   box-shadow: 0px 0px 15.3px 0px #e5c3845e;
-  background-color: #000000e5;
-  backdrop-filter: blur(10px);
+  background-image: var(--modal-bg-desktop);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  .close {
+    cursor: pointer;
+    width: 1.6vw;
+    height: 1.6vw;
+    position: absolute;
+    top: 5vw;
+    right: 7vw;
+
+    path {
+      fill: #4a3115;
+    }
+  }
 
   .heading {
-    color: #fff;
-    font: 400 1.7vw "DM Serif Text";
+    color: #3a2411;
+    font: 400 2.5vw "Syamsiah";
   }
   .content {
     display: flex;
     justify-content: space-between;
 
     .noEventsSelected {
-      height: 16vw;
+      height: 21vw;
       width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
       p {
-        font: 400 2vw "DM Serif Text";
+        color: #3a2411;
+        font: 400 1.6vw "Syamsiah";
       }
     }
     ul {
-      margin: 1vw 0 2vw 2.5vw;
-      height: 16vw;
+      margin: 1vw 0 2vw 1vw;
+      height: 21vw;
       overflow-y: auto;
-      list-style: inside;
+      list-style: none;
       padding: 1vw 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.3vw;
       mask-image: linear-gradient(
         to bottom,
         transparent 0%,
@@ -70,13 +89,29 @@
       }
 
       li {
-        margin: 0.2vw 0;
-        color: #fff;
-        font: 400 1.4vw "DM Serif Text";
+        position: relative;
+        color: #432611;
+        text-align: left;
+        font: 400 1.3vw "EB";
+        line-height: 1.6;
+        letter-spacing: 1px;
+        margin-left: 3vw;
+
+        &::before {
+          content: "";
+          position: absolute;
+          display: block;
+          top: 6%;
+          left: -2.5vw;
+          width: 1.5vw;
+          height: 1.45vw;
+          background: center / contain no-repeat
+            url("/game-icons_magic-lamp.svg");
+        }
       }
     }
     .scrollBarContainer {
-      height: 16vw;
+      height: 21vw;
       width: 10vw;
       display: flex;
       justify-content: center;
@@ -101,142 +136,352 @@
   .buttonsContainer {
     display: flex;
     justify-content: space-between;
+    gap: 1.5vw;
     margin-top: auto;
 
-    .cancelButton {
-      border: 1.5px solid #ededed;
-      border-radius: 8px;
-      background: transparent;
-      color: #fff;
-      font: 400 1.5vw "DM Serif Text";
-      padding: 0.5vw 4vw;
-      cursor: pointer;
-    }
+    /* ========================================= */
+    /* SAME BANNER AS THE EVENT-LIST BUTTONS      */
+    /* — inputBg.png outline + inputBgFilled.png  */
+    /* mask that wipes in a red gradient fill —   */
+    /* copied 1:1 from .eventItem in Events.      */
+    /* ========================================= */
+    .cancelButton,
     .confirmButton {
-      background-color: #fff6dd;
+      position: relative;
+
+      flex: 1 1 0;
+
+      min-height: 42px;
+      height: 3.5vw;
+
+      margin: 0;
+      padding: 0 1vw;
+
       border: none;
-      border-radius: 8px;
-      color: #000;
-      font: 400 1.5vw "DM Serif Text";
-      padding: 0.5vw 4vw;
+
+      background-color: transparent;
+      background-position: center;
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+
+      color: #38170b;
+
+      font-family: "Cinzel", serif;
+      font-size: clamp(12px, 1.1vw, 20px);
+      font-weight: 700;
+
       cursor: pointer;
+
+      box-sizing: border-box;
+      overflow: hidden;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+
+      appearance: none;
+      -webkit-appearance: none;
+      -webkit-tap-highlight-color: transparent;
+
+      transition:
+        transform 0.3s ease,
+        filter 0.3s ease;
+
+      /* red gradient fill, masked to the banner's silhouette, */
+      /* wiped in via clip-path on hover                       */
+      &::before {
+        content: "";
+
+        position: absolute;
+        inset: 0;
+
+        background: radial-gradient(
+          circle at center,
+          #671c07 0%,
+          #400e00 100%
+        );
+
+        -webkit-mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
+        mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+        -webkit-mask-position: center;
+        mask-position: center;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+
+        -webkit-clip-path: inset(0 100% 0 0);
+        clip-path: inset(0 100% 0 0);
+
+        z-index: 0;
+        pointer-events: none;
+
+        transition:
+          -webkit-clip-path 0.45s ease,
+          clip-path 0.45s ease;
+      }
+
+      span {
+        position: relative;
+
+        z-index: 2;
+
+        display: block;
+
+        width: 100%;
+
+        margin: 0;
+        padding: 0;
+
+        text-align: center;
+
+        line-height: 1;
+
+        color: inherit;
+
+        transition:
+          transform 0.3s ease,
+          letter-spacing 0.3s ease,
+          text-shadow 0.3s ease,
+          color 0.3s ease;
+      }
+
+      &:hover:not(:disabled) {
+        transform: scale(1.06);
+
+        filter: brightness(1.08)
+          drop-shadow(0 0 8px rgba(229, 195, 132, 0.55));
+
+        &::before {
+          -webkit-clip-path: inset(0 0 0 0);
+          clip-path: inset(0 0 0 0);
+        }
+
+        span {
+          transform: scale(1.04);
+
+          letter-spacing: 0.04em;
+
+          color: #fed59b;
+
+          text-shadow: 0 0 6px rgba(254, 213, 155, 0.8);
+        }
+      }
+
+      &:active:not(:disabled) {
+        transform: scale(0.97);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    /* CANCEL — plain banner outline, fills gold only on hover, */
+    /* same as an unselected event item */
+    .cancelButton {
+      color: #38170b;
+    }
+
+    /* CONFIRM — permanently in the "selected" state, i.e. the */
+    /* banner is already filled and the label is already gold, */
+    /* same as the currently-active event item, so it reads as */
+    /* the primary action */
+    .confirmButton {
+      transform: scale(1.04);
+
+      filter: brightness(1.12)
+        drop-shadow(0 0 10px rgba(229, 195, 132, 0.65));
+
+      animation: bannerSelected 0.35s ease-out;
+
+      &::before {
+        -webkit-clip-path: inset(0 0 0 0);
+        clip-path: inset(0 0 0 0);
+      }
+
+      span {
+        letter-spacing: 0.04em;
+
+        color: #fed59b;
+
+        text-shadow: 0 0 7px rgba(254, 213, 155, 0.8);
+      }
+
+      &:hover:not(:disabled) {
+        transform: scale(1.08);
+
+        filter: brightness(1.15)
+          drop-shadow(0 0 14px rgba(254, 213, 155, 0.85));
+
+        span {
+          transform: none;
+        }
+      }
     }
   }
 }
+
+@keyframes bannerSelected {
+  0% {
+    transform: scale(0.94);
+  }
+
+  60% {
+    transform: scale(1.07);
+  }
+
+  100% {
+    transform: scale(1.04);
+  }
+}
+
 .error {
-  height: 25vw;
   align-items: center;
   justify-content: center;
   gap: 4vw;
   p {
-    color: #eb5c5c;
-    font: 400 1.7vw "DM Serif Text";
+    color: #9c2b2b;
+    text-align: center;
+    font: 400 1.7vw "Syamsiah";
   }
   .buttonsContainer {
     margin-top: unset;
   }
 }
+
 @media screen and (max-width: 1200px) and (max-aspect-ratio: 1.45) {
   .selectedEvents {
+    // 0.4702 = 860 / 1829, the actual width:height ratio of modalFrameMobile.png.
+    // min() picks whichever of "88% of viewport width" or "the width that
+    // makes the frame exactly 82svh tall" is smaller, so the frame always
+    // fits inside the screen on both axes instead of overflowing it.
+    --modal-w: min(88vw, 82svh * 0.4702);
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 2.3vw 3.7vw;
-    width: 80vw;
+    width: var(--modal-w);
+    aspect-ratio: 860 / 1829;
+    height: auto;
+    padding: calc(var(--modal-w) * 0.17) calc(var(--modal-w) * 0.115)
+      calc(var(--modal-w) * 0.09);
+    background-image: var(--modal-bg-mobile);
+    overflow: hidden;
+
+    .close {
+      top: calc(var(--modal-w) * 0.075);
+      right: calc(var(--modal-w) * 0.085);
+      width: calc(var(--modal-w) * 0.06);
+      height: calc(var(--modal-w) * 0.06);
+    }
 
     .heading {
-      font: 400 4.3vw "DM Serif Text";
+      flex-shrink: 0;
+      font: 400 calc(var(--modal-w) * 0.068) "Syamsiah";
     }
     .content {
+      flex: 1 1 auto;
+      min-height: 0; // let the flex item shrink to the space that's actually left, instead of forcing the box taller than the frame
+
       .noEventsSelected {
-        height: 60svh;
+        height: 100%;
         p {
-          font: 400 4vw "DM Serif Text";
+          font: 400 calc(var(--modal-w) * 0.055) "Syamsiah";
         }
       }
+
       ul {
-        margin: 1vw 0 2vw 2.5vw;
-        height: 60svh;
-        padding: 4vw 0;
+        margin: calc(var(--modal-w) * 0.035) 0 0 calc(var(--modal-w) * 0.02);
+        height: 100%;
+        padding: calc(var(--modal-w) * 0.02) 0;
+        gap: calc(var(--modal-w) * 0.045);
         li {
-          font: 400 3vw "DM Serif Text";
+          margin-left: calc(var(--modal-w) * 0.13);
+          font: 400 calc(var(--modal-w) * 0.05) "EB";
+          &::before {
+            top: 0;
+            left: 0;
+            transform: translate(-100%, 20%);
+            width: calc(var(--modal-w) * 0.075);
+            height: calc(var(--modal-w) * 0.075);
+          }
         }
       }
       .scrollBarContainer {
-        height: 60svh;
+        height: 100%;
+        width: calc(var(--modal-w) * 0.12);
         .scrollBarThumb {
-          height: 8vw;
+          height: calc(var(--modal-w) * 0.11);
         }
       }
     }
     .buttonsContainer {
-      .cancelButton {
-        font: 400 3vw "DM Serif Text";
-        padding: 0.5vw 4vw;
-      }
+      flex-shrink: 0;
+
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      gap: calc(var(--modal-w) * 0.04);
+
+      .cancelButton,
       .confirmButton {
-        font: 400 3vw "DM Serif Text";
-        padding: 0.5vw 4vw;
-        cursor: pointer;
+        width: 100%;
+        height: calc(var(--modal-w) * 0.14);
+        min-height: 42px;
+        font-size: calc(var(--modal-w) * 0.045);
       }
     }
   }
   .error {
-    height: 30svh;
-    gap: 4vw;
+    gap: calc(var(--modal-w, 60vw) * 0.06);
     p {
-      color: #fff;
-      font: 400 3.5vw "DM Serif Text";
+      font: 400 calc(var(--modal-w, 60vw) * 0.06) "Syamsiah";
     }
   }
 }
 @media screen and (max-width: 1200px) and (max-aspect-ratio: 0.75) {
   .selectedEvents {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 3vw 4.3vw;
-    width: 80vw;
-
+    // Sizing (--modal-w, width, aspect-ratio, padding) is inherited from the
+    // breakpoint above — only the type scale needs to grow a bit further for
+    // very narrow/tall phones, so we don't re-declare box dimensions here.
     .heading {
-      font: 400 4.3vw "DM Serif Text";
+      font: 400 calc(var(--modal-w) * 0.095) "Syamsiah";
     }
     .content {
       .noEventsSelected {
-        height: 60svh;
         p {
-          font: 400 5vw "DM Serif Text";
+          font: 400 calc(var(--modal-w) * 0.065) "Syamsiah";
         }
       }
       ul {
-        margin: 1vw 0 2vw 2.5vw;
-        height: 60svh;
-
         li {
-          font: 400 4vw "DM Serif Text";
+          font: 400 calc(var(--modal-w) * 0.058) "EB";
+          &::before {
+            width: calc(var(--modal-w) * 0.085);
+            height: calc(var(--modal-w) * 0.085);
+          }
         }
       }
     }
     .buttonsContainer {
-      .cancelButton {
-        font: 400 4vw "DM Serif Text";
-        padding: 0.5vw 4vw;
-      }
+      .cancelButton,
       .confirmButton {
-        font: 400 4vw "DM Serif Text";
-        padding: 0.5vw 4vw;
-        cursor: pointer;
+        font-size: calc(var(--modal-w) * 0.05);
       }
+    }
+    .close {
+      right: 15%;
+      top: 10%;
+      visibility: hidden;
     }
   }
   .error {
-    height: 30svh;
-    gap: 4vw;
     p {
-      color: #fff;
-      font: 400 4vw "DM Serif Text";
+      font: 400 calc(var(--modal-w, 60vw) * 0.07) "Syamsiah";
     }
   }
 }
