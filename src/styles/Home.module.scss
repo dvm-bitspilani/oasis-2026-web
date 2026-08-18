@@ -1,9 +1,9 @@
-.container{
-    height: 100svh;
-    width: 100svw;
-    overflow: hidden;
-    position: relative;
-    overscroll-behavior: none;
+.container {
+  height: 100svh;
+  width: 100svw;
+  overflow: hidden;
+  position: relative;
+  overscroll-behavior: none;
 }
 
 .background {
@@ -43,24 +43,22 @@
   width: 100%;
   height: 100%;
   z-index: 3;
-  overflow: hidden;;
+  overflow: hidden;
 }
 
-
-.sandImg{
-    // object-fit: contatin;
-    object-position: center bottom;
-    width: 100%;
-    height: 100%;
-    z-index: 5;
+.sandImg {
+  object-position: center bottom;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
 }
 
 .castle {
   position: absolute;
-  bottom: 23%;         
+  bottom: 23%;
   left: 41%;
   transform: translateX(-50%);
-  width: 45%;           
+  width: 45%;
   z-index: 2;
 }
 
@@ -86,10 +84,10 @@
   display: block;
 }
 
-.oasisLogo{
+.oasisLogo {
   position: absolute;
   bottom: -2%;
-  left:5%;
+  left: 5%;
   height: 30vh;
   width: 30vw;
   z-index: 5;
@@ -99,33 +97,97 @@
     height: 100%;
     object-fit: contain;
     display: block;
-  } 
+  }
 }
 
-.regBtn{
+
+/* =========================================================
+   REGISTRATION BUTTON
+   ========================================================= */
+
+.regBtn {
   position: absolute;
   bottom: 0%;
-  right:6%;
+  right: 6%;
   height: 33vh;
   width: 33vw;
   z-index: 5;
+
+  cursor: pointer;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: contain;
     display: block;
-
     &:hover {
       cursor: pointer;
     }
+      will-change: filter;
+  }
+
+}
+
+
+/* =========================================================
+   REGISTRATION BUTTON GLOW
+   ========================================================= */
+
+.regBtn:hover img {
+  animation: regButtonGlow 2.5s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   SUBTLE GLOW ANIMATION
+   ========================================================= */
+
+@keyframes regButtonGlow {
+  0%,
+  100% {
+    filter:
+      drop-shadow(
+        0 0 3px rgba(254, 213, 155, 0.25)
+      )
+      drop-shadow(
+        0 0 6px rgba(254, 213, 155, 0.12)
+      );
+  }
+
+  50% {
+    filter:
+      drop-shadow(
+        0 0 5px rgba(254, 213, 155, 0.45)
+      )
+      drop-shadow(
+        0 0 10px rgba(254, 213, 155, 0.2)
+      );
   }
 }
 
-.camelLand{
+
+/* =========================================================
+   REGISTRATION BUTTON CLICK
+   ========================================================= */
+
+.regBtn:active img {
+  animation: none;
+
+  filter:
+    drop-shadow(
+      0 0 6px rgba(254, 213, 155, 0.4)
+    );
+}
+
+
+/* =========================================================
+   CAMEL
+   ========================================================= */
+
+.camelLand {
   position: absolute;
   bottom: 17%;
-  left:35%;
+  left: 35%;
   height: 15vh;
   width: 15vw;
   z-index: 4;
@@ -138,6 +200,11 @@
   }
 }
 
+
+/* =========================================================
+   LINKS
+   ========================================================= */
+
 .links {
   position: relative;
   width: 25vw;
@@ -148,39 +215,110 @@
 }
 
 .linksSvg {
-  position:relative;
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
 }
 
-@media (max-width: 650px){
-  .castle{
+
+/* =========================================================
+   SOCIAL LINKS
+   ========================================================= */
+
+.socialLink {
+  transition:
+    filter 0.25s ease,
+    transform 0.25s ease;
+
+  transform-box: fill-box;
+  transform-origin: center;
+  box-sizing: border-box;
+}
+
+.links a {
+  display: block;
+
+  &:hover .socialLink,
+  &:focus-visible .socialLink {
+    transform: scale(1.1);
+
+    filter:
+      drop-shadow(
+        0 0 2px rgba(255, 255, 255, 0.4)
+      )
+      drop-shadow(
+        0 0 5px rgba(255, 255, 255, 0.2)
+      );
+  }
+}
+
+
+/* =========================================================
+   MOON CLOUD OVERLAY
+   ========================================================= */
+
+.moonCloudOverlay {
+  position: absolute;
+
+  /*
+    top / left / width / height
+    are set via JS each frame
+  */
+
+  border-radius: 50%;
+  overflow: hidden;
+  mix-blend-mode: color;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.moonCloudOverlayInner {
+  position: absolute;
+
+  /*
+    top / left / width / height
+    are set via JS
+  */
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+  .castle {
     width: 100vw;
     left: 50%;
     bottom: 41%;
   }
+
+
   .sandImg {
-  // transform: scaleX(-1);
-}
+    /*
+      transform: scaleX(-1);
+    */
+  }
 
-.sand {
-  object-fit: cover;
-  height: 50%;
-  
-  // left: 1%;
+  .sand {
+    object-fit: cover;
+    height: 50%;
+  }
 
-}
-  .moon{
+
+  .moon {
     width: 100vw;
     left: 50%;
     bottom: 30%;
   }
 
-  .oasisLogo{
+
+  .oasisLogo {
     position: absolute;
     bottom: 12%;
-    left:5%;
+    left: 5%;
     height: 50vh;
     width: 50vw;
     z-index: 5;
@@ -193,13 +331,22 @@
     }
   }
 
-  .regBtn{
+
+  /* =======================================================
+     MOBILE REGISTRATION BUTTON
+     ======================================================= */
+
+  .regBtn {
     position: absolute;
-    height:70vh;
+
+    height: 70vh;
     width: 70vw;
-    z-index: 5; 
+
+    z-index: 5;
+
     bottom: -15%;
     left: 15%;
+    right: auto;
 
     img {
       width: 100%;
@@ -208,76 +355,28 @@
       display: block;
     }
   }
-  
-  .links{
+
+
+  /*
+    Disable hover animation on touch devices.
+  */
+
+  .regBtn:hover img {
+    animation: none;
+    filter: none;
+  }
+
+  .regBtn:active img {
+    animation: none;
+
+    filter:
+      drop-shadow(
+        0 0 6px rgba(254, 213, 155, 0.4)
+      );
+  }
+
+
+  .links {
     display: none;
   }
-}
-
-.socialLink {
-  transition: filter 0.25s ease, transform 0.25s ease;
-  transform-box: fill-box;
-  transform-origin: center;
-  box-sizing: border-box;
-}
-
-.links a {
-  display: block;
-
-  &:hover .socialLink,
-  &:focus-visible .socialLink {
-    transform: scale(1.1);
-    filter:
-      drop-shadow(0 0 2px rgba(255, 255, 255, 0.4))
-      drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
-  }
-}
-
-.moonCloudOverlay {
-  position: absolute; // top/left/width/height set via JS each frame
-  border-radius: 50%;
-  overflow: hidden;
-  mix-blend-mode: color;
-  pointer-events: none;
-  z-index: 4; // same tier as .clouds; comes after it in DOM so it paints on top
-}
-
-.moonCloudOverlayInner {
-  position: absolute; // top/left/width/height set via JS each frame
-}
-
-.regBtnLink {
-  display: block;
-  width: 100%;
-  height: 100%;
-
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.regBtnImg {
-  display: block;
-
-  width: 100%;
-  height: 100%;
-
-  object-fit: contain;
-
-  transition:
-    transform 0.25s ease,
-    filter 0.25s ease;
-}
-
-.regBtnLink:hover .regBtnImg {
-  // transform: scale(1.08);
-
-  filter:
-    brightness(1.12)
-    drop-shadow(
-      0 0 12px rgba(254, 213, 155, 0.65)
-    );
-}
-
-.regBtnLink:active .regBtnImg {
-  transform: scale(0.96);
 }
