@@ -37,6 +37,9 @@ import EB from "../../assets/fonts/EBGaramond-Medium.ttf";
 import Cinzel from "../../assets/fonts/Cinzel-VariableFont_wght.ttf";
 import Scroll1 from "/instructionsScroll.png";
 import Scroll2 from "/instructionsScrollLong.png";
+import googleButton from "/googleReg.svg";
+import lamps from "/game-icons_magic-lamp.svg";
+import instructionsBG from "/instructionsBG.png";
 
 const registrationAssets = [
   RegBg,
@@ -58,7 +61,10 @@ const registrationAssets = [
   EB,
   Cinzel,
   Scroll1,
-  Scroll2
+  Scroll2,
+  googleButton,
+  lamps,
+  instructionsBG
 ];
 
 // interface RegistrationProps {

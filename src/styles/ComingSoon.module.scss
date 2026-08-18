@@ -115,7 +115,7 @@
   inset: 0;
   z-index: 10;
   backdrop-filter: brightness(50%);
-  -webkit-backdrop-filter: brightness(50%);
+  //-webkit-backdrop-filter: brightness(50%);
   pointer-events: none;
 }
 
