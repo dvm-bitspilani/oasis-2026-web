@@ -5,8 +5,9 @@ import Instructions from "../../pages/registration/components/Instructions/Instr
 import Register from "../registration/components/Register/Register";
 import Events from "../../pages/registration/components/Events/Events";
 import Preloader from "../Preloader";
+import BookTransition from "./BookTransition";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useCookies } from "react-cookie";
 
 import axios from "axios";
@@ -64,17 +65,31 @@ const registrationAssets = [
   Scroll2,
   googleButton,
   lamps,
-  instructionsBG
+  instructionsBG,
 ];
 
-// interface RegistrationProps {
-//   startAnimation: boolean;
-//   goToPage: (path: string) => void;
-// }
+/* =====================================================
+   FLOW PHASES
+
+   instructions -> opening  : scroll slides up, book flies
+                              to centre and swings open
+   opening      -> revealing: cover has landed, the real
+                              <Register /> fades in under the
+                              overlay
+   revealing    -> register : overlay unmounts
+   register     -> events   : unchanged, via onClickNext
+   ===================================================== */
+
+type Phase =
+  | "instructions"
+  | "opening"
+  | "revealing"
+  | "register"
+  | "events";
 
 const Registration = () => {
   const [entered, setEntered] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [phase, setPhase] = useState<Phase>("instructions");
   const [userEmail, setUserEmail] = useState("");
   const [userData, setUserData] = useState<any>(null);
 
@@ -103,22 +118,15 @@ const Registration = () => {
     ],
   };
 
-  // const toFirstPage = () => {
-  //   setCurrentPage(1);
-  // };
-
-  const toRegPage = () => {
-    setCurrentPage(2);
-  };
-
   const toEventPage = () => {
-    setCurrentPage(3);
+    setPhase("events");
   };
 
-  function redirectWithPost(
-    url: string,
-    data: { [key: string]: string },
-  ) {
+  /* Stable so BookTransition's effects don't re-run */
+  const handleOpened = useCallback(() => setPhase("revealing"), []);
+  const handleTransitionDone = useCallback(() => setPhase("register"), []);
+
+  function redirectWithPost(url: string, data: { [key: string]: string }) {
     const form = document.createElement("form");
 
     form.method = "POST";
@@ -146,28 +154,19 @@ const Registration = () => {
     console.log(response);
 
     axios
-      .post(
-        "https://bits-oasis.org/2026/main/registrations/google-reg/",
-        {
-          id_token: idToken,
-        },
-      )
+      .post("https://bits-oasis.org/2026/main/registrations/google-reg/", {
+        id_token: idToken,
+      })
       .then((res) => {
         setCookies("id_token", idToken);
 
         if (res.data.exists) {
           setCookies("user-auth", res.data);
-          setCookies(
-            "Authorization",
-            res.data.tokens.access,
-          );
+          setCookies("Authorization", res.data.tokens.access);
 
-          redirectWithPost(
-            "https://bits-oasis.org/2026/main/registrations/",
-            {
-              token: res.data.tokens.access,
-            },
-          );
+          redirectWithPost("https://bits-oasis.org/2026/main/registrations/", {
+            token: res.data.tokens.access,
+          });
 
           setUserEmail(res.data.email);
         } else {
@@ -176,7 +175,9 @@ const Registration = () => {
           setUserEmail(res.data.email);
 
           if (res.data.email) {
-            toRegPage();
+            /* Was: toRegPage(). Now it starts the animation
+               instead of hard-swapping the page. */
+            setPhase("opening");
           }
         }
       })
@@ -185,10 +186,16 @@ const Registration = () => {
       });
   };
 
-  console.log("CURRENT PAGE:", currentPage);
+  const showInstructions =
+    phase === "instructions" || phase === "opening" || phase === "revealing";
+
+  const showRegister =
+    phase === "opening" || phase === "revealing" || phase === "register";
+
+  const registerVisible = phase === "revealing" || phase === "register";
 
   return (
-    <div>
+    <div className={styles.flowRoot}>
       <Helmet>
         <title>Registration | OASIS 2026</title>
 
@@ -197,15 +204,9 @@ const Registration = () => {
           content="Register for Oasis 2026, the annual cultural festival of BITS Pilani."
         />
 
-        <link
-          rel="canonical"
-          href="https://www.bits-oasis.org/register"
-        />
+        <link rel="canonical" href="https://www.bits-oasis.org/register" />
 
-        <meta
-          property="og:title"
-          content="Registration | OASIS 2026"
-        />
+        <meta property="og:title" content="Registration | OASIS 2026" />
 
         <meta
           property="og:description"
@@ -214,30 +215,18 @@ const Registration = () => {
 
         <meta property="og:type" content="website" />
 
-        <meta
-          property="og:url"
-          content="https://www.bits-oasis.org/register"
-        />
+        <meta property="og:url" content="https://www.bits-oasis.org/register" />
 
         <meta
           property="og:image"
           content="https://www.bits-oasis.org/logo2.png"
         />
 
-        <meta
-          property="og:site_name"
-          content="OASIS 2026"
-        />
+        <meta property="og:site_name" content="OASIS 2026" />
 
-        <meta
-          name="twitter:card"
-          content="summary_large_image"
-        />
+        <meta name="twitter:card" content="summary_large_image" />
 
-        <meta
-          name="twitter:title"
-          content="Registration | OASIS 2026"
-        />
+        <meta name="twitter:title" content="Registration | OASIS 2026" />
 
         <meta
           name="twitter:description"
@@ -253,36 +242,58 @@ const Registration = () => {
       <BreadCrumb data={breadcrumbJsonLd} />
 
       {!entered && (
-        <Preloader
-          assets={registrationAssets}
-          onEnter={() => setEntered(true)}
-        />
+        <Preloader assets={registrationAssets} onEnter={() => setEntered(true)} />
       )}
 
       {entered && (
         <>
           {/* =====================================================
               PAGE 1 — INSTRUCTIONS
-              RegBg.png is only applied here
+              Stays mounted through the whole transition so the
+              frame, corners and background never blink.
           ===================================================== */}
 
-          {currentPage === 1 && (
+          {showInstructions && (
             <div className={styles.instrback}>
-              <Instructions
-                onGoogleSignIn={handleSuccess}
-              />
+              <div
+                className={`${styles.instrLayer} ${
+                  phase !== "instructions" ? styles.instrLayerExit : ""
+                }`}
+              >
+                <Instructions onGoogleSignIn={handleSuccess} />
+              </div>
             </div>
           )}
 
           {/* =====================================================
               PAGE 2 — REGISTRATION
+              Mounted at the start of the animation but held at
+              opacity 0, so its college fetch and localStorage
+              read happen while the book is still in flight.
           ===================================================== */}
 
-          {currentPage === 2 && (
-            <Register
-              onClickNext={toEventPage}
-              userEmail={userEmail}
-              setUserData={setUserData}
+          {showRegister && (
+            <div
+              className={`${styles.regLayer} ${
+                registerVisible ? styles.regLayerVisible : ""
+              }`}
+            >
+              <Register
+                onClickNext={toEventPage}
+                userEmail={userEmail}
+                setUserData={setUserData}
+              />
+            </div>
+          )}
+
+          {/* =====================================================
+              THE TRANSITION ITSELF
+          ===================================================== */}
+
+          {(phase === "opening" || phase === "revealing") && (
+            <BookTransition
+              onOpened={handleOpened}
+              onDone={handleTransitionDone}
             />
           )}
 
@@ -290,11 +301,8 @@ const Registration = () => {
               PAGE 3 — EVENTS
           ===================================================== */}
 
-          {currentPage === 3 && (
-            <Events
-              userData={userData}
-              setUserData={setUserData}
-            />
+          {phase === "events" && (
+            <Events userData={userData} setUserData={setUserData} />
           )}
         </>
       )}

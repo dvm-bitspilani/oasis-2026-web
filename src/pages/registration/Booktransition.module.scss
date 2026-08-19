@@ -1,0 +1,114 @@
+/* =========================================================
+   BOOK TRANSITION OVERLAY
+
+   Sits above the Instructions page and below nothing else.
+   Everything is positioned in viewport pixels from JS, so it
+   is immune to the two pages' differing layout rules.
+   ========================================================= */
+
+.stage {
+  position: fixed;
+  inset: 0;
+
+  z-index: 900;
+
+  pointer-events: none;
+
+  /* Applies to .flight (direct child); preserve-3d on .flight
+     passes it down to the rotating .flap. */
+  perspective: 2400px;
+  perspective-origin: 50% 45%;
+}
+
+/* ---------------------------------------------------------
+   RIGHT PAGE
+   Right half of book.png, sitting under the cover.
+   --------------------------------------------------------- */
+
+.rightPage {
+  position: absolute;
+
+  background-size: 200% 100%;
+  background-position: right center;
+  background-repeat: no-repeat;
+
+  transition: opacity 120ms linear;
+
+  /* Kills the hairline seam between the two halves */
+  box-shadow: -1px 0 0 0 rgba(0, 0, 0, 0.15);
+}
+
+/* ---------------------------------------------------------
+   FLIGHT
+   Pure 2D FLIP wrapper. Laid out at the destination rect and
+   transformed back to the origin rect for the first frame.
+   --------------------------------------------------------- */
+
+.flight {
+  position: absolute;
+
+  transform-origin: top left;
+  transform-style: preserve-3d;
+
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.62, 0.02, 0.24, 1);
+
+  /* Set from JS: transition-duration */
+}
+
+/* ---------------------------------------------------------
+   FLAP
+   The cover. Hinges on its left edge and swings 180deg onto
+   the left half of the spread, where its back face is the
+   left page.
+   --------------------------------------------------------- */
+
+.flap {
+  position: absolute;
+  inset: 0;
+
+  transform-origin: left center;
+  transform-style: preserve-3d;
+
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.55, 0.05, 0.2, 1);
+
+  /* Set from JS: transition-duration */
+
+  will-change: transform;
+}
+
+.cover,
+.leftPage {
+  position: absolute;
+  inset: 0;
+
+  background-repeat: no-repeat;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Front face — closedBook.png, shown for the flight and the
+   first half of the swing. */
+.cover {
+  background-size: 100% 100%;
+  background-position: center;
+}
+
+/* Back face — left half of book.png. Pre-rotated so that when
+   .flap reaches -180deg the two rotations cancel and the page
+   renders the right way round. */
+.leftPage {
+  transform: rotateY(180deg);
+
+  background-size: 200% 100%;
+  background-position: left center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flight,
+  .flap {
+    transition: none !important;
+  }
+}
