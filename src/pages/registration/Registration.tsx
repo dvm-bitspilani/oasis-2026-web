@@ -5,7 +5,7 @@ import Instructions from "../../pages/registration/components/Instructions/Instr
 import Register from "../registration/components/Register/Register";
 import Events from "../../pages/registration/components/Events/Events";
 import Preloader from "../Preloader";
-import BookTransition from "./BookTransition";
+import BookTransition from "./Booktransition";
 
 import { useCallback, useState } from "react";
 import { useCookies } from "react-cookie";
