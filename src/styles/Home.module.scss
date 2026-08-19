@@ -257,12 +257,20 @@ right: calc(-2vw); // moves proportionally further off the right edge as viewpor
   .castle {
     width: clamp(340px, 100vw, 480px);
     left: 50%;
-    bottom: 41%;
+    bottom: 39%;
+  }
+
+
+  .sandImg {
+    /*
+      transform: scaleX(-1);
+    */
   }
 
   .sand {
-    object-fit: cover;
-    height: 50%;
+    // object-fit: cover;
+    height: 45%;
+    width: 100vw;
   }
 
   .moon {

@@ -1,156 +1,244 @@
 .preloader {
   position: fixed;
+
   inset: 0;
+
+  width: 100vw;
+  height: 100vh;
 
   z-index: 99999;
 
+  overflow: hidden;
+
+  background: rgb(8, 10, 24);
+
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  background: #000;
+  transform:
+    translate3d(
+      0,
+      0,
+      0
+    );
 
-  color: #e8e3d8;
+  will-change: transform;
 
-  overflow: hidden;
+  /*
+   * Curtain movement only.
+   */
+  transition:
+    transform 1200ms
+    cubic-bezier(
+      0.76,
+      0,
+      0.24,
+      1
+    );
+
+  pointer-events: auto;
 }
-.background{
-    position: absolute;
+
+/* ====================================================== */
+/* EXIT                                                    */
+/* ====================================================== */
+
+.exiting {
+  /*
+   * Move completely above viewport.
+   *
+   * The real website is underneath.
+   */
+  transform:
+    translate3d(
+      0,
+      -100%,
+      0
+    );
+
+  pointer-events: none;
+}
+
+/* ====================================================== */
+/* CANVAS                                                   */
+/* ====================================================== */
+
+.canvas {
+  position: absolute;
+
   inset: 0;
 
   width: 100%;
   height: 100%;
 
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  display: block;
 
-  opacity: 0.2;
-  z-index: 0;
+  background:
+    rgb(8, 10, 24);
 }
-.vignette {
+
+/* ====================================================== */
+/* SOURCE SVG                                               */
+/* ====================================================== */
+
+.sourceSvg {
   position: absolute;
-  inset: 0;
+
+  width: 0;
+  height: 0;
+
+  opacity: 0;
+
+  visibility: hidden;
 
   pointer-events: none;
 
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0, 0, 0, 0) 40%,
-    rgba(0, 0, 0, 0.85) 100%
-  );
-
-  z-index: 1;
+  overflow: hidden;
 }
 
+.sourceSvg path {
+  fill: none;
 
-/* ========================================= */
-/* CONTENT                                   */
-/* ========================================= */
-
-.content {
-  position: relative;
-
-  z-index: 2;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 100%;
-  height: 100%;
-
-  text-align: center;
+  stroke: none;
 }
 
+/* ====================================================== */
+/* VIGNETTE                                                 */
+/* ====================================================== */
 
-/* ========================================= */
-/* FLASH IMAGE                               */
-/* ========================================= */
-
-.flashImage {
+.vignette {
   position: absolute;
 
-  left: 50%;
-  top: 50%;
+  inset: 0;
 
-  transform:
-    translate(-50%, -50%)
-    scale(1.03);
+  z-index: 5;
 
-  max-width: 70vw;
-  max-height: 70vh;
+  pointer-events: none;
 
-  object-fit: contain;
+  background:
+    radial-gradient(
+      ellipse at center,
 
-  opacity: 0;
+      transparent 20%,
+
+      rgba(
+        0,
+        0,
+        0,
+        0.06
+      ) 44%,
+
+      rgba(
+        0,
+        0,
+        0,
+        0.22
+      ) 72%,
+
+      rgba(
+        0,
+        0,
+        0,
+        0.52
+      ) 100%
+    );
 }
 
+/* ====================================================== */
+/* TABLET                                                   */
+/* ====================================================== */
 
-/* ========================================= */
-/* FLASH IN                                  */
-/* ========================================= */
+@media (
+  max-width: 900px
+) {
+  .vignette {
+    background:
+      radial-gradient(
+        ellipse at center,
 
-.phase-in {
-  animation:
-    flashIn 0.25s ease-out forwards;
+        transparent 18%,
+
+        rgba(
+          0,
+          0,
+          0,
+          0.07
+        ) 45%,
+
+        rgba(
+          0,
+          0,
+          0,
+          0.26
+        ) 75%,
+
+        rgba(
+          0,
+          0,
+          0,
+          0.56
+        ) 100%
+      );
+  }
 }
 
-@keyframes flashIn {
-  0% {
-    opacity: 0;
+/* ====================================================== */
+/* MOBILE                                                   */
+/* ====================================================== */
 
-    transform:
-      translate(-50%, -50%)
-      scale(1.03);
+@media (
+  max-width: 600px
+) {
+  .vignette {
+    background:
+      radial-gradient(
+        ellipse at center,
+
+        transparent 15%,
+
+        rgba(
+          0,
+          0,
+          0,
+          0.08
+        ) 45%,
+
+        rgba(
+          0,
+          0,
+          0,
+          0.30
+        ) 75%,
+
+        rgba(
+          0,
+          0,
+          0,
+          0.60
+        ) 100%
+      );
+  }
+}
+
+/* ====================================================== */
+/* REDUCED MOTION                                           */
+/* ====================================================== */
+
+@media (
+  prefers-reduced-motion: reduce
+) {
+  .preloader {
+    transition: none;
   }
 
-  100% {
-    opacity: 1;
-
+  .exiting {
     transform:
-      translate(-50%, -50%)
-      scale(1);
-  }
-}
-
-
-/* ========================================= */
-/* FLASH HOLD                                */
-/* ========================================= */
-
-.phase-hold {
-  opacity: 1;
-
-  transform:
-    translate(-50%, -50%)
-    scale(1);
-}
-
-
-/* ========================================= */
-/* FLASH OUT                                 */
-/* ========================================= */
-
-.phase-out {
-  animation:
-    flashOut 0.25s ease-in forwards;
-}
-
-@keyframes flashOut {
-  0% {
-    opacity: 1;
-
-    transform:
-      translate(-50%, -50%)
-      scale(1);
-  }
-
-  100% {
-    opacity: 0;
-
-    transform:
-      translate(-50%, -50%)
-      scale(0.97);
+      translate3d(
+        0,
+        -100%,
+        0
+      );
   }
 }
