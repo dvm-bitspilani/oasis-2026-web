@@ -5,12 +5,12 @@ import gsap from "gsap";
 import styles from "../styles/Home.module.scss";
 
 import bg from "../assets/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg";
-import sandImg from "../assets/sandImg.png";
+import sandImg from "../assets/sand1.png";
 import sandMob from "../assets/sandmobile.png";
 import cloudSmall from "../assets/cloudSmall.svg";
 import cloudBig from "../assets/cloudBig.svg";
 import cloudThree from "../assets/cloudThree.svg";
-import Castle from "../assets/Castle.png";
+import Castle from "../assets/Castle1.svg";
 import Moon from "../assets/Moon.png";
 import LogoOasis from "../assets/LogoOasisi.png";
 import RegBtn from "../assets/regBtn.png";
@@ -113,7 +113,7 @@ const CLOUDS_MOBILE: Cloud[] = [
 const bgImg = window.innerWidth < 650 ? sandMob : sandImg;
 
 const MOON_CLOUD_TINT =
-  "brightness(0.35) sepia(1) hue-rotate(20deg) saturate(5)";
+  "brightness(0.35) sepia(0.8) hue-rotate(20deg) saturate(1.5)";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -248,7 +248,7 @@ export default function Home() {
 
   return (
     <div className={styles.container} ref={containerRef}>
-      <div data-transition-fade>
+      <div data-transition-fade className={styles.navbar}>
         <Nav />
       </div>
 
