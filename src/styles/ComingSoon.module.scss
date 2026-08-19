@@ -128,6 +128,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 20px;
   color: #FEEAD1;
 
   h1 {
@@ -142,9 +143,9 @@
       font-weight: 300;
     }
     
-    img {
-        outline: none;
-    }
+  img {
+    outline: none;
+  }
 }
 
 @media screen and (max-width: 768px) {

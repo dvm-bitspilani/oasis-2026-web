@@ -102,6 +102,11 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
               Complete the registration form with all required details. You'll
               be able to login through your registered email id when required.
             </li>
+            <li>
+              A College Representative (CR) will be appointed for
+              each college who'll be responsible for allotting heads for
+              all the societies the college will be participating for.
+            </li>
             <li>All prof shows are free. </li>
             <li>All team members are required to register separately.</li>
             <li>
