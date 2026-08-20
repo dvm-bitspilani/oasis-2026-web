@@ -35,7 +35,7 @@ type Cloud = {
   duration: number;
 };
 
-type Point = { x: number; y: number };
+// type Point = { x: number; y: number };
 
 const MOBILE_BREAKPOINT = 650;
 
@@ -149,7 +149,7 @@ const CLOUD_SETTLE_DURATION = 0.3;
 const FADE_ELEMENTS_START = 0.95;
 const FADE_ELEMENTS_DURATION = 0.9;
 const FADE_ELEMENTS_STAGGER = 0.14;
-const FADE_ELEMENTS_RISE = 22;
+// const FADE_ELEMENTS_RISE = 22;
 
 // =========================================================
 // HOME
