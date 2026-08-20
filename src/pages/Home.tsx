@@ -32,6 +32,8 @@ type Cloud = {
   duration: number;
 };
 
+type Point = { x: number; y: number };
+
 const MOBILE_BREAKPOINT = 650;
 
 const CLOUDS_DESKTOP: Cloud[] = [
@@ -119,7 +121,7 @@ export default function Home() {
   const navigate = useNavigate();
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const camelRef = useRef(null);
+  const camelRef = useRef<HTMLDivElement>(null);
   const cloudsRef = useRef<HTMLDivElement>(null);
   const cloudRefs = useRef<(HTMLDivElement | null)[]>([]);
   const castleRef = useRef<HTMLDivElement>(null);
@@ -246,9 +248,105 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile]);
 
+  useEffect(() => {
+  const caravan = camelRef.current;
+  const containerEl = containerRef.current;
+
+  if (!caravan || !containerEl) return;
+
+  const ctx = gsap.context(() => {
+    const { width: w, height: h } =
+      containerEl.getBoundingClientRect();
+
+    const MIDDLE_ROAD_PCT = [
+      { xPct: 5, yPct: -1 },
+      { xPct: 8, yPct: -1 },
+      { xPct: 10, yPct: -0.5 },
+      { xPct: 15, yPct: 0 },
+      { xPct: 20, yPct: 0.5 }, // REGISTER
+    ];
+
+    // ==========================================
+    // LOWER ROAD
+    // Lower-left -> Lower-right
+    // ==========================================
+    // const LOWER_ROAD_PCT = [
+    //   { xPct: 0, yPct: 1.2 }, // LOWER LEFT
+    //   { xPct: 2, yPct: 4 },
+    //   { xPct: 4, yPct: 8 },
+    //   { xPct: 6, yPct: 10 },
+    //   { xPct: 9, yPct: 12 }, // LOWER RIGHT
+    // ];
+
+    const toPx = (
+      pts: { xPct: number; yPct: number }[]
+    ): Point[] =>
+      pts.map((p) => ({
+        x: (p.xPct / 100) * w,
+        y: (p.yPct / 100) * h,
+      }));
+
+    const middlePath = toPx(MIDDLE_ROAD_PCT);
+    // const lowerPath = toPx(LOWER_ROAD_PCT);
+
+   // const FADE_DURATION = 0.6;
+    const HOLD_DURATION = 0.5;
+   // const EASE = "power1.inOut";
+
+    const addSteppedRoad = (
+      tl: gsap.core.Timeline,
+      path: Point[]
+    ) => {
+      path.forEach((point) => {
+        // Move to point while invisible
+        tl.set(caravan, {
+  x: point.x,
+  y: point.y,
+  opacity: 1,
+
+  // Original:
+  // opacity: 0,
+});
+
+// Appear
+// tl.to(caravan, {
+//   opacity: 1,
+//   duration: FADE_DURATION,
+//   ease: EASE,
+// });
+
+// Stay
+tl.to(caravan, {
+  opacity: 1,
+  duration: HOLD_DURATION,
+});
+
+// Disappear
+// tl.to(caravan, {
+//   opacity: 0,
+//   duration: FADE_DURATION,
+//   ease: EASE,
+// });
+      });
+    };
+
+    const tl = gsap.timeline({
+      repeat: -1,
+    });
+
+    addSteppedRoad(tl, middlePath);
+    // addSteppedRoad(tl, lowerPath);
+
+  }, containerRef);
+
+  return () => ctx.revert();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [isMobile]);
+
   return (
     <div className={styles.container} ref={containerRef}>
-      <div data-transition-fade className={styles.navbar}>
+      <div  className={styles.navbar}>
         <Nav />
       </div>
 
@@ -350,7 +448,6 @@ export default function Home() {
       <div
         ref={camelRef}
         className={styles.camelLand}
-        data-transition-fade
       >
         <img src={camelLand} alt="" />
       </div>
