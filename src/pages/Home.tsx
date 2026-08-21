@@ -16,7 +16,7 @@ import LogoOasis from "../assets/LogoOasisi.png";
 import RegBtn from "../assets/regBtn.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
-import camelLand from "../assets/camelLand.png";
+import camelLand from "../assets/camel1.svg";
 
 import instagramIcon from "../assets/links/instagram.png";
 import twitterIcon from "../assets/links/twitter.png";
@@ -248,7 +248,7 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile]);
 
-  useEffect(() => {
+useEffect(() => {
   const caravan = camelRef.current;
   const containerEl = containerRef.current;
 
@@ -260,23 +260,26 @@ export default function Home() {
 
     const MIDDLE_ROAD_PCT = [
       { xPct: 5, yPct: -1 },
-      { xPct: 8, yPct: -1 },
-      { xPct: 10, yPct: -0.5 },
-      { xPct: 15, yPct: 0 },
-      { xPct: 20, yPct: 0.5 }, // REGISTER
+      { xPct: 10, yPct: -1.4 },
+      { xPct: 15, yPct: -2 },
+      { xPct: 20, yPct: -1.3 },
+      { xPct: 25, yPct: -0.5 },
     ];
 
-    // ==========================================
-    // LOWER ROAD
-    // Lower-left -> Lower-right
-    // ==========================================
-    // const LOWER_ROAD_PCT = [
-    //   { xPct: 0, yPct: 1.2 }, // LOWER LEFT
-    //   { xPct: 2, yPct: 4 },
-    //   { xPct: 4, yPct: 8 },
-    //   { xPct: 6, yPct: 10 },
-    //   { xPct: 9, yPct: 12 }, // LOWER RIGHT
-    // ];
+    const LOWER_ROAD_PCT = [
+      { xPct: -35, yPct: 15 },
+      { xPct: -28, yPct: 17 },
+      { xPct: -20, yPct: 17 },
+      { xPct: -13, yPct: 17 },
+      { xPct: -6, yPct: 17 },
+      { xPct: 1, yPct: 17 },
+      { xPct: 10, yPct: 17 },
+      { xPct: 16, yPct: 15 },
+      { xPct: 22, yPct: 13 },
+      { xPct: 33, yPct: 12 },
+      { xPct: 42, yPct: 12 },
+      { xPct: 54, yPct: 16 },
+    ];
 
     const toPx = (
       pts: { xPct: number; yPct: number }[]
@@ -287,46 +290,47 @@ export default function Home() {
       }));
 
     const middlePath = toPx(MIDDLE_ROAD_PCT);
-    // const lowerPath = toPx(LOWER_ROAD_PCT);
+    const lowerPath = toPx(LOWER_ROAD_PCT);
 
-   // const FADE_DURATION = 0.6;
-    const HOLD_DURATION = 0.5;
-   // const EASE = "power1.inOut";
+    const FADE_DURATION = 1.5;
+    const HOLD_DURATION = 1.5;
+
+    const FADE_IN_EASE = "sine.inout";
+    const FADE_OUT_EASE = "power1.in";
 
     const addSteppedRoad = (
       tl: gsap.core.Timeline,
       path: Point[]
     ) => {
       path.forEach((point) => {
-        // Move to point while invisible
+
+        // Move instantly to the new position
+        // and start invisible
         tl.set(caravan, {
-  x: point.x,
-  y: point.y,
-  opacity: 1,
+          x: point.x,
+          y: point.y,
+          opacity: 0,
+        });
 
-  // Original:
-  // opacity: 0,
-});
+        // Fade IN
+        tl.to(caravan, {
+          opacity: 1,
+          duration: FADE_DURATION,
+          ease: FADE_IN_EASE,
+        });
 
-// Appear
-// tl.to(caravan, {
-//   opacity: 1,
-//   duration: FADE_DURATION,
-//   ease: EASE,
-// });
+        // Stay visible
+        tl.to(caravan, {
+          opacity: 1,
+          duration: HOLD_DURATION,
+        });
 
-// Stay
-tl.to(caravan, {
-  opacity: 1,
-  duration: HOLD_DURATION,
-});
-
-// Disappear
-// tl.to(caravan, {
-//   opacity: 0,
-//   duration: FADE_DURATION,
-//   ease: EASE,
-// });
+        // Fade OUT
+        tl.to(caravan, {
+          opacity: 0,
+          duration: FADE_DURATION,
+          ease: FADE_OUT_EASE,
+        });
       });
     };
 
@@ -335,7 +339,7 @@ tl.to(caravan, {
     });
 
     addSteppedRoad(tl, middlePath);
-    // addSteppedRoad(tl, lowerPath);
+    addSteppedRoad(tl, lowerPath);
 
   }, containerRef);
 

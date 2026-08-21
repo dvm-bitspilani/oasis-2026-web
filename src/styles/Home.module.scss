@@ -164,18 +164,18 @@
 
 .camelLand {
   position: absolute;
-  bottom: 17%;
+  bottom: 11%;
   left: 35%;
-  /* 15vh: 600px→90px, 1080px→162px | 15vw: 768px→115px, 1920px→288px */
-  height: clamp(90px, 15vh, 162px);
-  width: clamp(115px, 15vw, 288px);
+
+    height: clamp(70px, 12vh, 130px);
+    width: clamp(90px, 22vw, 220px);
   z-index: 4;
   opacity: 0; // GSAP owns this; prevents a flash before JS mounts
   will-change: transform, opacity;
 
   img {
-    width: 100%;
-    height: 100%;
+    width: 40%;
+    height: 45%;
     object-fit: contain;
     display: block;
   }
@@ -325,8 +325,7 @@
   .camelLand {
     bottom: 20%;
     left: 20%;
-    height: clamp(70px, 12vh, 130px);
-    width: clamp(90px, 22vw, 220px);
+
   }
 
   .links {
