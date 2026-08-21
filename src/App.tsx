@@ -49,10 +49,15 @@ export default function App() {
 
   return (
     <>
-      {!entered ? (
-        <Preloader assets={assets} onEnter={() => setEntered(true)} />
-      ) : (
-        <AppRoutes />
+      {/* Home/App is mounted immediately */}
+      <AppRoutes preloaderDone={entered} />
+
+      {/* Preloader stays above everything until it finishes */}
+      {!entered && (
+        <Preloader
+          assets={assets}
+          onEnter={() => setEntered(true)}
+        />
       )}
     </>
   );

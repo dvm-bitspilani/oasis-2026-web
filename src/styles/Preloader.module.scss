@@ -1,244 +1,27 @@
 .preloader {
   position: fixed;
-
   inset: 0;
-
-  width: 100vw;
-  height: 100vh;
-
-  z-index: 99999;
-
-  overflow: hidden;
-
-  background: rgb(8, 10, 24);
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  transform:
-    translate3d(
-      0,
-      0,
-      0
-    );
-
-  will-change: transform;
-
-  /*
-   * Curtain movement only.
-   */
-  transition:
-    transform 1200ms
-    cubic-bezier(
-      0.76,
-      0,
-      0.24,
-      1
-    );
-
-  pointer-events: auto;
-}
-
-/* ====================================================== */
-/* EXIT                                                    */
-/* ====================================================== */
-
-.exiting {
-  /*
-   * Move completely above viewport.
-   *
-   * The real website is underneath.
-   */
-  transform:
-    translate3d(
-      0,
-      -100%,
-      0
-    );
-
-  pointer-events: none;
-}
-
-/* ====================================================== */
-/* CANVAS                                                   */
-/* ====================================================== */
-
-.canvas {
-  position: absolute;
-
-  inset: 0;
-
   width: 100%;
   height: 100%;
+  z-index: 99999;
 
-  display: block;
-
-  background:
-    rgb(8, 10, 24);
-}
-
-/* ====================================================== */
-/* SOURCE SVG                                               */
-/* ====================================================== */
-
-.sourceSvg {
-  position: absolute;
-
-  width: 0;
-  height: 0;
-
-  opacity: 0;
-
-  visibility: hidden;
-
-  pointer-events: none;
+  transform: translateY(0);
 
   overflow: hidden;
 }
 
-.sourceSvg path {
-  fill: none;
-
-  stroke: none;
+.preloader.exiting {
+  animation: preloaderSwipeUp var(--exit-duration, 600ms)
+    cubic-bezier(0.76, 0, 0.24, 1)
+    forwards;
 }
 
-/* ====================================================== */
-/* VIGNETTE                                                 */
-/* ====================================================== */
-
-.vignette {
-  position: absolute;
-
-  inset: 0;
-
-  z-index: 5;
-
-  pointer-events: none;
-
-  background:
-    radial-gradient(
-      ellipse at center,
-
-      transparent 20%,
-
-      rgba(
-        0,
-        0,
-        0,
-        0.06
-      ) 44%,
-
-      rgba(
-        0,
-        0,
-        0,
-        0.22
-      ) 72%,
-
-      rgba(
-        0,
-        0,
-        0,
-        0.52
-      ) 100%
-    );
-}
-
-/* ====================================================== */
-/* TABLET                                                   */
-/* ====================================================== */
-
-@media (
-  max-width: 900px
-) {
-  .vignette {
-    background:
-      radial-gradient(
-        ellipse at center,
-
-        transparent 18%,
-
-        rgba(
-          0,
-          0,
-          0,
-          0.07
-        ) 45%,
-
-        rgba(
-          0,
-          0,
-          0,
-          0.26
-        ) 75%,
-
-        rgba(
-          0,
-          0,
-          0,
-          0.56
-        ) 100%
-      );
-  }
-}
-
-/* ====================================================== */
-/* MOBILE                                                   */
-/* ====================================================== */
-
-@media (
-  max-width: 600px
-) {
-  .vignette {
-    background:
-      radial-gradient(
-        ellipse at center,
-
-        transparent 15%,
-
-        rgba(
-          0,
-          0,
-          0,
-          0.08
-        ) 45%,
-
-        rgba(
-          0,
-          0,
-          0,
-          0.30
-        ) 75%,
-
-        rgba(
-          0,
-          0,
-          0,
-          0.60
-        ) 100%
-      );
-  }
-}
-
-/* ====================================================== */
-/* REDUCED MOTION                                           */
-/* ====================================================== */
-
-@media (
-  prefers-reduced-motion: reduce
-) {
-  .preloader {
-    transition: none;
+@keyframes preloaderSwipeUp {
+  from {
+    transform: translateY(0);
   }
 
-  .exiting {
-    transform:
-      translate3d(
-        0,
-        -100%,
-        0
-      );
+  to {
+    transform: translateY(-100%);
   }
 }
