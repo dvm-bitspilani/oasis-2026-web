@@ -9,7 +9,7 @@ import sandMob from "../assets/sandmobile.png";
 import cloudSmall from "../assets/cloudSmall.svg";
 import cloudBig from "../assets/cloudBig.svg";
 import cloudThree from "../assets/cloudThree.svg";
-import Castle from "../assets/Castle1.svg";
+import Castle from "../assets/Castlehigh.png";
 import Moon from "../assets/Moon.png";
 import LogoOasis from "../assets/LogoOasisi.png";
 import RegBtn from "../assets/regBtn.png";
