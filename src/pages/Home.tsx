@@ -12,7 +12,7 @@ import cloudThree from "../assets/cloudThree.svg";
 import Castle from "../assets/Castlehigh.png";
 import Moon from "../assets/Moon.png";
 import LogoOasis from "../assets/LogoOasisi.png";
-import RegBtn from "../assets/regBtn.png";
+import RegBtn from "../assets/cactusreg.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
 import camelLand from "../assets/camel1.svg";

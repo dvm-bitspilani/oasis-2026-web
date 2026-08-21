@@ -135,27 +135,11 @@
    REGISTRATION BUTTON GLOW
    ========================================================= */
 
-.regBtn:hover img {
-  animation: regButtonGlow 2.5s ease-in-out infinite;
-}
 
-@keyframes regButtonGlow {
-  0%, 100% {
-    filter:
-      drop-shadow(0 0 3px rgba(254, 213, 155, 0.25))
-      drop-shadow(0 0 6px rgba(254, 213, 155, 0.12));
-  }
-  50% {
-    filter:
-      drop-shadow(0 0 5px rgba(254, 213, 155, 0.45))
-      drop-shadow(0 0 10px rgba(254, 213, 155, 0.2));
-  }
-}
 
-.regBtn:active img {
-  animation: none;
-  filter: drop-shadow(0 0 6px rgba(254, 213, 155, 0.4));
-}
+
+
+
 
 
 /* =========================================================
@@ -374,11 +358,11 @@
 
 .regBtn {
   position: absolute;
-  bottom: 0%;
+  bottom: -1%;
   right: 6%;
   /* 33vh: 600px→198px, 1080px→356px | 33vw: 768px→253px, 1920px→633px */
   height: clamp(198px, 33vh, 356px);
-  width: clamp(253px, 33vw, 633px);
+  width: clamp(280px, 36vw, 800px);
   z-index: 5;
   cursor: pointer;
 
