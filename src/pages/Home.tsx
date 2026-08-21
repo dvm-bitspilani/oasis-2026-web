@@ -35,7 +35,7 @@ type Cloud = {
   duration: number;
 };
 
-// type Point = { x: number; y: number };
+type Point = { x: number; y: number };
 
 const MOBILE_BREAKPOINT = 650;
 
