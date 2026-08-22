@@ -53,12 +53,12 @@ export default function App() {
       <AppRoutes preloaderDone={entered} />
 
       {/* Preloader stays above everything until it finishes */}
-      {/* {!entered && (
+      {!entered && (
         <Preloader
           assets={assets}
           onEnter={() => setEntered(true)}
         />
-      )} */}
+      )}
     </>
   );
 }
