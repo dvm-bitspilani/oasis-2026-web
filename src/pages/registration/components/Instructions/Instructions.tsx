@@ -91,7 +91,7 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
         <img src={lefttop} className={styles.lefttop} alt="lefttop" />
         <img src={rightbottom} className={styles.rightbottom} alt="rightbottom" />
         <img src={righttop} className={styles.righttop} alt="righttop" />
-        <img src={book} className={styles.book} alt="Frontend Goated" data-book-start />
+        <img src={book} className={styles.book} alt="Frontend Goated" />
         <div className={styles.content}>
           <div className={styles.headingCont}>
             <h3 className={styles.heading}>Registration</h3>
