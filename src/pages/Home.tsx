@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 
 import styles from "../styles/Home.module.scss";
-import bg from "../assets/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg"
+import bg from "../assets/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg";
 import sandImg from "../assets/sand1.png";
 import sandMob from "../assets/sandmobile.png";
 import cloudSmall from "../assets/cloudSmall.svg";
@@ -15,7 +15,9 @@ import LogoOasis from "../assets/LogoOasisi.png";
 import RegBtn from "../assets/cactusreg.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
+
 import camelLand from "../assets/camel1.svg";
+import camelLand2 from "../assets/camel2.svg";
 
 import instagramIcon from "../assets/links/instagram.png";
 import twitterIcon from "../assets/links/twitter.png";
@@ -35,7 +37,10 @@ type Cloud = {
   duration: number;
 };
 
-type Point = { x: number; y: number };
+type Point = {
+  x: number;
+  y: number;
+};
 
 const MOBILE_BREAKPOINT = 650;
 
@@ -149,9 +154,8 @@ const CLOUD_SETTLE_DURATION = 0.3;
 const FADE_ELEMENTS_START = 0.95;
 const FADE_ELEMENTS_DURATION = 0.9;
 const FADE_ELEMENTS_STAGGER = 0.14;
-// const FADE_ELEMENTS_RISE = 22;
 
-// ========================================================= npx vercel
+// =========================================================
 // HOME
 // =========================================================
 
@@ -166,13 +170,15 @@ export default function Home({
   const camelRef =
     useRef<HTMLDivElement>(null);
 
+  // SECOND CAMEL
+  const camel2Ref =
+    useRef<HTMLDivElement>(null);
+
   const cloudsRef =
     useRef<HTMLDivElement>(null);
 
   const cloudRefs =
-    useRef<(HTMLDivElement | null)[]>(
-      [],
-    );
+    useRef<(HTMLDivElement | null)[]>([]);
 
   const castleRef =
     useRef<HTMLDivElement>(null);
@@ -193,9 +199,7 @@ export default function Home({
     useRef<HTMLDivElement>(null);
 
   const overlayCloudRefs =
-    useRef<(HTMLDivElement | null)[]>(
-      [],
-    );
+    useRef<(HTMLDivElement | null)[]>([]);
 
   const [isMobile, setIsMobile] =
     useState(
@@ -292,8 +296,6 @@ export default function Home({
         // INITIAL STATES
         // =====================================================
 
-        // Castle starts completely invisible.
-        // It will appear when its animation starts.
         if (castleEl) {
           gsap.set(castleEl, {
             y: castleBuriedY,
@@ -303,7 +305,6 @@ export default function Home({
           });
         }
 
-        // Moon starts completely invisible.
         if (moonEl) {
           gsap.set(moonEl, {
             opacity: 0,
@@ -313,7 +314,6 @@ export default function Home({
           });
         }
 
-        // Porthole starts hidden together with moon.
         if (portholeEl) {
           gsap.set(portholeEl, {
             opacity: 0,
@@ -362,8 +362,7 @@ export default function Home({
         // STRING SVG
         // =====================================================
 
-        let paths: SVGPathElement[] =
-          [];
+        let paths: SVGPathElement[] = [];
 
         if (stringLayer) {
           while (
@@ -397,8 +396,7 @@ export default function Home({
                 "1.5",
               );
 
-              path.style.opacity =
-                "0";
+              path.style.opacity = "0";
 
               stringLayer.appendChild(
                 path,
@@ -408,7 +406,6 @@ export default function Home({
             });
         }
 
-        // Clouds begin above the screen.
         cloudRigs.forEach(
           (rig) => {
             gsap.set(rig.el, {
@@ -436,7 +433,6 @@ export default function Home({
         // =====================================================
 
         if (castleEl) {
-          // Castle appears as the wobble begins.
           tl.to(
             castleEl,
             {
@@ -447,7 +443,6 @@ export default function Home({
             CASTLE_RISE_START,
           );
 
-          // Castle wobble
           tl.to(
             {},
             {
@@ -495,7 +490,6 @@ export default function Home({
             CASTLE_RISE_START,
           );
 
-          // Castle rise
           const riseState = {
             p: 0,
           };
@@ -528,9 +522,7 @@ export default function Home({
                   CASTLE_RISE_DURATION;
 
                 const x =
-                  Math.sin(
-                    t * 6,
-                  ) *
+                  Math.sin(t * 6) *
                   4 *
                   envelope;
 
@@ -815,9 +807,9 @@ export default function Home({
       ctx.revert();
   }, [preloaderDone]);
 
-  // =======================================================
+  // =========================================================
   // CONTINUOUS CLOUD DRIFT
-  // =======================================================
+  // =========================================================
 
   useEffect(() => {
     const ctx = gsap.context(
@@ -872,9 +864,9 @@ export default function Home({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile]);
 
-  // =======================================================
+  // =========================================================
   // MOON + CLOUD OVERLAY
-  // =======================================================
+  // =========================================================
 
   useEffect(() => {
     let raf: number;
@@ -937,43 +929,51 @@ export default function Home({
           `${containerBox.height}px`;
       }
 
-      cloudRefs.current.forEach((real, i) => {
-        const overlay = overlayCloudRefs.current[i];
+      cloudRefs.current.forEach(
+        (real, i) => {
+          const overlay =
+            overlayCloudRefs.current[i];
 
-        if (real && overlay) {
-          overlay.style.transform = real.style.transform;
-        }
-      });
+          if (real && overlay) {
+            overlay.style.transform =
+              real.style.transform;
+          }
+        },
+      );
 
-      raf = requestAnimationFrame(tick);
+      raf =
+        requestAnimationFrame(tick);
     };
 
-    raf = requestAnimationFrame(tick);
+    raf =
+      requestAnimationFrame(tick);
 
-    return () => cancelAnimationFrame(raf);
+    return () =>
+      cancelAnimationFrame(raf);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile]);
 
 useEffect(() => {
-  const caravan = camelRef.current;
+  const caravan1 = camelRef.current;
+  const caravan2 = camel2Ref.current;
   const containerEl = containerRef.current;
 
-  if (!caravan || !containerEl) return;
+  if (!caravan1 || !caravan2 || !containerEl) return;
 
   const ctx = gsap.context(() => {
     const { width: w, height: h } =
       containerEl.getBoundingClientRect();
 
-    const MIDDLE_ROAD_PCT = [
+    const CAMEL_1_MIDDLE_PATH = [
       { xPct: 5, yPct: -1 },
       { xPct: 10, yPct: -1.4 },
       { xPct: 15, yPct: -2 },
-      { xPct: 20, yPct: -1.3 },
+      { xPct: 20, yPct: -1.8 },
       { xPct: 25, yPct: -0.5 },
     ];
 
-    const LOWER_ROAD_PCT = [
+    const CAMEL_1_LOWER_PATH = [
       { xPct: -35, yPct: 15 },
       { xPct: -28, yPct: 17 },
       { xPct: -20, yPct: 17 },
@@ -985,74 +985,147 @@ useEffect(() => {
       { xPct: 22, yPct: 13 },
       { xPct: 33, yPct: 12 },
       { xPct: 42, yPct: 12 },
-      { xPct: 54, yPct: 16 },
+      { xPct: 54, yPct: 15 },
     ];
 
+    const CAMEL_2_MIDDLE_PATH = [
+      { xPct: 8, yPct: -2.5 },
+      { xPct: 13, yPct: -3.4 },
+      { xPct: 18, yPct: -3.8 },
+      { xPct: 23, yPct: -2 },
+      { xPct: 28, yPct: 1.5 },
+    ];
+
+    const CAMEL_2_LOWER_PATH = [
+      { xPct: -32, yPct: 14 },
+      { xPct: -25, yPct: 15 },
+      { xPct: -17, yPct: 16 },
+      { xPct: -10, yPct: 16 },
+      { xPct: -3, yPct: 16 },
+      { xPct: 4, yPct: 14},
+      { xPct: 15, yPct: 14 },
+      { xPct: 18, yPct: 13 },
+      { xPct: 25, yPct: 12 },
+      { xPct: 36, yPct: 12},
+      { xPct: 45, yPct: 13 },
+      { xPct: 57, yPct: 14 },
+    ];
+
+
     const toPx = (
-      pts: { xPct: number; yPct: number }[]
+      pts: {
+        xPct: number;
+        yPct: number;
+      }[]
     ): Point[] =>
       pts.map((p) => ({
         x: (p.xPct / 100) * w,
         y: (p.yPct / 100) * h,
       }));
 
-    const middlePath = toPx(MIDDLE_ROAD_PCT);
-    const lowerPath = toPx(LOWER_ROAD_PCT);
+    const camel1MiddlePath =
+      toPx(CAMEL_1_MIDDLE_PATH);
 
-    const FADE_DURATION = 1.5;
-    const HOLD_DURATION = 1.5;
+    const camel1LowerPath =
+      toPx(CAMEL_1_LOWER_PATH);
 
-    const FADE_IN_EASE = "sine.inout";
+    const camel2MiddlePath =
+      toPx(CAMEL_2_MIDDLE_PATH);
+
+    const camel2LowerPath =
+      toPx(CAMEL_2_LOWER_PATH);
+
+
+    const FADE_DURATION = 5;
+    const HOLD_DURATION= 5;
+
+    const FADE_IN_EASE = "sine.inOut";
     const FADE_OUT_EASE = "power1.in";
 
-    const addSteppedRoad = (
-      tl: gsap.core.Timeline,
-      path: Point[]
-    ) => {
-      path.forEach((point) => {
 
-        // Move instantly to the new position
-        // and start invisible
-        tl.set(caravan, {
-          x: point.x,
-          y: point.y,
-          opacity: 0,
-        });
-
-        // Fade IN
-        tl.to(caravan, {
-          opacity: 1,
-          duration: FADE_DURATION,
-          ease: FADE_IN_EASE,
-        });
-
-        // Stay visible
-        tl.to(caravan, {
-          opacity: 1,
-          duration: HOLD_DURATION,
-        });
-
-        // Fade OUT
-        tl.to(caravan, {
-          opacity: 0,
-          duration: FADE_DURATION,
-          ease: FADE_OUT_EASE,
-        });
-      });
-    };
 
     const tl = gsap.timeline({
       repeat: -1,
     });
 
-    addSteppedRoad(tl, middlePath);
-    addSteppedRoad(tl, lowerPath);
+
+
+    const addSteppedRoad = (
+      camel1Path: Point[],
+      camel2Path: Point[]
+    ) => {
+      const steps = Math.max(
+        camel1Path.length,
+        camel2Path.length
+      );
+
+      for (let i = 0; i < steps; i++) {
+
+        const point1 =
+          camel1Path[i];
+
+        const point2 =
+          camel2Path[i];
+
+        if (point1) {
+          tl.set(caravan1, {
+            x: point1.x,
+            y: point1.y,
+            opacity: 0,
+          });
+        }
+
+
+        if (point2) {
+          tl.set(caravan2, {
+            x: point2.x,
+            y: point2.y,
+            opacity: 0,
+          });
+        }
+
+        tl.to(
+          [caravan1, caravan2],
+          {
+            opacity: 1,
+            duration: FADE_DURATION,
+            ease: FADE_IN_EASE,
+          }
+        );
+
+        tl.to(
+          [caravan1, caravan2],
+          {
+            opacity: 1,
+            duration: HOLD_DURATION,
+          }
+        );
+
+        tl.to(
+          [caravan1, caravan2],
+          {
+            opacity: 0,
+            duration: FADE_DURATION,
+            ease: FADE_OUT_EASE,
+          }
+        );
+      }
+    };
+    addSteppedRoad(
+      camel1MiddlePath,
+      camel2MiddlePath
+    );
+
+    addSteppedRoad(
+      camel1LowerPath,
+      camel2LowerPath
+    );
 
   }, containerRef);
 
   return () => ctx.revert();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
 }, [isMobile]);
 
   return (
@@ -1244,16 +1317,26 @@ useEffect(() => {
         />
       </div>
 
-      {/* CAMEL */}
+      {/* CAMEL 1 */}
       <div
         ref={camelRef}
         className={
           styles.camelLand
         }
-        data-transition-fade
       >
         <img
           src={camelLand}
+          alt=""
+        />
+      </div>
+
+      {/* CAMEL 2 */}
+      <div
+        ref={camel2Ref}
+        className={styles.camelLand2}
+      >
+        <img
+          src={camelLand2}
           alt=""
         />
       </div>

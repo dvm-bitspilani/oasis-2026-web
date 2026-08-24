@@ -14,10 +14,12 @@
   background-position: center;
   background-repeat: no-repeat;
 }
-.navbar{
+
+.navbar {
   z-index: 1000;
   opacity: 1;
 }
+
 .clouds {
   position: absolute;
   top: 0;
@@ -61,7 +63,6 @@
   bottom: 24%;
   left: 41%;
   transform: translateX(-50%);
-  /* 45vw: 768px→346px, 1920px→864px */
   width: clamp(346px, 45vw, 864px);
   z-index: 2;
 }
@@ -76,7 +77,6 @@
   position: absolute;
   bottom: 21%;
   left: 40%;
-  /* 38vw: 768px→292px, 1920px→730px */
   width: clamp(292px, 36vw, 730px);
   z-index: 0;
   transform: translateX(-50%);
@@ -92,7 +92,6 @@
   position: absolute;
   bottom: -2%;
   left: 5%;
-  /* 30vh: 600px→180px, 1080px→324px | 30vw: 768px→230px, 1920px→576px */
   height: clamp(180px, 30vh, 324px);
   width: clamp(230px, 30vw, 576px);
   z-index: 5;
@@ -105,18 +104,16 @@
   }
 }
 
-
 /* =========================================================
    REGISTRATION BUTTON
    ========================================================= */
 
 .regBtn {
   position: absolute;
-  bottom: 0%;
+  bottom: -1%;
   right: 6%;
-  /* 33vh: 600px→198px, 1080px→356px | 33vw: 768px→253px, 1920px→633px */
   height: clamp(198px, 33vh, 356px);
-  width: clamp(253px, 33vw, 633px);
+  width: clamp(280px, 36vw, 800px);
   z-index: 5;
   cursor: pointer;
 
@@ -125,49 +122,80 @@
     height: 100%;
     object-fit: contain;
     display: block;
-    &:hover { cursor: pointer; }
     will-change: filter;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 }
 
-
-/* =========================================================
-   REGISTRATION BUTTON GLOW
-   ========================================================= */
-
-
-
-
-
-
-
-
 /* =========================================================
    CAMEL CARAVAN
-   Base position below is the START point of the middle road
-   (xPct:0, yPct:0 in the timeline in Home.tsx) — align it with
-   your artwork, then GSAP's x/y offsets take over from there.
    ========================================================= */
+
+/*
+  Both camel1.svg and camel2.svg use this exact same
+  container styling.
+
+  GSAP controls:
+  - x
+  - y
+  - opacity
+
+  Therefore both camels can be animated together
+  using the same GSAP timeline.
+*/
 
 .camelLand {
   position: absolute;
+
   bottom: 11%;
   left: 35%;
 
-    height: clamp(70px, 12vh, 130px);
-    width: clamp(90px, 22vw, 220px);
+  height: clamp(70px, 12vh, 130px);
+  width: clamp(90px, 22vw, 220px);
+
   z-index: 4;
-  opacity: 0; // GSAP owns this; prevents a flash before JS mounts
+
+  opacity: 0;
+
   will-change: transform, opacity;
+
+
+  pointer-events: none;
 
   img {
     width: 40%;
     height: 50%;
+
+    object-fit: contain;
+    display: block;
+
+    pointer-events: none;
+  }
+}
+.camelLand2 {
+  position: absolute;
+  bottom: 11%;
+  left: 35%;
+
+
+  height: clamp(70px, 12vh, 130px);
+  width: clamp(120px, 28vw, 280px);
+
+  z-index: 4;
+  opacity: 0;
+  will-change: transform, opacity;
+  pointer-events: none;
+
+  img {
+    width: 50%;
+    height: 60%;
     object-fit: contain;
     display: block;
   }
 }
-
 
 /* =========================================================
    LINKS
@@ -177,7 +205,9 @@
   position: relative;
   width: clamp(100px, 20vw, 250px);
   margin-top: clamp(20px, 7vh, 60px);
-  margin-left: calc(75% - clamp(0px, 5vw, 40px)); // was 80% — pushes it right
+  margin-left: calc(
+    75% - clamp(0px, 5vw, 40px)
+  );
   z-index: 10;
 }
 
@@ -187,7 +217,6 @@
   width: 100%;
   height: 100%;
 }
-
 
 /* =========================================================
    SOCIAL LINKS
@@ -211,11 +240,14 @@
     transform: scale(1.1);
 
     filter:
-      drop-shadow(0 0 2px rgba(255, 255, 255, 0.4))
-      drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
+      drop-shadow(
+        0 0 2px rgba(255, 255, 255, 0.4)
+      )
+      drop-shadow(
+        0 0 5px rgba(255, 255, 255, 0.2)
+      );
   }
 }
-
 
 /* =========================================================
    MOON CLOUD OVERLAY
@@ -234,7 +266,6 @@
   position: absolute;
 }
 
-
 /* =========================================================
    MOBILE
    ========================================================= */
@@ -248,14 +279,8 @@
   }
 
 
-  .sandImg {
-    /*
-      transform: scaleX(-1);
-    */
-  }
 
   .sand {
-    // object-fit: cover;
     height: 45%;
     width: 100vw;
   }
@@ -270,8 +295,10 @@
     position: absolute;
     bottom: 12%;
     left: 5%;
+
     height: clamp(160px, 50vh, 320px);
     width: clamp(160px, 50vw, 320px);
+
     z-index: 5;
 
     img {
@@ -284,9 +311,12 @@
 
   .regBtn {
     position: absolute;
+
     height: clamp(300px, 70vh, 480px);
     width: clamp(260px, 70vw, 420px);
+
     z-index: 5;
+
     bottom: -15%;
     left: 15%;
     right: auto;
@@ -306,82 +336,27 @@
 
   .regBtn:active img {
     animation: none;
-    filter: drop-shadow(0 0 6px rgba(254, 213, 155, 0.4));
+
+    filter: drop-shadow(
+      0 0 6px rgba(254, 213, 155, 0.4)
+    );
   }
+
+  /* =====================================================
+     MOBILE CAMELS
+     ===================================================== */
 
   .camelLand {
     bottom: 20%;
     left: 20%;
 
+    /*
+      Keep both camels identical in size
+      and position so GSAP can synchronize them.
+    */
   }
 
   .links {
     display: none;
   }
-}
-.castle {
-  position: absolute;
-  bottom: 24%;
-  left: 41%;
-  transform: translateX(-50%);
-  /* 45vw: 768px→346px, 1920px→864px */
-  width: clamp(346px, 45vw, 864px);
-  z-index: 2;
-}
-
-.moon {
-  position: absolute;
-  bottom: 21%;
-  left: 40%;
-  /* 38vw: 768px→292px, 1920px→730px */
-  width: clamp(292px, 36vw, 730px);
-  z-index: 0;
-  transform: translateX(-50%);
-}
-
-.oasisLogo {
-  position: absolute;
-  bottom: -2%;
-  left: 5%;
-  /* 30vh: 600px→180px, 1080px→324px | 30vw: 768px→230px, 1920px→576px */
-  height: clamp(180px, 30vh, 324px);
-  width: clamp(230px, 30vw, 576px);
-  z-index: 5;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-  }
-}
-
-.regBtn {
-  position: absolute;
-  bottom: -1%;
-  right: 6%;
-  /* 33vh: 600px→198px, 1080px→356px | 33vw: 768px→253px, 1920px→633px */
-  height: clamp(198px, 33vh, 356px);
-  width: clamp(280px, 36vw, 800px);
-  z-index: 5;
-  cursor: pointer;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-    &:hover { cursor: pointer; }
-    will-change: filter;
-  }
-}
-
-
-
-.links {
-  position: relative;
-  width: clamp(100px, 20vw, 250px);
-  margin-top: clamp(20px, 7vh, 60px);
-  margin-left: calc(75% - clamp(0px, 5vw, 40px)); // was 80% — pushes it right
-  z-index: 10;
 }
