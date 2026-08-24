@@ -3,7 +3,8 @@ import { useLocation } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import Preloader from "./pages/Preloader";
 import { useTransition } from "./context/TransitionProvider";
-import video from "./assets/video/curtain.mp4"
+
+import video from "./assets/video/curtain.mp4";
 import camel from "./assets/camelLand.png";
 import camel1 from "./assets/camel1.svg";
 import camel2 from "./assets/camel2.svg";
@@ -25,7 +26,6 @@ import registerBtn from "./assets/registerBtn.png";
 import sand from "./assets/sand.png";
 import sandImg from "./assets/sandImg.png";
 
-
 import RegBg from "./assets/registration/reg/RegBg.png";
 import leftbottom from "./assets/registration/reg/leftbottom.png";
 import rightbottom from "./assets/registration/reg/rightbottom.png";
@@ -38,44 +38,61 @@ import btn from "./assets/registration/reg/btn.png";
 import searchBg from "./assets/registration/reg/searchBg.png";
 import line from "./assets/registration/reg/line.png";
 import wheel from "./assets/registration/reg/wheel.png";
+
 import modalFrame from "/modalFrame.png";
 import modalFrameMobile from "/modalFrameMobile.png";
 import closedBook from "/closedBook.png";
+
 import Syamsiah from "./assets/fonts/Syamsiah Arabic.ttf";
 import EB from "./assets/fonts/EBGaramond-Medium.ttf";
 import Cinzel from "./assets/fonts/Cinzel-VariableFont_wght.ttf";
+
 import Scroll1 from "/instructionsScroll.png";
 import Scroll2 from "/instructionsScrollLong.png";
 import googleButton from "/googleReg.svg";
 import lamps from "/game-icons_magic-lamp.svg";
 import instructionsBG from "/instructionsBG.png";
 
+/* ======================================================
+   PRELOADER ASSETS
+====================================================== */
+
 const assets = [
   video,
+
   camel,
   camel1,
   camel2,
   camel3,
   camel4,
   camelLand,
+
   Castle,
+
   cloudBig,
   cloudSmall,
   cloudThree,
+
   hamLine,
+
   LogoOasis,
   Moon,
+
   navCircle,
   navSan,
+
   regBtn,
   registerBtn,
+
   sand,
   sandImg,
-    RegBg,
+
+  RegBg,
   leftbottom,
   rightbottom,
   lefttop,
   righttop,
+
   book,
   buttonBg,
   inputBg,
@@ -83,44 +100,107 @@ const assets = [
   searchBg,
   line,
   wheel,
+
   modalFrame,
   modalFrameMobile,
   closedBook,
+
   Syamsiah,
   EB,
   Cinzel,
+
   Scroll1,
   Scroll2,
+
   googleButton,
   lamps,
-  instructionsBG
+  instructionsBG,
 ];
+
+/* ======================================================
+   TRANSITION SETTINGS
+====================================================== */
 
 const TRANSITION_DURATION = 1150;
 
+/* ======================================================
+   APP
+====================================================== */
+
 export default function App() {
   const location = useLocation();
+
+  const { markEntered } = useTransition();
+
   const isHome = location.pathname === "/";
 
-  const { entered, markEntered } = useTransition();
+  /*
+   * IMPORTANT:
+   *
+   * Do NOT initialize this from `entered`.
+   *
+   * `entered` can remain true inside TransitionProvider,
+   * which causes the preloader to be skipped after reload.
+   *
+   * This state belongs to this App mount, so every browser
+   * reload starts with:
+   *
+   * preloaderDone = false
+   */
+  const [preloaderDone, setPreloaderDone] = useState(false);
 
-  const [homeExiting, setHomeExiting] =
-    useState<boolean>(entered);
+  /*
+   * Controls the home page curtain/content entrance.
+   *
+   * Starts false so the home content is initially below
+   * the viewport and moves upward when the preloader exits.
+   */
+  const [homeExiting, setHomeExiting] = useState(false);
+
+  /* ======================================================
+     PRELOADER EXIT START
+  ====================================================== */
 
   const handlePreloaderExit = () => {
+    /*
+     * Start moving the home page into view.
+     */
     setHomeExiting(true);
   };
+
+  /* ======================================================
+     * ENTER COMPLETE
+  ====================================================== */
 
   const handleEnter = () => {
+    /*
+     * Keep your existing transition context in sync.
+     */
     markEntered();
+
+    /*
+     * Tell App that the preloader is completely finished.
+     */
+    setPreloaderDone(true);
+
+    /*
+     * Make sure the home page is visible.
+     */
     setHomeExiting(true);
   };
 
-  const introActive =
-    isHome && !entered;
+  /* ======================================================
+     * INTRO STATE
+  ====================================================== */
+
+  const introActive = isHome && !preloaderDone;
 
   return (
     <>
+      {/* ==================================================
+          HOME PAGE TRANSITION WRAPPER
+      ================================================== */}
+
       <div
         style={
           introActive
@@ -153,13 +233,17 @@ export default function App() {
           }
         >
           <AppRoutes
-            preloaderDone={entered}
+            preloaderDone={preloaderDone}
             preloaderExiting={homeExiting}
           />
         </div>
       </div>
 
-      {isHome && !entered && (
+      {/* ==================================================
+          PRELOADER
+      ================================================== */}
+
+      {isHome && !preloaderDone && (
         <Preloader
           assets={assets}
           onExitStart={handlePreloaderExit}
