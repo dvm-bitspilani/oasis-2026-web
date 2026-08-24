@@ -16,6 +16,7 @@ import RegBtn from "../assets/cactuschange.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
 import camelLand from "../assets/camel1.svg";
+import camelLand2 from "../assets/camel2.svg"
 
 import instagramIcon from "../assets/links/instagram.png";
 import twitterIcon from "../assets/links/twitter.png";
@@ -166,6 +167,8 @@ export default function Home({
     useRef<HTMLDivElement>(null);
 
   const camelRef =
+    useRef<HTMLDivElement>(null);
+  const camel2Ref =
     useRef<HTMLDivElement>(null);
 
   const cloudsRef =
@@ -953,25 +956,27 @@ export default function Home({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile]);
 
+
 useEffect(() => {
-  const caravan = camelRef.current;
+  const caravan1 = camelRef.current;
+  const caravan2 = camel2Ref.current;
   const containerEl = containerRef.current;
 
-  if (!caravan || !containerEl) return;
+  if (!caravan1 || !caravan2 || !containerEl) return;
 
   const ctx = gsap.context(() => {
     const { width: w, height: h } =
       containerEl.getBoundingClientRect();
 
-    const MIDDLE_ROAD_PCT = [
+    const CAMEL_1_MIDDLE_PATH = [
       { xPct: 5, yPct: -1 },
       { xPct: 10, yPct: -1.4 },
       { xPct: 15, yPct: -2 },
-      { xPct: 20, yPct: -1.3 },
+      { xPct: 20, yPct: -1.8 },
       { xPct: 25, yPct: -0.5 },
     ];
 
-    const LOWER_ROAD_PCT = [
+    const CAMEL_1_LOWER_PATH = [
       { xPct: -35, yPct: 15 },
       { xPct: -28, yPct: 17 },
       { xPct: -20, yPct: 17 },
@@ -983,74 +988,147 @@ useEffect(() => {
       { xPct: 22, yPct: 13 },
       { xPct: 33, yPct: 12 },
       { xPct: 42, yPct: 12 },
-      { xPct: 54, yPct: 16 },
+      { xPct: 54, yPct: 15 },
     ];
 
+    const CAMEL_2_MIDDLE_PATH = [
+      { xPct: 8, yPct: -2.5 },
+      { xPct: 13, yPct: -3.4 },
+      { xPct: 18, yPct: -3.8 },
+      { xPct: 23, yPct: -2 },
+      { xPct: 28, yPct: 1.5 },
+    ];
+
+    const CAMEL_2_LOWER_PATH = [
+      { xPct: -32, yPct: 14 },
+      { xPct: -25, yPct: 15 },
+      { xPct: -17, yPct: 16 },
+      { xPct: -10, yPct: 16 },
+      { xPct: -3, yPct: 16 },
+      { xPct: 4, yPct: 14},
+      { xPct: 15, yPct: 14 },
+      { xPct: 18, yPct: 13 },
+      { xPct: 25, yPct: 12 },
+      { xPct: 36, yPct: 12},
+      { xPct: 45, yPct: 13 },
+      { xPct: 57, yPct: 14 },
+    ];
+
+
     const toPx = (
-      pts: { xPct: number; yPct: number }[]
+      pts: {
+        xPct: number;
+        yPct: number;
+      }[]
     ): Point[] =>
       pts.map((p) => ({
         x: (p.xPct / 100) * w,
         y: (p.yPct / 100) * h,
       }));
 
-    const middlePath = toPx(MIDDLE_ROAD_PCT);
-    const lowerPath = toPx(LOWER_ROAD_PCT);
+    const camel1MiddlePath =
+      toPx(CAMEL_1_MIDDLE_PATH);
 
-    const FADE_DURATION = 1.5;
-    const HOLD_DURATION = 1.5;
+    const camel1LowerPath =
+      toPx(CAMEL_1_LOWER_PATH);
 
-    const FADE_IN_EASE = "sine.inout";
+    const camel2MiddlePath =
+      toPx(CAMEL_2_MIDDLE_PATH);
+
+    const camel2LowerPath =
+      toPx(CAMEL_2_LOWER_PATH);
+
+
+    const FADE_DURATION = 5;
+    const HOLD_DURATION= 5;
+
+    const FADE_IN_EASE = "sine.inOut";
     const FADE_OUT_EASE = "power1.in";
 
-    const addSteppedRoad = (
-      tl: gsap.core.Timeline,
-      path: Point[]
-    ) => {
-      path.forEach((point) => {
 
-        // Move instantly to the new position
-        // and start invisible
-        tl.set(caravan, {
-          x: point.x,
-          y: point.y,
-          opacity: 0,
-        });
-
-        // Fade IN
-        tl.to(caravan, {
-          opacity: 1,
-          duration: FADE_DURATION,
-          ease: FADE_IN_EASE,
-        });
-
-        // Stay visible
-        tl.to(caravan, {
-          opacity: 1,
-          duration: HOLD_DURATION,
-        });
-
-        // Fade OUT
-        tl.to(caravan, {
-          opacity: 0,
-          duration: FADE_DURATION,
-          ease: FADE_OUT_EASE,
-        });
-      });
-    };
 
     const tl = gsap.timeline({
       repeat: -1,
     });
 
-    addSteppedRoad(tl, middlePath);
-    addSteppedRoad(tl, lowerPath);
+
+
+    const addSteppedRoad = (
+      camel1Path: Point[],
+      camel2Path: Point[]
+    ) => {
+      const steps = Math.max(
+        camel1Path.length,
+        camel2Path.length
+      );
+
+      for (let i = 0; i < steps; i++) {
+
+        const point1 =
+          camel1Path[i];
+
+        const point2 =
+          camel2Path[i];
+
+        if (point1) {
+          tl.set(caravan1, {
+            x: point1.x,
+            y: point1.y,
+            opacity: 0,
+          });
+        }
+
+
+        if (point2) {
+          tl.set(caravan2, {
+            x: point2.x,
+            y: point2.y,
+            opacity: 0,
+          });
+        }
+
+        tl.to(
+          [caravan1, caravan2],
+          {
+            opacity: 1,
+            duration: FADE_DURATION,
+            ease: FADE_IN_EASE,
+          }
+        );
+
+        tl.to(
+          [caravan1, caravan2],
+          {
+            opacity: 1,
+            duration: HOLD_DURATION,
+          }
+        );
+
+        tl.to(
+          [caravan1, caravan2],
+          {
+            opacity: 0,
+            duration: FADE_DURATION,
+            ease: FADE_OUT_EASE,
+          }
+        );
+      }
+    };
+    addSteppedRoad(
+      camel1MiddlePath,
+      camel2MiddlePath
+    );
+
+    addSteppedRoad(
+      camel1LowerPath,
+      camel2LowerPath
+    );
 
   }, containerRef);
 
   return () => ctx.revert();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
 }, [isMobile]);
 
   return (
@@ -1273,13 +1351,21 @@ useEffect(() => {
         className={
           styles.camelLand
         }
-        data-transition-fade
         style={{
           visibility: preloaderDone || preloaderExiting ? "visible" : "hidden",
         }}
       >
         <img
           src={camelLand}
+          alt=""
+        />
+      </div>
+       <div
+        ref={camel2Ref}
+        className={styles.camelLand2}
+      >
+        <img
+          src={camelLand2}
           alt=""
         />
       </div>
