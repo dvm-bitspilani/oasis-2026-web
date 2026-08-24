@@ -39,7 +39,7 @@ const PageTransition = forwardRef<
   PageTransitionHandle,
   PageTransitionProps
 >(function PageTransition(
-  { onComplete, blackThreshold = 30 },
+  { onComplete, blackThreshold = 10 },
   ref,
 ) {
   const rootRef = useRef<HTMLDivElement | null>(null);
