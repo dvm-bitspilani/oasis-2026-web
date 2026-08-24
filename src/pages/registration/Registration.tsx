@@ -276,7 +276,7 @@ const Registration = () => {
             <div
               className={`${styles.regLayer} ${
                 registerVisible ? styles.regLayerVisible : ""
-              }`}
+              } ${phase === "register" ? styles.regLayerSettled : ""}`}
             >
               <Register
                 onClickNext={toEventPage}

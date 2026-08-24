@@ -65,6 +65,7 @@
 
 
 import { useState } from "react";
+import { Link } from "react-router-dom"
 import styles from "./Instructions.module.scss";
 import { GoogleLogin } from "@react-oauth/google";
 import InstructionModal from "../InstructionModal/InstructionModal";
@@ -73,6 +74,7 @@ import leftbottom from "../../../../assets/registration/reg/leftbottom.png"
 import rightbottom from "../../../../assets/registration/reg/rightbottom.png"
 import lefttop from "../../../../assets/registration/reg/lefttop.png"
 import righttop from "../../../../assets/registration/reg/righttop.png"
+import rightmid from "../../../../assets/registration/reg/rightmid.png"
 import book from "/closedBook.png"
 
 interface InstructionsProps {
@@ -91,7 +93,9 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
         <img src={lefttop} className={styles.lefttop} alt="lefttop" />
         <img src={rightbottom} className={styles.rightbottom} alt="rightbottom" />
         <img src={righttop} className={styles.righttop} alt="righttop" />
+        <img src={rightmid} className={styles.rightmid} alt="rightmid" />
         <img src={book} className={styles.book} alt="Frontend Goated" data-book-start />
+        <Link to="/" className={styles.backButton}><img src="/regBackButton.png" alt="Go to Home Page" /></Link>
         <div className={styles.content}>
           <div className={styles.headingCont}>
             <h3 className={styles.heading}>Registration</h3>
@@ -102,11 +106,11 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
               Complete the registration form with all required details. You'll
               be able to login through your registered email id when required.
             </li>
-            <li>
+            {/*<li>
               A College Representative (CR) will be appointed for
               each college who'll be responsible for allotting heads for
               all the societies the college will be participating for.
-            </li>
+            </li>*/}
             <li>All prof shows are free. </li>
             <li>All team members are required to register separately.</li>
             <li>
@@ -127,7 +131,7 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
             shape="pill"
             size="large"
             text="signin_with"
-            width={window.innerWidth < 500 ? "200" : "305"}
+            width={window.innerWidth < 577 ? "65" : "250"}
           />
         </div>
         </div>
