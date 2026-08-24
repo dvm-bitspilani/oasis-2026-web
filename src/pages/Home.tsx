@@ -12,7 +12,7 @@ import cloudThree from "../assets/cloudThree.svg";
 import Castle from "../assets/Castlehigh.png";
 import Moon from "../assets/Moon.png";
 import LogoOasis from "../assets/LogoOasisi.png";
-import RegBtn from "../assets/cactusreg.png";
+import RegBtn from "../assets/cactuschange.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
 
@@ -1301,21 +1301,26 @@ useEffect(() => {
         />
       </div>
 
-      {/* REGISTER BUTTON */}
-      <div
-        className={
-          styles.regBtn
-        }
-        data-transition-fade
-        onClick={() =>
-          navigate("/register")
-        }
-      >
-        <img
-          src={RegBtn}
-          alt="Register"
-        />
-      </div>
+<div className={styles.regBtn}>
+  <img src={RegBtn} alt="Register" />
+  <svg
+    className={styles.regBtnText}
+    viewBox="0 0 220 90"
+    preserveAspectRatio="xMidYMid meet"
+    data-transition-fade
+  >
+    <path id="curve" d="M -4,4 Q 110,84 224,4" fill="transparent" />
+    <text
+  textLength="120"
+  lengthAdjust="spacingAndGlyphs"
+  onClick={() => navigate("/register")}
+>
+  <textPath href="#curve" startOffset="50%" textAnchor="middle">
+    REGISTER
+  </textPath>
+</text>
+  </svg>
+</div>
 
       {/* CAMEL 1 */}
       <div
