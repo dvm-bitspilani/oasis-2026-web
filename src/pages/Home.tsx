@@ -4,12 +4,12 @@ import gsap from "gsap";
 
 import styles from "../styles/Home.module.scss";
 import bg from "../assets/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg"
-import sandImg from "../assets/sand1.png";
-import sandMob from "../assets/sandmobile.png";
+import sandImg from "../assets/sandfinal.png";
+import sandMob from "../assets/maybefinalsorry.png";
 import cloudSmall from "../assets/cloudSmall.svg";
 import cloudBig from "../assets/cloudBig.svg";
 import cloudThree from "../assets/cloudThree.svg";
-import Castle from "../assets/Castlehigh.png";
+import Castle from "../assets/castlefinal2.png";
 import Moon from "../assets/Moon.png";
 import LogoOasis from "../assets/LogoOasisi.png";
 import RegBtn from "../assets/cactuschange.png";
@@ -958,6 +958,11 @@ export default function Home({
 
 
 useEffect(() => {
+  // Stop camel animation on mobile (650px and below)
+  if (window.innerWidth <= 650) {
+    return;
+  }
+
   const caravan1 = camelRef.current;
   const caravan2 = camel2Ref.current;
   const containerEl = containerRef.current;
@@ -1005,15 +1010,14 @@ useEffect(() => {
       { xPct: -17, yPct: 16 },
       { xPct: -10, yPct: 16 },
       { xPct: -3, yPct: 16 },
-      { xPct: 4, yPct: 14},
+      { xPct: 4, yPct: 14 },
       { xPct: 15, yPct: 14 },
       { xPct: 18, yPct: 13 },
       { xPct: 25, yPct: 12 },
-      { xPct: 36, yPct: 12},
+      { xPct: 36, yPct: 12 },
       { xPct: 45, yPct: 13 },
       { xPct: 57, yPct: 14 },
     ];
-
 
     const toPx = (
       pts: {
@@ -1026,32 +1030,21 @@ useEffect(() => {
         y: (p.yPct / 100) * h,
       }));
 
-    const camel1MiddlePath =
-      toPx(CAMEL_1_MIDDLE_PATH);
+    const camel1MiddlePath = toPx(CAMEL_1_MIDDLE_PATH);
+    const camel1LowerPath = toPx(CAMEL_1_LOWER_PATH);
 
-    const camel1LowerPath =
-      toPx(CAMEL_1_LOWER_PATH);
-
-    const camel2MiddlePath =
-      toPx(CAMEL_2_MIDDLE_PATH);
-
-    const camel2LowerPath =
-      toPx(CAMEL_2_LOWER_PATH);
-
+    const camel2MiddlePath = toPx(CAMEL_2_MIDDLE_PATH);
+    const camel2LowerPath = toPx(CAMEL_2_LOWER_PATH);
 
     const FADE_DURATION = 5;
-    const HOLD_DURATION= 5;
+    const HOLD_DURATION = 5;
 
     const FADE_IN_EASE = "sine.inOut";
     const FADE_OUT_EASE = "power1.in";
 
-
-
     const tl = gsap.timeline({
       repeat: -1,
     });
-
-
 
     const addSteppedRoad = (
       camel1Path: Point[],
@@ -1063,12 +1056,8 @@ useEffect(() => {
       );
 
       for (let i = 0; i < steps; i++) {
-
-        const point1 =
-          camel1Path[i];
-
-        const point2 =
-          camel2Path[i];
+        const point1 = camel1Path[i];
+        const point2 = camel2Path[i];
 
         if (point1) {
           tl.set(caravan1, {
@@ -1078,7 +1067,6 @@ useEffect(() => {
           });
         }
 
-
         if (point2) {
           tl.set(caravan2, {
             x: point2.x,
@@ -1087,33 +1075,25 @@ useEffect(() => {
           });
         }
 
-        tl.to(
-          [caravan1, caravan2],
-          {
-            opacity: 1,
-            duration: FADE_DURATION,
-            ease: FADE_IN_EASE,
-          }
-        );
+        tl.to([caravan1, caravan2], {
+          opacity: 1,
+          duration: FADE_DURATION,
+          ease: FADE_IN_EASE,
+        });
 
-        tl.to(
-          [caravan1, caravan2],
-          {
-            opacity: 1,
-            duration: HOLD_DURATION,
-          }
-        );
+        tl.to([caravan1, caravan2], {
+          opacity: 1,
+          duration: HOLD_DURATION,
+        });
 
-        tl.to(
-          [caravan1, caravan2],
-          {
-            opacity: 0,
-            duration: FADE_DURATION,
-            ease: FADE_OUT_EASE,
-          }
-        );
+        tl.to([caravan1, caravan2], {
+          opacity: 0,
+          duration: FADE_DURATION,
+          ease: FADE_OUT_EASE,
+        });
       }
     };
+
     addSteppedRoad(
       camel1MiddlePath,
       camel2MiddlePath
@@ -1123,12 +1103,9 @@ useEffect(() => {
       camel1LowerPath,
       camel2LowerPath
     );
-
   }, containerRef);
 
   return () => ctx.revert();
-
-
 }, [isMobile]);
 
   return (
