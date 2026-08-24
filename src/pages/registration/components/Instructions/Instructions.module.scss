@@ -24,12 +24,15 @@
   
     .heading {
       margin: 3vw 0 0;
-      color: #ffffff;
       font-family: "Syamsiah", sans-serif;
       font-weight: 500;
-      color: #6C1700;
+      color: transparent;
       font-size: 6rem;
       margin: 15vh 0 0;
+      text-shadow: 0 1.5px 0 #6C1700;
+      -webkit-background-clip: text;
+      background-clip: text;
+      background-color: #000;
     }
   }
 
@@ -86,7 +89,7 @@
     border: none;
     z-index: 4;
     transition: filter 0.3s;
-    width: 20vw;
+    width: 22vw;
     height: 3.216vw;
     margin-top: 20px;
     position: relative;
@@ -98,7 +101,7 @@
     }
 
     &:has(div:hover) {
-      filter: brightness(0.8);
+      filter: brightness(1.2);
     }
 
     div {
@@ -113,98 +116,115 @@
 
 .leftbottom{
     position: absolute;
-    left: -5%;
-    bottom: -10%;
+    left: 4%;
+    bottom: 6%;
+    scale: 1.4;
     width: 20%;
-    scale: 1.5;
+    z-index: 100;
 }
 
 
 .rightbottom{
     position: absolute;
     right: -7%;
-    bottom: -5%;
+    bottom: -30%;
     width: 30%;
     object-fit: contain;
 }
 
 .lefttop{
     position: absolute;
-    left: -18%;
-    top: -22%;
+    left: -8%;
+    top: -28%;
+    scale: 0.7;
 }
 
 .righttop{
     position: absolute;
-    right: 0;
-    top: 3%;
+    right: -6%;
+    top: -8%;
+    scale: 0.8;
+}
+
+.rightmid{
+  position: absolute;
+  right: -18%;
+  top: 22%;
+  scale: 0.8;
 }
 
 .book {
   position: absolute;
-  top: -12%;
+  top: -20%;
   right: 3%;
-  scale: 0.65;
+  scale: 0.7;
   z-index: 20;
 }
 
-@media screen and (max-width: 1401px) {
+.backButton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  scale: 0.8;
+  transition: all 0.3s ease;
+
+  &:hover {
+    scale: 0.9;
+    filter: brightness(1.2);
+  }
+}
+
+@media screen and (max-width: 1501px) {
   .content {
     width: 65vw;
+
+    .googleButton {
+      scale: 1.5;
+    }
   }
 
   .book {
     scale: 0.5;
     top: -10%;
-    right: -13%;
+    right: -7%;
   }
 
-  .googleButton {
-    scale: 1.5;
+  .rightbottom {
+    right: -3%;
+    bottom: -20%;
   }
 }
 
-@media screen and (max-width: 1201px) {
-  .content {
-    width: 80vw;
-    margin: 0;
-    left: 20%;
-  }
-
-  .lefttop {
-    left: -25%;
-    top: -25%;
+@media screen and (max-width: 1401px) {
+  .book {
+    display: none;
   }
 
   .leftbottom {
-    left: -5%;
-    bottom: -5%;
-    scale: 1.75;
-  }
-
-  .book {
-    display: none;
+    bottom: 3%;
   }
 }
 
 @media screen and (max-width: 1075px) {
   .content {
-    left: 10%;
+    left: 15%;
     background-image: url(/instructionsScrollLong.png);
   }
 
-  .lefttop {
+  /*.lefttop {
     left: -30%;
     top: -10%;
     scale: 0.6;
-  }
+  }*/
 
   .righttop {
     scale: 0.6;
   }
 
-  .googleButton {
-    scale: 2;
+  .content {
+    .googleButton {
+      scale: 2;
+    }
   }
 }
 
@@ -213,23 +233,16 @@
     width: 90vw;
     left: 5%;
   }
-
-  .leftbottom,
-  .lefttop,
-  .rightbottom,
-  .righttop {
-    display: none;
-  }
 }
 
 @media screen and (max-width: 577px) {
   .content {
     width: 95vw;
     left: 3%;
-    gap: 5vh;
+    gap: 2vh;
 
     .headingCont {
-      padding-top: 40px;
+      padding-top: 60px;
 
       .heading {
         margin: 0;
@@ -254,27 +267,63 @@
 
     .googleButton {
       scale: 3.25;
+      background: center / cover no-repeat url(/googleRegMob.svg);
+      height: 20px;
     }
+  }
+
+  .righttop {
+    right: -22%;
+    top: -5%;
+    scale: 0.3;
+  }
+
+  .backButton {
+    scale: 0.5;
+    top: 2%;
+    left: -3%;
+  }
+
+  .leftbottom {
+    left: 20%;
+    bottom: 7%;
+    scale: 3;
+  }
+
+  .lefttop{
+    left: -45%;
+    top: 25%;
+    scale: 0.4;
+  }
+
+  .rightbottom{
+    right: -5%;
+    bottom: 30%;
+    scale: 2.5;
+  }
+
+  .rightmid{
+    right: -57%;
+    top: 8%;
+    scale: 0.4;
   }
 }
 
 @media (max-width: 991px) and (min-height: 750px) {
   .content {
     .headingCont {
-      padding-top: 60px;
-
       .heading {
         font-size: 5rem;
       }
     }
 
     h5 {
-      font-size: 1.75rem;
+      font-size: 2rem;
     }
 
     .instr {
       li {
-        font-size: 1.35rem;
+        font-size: 1.5rem;
       }
     }
   }

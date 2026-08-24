@@ -44,5 +44,5 @@ export default function AppRoutes({
         />
       </Routes>
     </TransitionProvider>
-  );
+  ); 
 }

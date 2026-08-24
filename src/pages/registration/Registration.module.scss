@@ -153,3 +153,86 @@
     }
   }
 }
+
+/* =========================================================
+   ADD THESE TO Registration.module.scss
+
+   Replaces the earlier .regLayer block — the rest is
+   unchanged.
+   ========================================================= */
+
+.flowRoot {
+  position: relative;
+
+  /* Belt and braces with the overflow lock in
+     BookTransition: neither layer can raise a scrollbar
+     while both are mounted. */
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------
+   THE SCROLL
+   Instructions renders five <img> decorations and exactly one
+   <div> — .content. The corner ornaments stay put on purpose:
+   Register draws the same four in the same places.
+   --------------------------------------------------------- */
+
+.instrLayer > div {
+  transition: transform 900ms cubic-bezier(0.6, 0.02, 0.28, 1),
+    opacity 650ms ease-in;
+
+  will-change: transform, opacity;
+}
+
+.instrLayerExit > div {
+  transform: translateY(-118%);
+  opacity: 0;
+}
+
+/* ---------------------------------------------------------
+   PAGE 2
+
+   THE SCROLLBAR FIX.
+
+   .regLayer stays absolutely positioned for the whole
+   animation, including the fade-in. Previously it went back
+   to static as soon as it became visible, which put a 100vh
+   Register into normal flow underneath a 100svh Instructions
+   that had not unmounted yet — two viewports of document, so
+   a vertical scrollbar, and 100vw against it gave a
+   horizontal one too.
+
+   It only returns to static at phase "register", the point
+   where Instructions is gone and it is the only thing in the
+   tree.
+   --------------------------------------------------------- */
+
+.regLayer {
+  position: absolute;
+  inset: 0;
+
+  z-index: 2;
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  transition: opacity 400ms ease-out;
+}
+
+.regLayerVisible {
+  opacity: 1;
+
+  pointer-events: auto;
+}
+
+.regLayerSettled {
+  position: static;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .instrLayer > div,
+  .regLayer {
+    transition: none;
+  }
+}

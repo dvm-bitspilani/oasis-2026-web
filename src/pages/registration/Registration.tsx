@@ -280,10 +280,10 @@ const Registration = () => {
 
           {currentPage === 2 && (
             <Register
-              onClickNext={toEventPage}
-              userEmail={userEmail}
-              setUserData={setUserData}
-            />
+                onClickNext={toEventPage}
+                userEmail={userEmail}
+                setUserData={setUserData}
+              />
           )}
 
           {/* =====================================================
