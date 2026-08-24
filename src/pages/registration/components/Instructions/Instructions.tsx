@@ -64,7 +64,7 @@
 
 
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Link } from "react-router-dom"
 import styles from "./Instructions.module.scss";
 import { GoogleLogin } from "@react-oauth/google";
@@ -83,6 +83,30 @@ interface InstructionsProps {
 
 const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
   const [detailInst, setdetailInst] = useState(false);
+
+  function useWindowWidth() {
+    // Initialize state with the current window width
+    const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
+
+    useEffect(() => {
+      // 1. Define the handler to update state
+      const handleResize = () => {
+        setWindowWidth(window.innerWidth);
+      };
+
+      // 2. Add the event listener when the component mounts
+      window.addEventListener('resize', handleResize);
+
+      // 3. Clean up the listener when the component unmounts
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []); // Empty array ensures this effect only runs once on mount
+
+    return windowWidth;
+  }
+
+  const isMobile = useWindowWidth() < 768;
 
     return (
       <>
@@ -131,7 +155,7 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
             shape="pill"
             size="large"
             text="signin_with"
-            width={window.innerWidth < 577 ? "65" : "250"}
+            width={isMobile ? 65 : 250}
           />
         </div>
         </div>
