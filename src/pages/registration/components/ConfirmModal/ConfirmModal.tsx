@@ -396,6 +396,13 @@ const Confirmation = (props: PropsType) => {
 
         sessionStorage.removeItem("selectedEvents");
 
+        /*
+         * The registration form draft is kept alive across the
+         * Register -> Events step so the back button can restore it.
+         * This is the point where it is genuinely safe to discard.
+         */
+        localStorage.removeItem("registrationFormData");
+
         setNotification({
           showSelection: false,
           isError: false,

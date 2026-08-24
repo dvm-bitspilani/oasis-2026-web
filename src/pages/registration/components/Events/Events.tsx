@@ -20,6 +20,7 @@ import leftbottom from "../../../../assets/registration/reg/leftbottom.png";
 import lefttop from "../../../../assets/registration/reg/lefttop.png";
 import rightbottom from "../../../../assets/registration/reg/rightbottom.png";
 import righttop from "../../../../assets/registration/reg/righttop.png";
+import rightmid from "../../../../assets/registration/reg/rightmid.png"
 
 import book from "../../../../assets/registration/reg/book.png";
 import line from "../../../../assets/registration/reg/line.png";
@@ -34,6 +35,12 @@ interface Event {
 interface EventsProps {
   userData?: any;
   setUserData?: React.Dispatch<React.SetStateAction<any>>;
+
+  /*
+   * Called by the back button. The parent should use this to move the
+   * step back to the Register screen instead of navigating to "/".
+   */
+  onClickBack?: () => void;
 }
 
 /* ========================================= */
@@ -47,7 +54,7 @@ const MOBILE_BREAKPOINT = 900;
 /* ========================================= */
 
 const Events = forwardRef<HTMLDivElement, EventsProps>(
-  ({ userData, setUserData }, ref) => {
+  ({ userData, setUserData, onClickBack }, ref) => {
     /* ========================================= */
     /* EVENTS DATA — fetched from the backend,   */
     /* falls back to TEST_EVENTS on failure/empty */
@@ -865,6 +872,21 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
             }
             alt=""
           />
+
+          <img
+           src={rightmid}
+           className={styles.rightmid}
+           alt=""
+          />
+
+          <button
+            type="button"
+            onClick={onClickBack}
+            className={styles.backButton}
+            aria-label="Go back to Registration"
+          >
+            <img src="/regBackButton.png" alt="" />
+          </button>
 
           {/* ================================= */}
           {/* BOOK FRAME                         */}

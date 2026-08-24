@@ -282,6 +282,7 @@ const Registration = () => {
             <Register
                 onClickNext={toEventPage}
                 userEmail={userEmail}
+                userData={userData}
                 setUserData={setUserData}
               />
           )}
@@ -294,6 +295,7 @@ const Registration = () => {
             <Events
               userData={userData}
               setUserData={setUserData}
+              onClickBack={toRegPage}
             />
           )}
         </>
