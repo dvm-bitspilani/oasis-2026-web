@@ -3357,7 +3357,7 @@
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Select from "react-select";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -3381,6 +3381,14 @@ import statesData from "./cities.json";
 interface RegProps {
   onClickNext: () => void;
   userEmail: string;
+
+  /*
+   * Previously submitted values, held by the parent. When the user comes
+   * back from the Events screen this is used to repopulate the form and
+   * is preferred over the localStorage draft.
+   */
+  userData?: any;
+
   setUserData: React.Dispatch<React.SetStateAction<any>>;
 }
 
@@ -3516,6 +3524,7 @@ const MOBILE_BREAKPOINT = 900;
 export default function Reg({
   onClickNext,
   userEmail,
+  userData,
   setUserData,
 }: RegProps) {
   const [isMobile, setIsMobile] =
@@ -3681,48 +3690,71 @@ export default function Reg({
   /* LOCAL STORAGE                                             */
   /* ======================================================= */
 
+  // Guards against the restore running twice. `userData` is a dependency
+  // below, so without this a parent re-render could reset() the form and
+  // discard edits the user made after coming back from Events.
+  const hasRestored = useRef(false);
+
   useEffect(() => {
-    const savedData =
-      localStorage.getItem(
-        "registrationFormData"
-      );
+    if (hasRestored.current) return;
 
-    if (!savedData) return;
+    // Prefer the values held by the parent — they survive even if
+    // localStorage is unavailable or was cleared mid-session.
+    let source = userData;
 
-    try {
-      const parsedData =
-        JSON.parse(savedData);
-
-      reset({
-        ...parsedData,
-        email_id: userEmail,
-      });
-
-      if (parsedData.state) {
-        setSelectedState(
-          parsedData.state
+    if (!source) {
+      const savedData =
+        localStorage.getItem(
+          "registrationFormData"
         );
+
+      if (!savedData) return;
+
+      try {
+        source = JSON.parse(savedData);
+      } catch (err) {
+        console.error(
+          "Failed to parse local storage data:",
+          err
+        );
+
+        localStorage.removeItem(
+          "registrationFormData"
+        );
+
+        return;
       }
+    }
 
-      if (parsedData.dob) {
-        const [year, month, day] =
-          String(parsedData.dob).split("-");
+    if (!source) return;
 
-        setDobYear(year || "");
-        setDobMonth(month || "");
-        setDobDay(day || "");
-      }
-    } catch (err) {
-      console.error(
-        "Failed to parse local storage data:",
-        err
-      );
+    hasRestored.current = true;
 
-      localStorage.removeItem(
-        "registrationFormData"
+    // `events` is added on the Events screen and is not part of this
+    // form's schema, so it is dropped before repopulating.
+    const { events, ...formValues } =
+      source;
+
+    reset({
+      ...formValues,
+      email_id: userEmail,
+    });
+
+    if (formValues.state) {
+      setSelectedState(
+        formValues.state
       );
     }
-  }, [reset, userEmail]);
+
+    if (formValues.dob) {
+      const [year, month, day] =
+        String(formValues.dob).split("-");
+
+      setDobYear(year || "");
+      setDobMonth(month || "");
+      setDobDay(day || "");
+    }
+  }, [reset, userEmail, userData]);
 
   useEffect(() => {
     const subscription = watch(
@@ -3948,9 +3980,10 @@ export default function Reg({
 
     onClickNext();
 
-    localStorage.removeItem(
-      "registrationFormData"
-    );
+    // NOTE: the draft is deliberately NOT cleared here. The user can still
+    // come back from the Events screen, and clearing it now would empty the
+    // form. Clear "registrationFormData" only after the final registration
+    // request succeeds (in the confirm modal).
   };
 
   /* ======================================================= */

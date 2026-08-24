@@ -31,28 +31,68 @@
   z-index: 3;
 }
 
-.leftbottom {
-  bottom: 0;
-  left: 0;
-  width: 20vw;
+.leftbottom{
+    position: absolute;
+    left: 4%;
+    bottom: 6%;
+    scale: 1.4;
+    width: 20%;
+    z-index: 1000;
+    pointer-events: none;
 }
 
-.lefttop {
-  top: 0;
-  left: 0;
-  width: 20vw;
+
+.rightbottom{
+    position: absolute;
+    right: -7%;
+    bottom: -30%;
+    width: 30%;
+    object-fit: contain;
 }
 
-.rightbottom {
-  bottom: 0;
-  right: 0;
-  width: 20vw;
+.lefttop{
+    position: absolute;
+    left: -8%;
+    top: -28%;
+    scale: 0.7;
 }
 
-.righttop {
-  top: 0;
-  right: 0;
-  width: 20vw;
+.righttop{
+    position: absolute;
+    right: -6%;
+    top: -8%;
+    scale: 0.8;
+}
+
+.rightmid{
+  position: absolute;
+  right: -18%;
+  top: 22%;
+  scale: 0.8;
+}
+
+.backButton {
+    position: absolute;
+    top: 0;
+    left: 0;
+    scale: 0.8;
+    transition: all 0.3s ease;
+    z-index: 10;
+
+    /* Reset native <button> chrome — this used to be an <a> */
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+
+  &:hover {
+    scale: 0.9;
+    filter: brightness(1.2);
+  }
 }
 
 .bookFrame {
@@ -66,15 +106,25 @@
 .bookContainer {
   position: absolute;
 
-  inset: 0;
+  top: 52%;
+  left: 50%;
+
+  transform: translate(
+    -50%,
+    -50%
+  );
+
+  width: 75vw;
+
+  aspect-ratio: 1.4;
+
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 
   z-index: 4;
 
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
-  width: 100%;
-  pointer-events: none;
+  overflow: hidden;
 }
 
 /* ========================================= */
@@ -313,8 +363,8 @@
     filter 0.15s ease;
 }
 
-.scrollbarWheel:hover {
-}
+/*.scrollbarWheel:hover {
+}*/
 
 .scrollbarWheelDragging {
   cursor: grabbing;
@@ -1169,7 +1219,7 @@
     --lp-top: 6%;
     --lp-left: 16%;
     --lp-width: 66%;
-    --lp-height: 88%;
+    --lp-height: 80%;
 
     /* Fixed-height, non-scrolling shell — no margin/padding,
        so the book cannot be pushed away from the top. */
@@ -1187,14 +1237,21 @@
     background-position: center;
     background-repeat: no-repeat;
   }
-
-  .leftbottom,
-  .lefttop,
-  .rightbottom,
-  .righttop {
-    width: 26vw;
+  .lefttop {
+    width: 45%;
   }
 
+  .righttop {
+    width: 30%;
+  }
+
+  .leftbottom {
+    width: 25%;
+  }
+
+  .rightbottom {
+    width: 30%;
+  }
   /* ========================================= */
   /* BOOK FRAME — same box as register's        */
   /* .bookContainer on mobile                   */
@@ -1231,14 +1288,30 @@
 
   .bookContainer {
     position: absolute;
-    inset: 0;
 
-    width: 100%;
-    height: 100%;
+    top: 52%;
+    left: 13vw;
 
-    background-size: 180% 100%;
-    background-position: left top;
-    background-repeat: no-repeat;
+    transform: translateY(
+      -50%
+    );
+
+    width: 92vw;
+
+    height: 78vh;
+
+    aspect-ratio: auto;
+
+    background-size:
+      180% 100%;
+
+    background-position:
+      left top;
+
+    background-repeat:
+      no-repeat;
+
+    overflow: hidden;
   }
 
   /* ========================================= */
@@ -1303,7 +1376,7 @@
 
     margin: 0 0 2.5vw;
 
-    font-size: clamp(1.2rem, 6vw, 1.7rem);
+    //font-size: clamp(1.2rem, 6vw, 1.7rem);
   }
 
   .searchContainer {
@@ -1547,13 +1620,19 @@
   */
 
   .bookFrame {
-    left: 8vw;
-    width: 98vw;
-    height: 74vh;
+    left: -15%;
+    width: 115vw;
+    height: 85vh;
   }
 
   .bookContainer {
-    background-size: 180% 100%;
+    top: 50%;
+    width: 115vw;
+
+    height: 85vh;
+
+    background-size:
+      170% 100%;
   }
 
   .eventInfo {
@@ -1625,5 +1704,64 @@
   .searchContainer {
     width: 90%;
     margin-right: 10%;
+  }
+}
+
+/*Additions for new design*/
+@media screen and (max-width: 1501px) {
+  .rightbottom {
+    right: -3%;
+    bottom: -20%;
+  }
+}
+
+@media screen and (max-width: 1401px) {
+  .leftbottom {
+    bottom: 3%;
+  }
+}
+
+@media screen and (max-width: 1075px) {
+  .righttop {
+    scale: 0.6;
+  }
+}
+
+@media screen and (max-width: 577px) {
+  .righttop {
+    top: -5%;
+    scale: 0.8;
+  }
+  /*
+  .backButton {
+    scale: 0.5;
+    top: 2%;
+    left: -3%;
+  }*/
+
+  .leftbottom {
+    left: 110px;
+    bottom: 92px;
+    scale: 3.2;
+  }
+
+  .lefttop{
+    left: -10%;
+    top: -10%;
+    scale: 1;
+  }
+
+  .rightbottom{
+    right: -44px;
+    bottom: 42px;
+    scale: 2.9;
+  }
+
+  .rightmid{
+    display: none;
+  }
+
+  .eventsPage {
+    margin: 20px 0 0 50px;
   }
 }

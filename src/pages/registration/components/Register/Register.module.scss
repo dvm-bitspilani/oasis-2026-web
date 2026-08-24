@@ -781,6 +781,7 @@
   top: 35%;
 width: 10%;
   pointer-events: none;
+  display: none;
 }
 
 /* ========================================================= */
@@ -1733,9 +1734,9 @@ margin-top: 1rem;
 }
 
   .bookContainer {
-    left: 0;
+    left: -2%;
 
-    width: 100vw;
+    width: 115vw;
 
     height: 85vh;
 
@@ -1796,8 +1797,8 @@ margin-top: 1rem;
   }*/
 
   .leftbottom {
-    left: 20%;
-    bottom: 7%;
+    left: 80px;
+    bottom: 65.24px;
     scale: 2;
   }
 
@@ -1808,7 +1809,7 @@ margin-top: 1rem;
   }
 
   .rightbottom{
-    right: -20%;
+    right: -86px;
     bottom: 0%;
     scale: 1.75;
   }
