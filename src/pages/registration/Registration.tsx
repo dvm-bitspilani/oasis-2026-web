@@ -4,7 +4,7 @@ import styles from "./Registration.module.scss";
 import Instructions from "../../pages/registration/components/Instructions/Instructions";
 import Register from "../registration/components/Register/Register";
 import Events from "../../pages/registration/components/Events/Events";
-import Preloader from "../Preloader";
+// import Preloader from "../Preloader";
 
 import { useState } from "react";
 import { useCookies } from "react-cookie";
@@ -252,12 +252,12 @@ const Registration = () => {
 
       <BreadCrumb data={breadcrumbJsonLd} />
 
-      {!entered && (
+      {/* {!entered && (
         <Preloader
           assets={registrationAssets}
           onEnter={() => setEntered(true)}
         />
-      )}
+      )} */}
 
       {  (
         <>
