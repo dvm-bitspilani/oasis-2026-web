@@ -46,7 +46,7 @@
   bottom: -1%;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 46%;
   z-index: 6;
   overflow: hidden;
 }
@@ -208,7 +208,7 @@
   margin-left: calc(
     75% - clamp(0px, 5vw, 40px)
   );
-  z-index: 1;
+  z-index: 5;
 }
 
 .linksSvg {
