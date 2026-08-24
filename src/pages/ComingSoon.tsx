@@ -10,8 +10,8 @@ import cloudBig from "../assets/cloudBig.svg";
 import cloudThree from "../assets/cloudThree.svg";
 import Moon from "../assets/Moon.png";
 import ShootingStars from "../components/ShootingStars";
-import { useTransition } from "../context/TransitionProvider"; // NEW
-import goHomeIcon from "../assets/goHome.svg"; // NEW: import instead of string path
+import { useTransition } from "../context/TransitionProvider";
+import goHomeIcon from "../assets/goHome.svg";
 
 type Cloud = {
   src: string;
@@ -32,7 +32,7 @@ const CLOUDS: Cloud[] = [
 export default function ComingSoon() {
   const cloudsRef = useRef<HTMLDivElement>(null);
   const cloudRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const { navigateWithTransition } = useTransition(); // NEW
+  const { navigateWithTransition } = useTransition();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -60,9 +60,11 @@ export default function ComingSoon() {
     return () => ctx.revert();
   }, []);
 
-  // NEW: same interception pattern Nav.tsx uses.
   const handleGoHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
+    // navigateWithTransition internally calls markEntered() before
+    // navigating, so Home will never show the intro preloader here —
+    // only the page transition plays.
     navigateWithTransition("/");
   };
 
@@ -104,8 +106,6 @@ export default function ComingSoon() {
       <div className={styles.centerBox}>
         <h1>COMING SOON...</h1>
         <h3>This page is still under construction</h3>
-        {/* CHANGED: was <Link to="/">, now a plain <a> intercepted the
-           same way Nav.tsx intercepts its NavLinks */}
         <a href="/" className={styles.goHome} onClick={handleGoHomeClick}>
           <img src={goHomeIcon} alt="Go Home" />
         </a>
