@@ -3373,7 +3373,7 @@ import rightmiddle from "../../../../assets/registration/reg/rightmiddle.png";
 import righttop from "../../../../assets/registration/reg/righttop.png";
 import book from "../../../../assets/registration/reg/book.png";
 import buttonBg from "../../../../assets/registration/reg/buttonbg.png";
-import tajmahal from "../../../../assets/registration/reg/tajmahal.png";
+import tajmahal from "../../../../assets/registration/reg/tajMahal.png";
 
 import statesData from "./cities.json";
 
