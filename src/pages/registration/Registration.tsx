@@ -17,55 +17,55 @@ import BreadCrumb from "../../components/breadCrumb/BreadCrumb";
 // Covers Instructions, Register, Events, and all their modals
 // (ConfirmModal, EventsModal, InstructionModal, Reginput)
 // =====================================================
-import RegBg from "../../assets/registration/reg/RegBg.png";
-import leftbottom from "../../assets/registration/reg/leftbottom.png";
-import rightbottom from "../../assets/registration/reg/rightbottom.png";
-import lefttop from "../../assets/registration/reg/lefttop.png";
-import righttop from "../../assets/registration/reg/righttop.png";
-import book from "../../assets/registration/reg/book.png";
-import buttonBg from "../../assets/registration/reg/buttonbg.png";
-import inputBg from "../../assets/registration/reg/inputBg.png";
-import btn from "../../assets/registration/reg/btn.png";
-import searchBg from "../../assets/registration/reg/searchBg.png";
-import line from "../../assets/registration/reg/line.png";
-import wheel from "../../assets/registration/reg/wheel.png";
-import modalFrame from "/modalFrame.png";
-import modalFrameMobile from "/modalFrameMobile.png";
-import closedBook from "/closedBook.png";
-import Syamsiah from "../../assets/fonts/Syamsiah Arabic.ttf";
-import EB from "../../assets/fonts/EBGaramond-Medium.ttf";
-import Cinzel from "../../assets/fonts/Cinzel-VariableFont_wght.ttf";
-import Scroll1 from "/instructionsScroll.png";
-import Scroll2 from "/instructionsScrollLong.png";
-import googleButton from "/googleReg.svg";
-import lamps from "/game-icons_magic-lamp.svg";
-import instructionsBG from "/instructionsBG.png";
+// import RegBg from "../../assets/registration/reg/RegBg.png";
+// import leftbottom from "../../assets/registration/reg/leftbottom.png";
+// import rightbottom from "../../assets/registration/reg/rightbottom.png";
+// import lefttop from "../../assets/registration/reg/lefttop.png";
+// import righttop from "../../assets/registration/reg/righttop.png";
+// import book from "../../assets/registration/reg/book.png";
+// import buttonBg from "../../assets/registration/reg/buttonbg.png";
+// import inputBg from "../../assets/registration/reg/inputBg.png";
+// import btn from "../../assets/registration/reg/btn.png";
+// import searchBg from "../../assets/registration/reg/searchBg.png";
+// import line from "../../assets/registration/reg/line.png";
+// import wheel from "../../assets/registration/reg/wheel.png";
+// import modalFrame from "/modalFrame.png";
+// import modalFrameMobile from "/modalFrameMobile.png";
+// import closedBook from "/closedBook.png";
+// import Syamsiah from "../../assets/fonts/Syamsiah Arabic.ttf";
+// import EB from "../../assets/fonts/EBGaramond-Medium.ttf";
+// import Cinzel from "../../assets/fonts/Cinzel-VariableFont_wght.ttf";
+// import Scroll1 from "/instructionsScroll.png";
+// import Scroll2 from "/instructionsScrollLong.png";
+// import googleButton from "/googleReg.svg";
+// import lamps from "/game-icons_magic-lamp.svg";
+// import instructionsBG from "/instructionsBG.png";
 
-const registrationAssets = [
-  RegBg,
-  leftbottom,
-  rightbottom,
-  lefttop,
-  righttop,
-  book,
-  buttonBg,
-  inputBg,
-  btn,
-  searchBg,
-  line,
-  wheel,
-  modalFrame,
-  modalFrameMobile,
-  closedBook,
-  Syamsiah,
-  EB,
-  Cinzel,
-  Scroll1,
-  Scroll2,
-  googleButton,
-  lamps,
-  instructionsBG
-];
+// const registrationAssets = [
+//   RegBg,
+//   leftbottom,
+//   rightbottom,
+//   lefttop,
+//   righttop,
+//   book,
+//   buttonBg,
+//   inputBg,
+//   btn,
+//   searchBg,
+//   line,
+//   wheel,
+//   modalFrame,
+//   modalFrameMobile,
+//   closedBook,
+//   Syamsiah,
+//   EB,
+//   Cinzel,
+//   Scroll1,
+//   Scroll2,
+//   googleButton,
+//   lamps,
+//   instructionsBG
+// ];
 
 // interface RegistrationProps {
 //   startAnimation: boolean;
@@ -73,7 +73,7 @@ const registrationAssets = [
 // }
 
 const Registration = () => {
-  const [entered, setEntered] = useState(false);
+  // const [entered, setEntered] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [userEmail, setUserEmail] = useState("");
   const [userData, setUserData] = useState<any>(null);
