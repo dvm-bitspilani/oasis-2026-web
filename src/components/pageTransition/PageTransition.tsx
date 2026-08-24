@@ -5,25 +5,15 @@ import { gsap } from "gsap";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 
 const CLOUD_SELECTOR = "[data-cloud-string]";
-
 const CASTLE_SELECTOR = "[data-castle-drown]";
-
 const MOON_SELECTOR = "[data-moon-shrink]";
-
 const SAND_SELECTOR = "[data-sand-parallax]";
-
 const FADE_SELECTOR = "[data-transition-fade]";
-
 type CloudRig = {
-
   el: HTMLElement;
-
   group: SVGGElement;
-
   path: SVGPathElement;
-
   anchorX: number;
-
   hookY: number;
 
 };

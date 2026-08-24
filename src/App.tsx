@@ -46,16 +46,16 @@ const assets = [
   sandImg,
 ];
 
+const TRANSITION_DURATION = 1150;
+
 export default function App() {
   const location = useLocation();
   const isHome = location.pathname === "/";
 
-  // Single source of truth now lives in TransitionProvider so any
-  // page (e.g. ComingSoon's "Go Home" button) can mark "entered"
-  // before navigating, without App having stale local state.
   const { entered, markEntered } = useTransition();
 
-  const [homeExiting, setHomeExiting] = useState<boolean>(entered);
+  const [homeExiting, setHomeExiting] =
+    useState<boolean>(entered);
 
   const handlePreloaderExit = () => {
     setHomeExiting(true);
@@ -66,14 +66,19 @@ export default function App() {
     setHomeExiting(true);
   };
 
-  const introActive = isHome && !entered;
+  const introActive =
+    isHome && !entered;
 
   return (
     <>
       <div
         style={
           introActive
-            ? { position: "fixed", inset: 0, overflow: "hidden" }
+            ? {
+                position: "fixed",
+                inset: 0,
+                overflow: "hidden",
+              }
             : undefined
         }
       >
@@ -83,18 +88,24 @@ export default function App() {
               ? {
                   width: "100%",
                   minHeight: "100%",
+
                   transform: homeExiting
                     ? "translate3d(0, 0, 0)"
                     : "translate3d(0, 100%, 0)",
+
                   transition: homeExiting
-                    ? "transform 1.15s cubic-bezier(0.76, 0, 0.24, 1)"
+                    ? `transform ${TRANSITION_DURATION}ms cubic-bezier(0.76, 0, 0.24, 1)`
                     : "none",
+
                   willChange: "transform",
                 }
               : undefined
           }
         >
-          <AppRoutes preloaderDone={entered} preloaderExiting={homeExiting} />
+          <AppRoutes
+            preloaderDone={entered}
+            preloaderExiting={homeExiting}
+          />
         </div>
       </div>
 

@@ -208,7 +208,7 @@
   margin-left: calc(
     75% - clamp(0px, 5vw, 40px)
   );
-  z-index: 10;
+  z-index: 5;
 }
 
 .linksSvg {
@@ -270,14 +270,37 @@
    MOBILE
    ========================================================= */
 
-@media (max-width: 650px) {
+@media (max-width: 750px) {
 
   .castle {
     width: clamp(340px, 100vw, 480px);
     left: 50%;
     bottom: 39%;
   }
+  .camelLand2{
+    right:-3%;
+    bottom:23%;
+    opacity: 1;
+    left: auto;
+    
+    img{
+      width:80%;
+      height:80%;
+    }
 
+  }
+  .camelLand{
+    right:25%;
+    bottom: 20%;
+    left:auto;
+    opacity: 1;
+
+
+    img{
+      width:90%;
+      height:80%;
+    }
+  }
 
 
   .sand {
@@ -316,14 +339,14 @@
     width: clamp(260px, 70vw, 420px);
 
     z-index: 10;
-
-    bottom: -15%;
+     top :auto;
+    bottom: -20%;
     left: 15%;
     right: auto;
 
     img {
-      width: 100%;
-      height: 100%;
+      width: 90%;
+      height: 90%;
       object-fit: contain;
       display: block;
     }
@@ -346,15 +369,7 @@
      MOBILE CAMELS
      ===================================================== */
 
-  .camelLand {
-    bottom: 20%;
-    left: 20%;
 
-    /*
-      Keep both camels identical in size
-      and position so GSAP can synchronize them.
-    */
-  }
 
   .links {
     display: none;
@@ -362,7 +377,7 @@
 }
 .regBtn {
   position: absolute;
-  bottom: -1%;
+  bottom: -4%;
   right: 6%;
   height: clamp(198px, 33vh, 356px);
   width: clamp(280px, 36vw, 800px);
