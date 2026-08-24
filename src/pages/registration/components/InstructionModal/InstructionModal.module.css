@@ -1,0 +1,224 @@
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100svh;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.selectedEvents {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 8px;
+  z-index: 1001;
+  padding: 5vw 6vw 4vw;
+  width: 50vw;
+  aspect-ratio: 1536/1024;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0px 0px 15.3px 0px rgba(229, 195, 132, 0.368627451);
+  background-image: var(--modal-bg-desktop);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.selectedEvents .close {
+  cursor: pointer;
+  width: 1.6vw;
+  height: 1.6vw;
+  position: absolute;
+  top: 5vw;
+  right: 7vw;
+}
+.selectedEvents .close path {
+  fill: #4a3115;
+}
+.selectedEvents .heading {
+  color: #3a2411;
+  font: 400 2.5vw "Syamsiah";
+}
+.selectedEvents .content {
+  display: flex;
+  justify-content: space-between;
+}
+.selectedEvents .content ul {
+  margin: 1vw 0 2vw 1vw;
+  height: 21vw;
+  overflow-y: auto;
+  list-style: none;
+  padding: 1vw 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.3vw;
+  padding: 1vw 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 7%, #000 93%, transparent 100%);
+          mask-image: linear-gradient(to bottom, transparent 0%, #000 7%, #000 93%, transparent 100%);
+  --webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 7%,
+    #000 93%,
+    transparent 100%
+  );
+  scrollbar-width: none;
+}
+.selectedEvents .content ul::-webkit-scrollbar {
+  display: none;
+}
+.selectedEvents .content ul li {
+  position: relative;
+  color: #432611;
+  text-align: left;
+  font: 400 1.3vw "EB";
+  line-height: 1.6;
+  letter-spacing: 1px;
+  margin-left: 3vw;
+}
+.selectedEvents .content ul li::before {
+  content: "";
+  position: absolute;
+  display: block;
+  top: 6%;
+  left: -2.5vw;
+  width: 1.5vw;
+  height: 1.45vw;
+  background: center/contain no-repeat url("/game-icons_magic-lamp.svg");
+}
+.selectedEvents .content .scrollBarContainer {
+  height: 21vw;
+  width: 10vw;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  cursor: -webkit-grab;
+  z-index: 4;
+}
+.selectedEvents .content .scrollBarContainer .scrollBarThumb {
+  position: absolute;
+  top: 13.5%;
+  transform: translateY(-50%);
+  height: 2vw;
+}
+.selectedEvents .content .scrollBarContainer .scrollBar {
+  -o-object-fit: contain;
+     object-fit: contain;
+  height: 100%;
+  border-radius: 5px;
+}
+.selectedEvents .buttonsContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+}
+.selectedEvents .buttonsContainer .cancelButton {
+  border: 1.5px solid #4a3115;
+  border-radius: 8px;
+  background: transparent;
+  color: #3a2411;
+  font: 400 1.5vw "EB";
+  padding: 0.5vw 4vw;
+  cursor: pointer;
+}
+.selectedEvents .buttonsContainer .confirmButton {
+  background-color: #4a3115;
+  border: none;
+  border-radius: 8px;
+  color: #fff6dd;
+  font: 400 1.5vw "EB";
+  padding: 0.5vw 4vw;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 1200px) and (max-aspect-ratio: 1.45) {
+  .selectedEvents {
+    --modal-w: min(88vw, 82svh * 0.4702);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--modal-w);
+    aspect-ratio: 860/1829;
+    height: auto;
+    padding: calc(var(--modal-w) * 0.17) calc(var(--modal-w) * 0.115) calc(var(--modal-w) * 0.09);
+    background-image: var(--modal-bg-mobile);
+    overflow: hidden;
+  }
+  .selectedEvents .close {
+    top: calc(var(--modal-w) * 0.075);
+    right: calc(var(--modal-w) * 0.085);
+    width: calc(var(--modal-w) * 0.06);
+    height: calc(var(--modal-w) * 0.06);
+  }
+  .selectedEvents .heading {
+    flex-shrink: 0;
+    font: 400 calc(var(--modal-w) * 0.068) "Syamsiah";
+  }
+  .selectedEvents .content {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .selectedEvents .content ul {
+    margin: calc(var(--modal-w) * 0.035) 0 0 calc(var(--modal-w) * 0.02);
+    height: 100%;
+    padding: calc(var(--modal-w) * 0.02) 0;
+    gap: calc(var(--modal-w) * 0.045);
+  }
+  .selectedEvents .content ul li {
+    margin-left: calc(var(--modal-w) * 0.13);
+    padding-left: 0;
+    font: 400 calc(var(--modal-w) * 0.05) "EB";
+  }
+  .selectedEvents .content ul li::before {
+    top: 0;
+    left: 0;
+    transform: translate(-100%, 20%);
+    width: calc(var(--modal-w) * 0.075);
+    height: calc(var(--modal-w) * 0.075);
+  }
+  .selectedEvents .content .scrollBarContainer {
+    height: 100%;
+    width: calc(var(--modal-w) * 0.12);
+  }
+  .selectedEvents .content .scrollBarContainer .scrollBarThumb {
+    height: calc(var(--modal-w) * 0.11);
+  }
+  .selectedEvents .buttonsContainer {
+    flex-shrink: 0;
+  }
+  .selectedEvents .buttonsContainer .cancelButton {
+    font: 400 calc(var(--modal-w) * 0.045) "DM Serif Text";
+    padding: 0.5vw 4vw;
+  }
+  .selectedEvents .buttonsContainer .confirmButton {
+    font: 400 calc(var(--modal-w) * 0.045) "DM Serif Text";
+    padding: 0.5vw 4vw;
+    cursor: pointer;
+  }
+}
+@media screen and (max-width: 1200px) and (max-aspect-ratio: 0.75) {
+  .selectedEvents .heading {
+    font: 400 calc(var(--modal-w) * 0.095) "Syamsiah";
+  }
+  .selectedEvents .content ul li {
+    font: 400 calc(var(--modal-w) * 0.058) "EB";
+  }
+  .selectedEvents .content ul li::before {
+    width: calc(var(--modal-w) * 0.085);
+    height: calc(var(--modal-w) * 0.085);
+  }
+  .selectedEvents .buttonsContainer .cancelButton {
+    font: 400 calc(var(--modal-w) * 0.05) "DM Serif Text";
+  }
+  .selectedEvents .buttonsContainer .confirmButton {
+    font: 400 calc(var(--modal-w) * 0.05) "DM Serif Text";
+  }
+  .selectedEvents .close {
+    right: 15%;
+    top: 10%;
+    visibility: hidden;
+  }
+}/*# sourceMappingURL=InstructionModal.module.css.map */

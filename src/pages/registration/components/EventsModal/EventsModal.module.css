@@ -1,0 +1,214 @@
+@charset "UTF-8";
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100svh;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* ================================================= */
+/* SAME BOOK-PAGE FRAME AS THE CONFIRM MODAL          */
+/* (this modal only ever renders on mobile, so it     */
+/* uses the mobile frame directly instead of the      */
+/* desktop/mobile CSS-var switch ConfirmModal needs)  */
+/* ================================================= */
+.selectedEvents {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  --modal-w: min(88vw, 82svh * 0.4702);
+  width: var(--modal-w);
+  aspect-ratio: 860/1829;
+  height: auto;
+  border-radius: 8px;
+  z-index: 1001;
+  /* extra top padding so the heading clears the ornate flourish  */
+  /* built into the frame artwork instead of colliding with it,   */
+  /* and a bit more on the sides/bottom so nothing hugs the border */
+  padding: calc(var(--modal-w) * 0.21) calc(var(--modal-w) * 0.14) calc(var(--modal-w) * 0.1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0px 0px 15.3px 0px rgba(229, 195, 132, 0.368627451);
+  background-image: var(--modal-bg-mobile);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  overflow: hidden;
+  /* ============================================ */
+  /* CLOSE BUTTON — round dark chip behind a gold  */
+  /* icon so it reads against ANY part of the      */
+  /* busy border artwork, not just the plain paper */
+  /* ============================================ */
+}
+.selectedEvents .close {
+  position: absolute;
+  top: calc(var(--modal-w) * 0.055);
+  right: calc(var(--modal-w) * 0.06);
+  width: calc(var(--modal-w) * 0.095);
+  height: calc(var(--modal-w) * 0.095);
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 10, 5, 0.45);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  z-index: 5;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.selectedEvents .close svg {
+  width: 42%;
+  height: 42%;
+}
+.selectedEvents .close path {
+  fill: #fed59b;
+}
+.selectedEvents .close:active {
+  transform: scale(0.9);
+  background: rgba(20, 10, 5, 0.65);
+}
+.selectedEvents .heading {
+  flex-shrink: 0;
+  margin: 0 0 calc(var(--modal-w) * 0.03);
+  color: #3a2411;
+  font: 400 calc(var(--modal-w) * 0.075) "Syamsiah";
+  text-align: center;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.25);
+}
+.selectedEvents .description {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0 0 calc(var(--modal-w) * 0.04);
+  color: #432611;
+  font: 400 calc(var(--modal-w) * 0.05) "EB";
+  line-height: 1.65;
+  letter-spacing: 0.5px;
+  text-align: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.selectedEvents .description::-webkit-scrollbar {
+  display: none;
+}
+.selectedEvents .description {
+  /* fade only the bottom edge as a scroll hint — a top fade   */
+  /* doesn't make sense here since there's nothing hidden      */
+  /* above the very first line, and it was washing that line   */
+  /* out for short descriptions that never even scroll         */
+  mask-image: linear-gradient(to bottom, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 92%, transparent 100%);
+}
+.selectedEvents {
+  /* ============================================ */
+  /* SAME BANNER AS THE EVENT-LIST / CONFIRM MODAL */
+  /* BUTTONS — inputBg.png outline + inputBgFilled */
+  /* .png mask that reveals a red gradient fill    */
+  /* ============================================ */
+}
+.selectedEvents .confirmButton,
+.selectedEvents .removeButton {
+  flex-shrink: 0;
+  position: relative;
+  width: 100%;
+  height: calc(var(--modal-w) * 0.14);
+  min-height: 42px;
+  margin: calc(var(--modal-w) * 0.03) 0 0;
+  padding: 0 4%;
+  border: none;
+  background-color: transparent;
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  color: #38170b;
+  font-family: "Cinzel", serif;
+  font-size: calc(var(--modal-w) * 0.05);
+  font-weight: 700;
+  cursor: pointer;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  -moz-appearance: none;
+       appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  /* red gradient fill, masked to the banner's silhouette */
+}
+.selectedEvents .confirmButton::before,
+.selectedEvents .removeButton::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, #671c07 0%, #400e00 100%);
+  -webkit-mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
+  mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  clip-path: inset(0 100% 0 0);
+  z-index: 0;
+  pointer-events: none;
+  transition: clip-path 0.45s ease;
+}
+.selectedEvents .confirmButton span,
+.selectedEvents .removeButton span {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  line-height: 1;
+  color: inherit;
+  transition: transform 0.3s ease, letter-spacing 0.3s ease, text-shadow 0.3s ease, color 0.3s ease;
+}
+.selectedEvents .confirmButton,
+.selectedEvents .removeButton {
+  /* no :hover states — this modal is mobile-only, so the tap */
+  /* (:active) feedback below is what actually gets used      */
+}
+.selectedEvents .confirmButton:active,
+.selectedEvents .removeButton:active {
+  transform: scale(0.97);
+}
+.selectedEvents {
+  /* ADD — plain banner outline, same as an unselected event item */
+}
+.selectedEvents .confirmButton {
+  color: #38170b;
+}
+.selectedEvents {
+  /* REMOVE — permanently in the "selected" state, i.e. already   */
+  /* filled + gold, same as the currently-active/selected event   */
+  /* item, since the event behind this button is already added   */
+}
+.selectedEvents .removeButton {
+  transform: scale(1.02);
+  filter: brightness(1.1) drop-shadow(0 0 8px rgba(229, 195, 132, 0.5));
+}
+.selectedEvents .removeButton::before {
+  clip-path: inset(0 0 0 0);
+}
+.selectedEvents .removeButton span {
+  letter-spacing: 0.04em;
+  color: #fed59b;
+  text-shadow: 0 0 7px rgba(254, 213, 155, 0.8);
+}
+.selectedEvents .removeButton:active {
+  transform: scale(0.95);
+}/*# sourceMappingURL=EventsModal.module.css.map */

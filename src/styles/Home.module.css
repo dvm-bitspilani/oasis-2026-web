@@ -15,6 +15,11 @@
   background-repeat: no-repeat;
 }
 
+.navbar {
+  z-index: 1000;
+  opacity: 1;
+}
+
 .clouds {
   position: absolute;
   top: 0;
@@ -40,7 +45,7 @@
   bottom: -1%;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 46%;
   z-index: 3;
   overflow: hidden;
 }
@@ -55,10 +60,10 @@
 
 .castle {
   position: absolute;
-  bottom: 23%;
+  bottom: 24%;
   left: 41%;
   transform: translateX(-50%);
-  width: 45%;
+  width: clamp(346px, 45vw, 864px);
   z-index: 2;
 }
 
@@ -66,14 +71,13 @@
   width: 100%;
   height: auto;
   display: block;
-  filter: brightness(1.45);
 }
 
 .moon {
   position: absolute;
-  bottom: 15%;
+  bottom: 21%;
   left: 40%;
-  width: 38%;
+  width: clamp(292px, 36vw, 730px);
   z-index: 0;
   transform: translateX(-50%);
 }
@@ -88,8 +92,8 @@
   position: absolute;
   bottom: -2%;
   left: 5%;
-  height: 30vh;
-  width: 30vw;
+  height: clamp(180px, 30vh, 324px);
+  width: clamp(230px, 30vw, 576px);
   z-index: 5;
 }
 .oasisLogo img {
@@ -100,13 +104,17 @@
   display: block;
 }
 
+/* =========================================================
+   REGISTRATION BUTTON
+   ========================================================= */
 .regBtn {
   position: absolute;
-  bottom: 0%;
+  bottom: -1%;
   right: 6%;
-  height: 33vh;
-  width: 33vw;
+  height: clamp(198px, 33vh, 356px);
+  width: clamp(280px, 36vw, 800px);
   z-index: 5;
+  cursor: pointer;
 }
 .regBtn img {
   width: 100%;
@@ -114,31 +122,75 @@
   -o-object-fit: contain;
      object-fit: contain;
   display: block;
+  will-change: filter;
+}
+.regBtn img:hover {
+  cursor: pointer;
 }
 
+/* =========================================================
+   CAMEL CARAVAN
+   ========================================================= */
+/*
+  Both camel1.svg and camel2.svg use this exact same
+  container styling.
+
+  GSAP controls:
+  - x
+  - y
+  - opacity
+
+  Therefore both camels can be animated together
+  using the same GSAP timeline.
+*/
 .camelLand {
   position: absolute;
-  bottom: 17%;
+  bottom: 11%;
   left: 35%;
-  height: 15vh;
-  width: 15vw;
+  height: clamp(70px, 12vh, 130px);
+  width: clamp(90px, 22vw, 220px);
   z-index: 4;
+  opacity: 0;
+  will-change: transform, opacity;
+  pointer-events: none;
 }
 .camelLand img {
-  width: 100%;
-  height: 100%;
+  width: 40%;
+  height: 50%;
+  -o-object-fit: contain;
+     object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+.camelLand2 {
+  position: absolute;
+  bottom: 11%;
+  left: 35%;
+  height: clamp(70px, 12vh, 130px);
+  width: clamp(120px, 28vw, 280px);
+  z-index: 4;
+  opacity: 0;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+.camelLand2 img {
+  width: 50%;
+  height: 60%;
   -o-object-fit: contain;
      object-fit: contain;
   display: block;
 }
 
+/* =========================================================
+   LINKS
+   ========================================================= */
 .links {
   position: relative;
-  width: 27vw;
-  aspect-ratio: 1/1;
-  margin-top: 7%;
-  margin-left: 65%;
-  z-index: 1;
+  width: clamp(100px, 20vw, 250px);
+  margin-top: clamp(20px, 7vh, 60px);
+  margin-left: calc(75% - clamp(0px, 5vw, 40px));
+  z-index: 10;
 }
 
 .linksSvg {
@@ -148,56 +200,9 @@
   height: 100%;
 }
 
-@media (max-width: 650px) {
-  .castle {
-    width: 100vw;
-    left: 50%;
-    bottom: 41%;
-  }
-  .sand {
-    -o-object-fit: cover;
-       object-fit: cover;
-    height: 50%;
-  }
-  .moon {
-    width: 100vw;
-    left: 50%;
-    bottom: 30%;
-  }
-  .oasisLogo {
-    position: absolute;
-    bottom: 12%;
-    left: 5%;
-    height: 50vh;
-    width: 50vw;
-    z-index: 5;
-  }
-  .oasisLogo img {
-    width: 100%;
-    height: 100%;
-    -o-object-fit: contain;
-       object-fit: contain;
-    display: block;
-  }
-  .regBtn {
-    position: absolute;
-    height: 70vh;
-    width: 70vw;
-    z-index: 5;
-    bottom: -15%;
-    left: 15%;
-  }
-  .regBtn img {
-    width: 100%;
-    height: 100%;
-    -o-object-fit: contain;
-       object-fit: contain;
-    display: block;
-  }
-  .links {
-    display: none;
-  }
-}
+/* =========================================================
+   SOCIAL LINKS
+   ========================================================= */
 .socialLink {
   transition: filter 0.25s ease, transform 0.25s ease;
   transform-box: fill-box;
@@ -213,6 +218,9 @@
   filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.4)) drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
 }
 
+/* =========================================================
+   MOON CLOUD OVERLAY
+   ========================================================= */
 .moonCloudOverlay {
   position: absolute;
   border-radius: 50%;
@@ -224,4 +232,77 @@
 
 .moonCloudOverlayInner {
   position: absolute;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+@media (max-width: 650px) {
+  .castle {
+    width: clamp(340px, 100vw, 480px);
+    left: 50%;
+    bottom: 39%;
+  }
+  .sand {
+    height: 45%;
+    width: 100vw;
+  }
+  .moon {
+    width: clamp(320px, 100vw, 460px);
+    left: 50%;
+    bottom: 30%;
+  }
+  .oasisLogo {
+    position: absolute;
+    bottom: 12%;
+    left: 5%;
+    height: clamp(160px, 50vh, 320px);
+    width: clamp(160px, 50vw, 320px);
+    z-index: 5;
+  }
+  .oasisLogo img {
+    width: 100%;
+    height: 100%;
+    -o-object-fit: contain;
+       object-fit: contain;
+    display: block;
+  }
+  .regBtn {
+    position: absolute;
+    height: clamp(300px, 70vh, 480px);
+    width: clamp(260px, 70vw, 420px);
+    z-index: 5;
+    bottom: -15%;
+    left: 15%;
+    right: auto;
+  }
+  .regBtn img {
+    width: 100%;
+    height: 100%;
+    -o-object-fit: contain;
+       object-fit: contain;
+    display: block;
+  }
+  .regBtn:hover img {
+    animation: none;
+    filter: none;
+  }
+  .regBtn:active img {
+    animation: none;
+    filter: drop-shadow(0 0 6px rgba(254, 213, 155, 0.4));
+  }
+  /* =====================================================
+     MOBILE CAMELS
+     ===================================================== */
+  .camelLand {
+    bottom: 20%;
+    left: 20%;
+    /*
+      Keep both camels identical in size
+      and position so GSAP can synchronize them.
+    */
+  }
+  .links {
+    display: none;
+  }
 }/*# sourceMappingURL=Home.module.css.map */

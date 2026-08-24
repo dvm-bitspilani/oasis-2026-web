@@ -4,6 +4,7 @@ import styles from "../styles/Preloader.module.scss";
 interface PreloaderProps {
   assets?: string[];
   onEnter: () => void;
+  onExitStart?: () => void;
 }
 
 type Point = {
@@ -51,6 +52,21 @@ type FormationStar = {
 
   landed: boolean;
   landedAt: number;
+
+  // ---------------------------------------------------------------
+  // Randomized "load reveal" — once a star lands it sits as a dim
+  // ember dot, then brightens up to full pulsing opacity at its own
+  // random point along the real asset-loading progress (0 -> 1).
+  // Because every star has a different threshold/jitter/flicker seed,
+  // the brightening reads as scattered, organic twinkling instead of
+  // a uniform fade even though it's driven by one linear progress
+  // value.
+  // ---------------------------------------------------------------
+  revealThreshold: number;
+  revealJitter: number;
+  dimOpacity: number;
+  flickerSeed: number;
+  flickerSpeed: number;
 };
 
 type CanvasState = HTMLCanvasElement & {
@@ -60,29 +76,41 @@ type CanvasState = HTMLCanvasElement & {
 export default function Preloader({
   assets = [],
   onEnter,
+  onExitStart,
 }: PreloaderProps) {
-  const canvasRef =
-    useRef<HTMLCanvasElement>(null);
+  // ===================================================================
+  // REFS
+  // ===================================================================
 
-  const pathRef =
-    useRef<SVGPathElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const containerRef =
-    useRef<HTMLDivElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
 
-  const enteredRef =
-    useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const exitStartedRef =
-    useRef(false);
-  const [assetsLoaded, setAssetsLoaded] =
-    useState(assets.length === 0);
+  const enteredRef = useRef(false);
 
-  const [formationComplete, setFormationComplete] =
-    useState(false);
+  const exitStartedRef = useRef(false);
 
-  const [exiting, setExiting] =
-    useState(false);
+  // Fractional asset-loading progress (0 -> 1), read every animation
+  // frame. Lives in a ref (not state) so updates don't re-trigger the
+  // canvas effect, which only needs to run once.
+  const loadProgressRef = useRef(assets.length === 0 ? 1 : 0);
+
+  // ===================================================================
+  // STATE
+  // ===================================================================
+
+  const [assetsLoaded, setAssetsLoaded] = useState(assets.length === 0);
+
+  const [formationComplete, setFormationComplete] = useState(false);
+
+  const [exiting, setExiting] = useState(false);
+
+  // ===================================================================
+  // OASIS PATH
+  // ===================================================================
+
   const PATH_D = `
   M 264 237 L 258 242 L 258 243 L 253 248 L 253 249 L 243 261 L 237 272 L 235 274 L 229 286 L 229 288 L 225 298 L 224 307 L 223 308 L 223 329 L 224 330 L 224 335 L 225 336 L 225 339 L 226 340 L 228 348 L 234 360 L 250 382 L 267 398 L 268 398 L 283 411 L 296 420 L 300 422 L 303 422 L 303 419 L 302 418 L 301 413 L 295 401 L 295 399 L 293 396 L 293 394 L 289 384 L 289 381 L 287 376 L 287 372 L 286 371 L 286 366 L 285 365 L 285 357 L 284 356 L 284 342 L 285 341 L 285 332 L 286 331 L 286 326 L 287 325 L 288 315 L 289 314 L 289 311 L 290 310 L 290 307 L 291 306 L 291 303 L 292 302 L 294 294 L 300 284 L 297 284 L 289 288 L 283 292 L 274 301 L 269 308 L 265 316 L 264 322 L 263 323 L 263 332 L 261 335 L 259 334 L 256 328 L 256 326 L 251 315 L 251 313 L 247 303 L 246 296 L 245 295 L 245 283 L 246 282 L 246 276 L 247 275 L 248 268 L 249 267 L 251 259 L 256 249 Z
 
@@ -254,14 +282,11 @@ export default function Preloader({
   // COLORS
   // ===================================================================
 
-  const BG_COLOR =
-    "rgb(8, 10, 24)";
+  const BG_COLOR = "rgb(8, 10, 24)";
 
-  const STAR_COLOR =
-    "245, 222, 179";
+  const STAR_COLOR = "245, 222, 179";
 
-  const PATH_STAR_COLOR =
-    "255, 231, 180";
+  const PATH_STAR_COLOR = "255, 231, 180";
 
   // ===================================================================
   // ASSET LOADING
@@ -269,39 +294,50 @@ export default function Preloader({
 
   useEffect(() => {
     if (assets.length === 0) {
+      loadProgressRef.current = 1;
       setAssetsLoaded(true);
       return;
     }
 
     let cancelled = false;
+    let loadedCount = 0;
 
     setAssetsLoaded(false);
+    loadProgressRef.current = 0;
+
+    const markLoaded = () => {
+      loadedCount++;
+
+      if (!cancelled) {
+        loadProgressRef.current = loadedCount / assets.length;
+      }
+    };
 
     const loaders = assets.map(
       (src) =>
-        new Promise<void>(
-          (resolve) => {
-            const image =
-              new Image();
+        new Promise<void>((resolve) => {
+          const image = new Image();
 
-            image.onload =
-              () => resolve();
+          image.onload = () => {
+            markLoaded();
+            resolve();
+          };
 
-            image.onerror =
-              () => resolve();
+          image.onerror = () => {
+            markLoaded();
+            resolve();
+          };
 
-            image.src = src;
-          },
-        ),
+          image.src = src;
+        }),
     );
 
-    Promise.all(loaders).then(
-      () => {
-        if (!cancelled) {
-          setAssetsLoaded(true);
-        }
-      },
-    );
+    Promise.all(loaders).then(() => {
+      if (!cancelled) {
+        loadProgressRef.current = 1;
+        setAssetsLoaded(true);
+      }
+    });
 
     return () => {
       cancelled = true;
@@ -313,17 +349,13 @@ export default function Preloader({
   // ===================================================================
 
   useEffect(() => {
-    const canvas =
-      canvasRef.current;
+    const canvas = canvasRef.current;
 
-    const svgPath =
-      pathRef.current;
+    const svgPath = pathRef.current;
 
-    if (!canvas || !svgPath)
-      return;
+    if (!canvas || !svgPath) return;
 
-    const ctx =
-      canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
 
     if (!ctx) return;
 
@@ -334,122 +366,70 @@ export default function Preloader({
 
     let destroyed = false;
 
-    const startTime =
-      performance.now();
+    const startTime = performance.now();
 
-    let backgroundStars: BackgroundStar[] =
-      [];
+    let backgroundStars: BackgroundStar[] = [];
 
-    let shootingStars: ShootingStar[] =
-      [];
+    let shootingStars: ShootingStar[] = [];
 
-    let formationStars: FormationStar[] =
-      [];
+    let formationStars: FormationStar[] = [];
 
     // ---------------------------------------------------------------
     // SAMPLE PATH
     // ---------------------------------------------------------------
 
-    const samplePath =
-      (): Point[] => {
-        const totalLength =
-          svgPath.getTotalLength();
+    const samplePath = (): Point[] => {
+      const totalLength = svgPath.getTotalLength();
 
-        if (
-          !Number.isFinite(
-            totalLength,
-          ) ||
-          totalLength <= 0
-        ) {
-          return [];
-        }
+      if (!Number.isFinite(totalLength) || totalLength <= 0) {
+        return [];
+      }
 
-        const points: Point[] =
-          [];
+      const points: Point[] = [];
 
-        for (
-          let i = 0;
-          i < PATH_STAR_COUNT;
-          i++
-        ) {
-          const progress =
-            i /
-            Math.max(
-              1,
-              PATH_STAR_COUNT - 1,
-            );
+      for (let i = 0; i < PATH_STAR_COUNT; i++) {
+        const progress = i / Math.max(1, PATH_STAR_COUNT - 1);
 
-          const point =
-            svgPath.getPointAtLength(
-              totalLength *
-                progress,
-            );
+        const point = svgPath.getPointAtLength(totalLength * progress);
 
-          points.push({
-            x: point.x,
-            y: point.y,
-          });
-        }
+        points.push({
+          x: point.x,
+          y: point.y,
+        });
+      }
 
-        return points;
-      };
+      return points;
+    };
 
     // ---------------------------------------------------------------
     // SVG → SCREEN
     // ---------------------------------------------------------------
 
-    const svgPointToScreen = (
-      point: Point,
-    ): Point => {
-      const availableWidth =
-        width * 0.96;
+    const svgPointToScreen = (point: Point): Point => {
+      const availableWidth = width * 0.96;
 
-      const availableHeight =
-        height * 0.72;
+      const availableHeight = height * 0.72;
 
-      const scale =
-        Math.min(
-          availableWidth /
-            SVG_VIEWBOX_WIDTH,
+      const scale = Math.min(
+        availableWidth / SVG_VIEWBOX_WIDTH,
 
-          availableHeight /
-            SVG_VIEWBOX_HEIGHT,
-        );
+        availableHeight / SVG_VIEWBOX_HEIGHT,
+      );
 
-      const finalScale =
-        Math.max(
-          0.2,
-          scale,
-        );
+      const finalScale = Math.max(0.2, scale);
 
-      const renderedWidth =
-        SVG_VIEWBOX_WIDTH *
-        finalScale;
+      const renderedWidth = SVG_VIEWBOX_WIDTH * finalScale;
 
-      const renderedHeight =
-        SVG_VIEWBOX_HEIGHT *
-        finalScale;
+      const renderedHeight = SVG_VIEWBOX_HEIGHT * finalScale;
 
-      const offsetX =
-        (width -
-          renderedWidth) /
-        2;
+      const offsetX = (width - renderedWidth) / 2;
 
-      const offsetY =
-        (height -
-          renderedHeight) /
-        2;
+      const offsetY = (height - renderedHeight) / 2;
 
       return {
-        x:
-          offsetX +
-          point.x *
-            finalScale,
+        x: offsetX + point.x * finalScale,
 
-        y:
-          offsetY +
-          point.y *
-            finalScale,
+        y: offsetY + point.y * finalScale,
       };
     };
 
@@ -457,312 +437,166 @@ export default function Preloader({
     // BACKGROUND
     // ---------------------------------------------------------------
 
-    const createBackgroundStars =
-      () => {
-        backgroundStars = [];
+    const createBackgroundStars = () => {
+      backgroundStars = [];
 
-        const createLayer = (
-          count: number,
-          depth: number,
-          minSize: number,
-          maxSize: number,
-          minOpacity: number,
-          maxOpacity: number,
-          minSpeed: number,
-          maxSpeed: number,
-        ) => {
-          for (
-            let i = 0;
-            i < count;
-            i++
-          ) {
-            backgroundStars.push(
-              {
-                x:
-                  Math.random() *
-                  width,
+      const createLayer = (
+        count: number,
+        depth: number,
+        minSize: number,
+        maxSize: number,
+        minOpacity: number,
+        maxOpacity: number,
+        minSpeed: number,
+        maxSpeed: number,
+      ) => {
+        for (let i = 0; i < count; i++) {
+          backgroundStars.push({
+            x: Math.random() * width,
 
-                y:
-                  Math.random() *
-                  height,
+            y: Math.random() * height,
 
-                size:
-                  minSize +
-                  Math.random() *
-                    (maxSize -
-                      minSize),
+            size: minSize + Math.random() * (maxSize - minSize),
 
-                opacity:
-                  minOpacity +
-                  Math.random() *
-                    (maxOpacity -
-                      minOpacity),
+            opacity: minOpacity + Math.random() * (maxOpacity - minOpacity),
 
-                depth,
+            depth,
 
-                speed:
-                  minSpeed +
-                  Math.random() *
-                    (maxSpeed -
-                      minSpeed),
+            speed: minSpeed + Math.random() * (maxSpeed - minSpeed),
 
-                phase:
-                  Math.random() *
-                  Math.PI *
-                  2,
+            phase: Math.random() * Math.PI * 2,
 
-                twinkleSpeed:
-                  0.35 +
-                  Math.random() *
-                    0.9,
-              },
-            );
-          }
-        };
-
-        createLayer(
-          FAR_STARS,
-          0.16,
-          0.18,
-          0.65,
-          0.055,
-          0.2,
-          1,
-          4,
-        );
-
-        createLayer(
-          MID_STARS,
-          0.45,
-          0.4,
-          1.15,
-          0.12,
-          0.38,
-          4,
-          9,
-        );
-
-        createLayer(
-          NEAR_STARS,
-          0.95,
-          0.75,
-          1.9,
-          0.24,
-          0.62,
-          9,
-          18,
-        );
+            twinkleSpeed: 0.35 + Math.random() * 0.9,
+          });
+        }
       };
+
+      createLayer(FAR_STARS, 0.16, 0.18, 0.65, 0.055, 0.2, 1, 4);
+
+      createLayer(MID_STARS, 0.45, 0.4, 1.15, 0.12, 0.38, 4, 9);
+
+      createLayer(NEAR_STARS, 0.95, 0.75, 1.9, 0.24, 0.62, 9, 18);
+    };
 
     // ---------------------------------------------------------------
     // SHOOTING STARS
     // ---------------------------------------------------------------
 
-    const createShootingStars =
-      () => {
-        shootingStars = [];
+    const createShootingStars = () => {
+      shootingStars = [];
 
-        const now =
-          performance.now();
+      const now = performance.now();
 
-        for (
-          let i = 0;
-          i < SHOOTING_STARS;
-          i++
-        ) {
-          shootingStars.push(
-            {
-              x:
-                Math.random() *
-                width,
+      for (let i = 0; i < SHOOTING_STARS; i++) {
+        shootingStars.push({
+          x: Math.random() * width,
 
-              y:
-                -50 -
-                Math.random() *
-                  200,
+          y: -50 - Math.random() * 200,
 
-              angle:
-                (
-                  18 +
-                  Math.random() *
-                    18
-                ) *
-                (Math.PI /
-                  180),
+          angle: (18 + Math.random() * 18) * (Math.PI / 180),
 
-              speed:
-                180 +
-                Math.random() *
-                  160,
+          speed: 180 + Math.random() * 160,
 
-              length:
-                50 +
-                Math.random() *
-                  200,
+          length: 50 + Math.random() * 200,
 
-              size:
-                0.8 +
-                Math.random() *
-                  1.4,
+          size: 0.8 + Math.random() * 1.4,
 
-              nextSpawn:
-                now +
-                Math.random() *
-                  7000,
-            },
-          );
-        }
-      };
+          nextSpawn: now + Math.random() * 7000,
+        });
+      }
+    };
 
     // ---------------------------------------------------------------
     // FORMATION
     // ---------------------------------------------------------------
 
-    const createFormation =
-      () => {
-        const svgPoints =
-          samplePath();
+    const createFormation = () => {
+      const svgPoints = samplePath();
 
-        const angle =
-          FORMATION_ANGLE_DEG *
-          (Math.PI / 180);
+      const angle = FORMATION_ANGLE_DEG * (Math.PI / 180);
 
-        formationStars =
-          svgPoints.map(
-            (
-              svgPoint,
-              index,
-            ) => {
-              const target =
-                svgPointToScreen(
-                  svgPoint,
-                );
+      formationStars = svgPoints.map((svgPoint, index) => {
+        const target = svgPointToScreen(svgPoint);
 
-              const distance =
-                MIN_TRAVEL_DISTANCE +
-                Math.random() *
-                  (
-                    MAX_TRAVEL_DISTANCE -
-                    MIN_TRAVEL_DISTANCE
-                  );
+        const distance =
+          MIN_TRAVEL_DISTANCE +
+          Math.random() * (MAX_TRAVEL_DISTANCE - MIN_TRAVEL_DISTANCE);
 
-              const speed =
-                MIN_STAR_SPEED +
-                Math.random() *
-                  (
-                    MAX_STAR_SPEED -
-                    MIN_STAR_SPEED
-                  );
+        const speed =
+          MIN_STAR_SPEED + Math.random() * (MAX_STAR_SPEED - MIN_STAR_SPEED);
 
-              const startX =
-                target.x -
-                Math.cos(angle) *
-                  distance;
+        const startX = target.x - Math.cos(angle) * distance;
 
-              const startY =
-                target.y -
-                Math.sin(angle) *
-                  distance;
+        const startY = target.y - Math.sin(angle) * distance;
 
-              const pathProgress =
-                index /
-                Math.max(
-                  1,
-                  svgPoints.length -
-                    1,
-                );
+        const pathProgress = index / Math.max(1, svgPoints.length - 1);
 
-              const orderedDelay =
-                FORMATION_START +
-                pathProgress *
-                  FORMATION_STAGGER;
+        const orderedDelay = FORMATION_START + pathProgress * FORMATION_STAGGER;
 
-              const randomDelay =
-                (
-                  Math.random() -
-                  0.5
-                ) * 900;
+        const randomDelay = (Math.random() - 0.5) * 900;
 
-              const delay =
-                Math.max(
-                  400,
-                  orderedDelay +
-                    randomDelay,
-                );
+        const delay = Math.max(400, orderedDelay + randomDelay);
 
-              return {
-                target,
+        return {
+          target,
 
-                startX,
-                startY,
+          startX,
+          startY,
 
-                x: startX,
-                y: startY,
+          x: startX,
+          y: startY,
 
-                angle,
+          angle,
 
-                speed,
+          speed,
 
-                distance,
+          distance,
 
-                delay,
+          delay,
 
-                size:
-                  2.4 +
-                  Math.random() *
-                    2.0,
+          size: 2.4 + Math.random() * 2.0,
 
-                trailLength:
-                  45 +
-                  Math.random() *
-                    260,
+          trailLength: 45 + Math.random() * 260,
 
-                landed: false,
+          landed: false,
 
-                landedAt: 0,
-              };
-            },
-          );
-      };
+          landedAt: 0,
+
+          // Randomized "load reveal" parameters — see the
+          // FormationStar type for details.
+          revealThreshold: Math.random(),
+
+          revealJitter: 0.08 + Math.random() * 0.22,
+
+          dimOpacity: 0.04 + Math.random() * 0.14,
+
+          flickerSeed: Math.random() * Math.PI * 2,
+
+          flickerSpeed: 0.6 + Math.random() * 1.8,
+        };
+      });
+    };
 
     // ---------------------------------------------------------------
     // RESIZE
     // ---------------------------------------------------------------
 
     const resize = () => {
-      width =
-        window.innerWidth;
+      width = window.innerWidth;
 
-      height =
-        window.innerHeight;
+      height = window.innerHeight;
 
-      const dpr =
-        Math.min(
-          window.devicePixelRatio ||
-            1,
-          2,
-        );
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      canvas.width =
-        width * dpr;
+      canvas.width = width * dpr;
 
-      canvas.height =
-        height * dpr;
+      canvas.height = height * dpr;
 
-      canvas.style.width =
-        `${width}px`;
+      canvas.style.width = `${width}px`;
 
-      canvas.style.height =
-        `${height}px`;
+      canvas.style.height = `${height}px`;
 
-      ctx.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0,
-      );
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       createBackgroundStars();
 
@@ -784,85 +618,67 @@ export default function Preloader({
       opacity: number,
       color: string,
     ) => {
-      const tailX =
-        x -
-        Math.cos(angle) *
-          length;
+      const tailX = x - Math.cos(angle) * length;
 
-      const tailY =
-        y -
-        Math.sin(angle) *
-          length;
+      const tailY = y - Math.sin(angle) * length;
 
-      const gradient =
-        ctx.createLinearGradient(
-          tailX,
-          tailY,
-          x,
-          y,
-        );
+      const gradient = ctx.createLinearGradient(tailX, tailY, x, y);
 
-      gradient.addColorStop(
-        0,
-        `rgba(${color},0)`,
-      );
+      gradient.addColorStop(0, `rgba(${color},0)`);
 
-      gradient.addColorStop(
-        0.4,
-        `rgba(${color},${
-          opacity * 0.25
-        })`,
-      );
+      gradient.addColorStop(0.4, `rgba(${color},${opacity * 0.25})`);
 
-      gradient.addColorStop(
-        1,
-        `rgba(${color},${opacity})`,
-      );
+      gradient.addColorStop(1, `rgba(${color},${opacity})`);
 
       ctx.beginPath();
 
-      ctx.moveTo(
-        tailX,
-        tailY,
-      );
+      ctx.moveTo(tailX, tailY);
 
-      ctx.lineTo(
-        x,
-        y,
-      );
+      ctx.lineTo(x, y);
 
-      ctx.strokeStyle =
-        gradient;
+      ctx.strokeStyle = gradient;
 
       ctx.lineWidth = size;
 
-      ctx.lineCap =
-        "round";
+      ctx.lineCap = "round";
 
       ctx.stroke();
 
       ctx.beginPath();
 
-      ctx.arc(
-        x,
-        y,
-        size,
-        0,
-        Math.PI * 2,
-      );
+      ctx.arc(x, y, size, 0, Math.PI * 2);
 
-      ctx.fillStyle =
-        `rgba(${color},${opacity})`;
+      ctx.fillStyle = `rgba(${color},${opacity})`;
 
-      ctx.shadowBlur =
-        8 + size * 4;
+      ctx.shadowBlur = 8 + size * 4;
 
-      ctx.shadowColor =
-        `rgba(${color},0.9)`;
+      ctx.shadowColor = `rgba(${color},0.9)`;
 
       ctx.fill();
 
       ctx.shadowBlur = 0;
+    };
+
+    // ---------------------------------------------------------------
+    // LOAD REVEAL HELPER
+    //
+    // Computes how "revealed" (0 -> 1, eased) a landed star should be
+    // for a given asset-loading progress. Each star has its own random
+    // threshold + jitter, so different stars cross from dim -> bright
+    // at different points along the same 0->1 progress value, giving
+    // a scattered/organic feel rather than a uniform fade.
+    // ---------------------------------------------------------------
+
+    const computeStarReveal = (star: FormationStar, loadProgress: number) => {
+      const revealSpan = star.revealJitter * 2 + 0.12;
+
+      const raw =
+        (loadProgress - star.revealThreshold + revealSpan / 2) / revealSpan;
+
+      const clamped = Math.min(1, Math.max(0, raw));
+
+      // smoothstep — eases in rather than snapping
+      return clamped * clamped * (3 - 2 * clamped);
     };
 
     // ---------------------------------------------------------------
@@ -872,43 +688,37 @@ export default function Preloader({
     const drawPathStar = (
       star: FormationStar,
       elapsed: number,
+      loadProgress: number,
     ) => {
-      const pulse =
-        (
-          Math.sin(
-            elapsed *
-              0.002 +
-              star.target.x *
-                0.01,
-          ) +
-          1
-        ) / 2;
+      const pulse = (Math.sin(elapsed * 0.002 + star.target.x * 0.01) + 1) / 2;
+
+      const fullOpacity = 0.76 + pulse * 0.22;
+
+      const eased = computeStarReveal(star, loadProgress);
+
+      // Faint flicker while the star is still "waking up" — settles
+      // to zero once fully revealed.
+      const flicker =
+        (1 - eased) *
+        (Math.sin(elapsed * 0.003 * star.flickerSpeed + star.flickerSeed) *
+          0.5 +
+          0.5) *
+        0.06;
 
       const opacity =
-        0.76 +
-        pulse * 0.22;
+        star.dimOpacity + (fullOpacity - star.dimOpacity) * eased + flicker;
 
-      const radius =
-        star.size * 1.45;
+      const radius = star.size * (0.85 + eased * 0.6);
 
       ctx.beginPath();
 
-      ctx.arc(
-        star.x,
-        star.y,
-        radius,
-        0,
-        Math.PI * 2,
-      );
+      ctx.arc(star.x, star.y, radius, 0, Math.PI * 2);
 
-      ctx.fillStyle =
-        `rgba(${PATH_STAR_COLOR},${opacity})`;
+      ctx.fillStyle = `rgba(${PATH_STAR_COLOR},${opacity})`;
 
-      ctx.shadowBlur =
-        11 + star.size * 4;
+      ctx.shadowBlur = 4 + star.size * 3 + eased * (7 + star.size);
 
-      ctx.shadowColor =
-        `rgba(${PATH_STAR_COLOR},0.95)`;
+      ctx.shadowColor = `rgba(${PATH_STAR_COLOR},${0.4 + eased * 0.55})`;
 
       ctx.fill();
 
@@ -919,283 +729,126 @@ export default function Preloader({
     // LOGO GLOW
     // ---------------------------------------------------------------
 
-    const drawPathGlow = (
-      elapsed: number,
-      lastLanding: number,
-    ) => {
-      const age =
-        elapsed -
-        lastLanding;
+    const drawPathGlow = (elapsed: number, lastLanding: number) => {
+      const age = elapsed - lastLanding;
 
-      const progress =
-        Math.min(
-          1,
-          age / 1300,
-        );
+      const progress = Math.min(1, age / 1300);
 
-      const pulse =
-        0.9 +
-        Math.sin(
-          elapsed *
-            0.0014,
-        ) *
-          0.1;
+      const pulse = 0.9 + Math.sin(elapsed * 0.0014) * 0.1;
 
-      const gradient =
-        ctx.createRadialGradient(
-          width / 2,
-          height / 2,
-          0,
-          width / 2,
-          height / 2,
-          Math.min(
-            width,
-            height,
-          ) * 0.52,
-        );
+      const gradient = ctx.createRadialGradient(
+        width / 2,
+        height / 2,
+        0,
+        width / 2,
+        height / 2,
+        Math.min(width, height) * 0.52,
+      );
 
       gradient.addColorStop(
         0,
-        `rgba(${PATH_STAR_COLOR},${
-          0.16 *
-          progress *
-          pulse
-        })`,
+        `rgba(${PATH_STAR_COLOR},${0.16 * progress * pulse})`,
       );
 
-      gradient.addColorStop(
-        0.35,
-        `rgba(${STAR_COLOR},${
-          0.07 *
-          progress
-        })`,
-      );
+      gradient.addColorStop(0.35, `rgba(${STAR_COLOR},${0.07 * progress})`);
 
-      gradient.addColorStop(
-        0.7,
-        `rgba(${STAR_COLOR},${
-          0.025 *
-          progress
-        })`,
-      );
+      gradient.addColorStop(0.7, `rgba(${STAR_COLOR},${0.025 * progress})`);
 
-      gradient.addColorStop(
-        1,
-        `rgba(${STAR_COLOR},0)`,
-      );
+      gradient.addColorStop(1, `rgba(${STAR_COLOR},0)`);
 
-      ctx.fillStyle =
-        gradient;
+      ctx.fillStyle = gradient;
 
-      ctx.fillRect(
-        0,
-        0,
-        width,
-        height,
-      );
+      ctx.fillRect(0, 0, width, height);
     };
 
     // ---------------------------------------------------------------
     // MAIN ANIMATION
     // ---------------------------------------------------------------
 
-    const animate = (
-      time: number,
-    ) => {
+    const animate = (time: number) => {
       if (destroyed) return;
 
-      const elapsed =
-        time -
-        startTime;
+      const elapsed = time - startTime;
 
-      ctx.fillStyle =
-        BG_COLOR;
+      const loadProgress = loadProgressRef.current;
 
-      ctx.fillRect(
-        0,
-        0,
-        width,
-        height,
-      );
+      ctx.fillStyle = BG_COLOR;
+
+      ctx.fillRect(0, 0, width, height);
 
       // -------------------------------------------------------------
       // BACKGROUND STARS
       // -------------------------------------------------------------
 
-      backgroundStars.forEach(
-        (star) => {
-          let x =
-            (
-              star.x +
-              star.speed *
-                star.depth *
-                (elapsed /
-                  1000)
-            ) %
-            (width + 40);
+      backgroundStars.forEach((star) => {
+        let x =
+          (star.x + star.speed * star.depth * (elapsed / 1000)) % (width + 40);
 
-          let y =
-            (
-              star.y +
-              star.speed *
-                0.28 *
-                star.depth *
-                (elapsed /
-                  1000)
-            ) %
-            (height + 40);
+        let y =
+          (star.y + star.speed * 0.28 * star.depth * (elapsed / 1000)) %
+          (height + 40);
 
-          if (x < 0)
-            x +=
-              width + 40;
+        if (x < 0) x += width + 40;
 
-          if (y < 0)
-            y +=
-              height + 40;
+        if (y < 0) y += height + 40;
 
-          const twinkle =
-            (
-              Math.sin(
-                elapsed *
-                  0.001 *
-                  star.twinkleSpeed +
-                  star.phase,
-              ) +
-              1
-            ) / 2;
+        const twinkle =
+          (Math.sin(elapsed * 0.001 * star.twinkleSpeed + star.phase) + 1) / 2;
 
-          const opacity =
-            star.opacity *
-            (
-              0.7 +
-              twinkle * 0.3
-            );
+        const opacity = star.opacity * (0.7 + twinkle * 0.3);
 
-          ctx.beginPath();
+        ctx.beginPath();
 
-          ctx.arc(
-            x,
-            y,
-            star.size,
-            0,
-            Math.PI * 2,
-          );
+        ctx.arc(x, y, star.size, 0, Math.PI * 2);
 
-          ctx.fillStyle =
-            `rgba(${STAR_COLOR},${opacity})`;
+        ctx.fillStyle = `rgba(${STAR_COLOR},${opacity})`;
 
-          if (
-            star.depth >
-            0.75
-          ) {
-            ctx.shadowBlur = 4;
+        if (star.depth > 0.75) {
+          ctx.shadowBlur = 4;
 
-            ctx.shadowColor =
-              `rgba(${STAR_COLOR},${
-                opacity * 0.5
-              })`;
-          }
+          ctx.shadowColor = `rgba(${STAR_COLOR},${opacity * 0.5})`;
+        }
 
-          ctx.fill();
+        ctx.fill();
 
-          ctx.shadowBlur = 0;
-        },
-      );
+        ctx.shadowBlur = 0;
+      });
 
       // -------------------------------------------------------------
       // SHOOTING STARS
       // -------------------------------------------------------------
 
-      shootingStars.forEach(
-        (star) => {
-          if (
-            time <
-            star.nextSpawn
-          ) {
-            return;
-          }
+      shootingStars.forEach((star) => {
+        if (time < star.nextSpawn) {
+          return;
+        }
 
-          const age =
-            (
-              time -
-              star.nextSpawn
-            ) / 1000;
+        const age = (time - star.nextSpawn) / 1000;
 
-          const x =
-            star.x +
-            Math.cos(
-              star.angle,
-            ) *
-              star.speed *
-              age;
+        const x = star.x + Math.cos(star.angle) * star.speed * age;
 
-          const y =
-            star.y +
-            Math.sin(
-              star.angle,
-            ) *
-              star.speed *
-              age;
+        const y = star.y + Math.sin(star.angle) * star.speed * age;
 
-          if (
-            x >
-              width + 220 ||
-            y >
-              height + 220
-          ) {
-            star.x =
-              Math.random() *
-              width;
+        if (x > width + 220 || y > height + 220) {
+          star.x = Math.random() * width;
 
-            star.y =
-              -50 -
-              Math.random() *
-                150;
+          star.y = -50 - Math.random() * 150;
 
-            star.angle =
-              (
-                18 +
-                Math.random() *
-                  18
-              ) *
-              (Math.PI /
-                180);
+          star.angle = (18 + Math.random() * 18) * (Math.PI / 180);
 
-            star.speed =
-              180 +
-              Math.random() *
-                160;
+          star.speed = 180 + Math.random() * 160;
 
-            star.length =
-              50 +
-              Math.random() *
-                200;
+          star.length = 50 + Math.random() * 200;
 
-            star.size =
-              0.8 +
-              Math.random() *
-                1.4;
+          star.size = 0.8 + Math.random() * 1.4;
 
-            star.nextSpawn =
-              time +
-              1000 +
-              Math.random() *
-                5500;
+          star.nextSpawn = time + 1000 + Math.random() * 5500;
 
-            return;
-          }
+          return;
+        }
 
-          drawTrail(
-            x,
-            y,
-            star.angle,
-            star.length,
-            star.size,
-            0.72,
-            STAR_COLOR,
-          );
-        },
-      );
+        drawTrail(x, y, star.angle, star.length, star.size, 0.72, STAR_COLOR);
+      });
 
       // -------------------------------------------------------------
       // FORMATION
@@ -1205,164 +858,98 @@ export default function Preloader({
 
       let lastLanding = 0;
 
-      formationStars.forEach(
-        (star) => {
-          const localTime =
-            elapsed -
-            star.delay;
+      formationStars.forEach((star) => {
+        const localTime = elapsed - star.delay;
 
-          if (
-            localTime <= 0
-          ) {
-            return;
-          }
+        if (localTime <= 0) {
+          return;
+        }
 
-          const travelled =
-            star.speed *
-            (localTime /
-              1000);
+        const travelled = star.speed * (localTime / 1000);
 
-          if (
-            travelled <
-            star.distance
-          ) {
-            star.x =
-              star.startX +
-              Math.cos(
-                star.angle,
-              ) *
-                travelled;
+        if (travelled < star.distance) {
+          star.x = star.startX + Math.cos(star.angle) * travelled;
 
-            star.y =
-              star.startY +
-              Math.sin(
-                star.angle,
-              ) *
-                travelled;
+          star.y = star.startY + Math.sin(star.angle) * travelled;
 
-            drawTrail(
-              star.x,
-              star.y,
-              star.angle,
-              star.trailLength,
-              star.size,
-              0.88,
-              PATH_STAR_COLOR,
-            );
-
-            return;
-          }
-
-          if (!star.landed) {
-            star.landed =
-              true;
-
-            star.landedAt =
-              elapsed;
-          }
-
-          star.x =
-            star.target.x;
-
-          star.y =
-            star.target.y;
-
-          landedCount++;
-
-          lastLanding =
-            Math.max(
-              lastLanding,
-              star.landedAt,
-            );
-
-          drawPathStar(
-            star,
-            elapsed,
+          drawTrail(
+            star.x,
+            star.y,
+            star.angle,
+            star.trailLength,
+            star.size,
+            0.88,
+            PATH_STAR_COLOR,
           );
-        },
-      );
+
+          return;
+        }
+
+        if (!star.landed) {
+          star.landed = true;
+
+          star.landedAt = elapsed;
+        }
+
+        star.x = star.target.x;
+
+        star.y = star.target.y;
+
+        landedCount++;
+
+        lastLanding = Math.max(lastLanding, star.landedAt);
+
+        drawPathStar(star, elapsed, loadProgress);
+      });
 
       // -------------------------------------------------------------
       // CONNECTING LINES
       // -------------------------------------------------------------
 
-      for (
-        let i = 0;
-        i <
-        formationStars.length -
-          1;
-        i++
-      ) {
-        const a =
-          formationStars[i];
+      for (let i = 0; i < formationStars.length - 1; i++) {
+        const a = formationStars[i];
 
-        const b =
-          formationStars[
-            i + 1
-          ];
+        const b = formationStars[i + 1];
 
-        if (
-          !a.landed ||
-          !b.landed
-        ) {
+        if (!a.landed || !b.landed) {
           continue;
         }
 
-        const dx =
-          b.target.x -
-          a.target.x;
+        const dx = b.target.x - a.target.x;
 
-        const dy =
-          b.target.y -
-          a.target.y;
+        const dy = b.target.y - a.target.y;
 
-        const distance =
-          Math.sqrt(
-            dx * dx +
-              dy * dy,
-          );
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (
-          distance > 100
-        ) {
+        if (distance > 100) {
           continue;
         }
 
-        const age =
-          Math.min(
-            elapsed -
-              a.landedAt,
+        const age = Math.min(
+          elapsed - a.landedAt,
 
-            elapsed -
-              b.landedAt,
-          );
+          elapsed - b.landedAt,
+        );
 
-        const progress =
-          Math.min(
-            1,
-            Math.max(
-              0,
-              age / 450,
-            ),
-          );
+        const progress = Math.min(1, Math.max(0, age / 450));
+
+        // Fade the connecting line in alongside the dimmer of its two
+        // endpoint stars, so a line never looks brighter than the
+        // dots it's connecting.
+        const linkReveal = Math.min(
+          computeStarReveal(a, loadProgress),
+          computeStarReveal(b, loadProgress),
+        );
 
         ctx.beginPath();
 
-        ctx.moveTo(
-          a.x,
-          a.y,
-        );
+        ctx.moveTo(a.x, a.y);
 
-        ctx.lineTo(
-          b.x,
-          b.y,
-        );
+        ctx.lineTo(b.x, b.y);
 
-        ctx.strokeStyle =
-          `rgba(${PATH_STAR_COLOR},${
-            0.13 *
-            progress
-          })`;
+        ctx.strokeStyle = `rgba(${PATH_STAR_COLOR},${
+          0.13 * progress * linkReveal
+        })`;
 
         ctx.lineWidth = 0.7;
 
@@ -1374,44 +961,26 @@ export default function Preloader({
       // -------------------------------------------------------------
 
       const complete =
-        formationStars.length >
-          0 &&
-        landedCount ===
-          formationStars.length;
+        formationStars.length > 0 && landedCount === formationStars.length;
 
       if (complete) {
-        drawPathGlow(
-          elapsed,
-          lastLanding,
-        );
+        drawPathGlow(elapsed, lastLanding);
 
-        (
-          canvas as CanvasState
-        ).__pathComplete =
-          true;
+        (canvas as CanvasState).__pathComplete = true;
       }
 
-      animationFrame =
-        requestAnimationFrame(
-          animate,
-        );
+      animationFrame = requestAnimationFrame(animate);
     };
 
     // =================================================================
     // START
     // =================================================================
 
-    window.addEventListener(
-      "resize",
-      resize,
-    );
+    window.addEventListener("resize", resize);
 
     resize();
 
-    animationFrame =
-      requestAnimationFrame(
-        animate,
-      );
+    animationFrame = requestAnimationFrame(animate);
 
     // =================================================================
     // CLEANUP
@@ -1420,14 +989,9 @@ export default function Preloader({
     return () => {
       destroyed = true;
 
-      window.removeEventListener(
-        "resize",
-        resize,
-      );
+      window.removeEventListener("resize", resize);
 
-      cancelAnimationFrame(
-        animationFrame,
-      );
+      cancelAnimationFrame(animationFrame);
     };
   }, []);
 
@@ -1438,55 +1002,34 @@ export default function Preloader({
   useEffect(() => {
     if (!assetsLoaded) return;
 
-    let holdTimer:
-      ReturnType<
-        typeof setTimeout
-      > | null = null;
+    let holdTimer: ReturnType<typeof setTimeout> | null = null;
 
     let completed = false;
 
-    const check =
-      window.setInterval(() => {
-        if (completed) return;
+    const check = window.setInterval(() => {
+      if (completed) return;
 
-        const canvas =
-          canvasRef.current;
+      const canvas = canvasRef.current;
 
-        if (!canvas) return;
+      if (!canvas) return;
 
-        if (
-          (
-            canvas as CanvasState
-          ).__pathComplete
-        ) {
-          completed = true;
+      if ((canvas as CanvasState).__pathComplete) {
+        completed = true;
 
-          window.clearInterval(
-            check,
-          );
+        window.clearInterval(check);
 
-          // Hold the finished logo.
-          holdTimer =
-            window.setTimeout(
-              () => {
-                setFormationComplete(
-                  true,
-                );
-              },
-              LOGO_HOLD,
-            );
-        }
-      }, 100);
+        // Hold the finished logo.
+        holdTimer = window.setTimeout(() => {
+          setFormationComplete(true);
+        }, LOGO_HOLD);
+      }
+    }, 100);
 
     return () => {
-      window.clearInterval(
-        check,
-      );
+      window.clearInterval(check);
 
       if (holdTimer) {
-        window.clearTimeout(
-          holdTimer,
-        );
+        window.clearTimeout(holdTimer);
       }
     };
   }, [assetsLoaded]);
@@ -1505,89 +1048,59 @@ export default function Preloader({
   // ===================================================================
 
   useEffect(() => {
-    if (
-      !assetsLoaded ||
-      !formationComplete
-    ) {
+    if (!assetsLoaded || !formationComplete) {
       return;
     }
 
-    if (
-      exitStartedRef.current
-    ) {
+    if (exitStartedRef.current) {
       return;
     }
 
-    exitStartedRef.current =
-      true;
+    exitStartedRef.current = true;
 
     // Start upward swipe.
     setExiting(true);
+    onExitStart?.();
 
-    const finishEnter =
-      () => {
-        if (
-          enteredRef.current
-        ) {
-          return;
-        }
+    const finishEnter = () => {
+      if (enteredRef.current) return;
 
-        enteredRef.current =
-          true;
+      enteredRef.current = true;
+      setExiting(true);
 
-        // NOW Home is allowed to start
-        // its landing animation.
+      setTimeout(() => {
         onEnter();
-      };
+      }, EXIT_DURATION);
+    };
 
-    const node =
-      containerRef.current;
+    const node = containerRef.current;
 
-    const handleTransitionEnd = (
-      event: TransitionEvent,
-    ) => {
+    const handleTransitionEnd = (event: TransitionEvent) => {
       // Ignore bubbled transitions from descendants (canvas/svg) -
       // only the swipe transition on this node itself should trigger
       // the exit.
-      if (
-        event.target !==
-        node
-      ) {
+      if (event.target !== node) {
         return;
       }
 
       finishEnter();
     };
 
-    node?.addEventListener(
-      "transitionend",
-      handleTransitionEnd,
-    );
+    node?.addEventListener("transitionend", handleTransitionEnd);
 
     // Safety-net fallback, derived from the same EXIT_DURATION used
     // for the CSS transition so the two can't drift apart.
-    const fallbackTimer =
-      window.setTimeout(
-        finishEnter,
-        EXIT_DURATION +
-          EXIT_FALLBACK_BUFFER,
-      );
+    const fallbackTimer = window.setTimeout(
+      finishEnter,
+      EXIT_DURATION + EXIT_FALLBACK_BUFFER,
+    );
 
     return () => {
-      node?.removeEventListener(
-        "transitionend",
-        handleTransitionEnd,
-      );
+      node?.removeEventListener("transitionend", handleTransitionEnd);
 
-      window.clearTimeout(
-        fallbackTimer,
-      );
+      window.clearTimeout(fallbackTimer);
     };
-  }, [
-    assetsLoaded,
-    formationComplete,
-    onEnter,
-  ]);
+  }, [assetsLoaded, formationComplete, onEnter]);
 
   // ===================================================================
   // JSX
@@ -1596,22 +1109,14 @@ export default function Preloader({
   return (
     <div
       ref={containerRef}
-      className={[
-        styles.preloader,
-        exiting
-          ? styles.exiting
-          : "",
-      ].join(" ")}
+      className={[styles.preloader, exiting ? styles.exiting : ""].join(" ")}
       style={
         {
           "--exit-duration": `${EXIT_DURATION}ms`,
         } as React.CSSProperties
       }
     >
-      <canvas
-        ref={canvasRef}
-        className={styles.canvas}
-      />
+      <canvas ref={canvasRef} className={styles.canvas} />
 
       {/* Invisible SVG used for exact path geometry */}
       <svg
@@ -1620,15 +1125,10 @@ export default function Preloader({
         preserveAspectRatio="xMidYMid meet"
         aria-hidden="true"
       >
-        <path
-          ref={pathRef}
-          d={PATH_D}
-        />
+        <path ref={pathRef} d={PATH_D} />
       </svg>
 
-      <div
-        className={styles.vignette}
-      />
+      <div className={styles.vignette} />
     </div>
   );
 }

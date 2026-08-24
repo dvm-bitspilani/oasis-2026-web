@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import Preloader from "./pages/Preloader";
 
@@ -45,18 +46,62 @@ const assets = [
 ];
 
 export default function App() {
+  const location = useLocation();
+
   const [entered, setEntered] = useState(false);
+  const [homeExiting, setHomeExiting] = useState(false);
+
+  const isHome = location.pathname === "/";
+
+  const handlePreloaderExit = () => {
+    setHomeExiting(true);
+  };
+
+  const handleEnter = () => {
+    setEntered(true);
+  };
 
   return (
     <>
-      {/* Home/App is mounted immediately */}
-      <AppRoutes preloaderDone={entered} />
+      {isHome ? (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              minHeight: "100%",
+              transform: homeExiting
+                ? "translate3d(0, 0, 0)"
+                : "translate3d(0, 100%, 0)",
+              transition: homeExiting
+                ? "transform 1.15s cubic-bezier(0.76, 0, 0.24, 1)"
+                : "none",
+              willChange: "transform",
+            }}
+          >
+            <AppRoutes
+              preloaderDone={entered}
+              preloaderExiting={homeExiting}
+            />
+          </div>
+        </div>
+      ) : (
+        <AppRoutes
+          preloaderDone={true}
+          preloaderExiting={false}
+        />
+      )}
 
-      {/* Preloader stays above everything until it finishes */}
-      {!entered && (
+      {isHome && !entered && (
         <Preloader
           assets={assets}
-          onEnter={() => setEntered(true)}
+          onExitStart={handlePreloaderExit}
+          onEnter={handleEnter}
         />
       )}
     </>
