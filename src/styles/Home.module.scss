@@ -47,7 +47,7 @@
   left: 0;
   width: 100%;
   height: 46%;
-  z-index: 3;
+  z-index: 6;
   overflow: hidden;
 }
 
@@ -55,7 +55,7 @@
   object-position: center bottom;
   width: 100%;
   height: 100%;
-  z-index: 5;
+  z-index: 6;
 }
 
 .castle {
@@ -64,7 +64,7 @@
   left: 41%;
   transform: translateX(-50%);
   width: clamp(346px, 45vw, 864px);
-  z-index: 2;
+  z-index: 5;
 }
 
 .castleImg {
@@ -94,7 +94,7 @@
   left: 5%;
   height: clamp(180px, 30vh, 324px);
   width: clamp(230px, 30vw, 576px);
-  z-index: 5;
+  z-index: 10;
 
   img {
     width: 100%;
@@ -114,7 +114,7 @@
   right: 6%;
   height: clamp(198px, 33vh, 356px);
   width: clamp(280px, 36vw, 800px);
-  z-index: 5;
+  z-index: 10;
   cursor: pointer;
 
   img {
@@ -156,7 +156,7 @@
   height: clamp(70px, 12vh, 130px);
   width: clamp(90px, 22vw, 220px);
 
-  z-index: 4;
+  z-index: 10;
 
   opacity: 0;
 
@@ -184,7 +184,7 @@
   height: clamp(70px, 12vh, 130px);
   width: clamp(120px, 28vw, 280px);
 
-  z-index: 4;
+  z-index: 10;
   opacity: 0;
   will-change: transform, opacity;
   pointer-events: none;
@@ -259,7 +259,7 @@
   overflow: hidden;
   mix-blend-mode: color;
   pointer-events: none;
-  z-index: 4;
+  z-index: 10;
 }
 
 .moonCloudOverlayInner {
@@ -299,7 +299,7 @@
     height: clamp(160px, 50vh, 320px);
     width: clamp(160px, 50vw, 320px);
 
-    z-index: 5;
+    z-index: 10;
 
     img {
       width: 100%;
@@ -315,7 +315,7 @@
     height: clamp(300px, 70vh, 480px);
     width: clamp(260px, 70vw, 420px);
 
-    z-index: 5;
+    z-index: 10;
 
     bottom: -15%;
     left: 15%;
@@ -366,7 +366,7 @@
   right: 6%;
   height: clamp(198px, 33vh, 356px);
   width: clamp(280px, 36vw, 800px);
-  z-index: 5;
+  z-index: 10;
 
   img {
     width: 100%;
@@ -383,7 +383,7 @@
     left: 14%;
     width: 72%;
     height: 55%;
-    z-index: 1;
+    z-index: 10;
     pointer-events: none;
     overflow: visible;
 
