@@ -3368,6 +3368,8 @@ import RegBg from "../../../../assets/registration/reg/RegBg.png";
 import leftbottom from "../../../../assets/registration/reg/leftbottom.png";
 import rightbottom from "../../../../assets/registration/reg/rightbottom.png";
 import lefttop from "../../../../assets/registration/reg/lefttop.png";
+import leftmiddle from "../../../../assets/registration/reg/leftmiddle.png";
+import rightmiddle from "../../../../assets/registration/reg/rightmiddle.png";
 import righttop from "../../../../assets/registration/reg/righttop.png";
 import book from "../../../../assets/registration/reg/book.png";
 import buttonBg from "../../../../assets/registration/reg/buttonbg.png";
@@ -3974,6 +3976,16 @@ export default function Reg({
       <img
         src={lefttop}
         className={styles.lefttop}
+        alt=""
+      />
+       <img
+        src={leftmiddle}
+        className={styles.leftmiddle}
+        alt=""
+      />
+       <img
+        src={rightmiddle}
+        className={styles.rightmiddle}
         alt=""
       />
 

@@ -722,8 +722,8 @@
 .leftbottom {
   position: absolute;
 
-  left: -5%;
-  bottom: -10%;
+  left: 4%;
+  bottom: 3%;
 
   width: 20%;
 
@@ -735,8 +735,8 @@
 .rightbottom {
   position: absolute;
 
-  right: -10%;
-  bottom: -5%;
+  right: 2%;
+  bottom: 0%;
 
   width: 30%;
 
@@ -747,10 +747,9 @@
 
 .lefttop {
   position: absolute;
-
-  left: -22%;
-  top: -22%;
-
+  left: 0%;
+  top: 0%;
+  width: 20%;
   pointer-events: none;
 }
 
@@ -763,6 +762,24 @@
   pointer-events: none;
 }
 
+
+.leftmiddle {
+  position: absolute;
+
+  left: 0;
+  top: 35%;
+width: 10%;
+  pointer-events: none;
+}
+
+.rightmiddle {
+  position: absolute;
+
+  right: -2%;
+  top: 10%;
+
+  pointer-events: none;
+}
 /* ========================================================= */
 /* BOOK                                                        */
 /* ========================================================= */
@@ -1671,7 +1688,12 @@ margin-top: 1rem;
   .lefttop {
     width: 45%;
   }
-
+.leftmiddle{
+  display: none;
+}
+.rightmiddle{
+  display: none;
+}
   .righttop {
     width: 30%;
   }
@@ -1695,16 +1717,31 @@ margin-top: 1rem;
 
     --ftr-height: 50px;
   }
-
+  .leftbottom{
+    left: 10%;
+    width: 40%;
+  }
+  .rightbottom{
+    width: 50%;
+    right: 0;
+    bottom: 0%;
+   
+  }
+.leftmiddle{
+  display: none;
+}
+.rightmiddle{
+  display: none;
+}
   .bookContainer {
-    left: 8vw;
+    left: 0vw;
 
     width: 98vw;
 
     height: 74vh;
 
     background-size:
-      180% 100%;
+      170% 100%;
   }
 
   .formContainer {
