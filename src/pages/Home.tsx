@@ -1247,7 +1247,7 @@ useEffect(() => {
     className={styles.regBtnText}
     viewBox="0 0 220 90"
     preserveAspectRatio="xMidYMid meet"
-    data-transition-fade
+    // data-transition-fade
   >
     <path id="curve" d="M -4,4 Q 110,84 224,4" fill="transparent" />
     <text
