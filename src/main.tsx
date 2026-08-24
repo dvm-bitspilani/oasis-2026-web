@@ -8,17 +8,24 @@ import { HelmetProvider } from "react-helmet-async";
 
 import "./index.css";
 import App from "./App.tsx";
+import { TransitionProvider } from "./context/TransitionProvider";
 
-createRoot(document.getElementById("root")!).render(
+createRoot(
+  document.getElementById("root")!,
+).render(
   <StrictMode>
     <CookiesProvider>
-      <GoogleOAuthProvider clientId="425843336268-s352aj1hnh6m54n40ga6vtuoke5jma4b.apps.googleusercontent.com">
+      <GoogleOAuthProvider
+        clientId="425843336268-s352aj1hnh6m54n40ga6vtuoke5jma4b.apps.googleusercontent.com"
+      >
         <HelmetProvider>
           <BrowserRouter>
-            <App />
+            <TransitionProvider>
+              <App />
+            </TransitionProvider>
           </BrowserRouter>
         </HelmetProvider>
       </GoogleOAuthProvider>
     </CookiesProvider>
-  </StrictMode>
+  </StrictMode>,
 );

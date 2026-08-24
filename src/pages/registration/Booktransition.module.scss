@@ -1,113 +1,114 @@
-/* =========================================================
-   BOOK TRANSITION OVERLAY — LAYOUT AND PAINT ONLY
+// /* =========================================================
+//    BOOK TRANSITION OVERLAY
 
-   There are deliberately no @keyframes and no animation-*
-   properties in this file. Every animation is created with
-   element.animate() in BookTransition.tsx, because CSS
-   Modules hashes keyframe names and a failed rewrite makes
-   animations silently not run.
+//    Sits above the Instructions page and below nothing else.
+//    Everything is positioned in viewport pixels from JS, so it
+//    is immune to the two pages' differing layout rules.
+//    ========================================================= */
 
-   What must stay here is the 3D scaffolding — perspective,
-   preserve-3d, transform-origin, backface-visibility. Those
-   are inherited context that the Web Animations API reads
-   but cannot set for you.
-   ========================================================= */
+// .stage {
+//   position: fixed;
+//   inset: 0;
 
-.stage {
-  position: fixed;
-  inset: 0;
+//   z-index: 900;
 
-  z-index: 900;
+//   pointer-events: none;
 
-  pointer-events: none;
+//   /* Applies to .flight (direct child); preserve-3d on .flight
+//      passes it down to the rotating .flap. */
+//   perspective: 2400px;
+//   perspective-origin: 50% 45%;
+// }
 
-  /* Applies to .flight; preserve-3d on .flight passes it
-     down to the rotating .flap. */
-  perspective: 2400px;
-  perspective-origin: 50% 45%;
-}
+// /* ---------------------------------------------------------
+//    RIGHT PAGE
+//    Right half of book.png, sitting under the cover.
+//    --------------------------------------------------------- */
 
-/* ---------------------------------------------------------
-   THE SPREAD
-   Right half of book.png. Opacity is owned by React and only
-   goes to 1 once the cover has landed square on top of it.
-   --------------------------------------------------------- */
+// .rightPage {
+//   position: absolute;
 
-.rightPage {
-  position: absolute;
+//   background-size: 200% 100%;
+//   background-position: right center;
+//   background-repeat: no-repeat;
 
-  background-size: 200% 100%;
-  background-position: right center;
-  background-repeat: no-repeat;
+//   transition: opacity 120ms linear;
 
-  /* Short fade rather than a hard switch. By the time it
-     runs the cover is already turning, so the page arrives
-     under cover of movement instead of popping in. */
-  transition: opacity 200ms ease-out;
+//   /* Kills the hairline seam between the two halves */
+//   box-shadow: -1px 0 0 0 rgba(0, 0, 0, 0.15);
+// }
 
-  /* Kills the hairline seam between the two halves */
-  box-shadow: -1px 0 0 0 rgba(0, 0, 0, 0.15);
-}
+// /* ---------------------------------------------------------
+//    FLIGHT
+//    Pure 2D FLIP wrapper. Laid out at the destination rect and
+//    transformed back to the origin rect for the first frame.
+//    --------------------------------------------------------- */
 
-/* ---------------------------------------------------------
-   FLIGHT
-   Laid out at the destination; the flight animation pushes
-   it back to the closed book's rect.
+// .flight {
+//   position: absolute;
 
-   transform-origin must be top left — the translate/scale
-   pair in the animation is FLIP maths and assumes it.
-   --------------------------------------------------------- */
+//   transform-origin: top left;
+//   transform-style: preserve-3d;
 
-.flight {
-  position: absolute;
+//   transition-property: transform;
+//   transition-timing-function: cubic-bezier(0.62, 0.02, 0.24, 1);
 
-  transform-origin: top left;
-  transform-style: preserve-3d;
+//   /* Set from JS: transition-duration */
+// }
 
-  will-change: transform;
-}
+// /* ---------------------------------------------------------
+//    FLAP
+//    The cover. Hinges on its left edge and swings 180deg onto
+//    the left half of the spread, where its back face is the
+//    left page.
+//    --------------------------------------------------------- */
 
-/* ---------------------------------------------------------
-   FLAP
-   Hinges on its left edge and swings onto the left half.
-   --------------------------------------------------------- */
+// .flap {
+//   position: absolute;
+//   inset: 0;
 
-.flap {
-  position: absolute;
-  inset: 0;
+//   transform-origin: left center;
+//   transform-style: preserve-3d;
 
-  transform-origin: left center;
-  transform-style: preserve-3d;
+//   transition-property: transform;
+//   transition-timing-function: cubic-bezier(0.55, 0.05, 0.2, 1);
 
-  will-change: transform;
-}
+//   /* Set from JS: transition-duration */
 
-.cover,
-.leftPage {
-  position: absolute;
-  inset: 0;
+//   will-change: transform;
+// }
 
-  background-repeat: no-repeat;
+// .cover,
+// .leftPage {
+//   position: absolute;
+//   inset: 0;
 
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
+//   background-repeat: no-repeat;
 
-/* Front face. contain, not 100% 100% — stretching tilted
-   artwork into a page-shaped box distorts it. The straighten
-   animation supplies the rotation and the fit scale. */
-.cover {
-  background-size: contain;
-  background-position: center;
+//   backface-visibility: hidden;
+//   -webkit-backface-visibility: hidden;
+// }
 
-  transform-origin: center center;
-}
+// /* Front face — closedBook.png, shown for the flight and the
+//    first half of the swing. */
+// .cover {
+//   background-size: 100% 100%;
+//   background-position: center;
+// }
 
-/* Back face — left half of book.png, pre-rotated so the two
-   rotations cancel when the flap reaches -180deg. */
-.leftPage {
-  transform: rotateY(180deg);
+// /* Back face — left half of book.png. Pre-rotated so that when
+//    .flap reaches -180deg the two rotations cancel and the page
+//    renders the right way round. */
+// .leftPage {
+//   transform: rotateY(180deg);
 
-  background-size: 200% 100%;
-  background-position: left center;
-}
+//   background-size: 200% 100%;
+//   background-position: left center;
+// }
+
+// @media (prefers-reduced-motion: reduce) {
+//   .flight,
+//   .flap {
+//     transition: none !important;
+//   }
+// }

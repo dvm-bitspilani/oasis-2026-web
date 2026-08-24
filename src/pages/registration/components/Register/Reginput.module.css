@@ -1,0 +1,296 @@
+.reginputContainer {
+  width: 100%;
+  /*
+   * Each field gets a controlled amount
+   * of vertical space so the six left-page
+   * fields fit like the reference.
+   */
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: 80%;
+}
+
+.inputTitle {
+  margin: 0;
+  padding: 0;
+  font-family: "EBGaramond", sans-serif;
+  font-size: clamp(1rem, 1.6vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: 1.4;
+  font-weight: 400;
+  color: #38170b;
+}
+
+.inputContainer {
+  position: relative;
+  width: 100%;
+  height: clamp(38px, 4.3vh, 58px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+/* ========================================================= */
+/* FIELD CONTENT                                               */
+/* ========================================================= */
+.fieldContent {
+  position: relative;
+  z-index: 2;
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* ========================================================= */
+/* INPUT                                                       */
+/* ========================================================= */
+.input {
+  width: 90%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: "Cinzel", sans-serif;
+  font-size: clamp(0.85rem, 1.45vw, 1.55rem);
+  color: #6c1700;
+  font-family: "Dancing Script";
+  font-weight: 700;
+  text-align: center;
+}
+
+.input::-moz-placeholder {
+  color: #777;
+  font-family: "Dancing Script";
+  opacity: 1;
+}
+
+.input::placeholder {
+  color: #777;
+  font-family: "Dancing Script";
+  opacity: 1;
+}
+
+.input:disabled {
+  opacity: 1;
+  color: #6c1700 !important;
+  -webkit-text-fill-color: #6c1700 !important;
+  cursor: default;
+}
+
+/* ========================================================= */
+/* LINE                                                        */
+/* ========================================================= */
+.fieldLine {
+  position: absolute;
+  left: 0;
+  bottom: 3px;
+  width: 100%;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.lineImage {
+  display: block;
+  width: calc(100% - 25px);
+  height: 1px;
+  min-height: 1px;
+  max-height: 3px;
+  -o-object-fit: fill;
+     object-fit: fill;
+  -o-object-position: center;
+     object-position: center;
+  flex-shrink: 0;
+}
+
+.leaf {
+  display: block;
+  width: 24px;
+  height: 24px;
+  -o-object-fit: contain;
+     object-fit: contain;
+  flex-shrink: 0;
+  margin-left: -1px;
+}
+
+/* ========================================================= */
+/* REACT SELECT                                                */
+/* ========================================================= */
+:global(.regselect__control) {
+  width: 100% !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+
+:global(.regselect__control:hover) {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+:global(.regselect__control--is-focused) {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+:global(.regselect__control--is-disabled) {
+  background: transparent !important;
+  border: none !important;
+  opacity: 1 !important;
+}
+
+:global(.regselect__value-container) {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  background: transparent !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+:global(.regselect__placeholder) {
+  margin: 0 !important;
+  color: #777 !important;
+  font-family: "Cinzel", sans-serif !important;
+  font-size: clamp(0.75rem, 0.9vw, 1rem) !important;
+  text-align: center !important;
+}
+
+:global(.regselect__single-value) {
+  margin: 0 !important;
+  color: #6c1700 !important;
+  font-family: "Cinzel", sans-serif !important;
+  font-size: clamp(0.8rem, 0.95vw, 1.15rem) !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+}
+
+:global(.regselect__input-container) {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+:global(.regselect__input) {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+:global(.regselect__indicators) {
+  background: transparent !important;
+}
+
+:global(.regselect__indicator-separator) {
+  display: none !important;
+}
+
+:global(.regselect__indicator) {
+  padding: 4px !important;
+  color: #38170b !important;
+}
+
+:global(.regselect__indicator:hover) {
+  color: #38170b !important;
+}
+
+/* ========================================================= */
+/* SELECT MENU                                                 */
+/* ========================================================= */
+:global(.regselect__menu) {
+  z-index: 9999 !important;
+  width: calc(100% + 160px) !important;
+  min-width: calc(100% + 80px) !important;
+  left: -80px !important;
+  box-sizing: border-box !important;
+  background: #ecdcb0 !important;
+  border: 1px solid #c9a769 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  color: #38170b !important;
+  font-family: "Cinzel", sans-serif !important;
+}
+
+:global(.regselect__menu-list) {
+  background: transparent !important;
+  padding: 4px !important;
+}
+
+:global(.regselect__option) {
+  background: transparent !important;
+  color: #38170b !important;
+  cursor: pointer !important;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+:global(.regselect__option--is-selected) {
+  background: #c9a769 !important;
+  color: #38170b !important;
+}
+
+:global(.regselect__option--is-focused) {
+  background: #2a180d !important;
+  color: #f5e6c8 !important;
+}
+
+/* ========================================================= */
+/* MOBILE                                                      */
+/* ========================================================= */
+@media (max-width: 900px) {
+  .reginputContainer {
+    height: auto;
+    min-height: 75px;
+  }
+  .inputWrapper {
+    width: 90%;
+    padding-left: 5%;
+  }
+  .inputTitle {
+    font-size: 1rem;
+  }
+  .inputContainer {
+    height: 42px;
+  }
+  .input {
+    font-size: 0.9rem;
+  }
+  .fieldLine {
+    bottom: 1px;
+  }
+  .lineImage {
+    height: 2px;
+    min-height: 2px;
+    max-height: 2px;
+  }
+  .leaf {
+    width: 20px;
+    height: 20px;
+  }
+}/*# sourceMappingURL=Reginput.module.css.map */

@@ -2,14 +2,14 @@
   position: absolute;
   top: 24px;
   left: 0;
-  width: 95vw;
+  width: 100vw;
   height: 10vh;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  z-index: 5;
   margin-left: 5%;
+  z-index: 5000;
 }
 
 .rectangle {
@@ -54,6 +54,16 @@ a {
   color: #eed8af;
   font-size: 1.25rem;
   font-family: "Ramadhan", sans-serif;
+}
+
+.rectangle a {
+  display: inline-block;
+  transition: transform 200ms ease, text-shadow 200ms ease;
+  transform-origin: center;
+}
+.rectangle a:hover, .rectangle a:focus-visible {
+  transform: scale(1.15);
+  text-shadow: 0 0 10px rgba(238, 216, 175, 0.7);
 }
 
 @media (max-width: 650px) {
@@ -104,13 +114,4 @@ a {
   .rectangle a:not(:first-child) {
     display: none;
   }
-}
-.rectangle a {
-  display: inline-block;
-  transition: transform 200ms ease, text-shadow 200ms ease;
-  transform-origin: center;
-}
-.rectangle a:hover, .rectangle a:focus-visible {
-  transform: scale(1.15);
-  text-shadow: 0 0 10px rgba(238, 216, 175, 0.7);
 }/*# sourceMappingURL=Nav.module.css.map */

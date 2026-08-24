@@ -15,6 +15,11 @@
   background-repeat: no-repeat;
 }
 
+.navbar {
+  z-index: 1000;
+  opacity: 1;
+}
+
 .clouds {
   position: absolute;
   top: 0;
@@ -55,12 +60,10 @@
 
 .castle {
   position: absolute;
-  bottom: 23%;
+  bottom: 24%;
   left: 41%;
   transform: translateX(-50%);
-  /* was: width: 45%; — capped so it doesn't blow up on large screens
-     or shrink to nothing on small ones */
-  width: clamp(280px, 45vw, 560px);
+  width: clamp(346px, 45vw, 864px);
   z-index: 2;
 }
 
@@ -72,10 +75,9 @@
 
 .moon {
   position: absolute;
-  bottom: 15%;
+  bottom: 21%;
   left: 40%;
-  /* was: width: 38%; */
-  width: clamp(260px, 38vw, 480px);
+  width: clamp(292px, 36vw, 730px);
   z-index: 0;
   transform: translateX(-50%);
 }
@@ -90,9 +92,8 @@
   position: absolute;
   bottom: -2%;
   left: 5%;
-  /* was: height: 30vh; width: 30vw; */
-  height: clamp(120px, 30vh, 220px);
-  width: clamp(160px, 30vw, 300px);
+  height: clamp(180px, 30vh, 324px);
+  width: clamp(230px, 30vw, 576px);
   z-index: 5;
 
   img {
@@ -102,7 +103,6 @@
     display: block;
   }
 }
-
 
 /* =========================================================
    REGISTRATION BUTTON
@@ -110,14 +110,11 @@
 
 .regBtn {
   position: absolute;
-  bottom: 0%;
+  bottom: -1%;
   right: 6%;
-  /* was: height: 33vh; width: 33vw; — this was the biggest offender
-     on wide desktop screens */
-  height: clamp(200px, 33vh, 320px);
-  width: clamp(200px, 33vw, 320px);
+  height: clamp(198px, 33vh, 356px);
+  width: clamp(280px, 36vw, 800px);
   z-index: 5;
-
   cursor: pointer;
 
   img {
@@ -125,72 +122,92 @@
     height: 100%;
     object-fit: contain;
     display: block;
+    will-change: filter;
+
     &:hover {
       cursor: pointer;
     }
-    will-change: filter;
   }
 }
-
 
 /* =========================================================
-   REGISTRATION BUTTON GLOW
+   CAMEL CARAVAN
    ========================================================= */
 
-.regBtn:hover img {
-  animation: regButtonGlow 2.5s ease-in-out infinite;
-}
+/*
+  Both camel1.svg and camel2.svg use this exact same
+  container styling.
 
-@keyframes regButtonGlow {
-  0%, 100% {
-    filter:
-      drop-shadow(0 0 3px rgba(254, 213, 155, 0.25))
-      drop-shadow(0 0 6px rgba(254, 213, 155, 0.12));
-  }
-  50% {
-    filter:
-      drop-shadow(0 0 5px rgba(254, 213, 155, 0.45))
-      drop-shadow(0 0 10px rgba(254, 213, 155, 0.2));
-  }
-}
+  GSAP controls:
+  - x
+  - y
+  - opacity
 
-.regBtn:active img {
-  animation: none;
-  filter: drop-shadow(0 0 6px rgba(254, 213, 155, 0.4));
-}
-
-
-/* =========================================================
-   CAMEL
-   ========================================================= */
+  Therefore both camels can be animated together
+  using the same GSAP timeline.
+*/
 
 .camelLand {
   position: absolute;
-  bottom: 17%;
+
+  bottom: 11%;
   left: 35%;
-  /* was: height: 15vh; width: 15vw; */
-  height: clamp(90px, 15vh, 170px);
-  width: clamp(90px, 15vw, 170px);
+
+  height: clamp(70px, 12vh, 130px);
+  width: clamp(90px, 22vw, 220px);
+
   z-index: 4;
 
+  opacity: 0;
+
+  will-change: transform, opacity;
+
+
+  pointer-events: none;
+
   img {
-    width: 100%;
-    height: 100%;
+    width: 40%;
+    height: 50%;
+
+    object-fit: contain;
+    display: block;
+
+    pointer-events: none;
+  }
+}
+.camelLand2 {
+  position: absolute;
+  bottom: 11%;
+  left: 35%;
+
+
+  height: clamp(70px, 12vh, 130px);
+  width: clamp(120px, 28vw, 280px);
+
+  z-index: 4;
+  opacity: 0;
+  will-change: transform, opacity;
+  pointer-events: none;
+
+  img {
+    width: 50%;
+    height: 60%;
     object-fit: contain;
     display: block;
   }
 }
-
 
 /* =========================================================
    LINKS
    ========================================================= */
 
 .links {
-  position: absolute;
-  top: clamp(20px, 7vh, 60px);
-right: calc(-2vw); // moves proportionally further off the right edge as viewport widens
-  width: clamp(100px, 14vw, 200px);
+  position: relative;
+  width: clamp(100px, 20vw, 250px);
+  margin-top: clamp(20px, 7vh, 60px);
+  margin-left: calc(
+    75% - clamp(0px, 5vw, 40px)
+  );
   z-index: 10;
 }
 
@@ -200,7 +217,6 @@ right: calc(-2vw); // moves proportionally further off the right edge as viewpor
   width: 100%;
   height: 100%;
 }
-
 
 /* =========================================================
    SOCIAL LINKS
@@ -224,11 +240,14 @@ right: calc(-2vw); // moves proportionally further off the right edge as viewpor
     transform: scale(1.1);
 
     filter:
-      drop-shadow(0 0 2px rgba(255, 255, 255, 0.4))
-      drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
+      drop-shadow(
+        0 0 2px rgba(255, 255, 255, 0.4)
+      )
+      drop-shadow(
+        0 0 5px rgba(255, 255, 255, 0.2)
+      );
   }
 }
-
 
 /* =========================================================
    MOON CLOUD OVERLAY
@@ -247,7 +266,6 @@ right: calc(-2vw); // moves proportionally further off the right edge as viewpor
   position: absolute;
 }
 
-
 /* =========================================================
    MOBILE
    ========================================================= */
@@ -261,14 +279,8 @@ right: calc(-2vw); // moves proportionally further off the right edge as viewpor
   }
 
 
-  .sandImg {
-    /*
-      transform: scaleX(-1);
-    */
-  }
 
   .sand {
-    // object-fit: cover;
     height: 45%;
     width: 100vw;
   }
@@ -283,8 +295,10 @@ right: calc(-2vw); // moves proportionally further off the right edge as viewpor
     position: absolute;
     bottom: 12%;
     left: 5%;
+
     height: clamp(160px, 50vh, 320px);
     width: clamp(160px, 50vw, 320px);
+
     z-index: 5;
 
     img {
@@ -297,9 +311,12 @@ right: calc(-2vw); // moves proportionally further off the right edge as viewpor
 
   .regBtn {
     position: absolute;
+
     height: clamp(300px, 70vh, 480px);
     width: clamp(260px, 70vw, 420px);
+
     z-index: 5;
+
     bottom: -15%;
     left: 15%;
     right: auto;
@@ -319,91 +336,85 @@ right: calc(-2vw); // moves proportionally further off the right edge as viewpor
 
   .regBtn:active img {
     animation: none;
-    filter: drop-shadow(0 0 6px rgba(254, 213, 155, 0.4));
+
+    filter: drop-shadow(
+      0 0 6px rgba(254, 213, 155, 0.4)
+    );
+  }
+
+  /* =====================================================
+     MOBILE CAMELS
+     ===================================================== */
+
+  .camelLand {
+    bottom: 20%;
+    left: 20%;
+
+    /*
+      Keep both camels identical in size
+      and position so GSAP can synchronize them.
+    */
   }
 
   .links {
     display: none;
   }
 }
-.castle {
-  position: absolute;
-  bottom: 24%;
-  left: 41%;
-  transform: translateX(-50%);
-  /* 45vw: 768px→346px, 1920px→864px */
-  width: clamp(346px, 45vw, 864px);
-  z-index: 2;
-}
-
-.moon {
-  position: absolute;
-  bottom: 21%;
-  left: 40%;
-  /* 38vw: 768px→292px, 1920px→730px */
-  width: clamp(292px, 36vw, 730px);
-  z-index: 0;
-  transform: translateX(-50%);
-}
-
-.oasisLogo {
-  position: absolute;
-  bottom: -2%;
-  left: 5%;
-  /* 30vh: 600px→180px, 1080px→324px | 30vw: 768px→230px, 1920px→576px */
-  height: clamp(180px, 30vh, 324px);
-  width: clamp(230px, 30vw, 576px);
-  z-index: 5;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-  }
-}
-
 .regBtn {
   position: absolute;
-  bottom: 0%;
+  bottom: -1%;
   right: 6%;
-  /* 33vh: 600px→198px, 1080px→356px | 33vw: 768px→253px, 1920px→633px */
   height: clamp(198px, 33vh, 356px);
-  width: clamp(253px, 33vw, 633px);
+  width: clamp(280px, 36vw, 800px);
   z-index: 5;
-  cursor: pointer;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: contain;
     display: block;
-    &:hover { cursor: pointer; }
     will-change: filter;
+    pointer-events: none;
+  }
+
+  .regBtnText {
+    position: absolute;
+    top: 22%;
+    left: 14%;
+    width: 72%;
+    height: 55%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: visible;
+
+    text {
+      font-family: "Ramadhan", sans-serif;
+      font-size: 4px;
+      letter-spacing: 1px;
+      fill: #ffffa4;
+      stroke: none; // no stroke at all in base state — removes the thickness
+      paint-order: fill;
+      cursor: pointer;
+      pointer-events: bounding-box;
+
+      filter: drop-shadow(0 0 4px rgba(255, 255, 164, 0.6));
+
+      transition:
+        fill 0.25s ease,
+        stroke 0.25s ease,
+        filter 0.25s ease;
+
+      &:hover {
+        fill: #ffcf6b;
+        stroke: #d9480f;
+        stroke-width: 1px;
+        paint-order: stroke fill;
+
+        filter: drop-shadow(0 0 3px #ff7a1a);
+      }
+    }
   }
 }
-
-.camelLand {
-  position: absolute;
-  bottom: 17%;
-  left: 35%;
-  /* 15vh: 600px→90px, 1080px→162px | 15vw: 768px→115px, 1920px→288px */
-  height: clamp(90px, 15vh, 162px);
-  width: clamp(115px, 15vw, 288px);
-  z-index: 4;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-  }
-}
-
-.links {
-  position: relative;
-  width: clamp(100px, 20vw, 250px);
-  margin-top: clamp(20px, 7vh, 60px);
-  margin-left: calc(75% - clamp(0px, 5vw, 40px)); // was 80% — pushes it right
-  z-index: 10;
+.regBtn .regBtnText text {
+  font-size: clamp(16px, 5.5vw, 26px);
 }

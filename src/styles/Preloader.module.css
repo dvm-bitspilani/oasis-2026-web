@@ -1,51 +1,79 @@
+/* ======================================================
+   PRELOADER
+====================================================== */
 .preloader {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #e8e3d8;
-  font-family: "Syamsiah", sans-serif;
   overflow: hidden;
-}
-.background{
-  opacity:1
+  background: rgb(8, 10, 24);
+  display: block;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  pointer-events: auto;
+  transition: transform 1200ms cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-.vignette {
-  position: absolute;
-  inset: 0;
+/* ======================================================
+   EXIT
+====================================================== */
+.exiting {
+  transform: translate3d(0, -100%, 0);
   pointer-events: none;
-  
 }
 
-.content {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 0.15em;
-  width: 100%;
-  text-align: center;
-  opacity: 1;
+/* ======================================================
+   CANVAS
+====================================================== */
+.canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  z-index: 1;
+  background: rgb(8, 10, 24);
+  pointer-events: none;
+  will-change: opacity, transform;
 }
 
-
-
-.fadeOut {
-  animation: contentOut 800ms ease-in forwards;
+/* ======================================================
+   VIGNETTE
+====================================================== */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 18%, rgba(0, 0, 0, 0.04) 42%, rgba(0, 0, 0, 0.18) 68%, rgba(0, 0, 0, 0.52) 100%);
 }
 
-@keyframes contentOut {
-  0% {
-    opacity: 1;
-    transform: scale(1);
+/* ======================================================
+   TABLET
+====================================================== */
+@media (max-width: 900px) {
+  .vignette {
+    background: radial-gradient(ellipse at center, transparent 16%, rgba(0, 0, 0, 0.05) 42%, rgba(0, 0, 0, 0.22) 70%, rgba(0, 0, 0, 0.56) 100%);
   }
-  100% {
-    opacity: 0;
-    transform: scale(0.98);
+}
+/* ======================================================
+   MOBILE
+====================================================== */
+@media (max-width: 600px) {
+  .vignette {
+    background: radial-gradient(ellipse at center, transparent 13%, rgba(0, 0, 0, 0.06) 42%, rgba(0, 0, 0, 0.28) 70%, rgba(0, 0, 0, 0.62) 100%);
+  }
+}
+/* ======================================================
+   REDUCED MOTION
+====================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .preloader {
+    transition: none;
+  }
+  .exiting {
+    transform: translate3d(0, -100%, 0);
   }
 }/*# sourceMappingURL=Preloader.module.css.map */

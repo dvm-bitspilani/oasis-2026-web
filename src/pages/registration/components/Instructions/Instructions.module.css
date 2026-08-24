@@ -1,0 +1,238 @@
+.content {
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 15%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+  height: 100svh;
+  width: 50vw;
+  background-image: url(/instructionsScroll.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.content .headingCont {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.content .headingCont .heading {
+  margin: 3vw 0 0;
+  color: #ffffff;
+  font-family: "Syamsiah", sans-serif;
+  font-weight: 500;
+  color: #6C1700;
+  font-size: 6rem;
+  margin: 15vh 0 0;
+}
+.content h5 {
+  align-self: flex-start;
+  font-family: "Cinzel", sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #38170B;
+  padding: 0 150px;
+}
+.content .instr {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  list-style: none;
+  padding: 0 150px;
+}
+.content .instr li {
+  position: relative;
+  padding-left: 34px;
+  color: #432611;
+  text-align: left;
+  font-family: "EB", sans-serif;
+  font-size: 1.25rem;
+}
+.content .instr li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.25em;
+  width: 22px;
+  height: 22px;
+  background: url("/game-icons_magic-lamp.svg") center/contain no-repeat;
+}
+.content .instr li a {
+  color: #432611;
+  font-family: "EB", sans-serif;
+}
+.content .instr li span {
+  cursor: pointer;
+  text-decoration: underline;
+}
+.content .googleButton {
+  cursor: pointer;
+  background: center/cover no-repeat url(/googleReg.svg);
+  border: none;
+  z-index: 4;
+  transition: filter 0.3s;
+  width: 20vw;
+  height: 3.216vw;
+  margin-top: 20px;
+  position: relative;
+  overflow: hidden;
+  scale: 1.25;
+}
+.content .googleButton:hover {
+  cursor: default;
+}
+.content .googleButton:has(div:hover) {
+  filter: brightness(0.8);
+}
+.content .googleButton div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.01;
+}
+
+.leftbottom {
+  position: absolute;
+  left: -5%;
+  bottom: -10%;
+  width: 20%;
+  scale: 1.5;
+}
+
+.rightbottom {
+  position: absolute;
+  right: -7%;
+  bottom: -5%;
+  width: 30%;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.lefttop {
+  position: absolute;
+  left: -18%;
+  top: -22%;
+}
+
+.righttop {
+  position: absolute;
+  right: 0;
+  top: 3%;
+}
+
+.book {
+  position: absolute;
+  top: -12%;
+  right: 3%;
+  scale: 0.65;
+  z-index: 20;
+}
+
+@media screen and (max-width: 1401px) {
+  .content {
+    width: 65vw;
+  }
+  .book {
+    scale: 0.5;
+    top: -10%;
+    right: -13%;
+  }
+  .googleButton {
+    scale: 1.5;
+  }
+}
+@media screen and (max-width: 1201px) {
+  .content {
+    width: 80vw;
+    margin: 0;
+    left: 20%;
+  }
+  .lefttop {
+    left: -25%;
+    top: -25%;
+  }
+  .leftbottom {
+    left: -5%;
+    bottom: -5%;
+    scale: 1.75;
+  }
+  .book {
+    display: none;
+  }
+}
+@media screen and (max-width: 1075px) {
+  .content {
+    left: 10%;
+    background-image: url(/instructionsScrollLong.png);
+  }
+  .lefttop {
+    left: -30%;
+    top: -10%;
+    scale: 0.6;
+  }
+  .righttop {
+    scale: 0.6;
+  }
+  .googleButton {
+    scale: 2;
+  }
+}
+@media screen and (max-width: 769px) {
+  .content {
+    width: 90vw;
+    left: 5%;
+  }
+  .leftbottom,
+  .lefttop,
+  .rightbottom,
+  .righttop {
+    display: none;
+  }
+}
+@media screen and (max-width: 577px) {
+  .content {
+    width: 95vw;
+    left: 3%;
+    gap: 5vh;
+  }
+  .content .headingCont {
+    padding-top: 40px;
+  }
+  .content .headingCont .heading {
+    margin: 0;
+    font-size: 4rem;
+  }
+  .content h5 {
+    padding: 0;
+    align-self: center;
+    font-size: 1.5rem;
+  }
+  .content .instr {
+    padding: 0;
+    margin: 0 50px;
+  }
+  .content .instr li {
+    font-size: 1rem;
+  }
+  .content .googleButton {
+    scale: 3.25;
+  }
+}
+@media (max-width: 991px) and (min-height: 750px) {
+  .content .headingCont {
+    padding-top: 60px;
+  }
+  .content .headingCont .heading {
+    font-size: 5rem;
+  }
+  .content h5 {
+    font-size: 1.75rem;
+  }
+  .content .instr li {
+    font-size: 1.35rem;
+  }
+}/*# sourceMappingURL=Instructions.module.css.map */
