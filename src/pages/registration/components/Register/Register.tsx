@@ -3359,6 +3359,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Select from "react-select";
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 import styles from "./Register.module.scss";
@@ -3369,7 +3370,7 @@ import leftbottom from "../../../../assets/registration/reg/leftbottom.png";
 import rightbottom from "../../../../assets/registration/reg/rightbottom.png";
 import lefttop from "../../../../assets/registration/reg/lefttop.png";
 import leftmiddle from "../../../../assets/registration/reg/leftmiddle.png";
-import rightmiddle from "../../../../assets/registration/reg/rightmiddle.png";
+import rightmid from "../../../../assets/registration/reg/rightmid.png";
 import righttop from "../../../../assets/registration/reg/righttop.png";
 import book from "../../../../assets/registration/reg/book.png";
 import buttonBg from "../../../../assets/registration/reg/buttonbg.png";
@@ -3984,8 +3985,8 @@ export default function Reg({
         alt=""
       />
        <img
-        src={rightmiddle}
-        className={styles.rightmiddle}
+        src={rightmid}
+        className={styles.rightmid}
         alt=""
       />
 
@@ -4002,6 +4003,10 @@ export default function Reg({
         className={styles.righttop}
         alt=""
       />
+
+      <Link className={styles.backButton} to="/">
+        <img src="/regBackButton.png" alt="Go back to Home Page" />
+      </Link>
 
       {/* BOOK */}
 
