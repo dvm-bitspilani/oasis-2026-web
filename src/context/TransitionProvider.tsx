@@ -16,17 +16,13 @@ import PageTransition, {
   type PageTransitionHandle,
 } from "../components/pageTransition/PageTransition";
 
-type TransitionMode =
-  | "full"
-  | "doors";
-
 type TransitionContextValue = {
   transitioning: boolean;
   navigateWithTransition: (
     to: string,
   ) => void;
-  entered: boolean;      // NEW: has the intro preloader already played this session?
-  markEntered: () => void; // NEW: lets any page (e.g. ComingSoon) flag "entered" before navigating
+  entered: boolean;
+  markEntered: () => void;
 };
 
 const TransitionContext =
@@ -44,8 +40,8 @@ function waitForNextPaint() {
   });
 }
 
-const HOME_PATH = "/";
-const PRELOADER_KEY = "oasis_preloader_shown"; // NEW
+const PRELOADER_KEY =
+  "oasis_preloader_shown";
 
 export function TransitionProvider({
   children,
@@ -61,34 +57,45 @@ export function TransitionProvider({
   const [pendingPath, setPendingPath] =
     useState<string | null>(null);
 
-  const [pendingMode, setPendingMode] =
-    useState<TransitionMode>("full");
-
   const transitionRef =
     useRef<PageTransitionHandle>(null);
 
   const navigatingRef =
     useRef(false);
 
-  // NEW: single source of truth for "has the intro preloader played
-  // this session", seeded from sessionStorage so a refresh/deep-link
-  // doesn't replay it either.
-  const [entered, setEntered] = useState<boolean>(() => {
-    try {
-      return sessionStorage.getItem(PRELOADER_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
+  // =========================================
+  // PRELOADER STATE
+  // =========================================
+
+  const [entered, setEntered] =
+    useState<boolean>(() => {
+      try {
+        return (
+          sessionStorage.getItem(
+            PRELOADER_KEY,
+          ) === "true"
+        );
+      } catch {
+        return false;
+      }
+    });
 
   const markEntered = useCallback(() => {
     setEntered(true);
+
     try {
-      sessionStorage.setItem(PRELOADER_KEY, "true");
+      sessionStorage.setItem(
+        PRELOADER_KEY,
+        "true",
+      );
     } catch {
-      // ignore write failures (e.g. storage disabled)
+      // Ignore storage errors
     }
   }, []);
+
+  // =========================================
+  // NAVIGATION
+  // =========================================
 
   const navigateWithTransition = (
     to: string,
@@ -100,32 +107,22 @@ export function TransitionProvider({
       return;
     }
 
-    // NEW: any real navigation implies the user has "entered" —
-    // never show the intro Preloader again after this point
-    // (e.g. clicking "Go Home" from ComingSoon should only ever
-    // trigger this page transition, not the preloader).
+    /*
+     * Once the user navigates, the intro
+     * preloader should never play again
+     * during this session.
+     */
     markEntered();
 
     navigatingRef.current = true;
 
-    /*
-     * Keep your original behaviour:
-     *
-     * Home -> another page:
-     * full transition
-     *
-     * Any other navigation:
-     * doors only
-     */
-    const mode: TransitionMode =
-      location.pathname === HOME_PATH
-        ? "full"
-        : "doors";
-
     setPendingPath(to);
-    setPendingMode(mode);
     setTransitioning(true);
   };
+
+  // =========================================
+  // STRING + CURTAIN TRANSITION COMPLETE
+  // =========================================
 
   const handleTransitionComplete =
     async () => {
@@ -139,40 +136,81 @@ export function TransitionProvider({
       }
 
       /*
-       * IMPORTANT:
+       * At this point:
        *
-       * PageTransition has now completely
-       * closed the doors.
+       * Strings have finished.
+       * Curtain has reached 2 seconds.
+       * Curtain is currently PAUSED.
        *
-       * DO NOT remove it.
-       *
-       * Change the route while the transition
-       * is still covering the screen.
+       * The curtain is still covering
+       * the screen.
        */
+
       navigate(destination);
 
       /*
-       * Allow React to mount the destination.
+       * Give React time to mount the new page.
        */
       await waitForNextPaint();
 
       /*
-       * Second paint ensures the destination
-       * has actually rendered behind the doors.
+       * Make absolutely sure the new page
+       * has rendered.
        */
       await waitForNextPaint();
 
       /*
-       * Open the SAME PageTransition instance.
+       * Continue the SAME curtain video
+       * from exactly where it paused (2s).
        */
-      if (transitionRef.current) {
-        await transitionRef.current.openDoors();
+      transitionRef.current?.resumeCurtain();
+    };
+
+  // =========================================
+  // CURTAIN FINISHED
+  // =========================================
+
+  /*
+   * PageTransition calls onComplete again
+   * after resumeCurtain() finishes the video.
+   *
+   * We need to distinguish that second
+   * completion from the first completion
+   * at 2 seconds.
+   */
+
+  const transitionStageRef =
+    useRef<
+      "strings" | "curtain"
+    >("strings");
+
+  const handleTransition =
+    async () => {
+      /*
+       * First completion:
+       *
+       * strings → curtain paused at 2s
+       */
+      if (
+        transitionStageRef.current ===
+        "strings"
+      ) {
+        transitionStageRef.current =
+          "curtain";
+
+        await handleTransitionComplete();
+
+        return;
       }
 
       /*
-       * Only remove PageTransition after
-       * the doors have completely opened.
+       * Second completion:
+       *
+       * curtain has completely finished.
        */
+      transitionStageRef.current =
+        "strings";
+
       setPendingPath(null);
       setTransitioning(false);
       navigatingRef.current = false;
@@ -183,8 +221,8 @@ export function TransitionProvider({
       value={{
         transitioning,
         navigateWithTransition,
-        entered,      // NEW
-        markEntered,  // NEW
+        entered,
+        markEntered,
       }}
     >
       {children}
@@ -192,10 +230,7 @@ export function TransitionProvider({
       {transitioning && (
         <PageTransition
           ref={transitionRef}
-          mode={pendingMode}
-          onComplete={
-            handleTransitionComplete
-          }
+          onComplete={handleTransition}
         />
       )}
     </TransitionContext.Provider>
