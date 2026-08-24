@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import {useEffect,useLayoutEffect,useRef,useState,} from "react";
 import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 
@@ -239,7 +239,7 @@ export default function Home({
   // INTRO SEQUENCE
   // =======================================================
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!preloaderDone) return;
 
     const containerEl =
@@ -807,9 +807,9 @@ export default function Home({
       ctx.revert();
   }, [preloaderDone]);
 
-  // =========================================================
+  // =======================================================
   // CONTINUOUS CLOUD DRIFT
-  // =========================================================
+  // =======================================================
 
   useEffect(() => {
     const ctx = gsap.context(
