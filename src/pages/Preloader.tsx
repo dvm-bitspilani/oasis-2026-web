@@ -24,6 +24,8 @@ type ShootingStar = {
   speed: number;
   length: number;
   size: number;
+  depth: number;
+  opacity: number;
   nextSpawn: number;
 };
 type LogoDot = {
@@ -37,7 +39,7 @@ const SVG_VIEWBOX_WIDTH = 1578;
 const SVG_VIEWBOX_HEIGHT = 744;
 const PATH_STAR_COUNT = 700;
 const MIN_LOGO_TIME = 2000;
-const LOGO_HOLD = 700;
+const LOGO_HOLD = 1000;
 const EXIT_DURATION = 1200;
 const BG_COLOR = "rgb(8, 10, 24)";
 const STAR_COLOR = "245, 222, 179";
@@ -45,7 +47,13 @@ const LOGO_COLOR = "180, 225, 255";
 const FAR_STARS = 320;
 const MID_STARS = 190;
 const NEAR_STARS = 110;
-const SHOOTING_STARS = 80;
+const SHOOTING_STARS = 10;
+// Delta-time clamp: prevents huge position jumps when the tab is
+// backgrounded / throttled and rAF resumes with a large elapsed gap.
+const MAX_FRAME_DT = 1000 / 30;
+// Debounce window for the resize handler so mobile URL-bar show/hide
+// doesn't repeatedly re-sample the SVG path and rebuild star fields.
+const RESIZE_DEBOUNCE = 150;
 
 const PATH_D = `
   M 264 237 L 258 242 L 258 243 L 253 248 L 253 249 L 243 261 L 237 272 L 235 274 L 229 286 L 229 288 L 225 298 L 224 307 L 223 308 L 223 329 L 224 330 L 224 335 L 225 336 L 225 339 L 226 340 L 228 348 L 234 360 L 250 382 L 267 398 L 268 398 L 283 411 L 296 420 L 300 422 L 303 422 L 303 419 L 302 418 L 301 413 L 295 401 L 295 399 L 293 396 L 293 394 L 289 384 L 289 381 L 287 376 L 287 372 L 286 371 L 286 366 L 285 365 L 285 357 L 284 356 L 284 342 L 285 341 L 285 332 L 286 331 L 286 326 L 287 325 L 288 315 L 289 314 L 289 311 L 290 310 L 290 307 L 291 306 L 291 303 L 292 302 L 294 294 L 300 284 L 297 284 L 289 288 L 283 292 L 274 301 L 269 308 L 265 316 L 264 322 L 263 323 L 263 332 L 261 335 L 259 334 L 256 328 L 256 326 L 251 315 L 251 313 L 247 303 L 246 296 L 245 295 L 245 283 L 246 282 L 246 276 L 247 275 L 248 268 L 249 267 L 251 259 L 256 249 Z
@@ -167,6 +175,33 @@ const PATH_D = `
   M 313 89 L 317 93 L 319 99 L 320 100 L 323 100 L 325 102 L 324 109 L 325 110 L 326 109 L 328 109 L 329 110 L 329 114 L 328 115 L 330 114 L 332 115 L 331 120 L 332 120 L 334 123 L 334 141 L 333 142 L 333 147 L 330 150 L 327 148 L 327 154 L 328 155 L 327 156 L 327 159 L 322 165 L 322 168 L 317 173 L 318 172 L 319 173 L 318 177 L 307 189 L 305 189 L 304 190 L 299 187 L 297 190 L 298 189 L 300 189 L 301 190 L 301 192 L 297 196 L 292 198 L 292 200 L 283 208 L 273 214 L 268 215 L 261 221 L 259 221 L 258 222 L 256 220 L 260 215 L 255 218 L 253 222 L 253 224 L 251 226 L 249 226 L 246 228 L 225 249 L 225 250 L 217 259 L 213 267 L 213 269 L 210 276 L 210 279 L 208 284 L 208 289 L 207 290 L 207 298 L 206 299 L 206 303 L 204 306 L 207 312 L 207 315 L 203 319 L 202 319 L 200 322 L 204 326 L 203 325 L 202 320 L 205 318 L 208 322 L 208 327 L 209 328 L 209 335 L 212 341 L 207 347 L 204 347 L 203 346 L 203 344 L 207 340 L 203 336 L 202 338 L 196 332 L 191 324 L 191 323 L 193 322 L 195 325 L 196 325 L 196 323 L 189 317 L 184 308 L 184 304 L 185 303 L 187 305 L 187 307 L 187 304 L 182 296 L 182 292 L 186 286 L 185 286 L 183 289 L 181 289 L 178 285 L 183 276 L 183 275 L 180 275 L 179 274 L 179 271 L 178 270 L 179 248 L 180 247 L 181 238 L 184 233 L 184 230 L 183 229 L 188 220 L 187 217 L 198 204 L 199 201 L 203 197 L 212 192 L 214 190 L 224 186 L 227 186 L 228 185 L 236 183 L 239 181 L 252 179 L 264 171 L 270 171 L 276 165 L 283 165 L 283 161 L 288 157 L 294 157 L 294 152 L 295 150 L 300 145 L 305 144 L 305 139 L 312 128 L 312 120 L 314 117 L 314 103 L 313 102 L 313 100 L 311 99 L 309 96 L 309 92 Z
   `;
 
+/**
+ * Build a small offscreen "glow sprite" once — a soft radial gradient.
+ * We drawImage() this instead of using ctx.shadowBlur per-shape, since
+ * shadowBlur forces a real blur pass on every single fill() call and is
+ * by far the most expensive canvas operation used here (the main source
+ * of the jitter with ~700 logo dots + ~600 background stars per frame).
+ */
+function makeGlowSprite(size = 64) {
+  const c = document.createElement("canvas");
+  c.width = c.height = size;
+  const g = c.getContext("2d")!;
+  const grad = g.createRadialGradient(
+    size / 2,
+    size / 2,
+    0,
+    size / 2,
+    size / 2,
+    size / 2,
+  );
+  grad.addColorStop(0, "rgba(255,255,255,1)");
+  grad.addColorStop(0.4, "rgba(255,255,255,0.35)");
+  grad.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = grad;
+  g.fillRect(0, 0, size, size);
+  return c;
+}
+
 export default function Preloader({
   assets = [],
   onEnter,
@@ -241,6 +276,15 @@ export default function Preloader({
     let logoDots: LogoDot[] = [];
     let backgroundStars: BackgroundStar[] = [];
     let shootingStars: ShootingStar[] = [];
+    // Pre-rendered glow sprite, reused every frame instead of shadowBlur.
+    const glowSprite = makeGlowSprite(64);
+    // Clock bookkeeping for clamped delta-time (fixes teleport/jitter
+    // after the tab is backgrounded or the browser throttles rAF).
+    let lastFrameTime = performance.now();
+    let virtualElapsed = 0;
+    // Debounced resize bookkeeping.
+    let resizeTimer: number | null = null;
+
     const ease = (v: number) => v * v * (3 - 2 * v);
     const sample = () => {
       const len = path.getTotalLength(),
@@ -290,26 +334,64 @@ export default function Preloader({
       layer(MID_STARS, 0.45, 0.4, 1.15, 0.12, 0.38, 4, 9);
       layer(NEAR_STARS, 0.95, 0.75, 1.9, 0.24, 0.62, 9, 18);
     };
+    const randomizeShootingStar = (
+      star: ShootingStar,
+      now: number,
+      initial: boolean,
+    ) => {
+      const depthRoll = Math.random();
+      let depth = 0;
+      if (depthRoll > 0.76) depth = 2;
+      else if (depthRoll > 0.34) depth = 1;
+
+      const x = -350 + Math.random() * (width * 1.15 + 350);
+      let y: number;
+      const positionRoll = Math.random();
+      if (positionRoll < (initial ? 0.58 : 0.55)) {
+        y = -250 + Math.random() * (height * (initial ? 0.78 : 0.75));
+      } else {
+        y = height * (initial ? 0.28 : 0.25) + Math.random() * (height * (initial ? 0.82 : 0.8));
+      }
+      const angle = ((12 + Math.random() * 32) * Math.PI) / 180;
+
+      let speed: number, length: number, size: number, opacity: number;
+      if (depth === 0) {
+        speed = 110 + Math.random() * 120;
+        length = 35 + Math.random() * 100;
+        size = 0.55 + Math.random() * 0.55;
+        opacity = 0.2 + Math.random() * 0.28;
+      } else if (depth === 1) {
+        speed = 180 + Math.random() * 180;
+        length = 60 + Math.random() * 160;
+        size = 0.75 + Math.random() * 0.85;
+        opacity = 0.4 + Math.random() * 0.35;
+      } else {
+        speed = 300 + Math.random() * 260;
+        length = 100 + Math.random() * 240;
+        size = 1.0 + Math.random() * 1.5;
+        opacity = 0.7 + Math.random() * 0.3;
+      }
+
+      star.x = x;
+      star.y = y;
+      star.angle = angle;
+      star.speed = speed;
+      star.length = length;
+      star.size = size;
+      star.depth = depth;
+      star.opacity = opacity;
+      star.nextSpawn = initial
+        // ? now - Math.random() * 5500
+        // : now + 30 + Math.random() * 650;
+        ? 0
+        : now + 10 + Math.random() * 650;
+    };
     const makeShooting = () => {
       const now = performance.now();
-
       shootingStars = Array.from({ length: SHOOTING_STARS }, () => {
-        // Spread across the full width, with y ranging above and below
-        // the viewport so the initial frame already looks "mid-fall".
-        const x = Math.random() * width;
-        const y = -height * 0.3 + Math.random() * (height * 1.3);
-
-        return {
-          x,
-          y,
-          // TOP -> BOTTOM, with only a slight horizontal drift.
-          angle: ((150 + Math.random() * 20) * Math.PI) / 180,
-          speed: 220 + Math.random() * 260,
-          length: 70 + Math.random() * 180,
-          // Constant thin width. CSS controls the actual height.
-          size: 1,
-          nextSpawn: now - Math.random() * 3500,
-        };
+        const star = {} as ShootingStar;
+        randomizeShootingStar(star, now, true);
+        return star;
       });
     };
     const makeLogo = () => {
@@ -324,7 +406,7 @@ export default function Preloader({
         };
       });
     };
-    const resize = () => {
+    const rebuild = () => {
       width = window.innerWidth;
       height = window.innerHeight;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -337,14 +419,34 @@ export default function Preloader({
       makeShooting();
       makeLogo();
     };
+    // Debounced resize: only rebuild after resizing has settled, so
+    // rapid-fire mobile viewport events (URL bar show/hide) don't cause
+    // repeated full rebuilds mid-frame.
+    const resize = () => {
+      if (resizeTimer !== null) window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        resizeTimer = null;
+        rebuild();
+      }, RESIZE_DEBOUNCE);
+    };
     const animate = (time: number) => {
       if (dead) return;
-      const elapsed = time - startRef.current,
-        assetP = progressRef.current,
+
+      // Clamp per-frame delta so a throttled/backgrounded tab resuming
+      // doesn't cause everything to jump/teleport in one frame.
+      const rawDt = time - lastFrameTime;
+      lastFrameTime = time;
+      const dt = Math.min(Math.max(rawDt, 0), MAX_FRAME_DT);
+      virtualElapsed += dt;
+      const elapsed = virtualElapsed;
+
+      const assetP = progressRef.current,
         timeP = Math.min(1, elapsed / MIN_LOGO_TIME),
         logoP = Math.min(assetP, timeP);
+
       ctx.fillStyle = BG_COLOR;
       ctx.fillRect(0, 0, width, height);
+
       backgroundStars.forEach((star) => {
         let x =
             (star.x + (star.speed * star.depth * elapsed) / 1000) %
@@ -358,77 +460,113 @@ export default function Preloader({
             (Math.sin(elapsed * 0.001 * star.twinkleSpeed + star.phase) + 1) /
             2,
           op = star.opacity * (0.7 + tw * 0.3);
+
+        // Cheap glow via sprite instead of shadowBlur for near stars.
+        if (star.depth > 0.75) {
+          const glowSize = star.size * 10;
+          ctx.globalAlpha = op * 0.5;
+          ctx.drawImage(
+            glowSprite,
+            x - glowSize / 2,
+            y - glowSize / 2,
+            glowSize,
+            glowSize,
+          );
+          ctx.globalAlpha = 1;
+        }
         ctx.beginPath();
         ctx.arc(x, y, star.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${STAR_COLOR},${op})`;
-        if (star.depth > 0.75) {
-          ctx.shadowBlur = 4;
-          ctx.shadowColor = `rgba(${STAR_COLOR},${op * 0.5})`;
-        }
         ctx.fill();
-        ctx.shadowBlur = 0;
       });
 
       // Shooting stars are rendered as real DOM elements (styles.star) so the
       // CSS blur / glow (drop-shadow + radial box-shadow head) applies to them.
-      // Here we just update each star's position/rotation/scale + spawn lifecycle.
+      // Positioned purely via `transform` (translate3d + rotate + scaleX) so
+      // the browser can composite them on the GPU without triggering layout,
+      // which is what left/top updates were doing 20x per frame before.
       shootingStars.forEach((star, i) => {
-        const el = starRefs.current[i];
-        if (!el) return;
-        if (time < star.nextSpawn) {
-          el.style.opacity = "0";
-          return;
-        }
-        const age = (time - star.nextSpawn) / 1000;
-        const x = star.x + Math.cos(star.angle) * star.speed * age;
-        const y = star.y + Math.sin(star.angle) * star.speed * age;
-        if (x > width + 250 || y > height + 250 || x < -250 || y < -250) {
-          // Respawn near the top of the screen so stars keep streaming
-          // downward across the whole width.
-          star.x = Math.random() * width;
-          star.y = -100 - Math.random() * 200;
-          star.angle = (-75 * Math.PI) / 180;
-          star.speed = 220 + Math.random() * 260;
-          star.length = 70 + Math.random() * 180;
-          star.size = 1;
-          star.nextSpawn = time + 100 + Math.random() * 1000;
-          el.style.opacity = "0";
-          return;
-        }
-        const angleDeg = (star.angle * 180) / Math.PI;
-        const lengthScale = star.length / 300;
-        // Constant thin width. Never scale the Y axis.
-        const thicknessScale = 1;
-        el.style.opacity = "1";
-        el.style.left = `${x}px`;
-        el.style.top = `${y}px`;
-        // Star shape's tip sits at its right edge (transform-origin: right center),
-        // so rotating by the physics angle directly (no +/-90 offset) points the
-        // tip exactly along the direction of travel.
-        el.style.transform = `translate(-100%,-50%) rotate(${angleDeg}deg) scale(${lengthScale},${thicknessScale})`;
-      });
+  const el = starRefs.current[i];
+  if (!el) return;
 
+  if (time < star.nextSpawn) {
+    el.style.opacity = "0";
+    return;
+  }
+
+  // Accumulate with dt (already clamped to MAX_FRAME_DT above) instead
+  // of recomputing from (time - star.nextSpawn) each frame — avoids a
+  // teleport if the tab was backgrounded/throttled and `time` jumps.
+  star.x += Math.cos(star.angle) * star.speed * (dt / 1000);
+  star.y += Math.sin(star.angle) * star.speed * (dt / 1000);
+
+  const x = star.x;
+  const y = star.y;
+
+  if (x > width + 450 || y > height + 450 || x < -450 || y < -450) {
+    randomizeShootingStar(star, time, false);
+    el.style.opacity = "0";
+    return;
+  }
+
+  const lengthScale = star.length / 140;
+  const angleDeg = (star.angle * 180) / Math.PI;
+  const trailHeight = Math.max(1.5, star.size * 2.2);
+  const headSize = Math.max(7, star.size * 10);
+
+  el.style.setProperty("--star-length", `${star.length}px`);
+  el.style.setProperty("--star-height", `${trailHeight}px`);
+  el.style.setProperty("--head-size", `${headSize}px`);
+  el.style.setProperty("--star-glow", `${3 + star.size * 3}px`);
+  el.style.setProperty("--star-opacity", String(star.opacity));
+
+  el.style.zIndex = String(20 + star.depth * 10);
+  el.style.opacity = String(star.opacity);
+  el.style.transform =
+    `translate3d(${x}px, ${y}px, 0) ` +
+    `translate(-100%, -50%) ` +
+    `rotate(${angleDeg}deg) ` +
+    `scaleX(${lengthScale})`;
+});
+      // Logo dots: single glow sprite pass (cheap) + crisp core pass,
+      // no per-dot shadowBlur.
       logoDots.forEach((dot) => {
-        const local = ease(Math.min(1, Math.max(0, (logoP - dot.order) / 0.1))),
+        const local = ease(
+            Math.min(1, Math.max(0, (logoP - dot.order) / 0.1)),
+          ),
           pulse = 0.9 + 0.1 * ((Math.sin(elapsed * 0.002 + dot.phase) + 1) / 2),
           op = 0.035 + local * 0.965 * pulse,
           r = dot.size * (0.7 + local * 0.55);
+
+        if (local > 0.02) {
+          const glowSize = r * (4 + local * 4);
+          ctx.globalAlpha = op * local * 0.6;
+          ctx.drawImage(
+            glowSprite,
+            dot.x - glowSize / 2,
+            dot.y - glowSize / 2,
+            glowSize,
+            glowSize,
+          );
+          ctx.globalAlpha = 1;
+        }
+
         ctx.beginPath();
         ctx.arc(dot.x, dot.y, r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${LOGO_COLOR},${op})`;
-        ctx.shadowBlur = local * (7 + dot.size * 3);
-        ctx.shadowColor = `rgba(${LOGO_COLOR},${local * 0.9})`;
         ctx.fill();
-        ctx.shadowBlur = 0;
       });
+
       frame = requestAnimationFrame(animate);
     };
+
     window.addEventListener("resize", resize);
-    resize();
+    rebuild();
     frame = requestAnimationFrame(animate);
     return () => {
       dead = true;
       window.removeEventListener("resize", resize);
+      if (resizeTimer !== null) window.clearTimeout(resizeTimer);
       cancelAnimationFrame(frame);
     };
   }, []);
@@ -471,7 +609,7 @@ export default function Preloader({
       >
         <path ref={pathRef} d={PATH_D} />
       </svg>
-      {/* <div className={styles.shootingStars}>
+      <div className={styles.shootingStars}>
         {Array.from({ length: SHOOTING_STARS }).map((_, i) => (
           <div
             key={i}
@@ -479,10 +617,17 @@ export default function Preloader({
               starRefs.current[i] = el;
             }}
             className={styles.star}
-            style={{ opacity: 0 }}
+            style={{
+              opacity: 0,
+              zIndex: 20,
+              // GPU-composited transform updates only; no layout thrash.
+              willChange: "transform, opacity",
+              left: 0,
+              top: 0,
+            }}
           />
         ))}
-      </div> */}
+      </div>
       <div className={styles.loadingBar}>
         <div
           className={styles.loadingBarFill}

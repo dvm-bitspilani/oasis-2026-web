@@ -192,13 +192,9 @@ export default function Home({
     if (!preloaderDone) return;
 
     const containerEl = containerRef.current;
-
     const castleEl = castleRef.current;
-
     const moonEl = moonRef.current;
-
     const portholeEl = portholeRef.current;
-
     const stringLayer = introStringLayerRef.current;
 
     if (!containerEl) return;
@@ -218,6 +214,10 @@ export default function Home({
           overwrite: "auto",
         },
       });
+
+      /* ======================================================
+         INITIAL STATES
+      ====================================================== */
 
       if (castleEl) {
         gsap.set(castleEl, {
@@ -242,6 +242,14 @@ export default function Home({
         });
       }
 
+      /* ======================================================
+         CLOUD RIGS + STRINGS
+
+         Clouds start above the viewport.
+         Their horizontal animation is handled separately
+         and NEVER stops.
+      ====================================================== */
+
       const containerRect = containerEl.getBoundingClientRect();
 
       const cloudRigs = cloudRefs.current
@@ -262,8 +270,6 @@ export default function Home({
         hookY: number;
       }[];
 
-      const liftDistance = window.innerHeight * 1.3;
-
       let paths: SVGPathElement[] = [];
 
       if (stringLayer) {
@@ -279,11 +285,20 @@ export default function Home({
 
           path.setAttribute("fill", "none");
 
-          path.setAttribute("stroke", "rgba(255,255,255,0.55)");
+          /* ==================================================
+             IMPORTANT:
+             Every generated string gets .path
+          ================================================== */
+          path.setAttribute("class", styles.path);
+
+          path.setAttribute(
+            "stroke",
+            "rgba(255,255,255,0.55)",
+          );
 
           path.setAttribute("stroke-width", "1.5");
 
-          path.style.opacity = "0";
+          path.style.opacity = "1";
 
           stringLayer.appendChild(path);
 
@@ -291,24 +306,73 @@ export default function Home({
         });
       }
 
-      cloudRigs.forEach((rig) => {
-        gsap.set(rig.el, {
-          y: -liftDistance,
-          opacity: 0,
-        });
-      });
+      /* ======================================================
+         STRING GEOMETRY
 
-      const buildStringPath = (
+         Same curve/formation as PageTransition.
+      ====================================================== */
+
+      const TOP_Y = 0;
+      const START_LEN = 30;
+      const START_SAG = 120;
+
+      const STRAIGHT_T = 0.55;
+      const HOOK_T = 0.85;
+
+      const buildPath = (
         anchorX: number,
-        currentY: number,
+        endY: number,
         sag: number,
       ) => {
-        const midY = currentY * 0.6;
+        const control1Y =
+          TOP_Y +
+          (endY - TOP_Y) * STRAIGHT_T;
 
-        return `M ${anchorX} 0 Q ${
+        const control2Y =
+          TOP_Y +
+          (endY - TOP_Y) * HOOK_T;
+
+        return `M ${anchorX} ${TOP_Y} C ${anchorX} ${control1Y} ${
           anchorX + sag
-        } ${midY} ${anchorX} ${currentY}`;
+        } ${control2Y} ${anchorX} ${endY}`;
       };
+
+      const liftDistance = window.innerHeight * 1.3;
+
+      /* ======================================================
+         INITIAL CLOUD + STRING POSITION
+      ====================================================== */
+
+      cloudRigs.forEach((rig, index) => {
+        const path = paths[index];
+
+        gsap.set(rig.el, {
+          y: -liftDistance,
+          opacity: 1,
+        });
+
+        if (!path) return;
+
+        path.setAttribute(
+          "d",
+          buildPath(
+            rig.anchorX,
+            START_LEN,
+            START_SAG,
+          ),
+        );
+
+        path.style.opacity = "1";
+
+        const length = path.getTotalLength();
+
+        path.style.strokeDasharray = `${length}`;
+        path.style.strokeDashoffset = `${length}`;
+      });
+
+      /* ======================================================
+         CASTLE
+      ====================================================== */
 
       if (castleEl) {
         tl.to(
@@ -317,32 +381,6 @@ export default function Home({
             opacity: 1,
             duration: 0.08,
             ease: "none",
-          },
-          CASTLE_RISE_START,
-        );
-
-        tl.to(
-          {},
-          {
-            duration: CASTLE_WOBBLE_DURATION,
-            ease: "none",
-            onUpdate: function () {
-              const p = this.progress();
-
-              const envelope = Math.sin(p * Math.PI);
-
-              const t = p * CASTLE_WOBBLE_DURATION;
-
-              const x = Math.sin(t * 10) * 5 * envelope;
-
-              const rotation = Math.sin(t * 8 + 0.4) * 1.1 * envelope;
-
-              gsap.set(castleEl, {
-                x,
-                rotation,
-                opacity: 1,
-              });
-            },
           },
           CASTLE_RISE_START,
         );
@@ -357,18 +395,28 @@ export default function Home({
             p: 1,
             duration: CASTLE_RISE_DURATION,
             ease: "power2.out",
+
             onUpdate: () => {
               const p = riseState.p;
 
-              const y = castleBuriedY * (1 - p);
+              const y =
+                castleBuriedY * (1 - p);
 
-              const envelope = Math.exp(-3.5 * p);
+              const envelope =
+                Math.exp(-3.5 * p);
 
-              const t = p * CASTLE_RISE_DURATION;
+              const t =
+                p * CASTLE_RISE_DURATION;
 
-              const x = Math.sin(t * 6) * 4 * envelope;
+              const x =
+                Math.sin(t * 6) *
+                4 *
+                envelope;
 
-              const rotation = Math.sin(t * 5 + 0.3) * 0.8 * envelope;
+              const rotation =
+                Math.sin(t * 5 + 0.3) *
+                0.8 *
+                envelope;
 
               gsap.set(castleEl, {
                 y,
@@ -377,6 +425,7 @@ export default function Home({
                 opacity: 1,
               });
             },
+
             onComplete: () => {
               gsap.set(castleEl, {
                 y: 0,
@@ -386,9 +435,13 @@ export default function Home({
               });
             },
           },
-          CASTLE_RISE_START + CASTLE_WOBBLE_DURATION * 0.7,
+          CASTLE_RISE_START,
         );
       }
+
+      /* ======================================================
+         MOON
+      ====================================================== */
 
       if (moonEl) {
         tl.to(
@@ -403,6 +456,10 @@ export default function Home({
         );
       }
 
+      /* ======================================================
+         PORTHOLE
+      ====================================================== */
+
       if (portholeEl) {
         tl.to(
           portholeEl,
@@ -415,10 +472,24 @@ export default function Home({
         );
       }
 
-      cloudRigs.forEach((rig, idx) => {
-        const path = paths[idx];
+      /* ======================================================
+         CLOUD + STRING DROP
 
-        const startAt = CLOUD_DROP_START + idx * CLOUD_DROP_STAGGER;
+         The cloud and its string use the SAME progress.
+
+         Cloud:
+           -liftDistance -> 0
+
+         String:
+           top -> cloud
+
+         The string NEVER fades out.
+      ====================================================== */
+
+      cloudRigs.forEach((rig, index) => {
+        const path = paths[index];
+
+        if (!path) return;
 
         const state = {
           p: 0,
@@ -428,97 +499,218 @@ export default function Home({
           state,
           {
             p: 1,
-            duration: CLOUD_DROP_DURATION,
-            ease: "sine.in",
-            onStart: () => {
-              if (path) {
-                path.style.opacity = "1";
-              }
-            },
+
+            duration: 0.75,
+
+            ease: "power2.out",
+
+            delay: index * 0.045,
+
             onUpdate: () => {
               const p = state.p;
 
-              const y = -liftDistance * (1 - p);
+              /* ==============================================
+                 CLOUD DROPS DOWN
+              ============================================== */
+
+              const cloudY = gsap.utils.interpolate(
+                -liftDistance,
+                0,
+                p,
+              );
 
               gsap.set(rig.el, {
-                y,
-                opacity: Math.min(p / 0.25, 1),
+                y: cloudY,
+                opacity: 1,
               });
 
-              if (path) {
-                const currentY = rig.hookY + y;
+              /* ==============================================
+                 GET CURRENT CLOUD X
 
-                const sag = Math.sin(p * Math.PI) * 40;
+                 The clouds are ALSO moving horizontally.
+                 This keeps the string attached to the cloud.
+              ============================================== */
 
-                path.setAttribute(
-                  "d",
-                  buildStringPath(rig.anchorX, currentY, sag),
+              const currentRect =
+                rig.el.getBoundingClientRect();
+
+              const currentContainerRect =
+                containerEl.getBoundingClientRect();
+
+              const currentAnchorX =
+                currentRect.left -
+                currentContainerRect.left +
+                currentRect.width / 2;
+
+              /* ==============================================
+                 CURRENT STRING END
+              ============================================== */
+
+              const currentY =
+                rig.hookY + cloudY;
+
+              const endY =
+                gsap.utils.interpolate(
+                  START_LEN,
+                  currentY,
+                  p,
                 );
-              }
+
+              /* ==============================================
+                 CURVE -> TAUT
+              ============================================== */
+
+              const sag =
+                gsap.utils.interpolate(
+                  START_SAG,
+                  0,
+                  Math.pow(p, 0.75),
+                );
+
+              path.setAttribute(
+                "d",
+                buildPath(
+                  currentAnchorX,
+                  endY,
+                  sag,
+                ),
+              );
+
+              /* ==============================================
+                 DRAW STRING
+
+                 opacity ALWAYS = 1
+              ============================================== */
+
+              const currentLength =
+                path.getTotalLength();
+
+              const drawProgress =
+                Math.min(p / 0.65, 1);
+
+              path.style.strokeDasharray =
+                `${currentLength}`;
+
+              path.style.strokeDashoffset =
+                `${currentLength * (1 - drawProgress)}`;
+
+              path.style.opacity = "1";
             },
+
+            onComplete: () => {
+  /* ================================================
+     CLOUD STAYS AT FINAL POSITION
+     ================================================ */
+
+  gsap.set(rig.el, {
+    y: 0,
+    opacity: 1,
+  });
+
+  /* ================================================
+     STRING IS NOW FULLY TAUT
+     ================================================ */
+
+  path.setAttribute(
+    "d",
+    buildPath(
+      rig.anchorX,
+      rig.hookY,
+      0
+    )
+  );
+
+  path.style.strokeDasharray = "none";
+  path.style.strokeDashoffset = "0";
+  path.style.opacity = "1";
+
+  /* ================================================
+     HOLD STRING FOR A MOMENT
+     ================================================ */
+
+  gsap.delayedCall(0.8, () => {
+    const retractState = {
+      p: 0,
+    };
+
+    gsap.to(retractState, {
+      p: 1,
+
+      duration: 0.55,
+
+      ease: "power2.in",
+
+      onUpdate: () => {
+        const p = retractState.p;
+
+        /*
+          hookY -> START_LEN
+
+          The bottom of the string travels
+          upward toward the top.
+        */
+        const endY = gsap.utils.interpolate(
+          rig.hookY,
+          START_LEN,
+          p
+        );
+
+        /*
+          String becomes more curved while
+          retracting upward.
+        */
+        const sag = gsap.utils.interpolate(
+          0,
+          START_SAG,
+          p
+        );
+
+        path.setAttribute(
+          "d",
+          buildPath(
+            rig.anchorX,
+            endY,
+            sag
+          )
+        );
+
+        /*
+          Draw direction is reversed so the
+          visible string retracts toward the top.
+        */
+        const length = path.getTotalLength();
+
+        path.style.strokeDasharray =
+          `${length}`;
+
+        path.style.strokeDashoffset =
+          `${length * p}`;
+
+        path.style.opacity = "1";
+      },
+
+      onComplete: () => {
+        /*
+          Completely gone after retracting.
+        */
+        path.style.opacity = "0";
+        path.style.strokeDasharray = "none";
+        path.style.strokeDashoffset = "0";
+      },
+    });
+  });
+},
           },
-          startAt,
-        )
-          .to(
-            {},
-            {
-              duration: CLOUD_OVERSHOOT_DURATION,
-              ease: "sine.inOut",
-              onUpdate: function () {
-                const overshoot = Math.sin(this.progress() * Math.PI) * 14;
-
-                gsap.set(rig.el, {
-                  y: overshoot,
-                });
-
-                if (path) {
-                  path.setAttribute(
-                    "d",
-                    buildStringPath(rig.anchorX, rig.hookY + overshoot, 0),
-                  );
-                }
-              },
-            },
-            `>-${CLOUD_OVERSHOOT_DURATION * 0.4}`,
-          )
-          .to(
-            {},
-            {
-              duration: CLOUD_SETTLE_DELAY,
-            },
-          )
-          .to(
-            {},
-            {
-              duration: CLOUD_SETTLE_DURATION,
-              ease: "power3.out",
-              onUpdate: function () {
-                const settle = gsap.utils.interpolate(14, 0, this.progress());
-
-                gsap.set(rig.el, {
-                  y: settle,
-                });
-
-                if (path) {
-                  path.setAttribute(
-                    "d",
-                    buildStringPath(rig.anchorX, rig.hookY + settle, 0),
-                  );
-                }
-              },
-              onComplete: () => {
-                gsap.set(rig.el, {
-                  y: 0,
-                  opacity: 1,
-                });
-
-                if (path) {
-                  path.style.opacity = "0";
-                }
-              },
-            },
-          );
+          CLOUD_DROP_START +
+            index * CLOUD_DROP_STAGGER,
+        );
       });
+
+      /* ======================================================
+         PAGE CONTENT
+
+         This does NOT affect .path.
+      ====================================================== */
 
       if (fadeEls.length) {
         gsap.set(fadeEls, {
@@ -541,10 +733,7 @@ export default function Home({
     }, containerRef);
 
     return () => ctx.revert();
-  }, [
-    preloaderDone,
-    // preloaderExiting,
-  ]);
+  }, [preloaderDone]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
