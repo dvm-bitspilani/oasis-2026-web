@@ -251,7 +251,7 @@ export default function Preloader({
   // PATH FORMATION
   // ===================================================================
 
-  const PATH_STAR_COUNT = 500;
+  const PATH_STAR_COUNT = 700;
 
   const FORMATION_START = 500;
 
