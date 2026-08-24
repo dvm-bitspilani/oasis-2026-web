@@ -1,3 +1,701 @@
+// * {
+//   margin: 0;
+//   padding: 0;
+//   box-sizing: border-box;
+// }
+
+// .registerContainer {
+//   width: 100vw;
+//   min-height: 100vh;
+
+//   background-size: cover;
+//   background-repeat: no-repeat;
+//   background-position: center;
+
+//   position: relative;
+
+//   overflow: hidden;
+// }
+
+// /* ========================================= */
+// /* DECORATIONS                               */
+// /* ========================================= */
+
+// .leftbottom {
+//   position: absolute;
+
+//   left: -5%;
+//   bottom: -10%;
+
+//   width: 20%;
+
+//   scale: 1.5;
+
+//   pointer-events: none;
+// }
+
+// .rightbottom {
+//   position: absolute;
+
+//   right: -10%;
+//   bottom: -5%;
+
+//   width: 30%;
+
+//   object-fit: contain;
+
+//   pointer-events: none;
+// }
+
+// .lefttop {
+//   position: absolute;
+
+//   left: -22%;
+//   top: -22%;
+
+//   pointer-events: none;
+// }
+
+// .righttop {
+//   position: absolute;
+
+//   right: 0;
+//   top: 3%;
+
+//   pointer-events: none;
+// }
+
+// /* ========================================= */
+// /* BOOK                                      */
+// /* ========================================= */
+
+// .bookContainer {
+//   position: absolute;
+
+//   top: 52%;
+//   left: 50%;
+
+//   transform: translate(-50%, -50%);
+
+//   width: 75vw;
+
+//   aspect-ratio: 1.4;
+
+//   background-size: contain;
+//   background-repeat: no-repeat;
+//   background-position: center;
+
+//   z-index: 100;
+// }
+
+// /* ========================================= */
+// /* FORM                                      */
+// /* ========================================= */
+
+// .formContainer {
+//   display: flex;
+
+//   width: 100%;
+//   height: 100%;
+
+//   padding: 50px 55px 60px;
+// }
+
+// /* ----------------------------------------- */
+// /* LEFT PAGE                                 */
+// /* ----------------------------------------- */
+
+// .formLeft {
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+
+//   width: 50%;
+//   height: 90%;
+// }
+
+// /* ----------------------------------------- */
+// /* RIGHT PAGE                                */
+// /* ----------------------------------------- */
+
+// .formRight {
+//   margin-top: 2rem;
+
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+
+//   width: 50%;
+//   height: 90%;
+// }
+
+// /* ----------------------------------------- */
+// /* MOBILE COLUMN                             */
+// /*                                           */
+// /* Applied instead of .formLeft/.formRight   */
+// /* by the isMobile check in Register.tsx.    */
+// /* display:contents dissolves the wrapper so */
+// /* every field becomes a direct flex item of */
+// /* .formContainer and flows as one column —  */
+// /* which is what lets the sticky heading and */
+// /* pinned button work without a DOM change.  */
+// /* ----------------------------------------- */
+
+// .formColumn {
+//   display: contents;
+// }
+
+// /* ========================================= */
+// /* REGISTRATION TITLE                        */
+// /*                                           */
+// /* Top level (not nested under .formLeft) so */
+// /* it keeps its type styles when the mobile  */
+// /* column class replaces that wrapper.       */
+// /* ========================================= */
+
+// .regTitle {
+//   margin-top: 2rem;
+
+//   font-family: "Syamsiah", sans-serif;
+
+//   font-size: 5rem;
+
+//   font-weight: 500;
+
+//   color: #6c1700;
+
+//   z-index: 200;
+// }
+
+// /* ========================================= */
+// /* YEAR                                      */
+// /* ========================================= */
+
+// .yearOptions {
+//   width: 80%;
+//   height: 40%;
+
+//   display: flex;
+//   flex-direction: row;
+//   flex-wrap: nowrap;
+
+//   align-items: center;
+//   justify-content: center;
+
+//   gap: 2vw;
+// }
+
+// .yearOptions label {
+//   display: flex;
+//   flex-direction: row;
+//   align-items: center;
+//   justify-content: center;
+
+//   gap: 0.4vw;
+
+//   flex: 0 0 auto;
+
+//   font-family: "Cinzel", sans-serif;
+//   font-size: clamp(12px, 1vw, 18px);
+
+//   color: #38170b;
+
+//   cursor: pointer;
+//   white-space: nowrap;
+// }
+
+// .yearOptions input[type="radio"] {
+//   -webkit-appearance: none;
+//   -moz-appearance: none;
+//   appearance: none;
+
+//   box-sizing: border-box;
+
+//   width: 22px;
+//   height: 22px;
+//   min-width: 22px;
+//   min-height: 22px;
+
+//   flex: 0 0 22px;
+//   flex-shrink: 0;
+
+//   margin: 0;
+
+//   border: 2px solid #38170b;
+//   border-radius: 50%;
+
+//   background-color: transparent;
+//   background-clip: padding-box;
+
+//   cursor: pointer;
+
+//   outline: none;
+
+//   position: relative;
+// }
+
+// /* Selected dot */
+// .yearOptions input[type="radio"]:checked::before {
+//   content: "";
+
+//   position: absolute;
+
+//   width: 10px;
+//   height: 10px;
+
+//   top: 50%;
+//   left: 50%;
+
+//   transform: translate(-50%, -50%);
+
+//   border-radius: 50%;
+
+//   background: #6c1700;
+// }
+
+// /* ========================================= */
+// /* ERRORS                                    */
+// /* ========================================= */
+
+// .error {
+//   margin-top: 3px;
+
+//   color: #8b0000;
+
+//   font-family: "Cinzel", sans-serif;
+
+//   font-size: 0.75rem;
+
+//   text-align: center;
+// }
+
+// /* ========================================= */
+// /* NEXT BUTTON                               */
+// /* ========================================= */
+
+// .nextButton {
+//   width: min(320px, 20vw);
+
+//   height: 5vw;
+
+//   min-width: 150px;
+
+//   min-height: 55px;
+
+//   margin: 0 auto;
+
+//   padding: 0;
+
+//   border: none;
+
+//   background-color: transparent;
+
+//   background-position: center;
+
+//   background-size: contain;
+
+//   background-repeat: no-repeat;
+
+//   color: #fed59b;
+
+//   font-family: "Cinzel", serif;
+
+//   font-size: clamp(15px, 1.2vw, 22px);
+
+//   font-weight: 700;
+
+//   cursor: pointer;
+
+//   display: flex;
+
+//   align-items: center;
+
+//   justify-content: center;
+
+//   text-align: center;
+
+//   line-height: 1;
+
+//   appearance: none;
+
+//   -webkit-appearance: none;
+
+//   flex-shrink: 0;
+
+//   transition:
+//     transform 0.25s ease,
+//     filter 0.25s ease;
+// }
+
+// /* pointer devices only — touch screens latch :hover
+//    onto the last tapped element and leave it stuck */
+// @media (hover: hover) and (pointer: fine) {
+//   .nextButton:hover {
+//     transform: scale(1.06);
+
+//     filter: brightness(1.1) drop-shadow(0 0 8px rgba(254, 213, 155, 0.55));
+//   }
+// }
+
+// .nextButton:active {
+//   transform: scale(0.96);
+// }
+
+// /* ========================================= */
+// /* REACT SELECT GLOBAL STYLES                */
+// /* ========================================= */
+
+// :global(.regselect__control) {
+//   background: transparent !important;
+
+//   border: none !important;
+
+//   box-shadow: none !important;
+// }
+
+// :global(.regselect__control:hover) {
+//   border: none !important;
+
+//   box-shadow: none !important;
+// }
+
+// :global(.regselect__control--is-focused) {
+//   border: none !important;
+
+//   box-shadow: none !important;
+// }
+// :global(.regselect__control--is-disabled) {
+//   background: transparent !important;
+//   border: none !important;
+//   opacity: 1 !important;
+//   color: #6c1700;
+// }
+
+// :global(.regselect__control--is-disabled .regselect__placeholder) {
+//   color: #6c1700 !important;
+//   font-family: "Cinzel", sans-serif !important;
+//   font-size: 1rem !important;
+//   font-weight: 400 !important;
+//   opacity: 1 !important;
+// }
+// :global(.regselect__value-container) {
+//   background: transparent !important;
+
+//   padding: 0 !important;
+// }
+
+// :global(.regselect__placeholder) {
+//   color: #6c1700 !important;
+// }
+
+// :global(.regselect__single-value) {
+//   color: #38170b !important;
+// }
+
+// :global(.regselect__input-container) {
+//   background: transparent !important;
+
+//   margin: 0 !important;
+//   padding: 0 !important;
+// }
+
+// :global(.regselect__input) {
+//   background: transparent !important;
+
+//   border: none !important;
+
+//   box-shadow: none !important;
+// }
+
+// :global(.regselect__indicators) {
+//   background: transparent !important;
+// }
+
+// :global(.regselect__indicator-separator) {
+//   background: rgba(56, 23, 11, 0.3) !important;
+// }
+
+// :global(.regselect__indicator) {
+//   color: #38170b !important;
+// }
+
+// :global(.regselect__indicator:hover) {
+//   color: #38170b !important;
+// }
+
+// :global(.regselect__menu) {
+//   z-index: 1000 !important;
+// }
+
+// /* =========================================================== */
+// /* MOBILE (<=900px)                                             */
+// /*                                                               */
+// /* Mirrors the Events page:                                      */
+// /*                                                               */
+// /*   - .registerContainer is a fixed, non-scrolling 100svh box   */
+// /*     with no margin or padding, so nothing pushes the book     */
+// /*     down and leaves a strip at the top.                       */
+// /*                                                               */
+// /*   - .bookContainer is pinned at top:52% / left:13vw,          */
+// /*     92vw x 78vh, flat 180% 100% / left top crop. It overruns  */
+// /*     the right edge on purpose.                                */
+// /*                                                               */
+// /*   - .formContainer is inset with --lp-* onto the page's       */
+// /*     printed area (same numbers as the Events left page), so   */
+// /*     fields no longer cross the gold border.                   */
+// /*                                                               */
+// /*   - Inside it: heading pinned top, fields scroll between,     */
+// /*     NEXT pinned bottom — the Events heading/list/CONFIRM      */
+// /*     arrangement, done with sticky so the TSX stays as is.     */
+// /* =========================================================== */
+
+// @media (max-width: 900px) {
+//   .registerContainer {
+//     /* Where the form box sits within the book.
+//        Same values as the Events left page — nudge
+//        --lp-left / --lp-width if fields sit outside
+//        the gold border. */
+//     --lp-top: 6%;
+//     --lp-left: 16%;
+//     --lp-width: 66%;
+//     --lp-height: 88%;
+
+//     /* 100% - (--lp-top + --lp-height); used by the
+//        fixed NEXT button below */
+//     --lp-bottom: 6%;
+
+//     /* Sticky band heights. Keep these in sync with the
+//        heading and button sizes below — they're also the
+//        border insets that clip the scrolling fields. */
+//     --hdr-height: 46px;
+//     --ftr-height: 56px;
+
+//     height: 100svh;
+//     min-height: 100svh;
+
+//     margin: 0;
+//     padding: 0;
+
+//     overflow: hidden;
+//   }
+
+//   .bookContainer {
+//     position: absolute;
+
+//     top: 52%;
+//     left: 13vw;
+//     transform: translateY(-50%);
+
+//     width: 92vw;
+//     height: 78vh;
+
+//     aspect-ratio: auto;
+
+//     background-size: 180% 100%;
+//     background-position: left top;
+//     background-repeat: no-repeat;
+
+//     overflow: hidden;
+//   }
+
+//   /* ========================================= */
+//   /* FORM BOX — pinned onto the printed page,   */
+//   /* scrolls internally                         */
+//   /* ========================================= */
+
+//   .formContainer {
+//     position: absolute;
+
+//     top: var(--lp-top);
+//     left: var(--lp-left);
+//     width: var(--lp-width);
+//     height: var(--lp-height);
+
+//     box-sizing: border-box;
+
+//     flex-direction: column;
+//     gap: 10px;
+
+//     padding: 0;
+
+//     /*
+//       THIS is what removes the need for a background band.
+
+//       A scroll container clips its content at the PADDING box,
+//       and border area never scrolls — so these transparent
+//       borders carve out a strip at the top and bottom that
+//       scrolled fields are clipped away in. The heading and
+//       NEXT button then sit in those strips over bare
+//       parchment, with nothing behind them, exactly like
+//       Events' heading and CONFIRM.
+//     */
+//     border-top: var(--hdr-height) solid transparent;
+//     border-bottom: var(--ftr-height) solid transparent;
+
+//     overflow-y: auto;
+//     overflow-x: hidden;
+//     -webkit-overflow-scrolling: touch;
+//     overscroll-behavior: contain;
+
+//     /* native bar hidden, same as the Events list */
+//     scrollbar-width: none;
+//     -ms-overflow-style: none;
+//   }
+
+//   .formContainer::-webkit-scrollbar {
+//     display: none;
+//     width: 0;
+//     height: 0;
+//   }
+
+//   /* ========================================= */
+//   /* FIELD COLUMN                               */
+//   /* Targets the fields themselves, which are   */
+//   /* direct children now that .formColumn is    */
+//   /* display: contents.                         */
+//   /* ========================================= */
+
+//   .formColumn > * {
+//     width: 100%;
+
+//     margin-left: auto;
+//     margin-right: auto;
+
+//     flex-shrink: 0;
+//   }
+
+//   /* ========================================= */
+//   /* HEADING — sits in the top strip carved     */
+//   /* out by .formContainer's border, over bare  */
+//   /* parchment. No background: the fields are   */
+//   /* clipped before they reach it.              */
+//   /*                                            */
+//   /* position: fixed resolves against           */
+//   /* .bookContainer, because that element is    */
+//   /* transformed (translateY) and a transformed */
+//   /* ancestor becomes the containing block for  */
+//   /* fixed descendants. That's what takes the   */
+//   /* heading out of the scroller without a      */
+//   /* wrapper div. Keep the transform on         */
+//   /* .bookContainer or this will anchor to the  */
+//   /* viewport instead.                          */
+//   /* ========================================= */
+
+//   .regTitle {
+//     position: fixed;
+
+//     top: var(--lp-top);
+//     left: var(--lp-left);
+//     width: var(--lp-width);
+//     height: var(--hdr-height);
+
+//     z-index: 10;
+
+//     margin: 0 !important;
+//     padding: 0;
+
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+
+//     font-size: clamp(1.2rem, 6vw, 1.7rem);
+//     line-height: 1;
+//     text-align: center;
+
+//     background: none;
+
+//     pointer-events: none;
+//   }
+
+//   .yearOptions {
+//     width: 100%;
+//     height: auto;
+
+//     padding: 4px 0;
+
+//     gap: 4vw;
+//   }
+
+//   /* ========================================= */
+//   /* NEXT — sits in the bottom strip, same      */
+//   /* mechanism as the heading. Transparent, so  */
+//   /* the parchment shows around the button art. */
+//   /* ========================================= */
+
+//   .formColumn > .nextButton {
+//     position: fixed;
+
+//     left: var(--lp-left);
+//     width: var(--lp-width);
+//     height: var(--ftr-height);
+
+//     /* 100% - (--lp-top + --lp-height) */
+//     bottom: var(--lp-bottom);
+
+//     z-index: 10;
+
+//     min-width: 0;
+//     min-height: 0;
+
+//     margin: 0;
+//     padding: 0;
+
+//     background-color: transparent;
+//     background-size: contain;
+
+//     font-size: 0.95rem;
+//   }
+
+//   .lefttop {
+//     width: 45%;
+//   }
+
+//   .righttop {
+//     width: 30%;
+//   }
+
+//   .leftbottom {
+//     width: 25%;
+//   }
+
+//   .rightbottom {
+//     width: 30%;
+//   }
+// }
+
+// /* =========================================================== */
+// /* SMALL MOBILE (<=600px)                                       */
+// /*                                                               */
+// /* No --lp-* overrides on purpose: the book crop is the same     */
+// /* 180% 100% / left top at every mobile width, so the fractions  */
+// /* set above already land correctly.                             */
+// /* =========================================================== */
+
+// @media (max-width: 600px) {
+//   .registerContainer {
+//     --hdr-height: 40px;
+//     --ftr-height: 50px;
+//   }
+
+//   .bookContainer {
+//     left: 8vw;
+
+//     width: 98vw;
+//     height: 74vh;
+
+//     background-size: 180% 100%;
+//   }
+
+//   .formContainer {
+//     gap: 8px;
+//   }
+
+//   .formColumn > .nextButton {
+//     font-size: 0.85rem;
+//   }
+// }
+
+
 * {
   margin: 0;
   padding: 0;
@@ -17,9 +715,9 @@
   overflow: hidden;
 }
 
-/* ========================================= */
-/* DECORATIONS                               */
-/* ========================================= */
+/* ========================================================= */
+/* DECORATIONS                                                */
+/* ========================================================= */
 
 .leftbottom {
   position: absolute;
@@ -65,9 +763,9 @@
   pointer-events: none;
 }
 
-/* ========================================= */
-/* BOOK                                      */
-/* ========================================= */
+/* ========================================================= */
+/* BOOK                                                        */
+/* ========================================================= */
 
 .bookContainer {
   position: absolute;
@@ -75,7 +773,10 @@
   top: 52%;
   left: 50%;
 
-  transform: translate(-50%, -50%);
+  transform: translate(
+    -50%,
+    -50%
+  );
 
   width: 75vw;
 
@@ -86,203 +787,403 @@
   background-position: center;
 
   z-index: 100;
+
+  overflow: hidden;
 }
 
-/* ========================================= */
-/* FORM                                      */
-/* ========================================= */
+/* ========================================================= */
+/* TAJ MAHAL                                                  */
+/* ========================================================= */
+
+.tajmahal {
+  position: absolute;
+
+  z-index: 1;
+
+  pointer-events: none;
+
+  object-fit: contain;
+
+  /*
+   * Bottom-right page.
+   * The image intentionally sits behind the form.
+   */
+
+  width: 34%;
+
+  height: auto;
+
+  right: 10%;
+
+  bottom: 10%;
+}
+
+/* ========================================================= */
+/* FORM                                                        */
+/* ========================================================= */
 
 .formContainer {
+  position: relative;
+
+  z-index: 5;
+
   display: flex;
 
   width: 100%;
   height: 100%;
 
-  padding: 50px 55px 60px;
+  padding: 4.5% 6.5% 5%;
 }
 
-/* ----------------------------------------- */
-/* LEFT PAGE                                 */
-/* ----------------------------------------- */
+/* ========================================================= */
+/* LEFT PAGE                                                   */
+/* ========================================================= */
 
 .formLeft {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-
+  justify-content: flex-start;
+  gap: 1.2rem;
   width: 50%;
-  height: 90%;
+  height: 100%;
+  padding:3.5% 2%;
 }
 
-/* ----------------------------------------- */
-/* RIGHT PAGE                                */
-/* ----------------------------------------- */
+/* ========================================================= */
+/* RIGHT PAGE                                                  */
+/* ========================================================= */
 
 .formRight {
-  margin-top: 2rem;
+  position: relative;
 
   display: flex;
+gap: 1rem;
   flex-direction: column;
+
   align-items: center;
 
   width: 50%;
-  height: 90%;
+
+  height: 100%;
+
+  padding-top: 7%;
+
+  padding-left: 2%;
 }
 
-/* ----------------------------------------- */
-/* MOBILE COLUMN                             */
-/*                                           */
-/* Applied instead of .formLeft/.formRight   */
-/* by the isMobile check in Register.tsx.    */
-/* display:contents dissolves the wrapper so */
-/* every field becomes a direct flex item of */
-/* .formContainer and flows as one column —  */
-/* which is what lets the sticky heading and */
-/* pinned button work without a DOM change.  */
-/* ----------------------------------------- */
+/* ========================================================= */
+/* MOBILE COLUMN                                               */
+/* ========================================================= */
 
 .formColumn {
   display: contents;
 }
 
-/* ========================================= */
-/* REGISTRATION TITLE                        */
-/*                                           */
-/* Top level (not nested under .formLeft) so */
-/* it keeps its type styles when the mobile  */
-/* column class replaces that wrapper.       */
-/* ========================================= */
+/* ========================================================= */
+/* REGISTRATION TITLE                                           */
+/* ========================================================= */
 
 .regTitle {
-  margin-top: 2rem;
+  margin: 0;
 
-  font-family: "Syamsiah", sans-serif;
+  font-family: "Syamsiah",
+    sans-serif;
 
-  font-size: 5rem;
+  font-size: clamp(
+    2.2rem,
+    5vw,
+    7rem
+  );
 
+  line-height: 1;
   font-weight: 500;
-
   color: #6c1700;
-
-  z-index: 200;
+  z-index: 20;
+  text-align: center;
 }
 
-/* ========================================= */
-/* YEAR                                      */
-/* ========================================= */
+/* ========================================================= */
+/* GENDER                                                       */
+/* ========================================================= */
 
-.yearOptions {
-  width: 80%;
-  height: 40%;
-
+.genderOptions {
+  width: 85%;
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-
   align-items: center;
-  justify-content: center;
-
-  gap: 2vw;
+  justify-content: flex-start;
+  gap: 3vw;
+  padding-top: 0.25rem;
 }
 
-.yearOptions label {
+.genderOption {
   display: flex;
-  flex-direction: row;
   align-items: center;
   justify-content: center;
-
-  gap: 0.4vw;
-
-  flex: 0 0 auto;
-
-  font-family: "Cinzel", sans-serif;
-  font-size: clamp(12px, 1vw, 18px);
+  gap: 0.55rem;
+  font-family: "Cinzel",
+    sans-serif;
+  font-size: clamp(
+    11px,
+    1vw,
+    18px
+  );
 
   color: #38170b;
 
   cursor: pointer;
+
   white-space: nowrap;
 }
 
-.yearOptions input[type="radio"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-
-  box-sizing: border-box;
-
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
-  min-height: 22px;
-
-  flex: 0 0 22px;
-  flex-shrink: 0;
-
-  margin: 0;
-
-  border: 2px solid #38170b;
-  border-radius: 50%;
-
-  background-color: transparent;
-  background-clip: padding-box;
-
-  cursor: pointer;
-
-  outline: none;
-
-  position: relative;
-}
-
-/* Selected dot */
-.yearOptions input[type="radio"]:checked::before {
-  content: "";
-
+.genderOption input {
   position: absolute;
 
-  width: 10px;
-  height: 10px;
+  opacity: 0;
 
-  top: 50%;
-  left: 50%;
+  pointer-events: none;
+}
 
-  transform: translate(-50%, -50%);
+.genderDiamond {
+  width: 15px;
+  height: 15px;
 
-  border-radius: 50%;
+  min-width: 15px;
+  min-height: 15px;
 
+  border: 1.5px solid
+    #38170b;
+
+  transform: rotate(45deg);
+
+  background: transparent;
+}
+
+.genderOption
+  input[type="radio"]:checked
+  + .genderDiamond {
   background: #6c1700;
 }
 
-/* ========================================= */
-/* ERRORS                                    */
-/* ========================================= */
+.genderLabel {
+  line-height: 1;
+}
+
+/* ========================================================= */
+/* YEAR                                                        */
+/* ========================================================= */
+
+.yearOptions {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 0 0.5rem;
+
+  gap: 1.5rem;
+}
+
+.yearOption {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 0.55rem;
+
+  font-family: "Cinzel",
+    sans-serif;
+
+  font-size: clamp(
+    12px,
+    1vw,
+    18px
+  );
+
+  color: #38170b;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+}
+
+.yearOption input {
+  position: absolute;
+
+  opacity: 0;
+
+  pointer-events: none;
+}
+
+.yearDiamond {
+  width: 15px;
+  height: 15px;
+
+  min-width: 15px;
+  min-height: 15px;
+
+  border: 1.5px solid
+    #38170b;
+
+  transform: rotate(45deg);
+
+  background: transparent;
+}
+
+.yearOption
+  input[type="radio"]:checked
+  + .yearDiamond {
+  background: #6c1700;
+}
+
+.yearLabel {
+  line-height: 1;
+}
+
+/* ========================================================= */
+/* DATE OF BIRTH                                                */
+/* ========================================================= */
+
+.dobOptions {
+  width: 85%;
+margin-top: 1rem;
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-start;
+
+  gap: 0.8rem;
+}
+
+.dobSelect {
+  appearance: none;
+  -webkit-appearance: none;
+
+  width: clamp(
+    75px,
+    6.5vw,
+    115px
+  );
+
+  height: clamp(
+    10px,
+    2vw,
+    36px
+  );
+
+  padding: 0 25px 0 9px;
+
+  border: 1px solid
+    rgba(
+      56,
+      23,
+      11,
+      0.4
+    );
+
+  border-radius: 6px;
+
+  outline: none;
+
+  background-color: transparent;
+
+  color: #6c1700;
+
+  font-family: "Cinzel",
+    sans-serif;
+
+  font-size: clamp(
+    9px,
+    0.8vw,
+    15px
+  );
+
+  cursor: pointer;
+
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      #38170b 50%
+    ),
+    linear-gradient(
+      135deg,
+      #38170b 50%,
+      transparent 50%
+    );
+
+  background-position:
+    calc(100% - 13px) 11px,
+    calc(100% - 8px) 11px;
+
+  background-size:
+    5px 5px,
+    5px 5px;
+
+  background-repeat: no-repeat;
+}
+
+.dobSelect:focus {
+  outline: none;
+
+  border-color: #6c1700;
+
+  box-shadow: none;
+}
+
+.dobSelect option {
+  background: #ecdcb0;
+
+  color: #38170b;
+}
+
+/* ========================================================= */
+/* ERRORS                                                      */
+/* ========================================================= */
 
 .error {
-  margin-top: 3px;
+  margin-top: 2px;
 
   color: #8b0000;
 
-  font-family: "Cinzel", sans-serif;
+  font-family: "Cinzel",
+    sans-serif;
 
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 
   text-align: center;
+
+  z-index: 20;
 }
 
-/* ========================================= */
-/* NEXT BUTTON                               */
-/* ========================================= */
+/* ========================================================= */
+/* NEXT BUTTON                                                  */
+/* ========================================================= */
 
 .nextButton {
-  width: min(320px, 20vw);
+  position: relative;
+
+  z-index: 20;
+
+  width: min(
+    320px,
+    19vw
+  );
 
   height: 5vw;
 
-  min-width: 150px;
+  min-width: 145px;
 
-  min-height: 55px;
+  min-height: 50px;
 
-  margin: 0 auto;
+  margin-top: 1.5rem;
 
   padding: 0;
 
@@ -298,9 +1199,14 @@
 
   color: #fed59b;
 
-  font-family: "Cinzel", serif;
+  font-family: "Cinzel",
+    serif;
 
-  font-size: clamp(15px, 1.2vw, 22px);
+  font-size: clamp(
+    15px,
+    1.2vw,
+    22px
+  );
 
   font-weight: 700;
 
@@ -327,13 +1233,21 @@
     filter 0.25s ease;
 }
 
-/* pointer devices only — touch screens latch :hover
-   onto the last tapped element and leave it stuck */
 @media (hover: hover) and (pointer: fine) {
   .nextButton:hover {
     transform: scale(1.06);
 
-    filter: brightness(1.1) drop-shadow(0 0 8px rgba(254, 213, 155, 0.55));
+    filter:
+      brightness(1.1)
+      drop-shadow(
+        0 0 8px
+        rgba(
+          254,
+          213,
+          155,
+          0.55
+        )
+      );
   }
 }
 
@@ -341,9 +1255,9 @@
   transform: scale(0.96);
 }
 
-/* ========================================= */
-/* REACT SELECT GLOBAL STYLES                */
-/* ========================================= */
+/* ========================================================= */
+/* REACT SELECT                                                */
+/* ========================================================= */
 
 :global(.regselect__control) {
   background: transparent !important;
@@ -353,120 +1267,193 @@
   box-shadow: none !important;
 }
 
-:global(.regselect__control:hover) {
+:global(
+  .regselect__control:hover
+) {
   border: none !important;
 
   box-shadow: none !important;
 }
 
-:global(.regselect__control--is-focused) {
+:global(
+  .regselect__control--is-focused
+) {
   border: none !important;
 
   box-shadow: none !important;
 }
-:global(.regselect__control--is-disabled) {
+
+:global(
+  .regselect__control--is-disabled
+) {
   background: transparent !important;
+
   border: none !important;
+
   opacity: 1 !important;
+
   color: #6c1700;
 }
 
-:global(.regselect__control--is-disabled .regselect__placeholder) {
-  color: #6c1700 !important;
-  font-family: "Cinzel", sans-serif !important;
+:global(
+  .regselect__value-container
+) {
+  background: transparent !important;
+
+  padding: 0 !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+
+  justify-content: center !important;
+}
+
+:global(
+  .regselect__placeholder
+) {
+  color: #777 !important;
+
+  font-family: "Cinzel",
+    sans-serif !important;
+
   font-size: 1rem !important;
-  font-weight: 400 !important;
-  opacity: 1 !important;
-}
-:global(.regselect__value-container) {
-  background: transparent !important;
-
-  padding: 0 !important;
 }
 
-:global(.regselect__placeholder) {
+:global(
+  .regselect__single-value
+) {
   color: #6c1700 !important;
+
+  font-family: "Cinzel",
+    sans-serif !important;
+
+  font-size: 1.1rem !important;
+
+  font-weight: 700 !important;
 }
 
-:global(.regselect__single-value) {
-  color: #38170b !important;
-}
-
-:global(.regselect__input-container) {
-  background: transparent !important;
-
+:global(
+  .regselect__input-container
+) {
   margin: 0 !important;
+
   padding: 0 !important;
+
+  background: transparent !important;
 }
 
 :global(.regselect__input) {
+  margin: 0 !important;
+
+  padding: 0 !important;
+
   background: transparent !important;
 
   border: none !important;
 
+  outline: none !important;
+
   box-shadow: none !important;
 }
 
-:global(.regselect__indicators) {
+:global(
+  .regselect__indicators
+) {
   background: transparent !important;
 }
 
-:global(.regselect__indicator-separator) {
-  background: rgba(56, 23, 11, 0.3) !important;
+:global(
+  .regselect__indicator-separator
+) {
+  display: none !important;
 }
 
-:global(.regselect__indicator) {
-  color: #38170b !important;
-}
+:global(
+  .regselect__indicator
+) {
+  padding: 4px !important;
 
-:global(.regselect__indicator:hover) {
   color: #38170b !important;
 }
 
 :global(.regselect__menu) {
-  z-index: 1000 !important;
+  z-index: 9999 !important;
+
+  width: calc(
+    100% + 160px
+  ) !important;
+
+  min-width: calc(
+    100% + 80px
+  ) !important;
+
+  left: -80px !important;
+
+  box-sizing: border-box !important;
+
+  background: #ecdcb0 !important;
+
+  border: 1px solid
+    #c9a769 !important;
+
+  border-radius: 8px !important;
+
+  overflow: hidden !important;
+
+  color: #38170b !important;
+
+  font-family: "Cinzel",
+    sans-serif !important;
 }
 
-/* =========================================================== */
-/* MOBILE (<=900px)                                             */
-/*                                                               */
-/* Mirrors the Events page:                                      */
-/*                                                               */
-/*   - .registerContainer is a fixed, non-scrolling 100svh box   */
-/*     with no margin or padding, so nothing pushes the book     */
-/*     down and leaves a strip at the top.                       */
-/*                                                               */
-/*   - .bookContainer is pinned at top:52% / left:13vw,          */
-/*     92vw x 78vh, flat 180% 100% / left top crop. It overruns  */
-/*     the right edge on purpose.                                */
-/*                                                               */
-/*   - .formContainer is inset with --lp-* onto the page's       */
-/*     printed area (same numbers as the Events left page), so   */
-/*     fields no longer cross the gold border.                   */
-/*                                                               */
-/*   - Inside it: heading pinned top, fields scroll between,     */
-/*     NEXT pinned bottom — the Events heading/list/CONFIRM      */
-/*     arrangement, done with sticky so the TSX stays as is.     */
-/* =========================================================== */
+:global(
+  .regselect__menu-list
+) {
+  background: transparent !important;
+
+  padding: 4px !important;
+}
+
+:global(
+  .regselect__option
+) {
+  background: transparent !important;
+
+  color: #38170b !important;
+
+  cursor: pointer !important;
+}
+
+:global(
+  .regselect__option--is-selected
+) {
+  background: #c9a769 !important;
+
+  color: #38170b !important;
+}
+
+:global(
+  .regselect__option--is-focused
+) {
+  background: #2a180d !important;
+
+  color: #f5e6c8 !important;
+}
+
+/* ========================================================= */
+/* MOBILE                                                      */
+/* ========================================================= */
 
 @media (max-width: 900px) {
   .registerContainer {
-    /* Where the form box sits within the book.
-       Same values as the Events left page — nudge
-       --lp-left / --lp-width if fields sit outside
-       the gold border. */
     --lp-top: 6%;
     --lp-left: 16%;
     --lp-width: 66%;
     --lp-height: 88%;
 
-    /* 100% - (--lp-top + --lp-height); used by the
-       fixed NEXT button below */
     --lp-bottom: 6%;
 
-    /* Sticky band heights. Keep these in sync with the
-       heading and button sizes below — they're also the
-       border insets that clip the scrolling fields. */
     --hdr-height: 46px;
     --ftr-height: 56px;
 
@@ -484,122 +1471,131 @@
 
     top: 52%;
     left: 13vw;
-    transform: translateY(-50%);
+
+    transform: translateY(
+      -50%
+    );
 
     width: 92vw;
+
     height: 78vh;
 
     aspect-ratio: auto;
 
-    background-size: 180% 100%;
-    background-position: left top;
-    background-repeat: no-repeat;
+    background-size:
+      180% 100%;
+
+    background-position:
+      left top;
+
+    background-repeat:
+      no-repeat;
 
     overflow: hidden;
   }
 
-  /* ========================================= */
-  /* FORM BOX — pinned onto the printed page,   */
-  /* scrolls internally                         */
-  /* ========================================= */
+  .tajmahal {
+    display: none;
+    width: 34%;
+    display: none;
+    right: 4%;
+
+    bottom: 3%;
+  }
 
   .formContainer {
     position: absolute;
 
-    top: var(--lp-top);
-    left: var(--lp-left);
-    width: var(--lp-width);
-    height: var(--lp-height);
+    top: calc(var(--lp-top) + 10%);
 
+    left: var(--lp-left);
+
+    width: var(--lp-width);
+
+    height: calc(var(--lp-height) - 15%);
+  margin-top: 0;
+    padding: 0;
     box-sizing: border-box;
 
     flex-direction: column;
+
     gap: 10px;
 
-    padding: 0;
+   
 
-    /*
-      THIS is what removes the need for a background band.
+    border-top:
+      var(--hdr-height)
+      solid transparent;
 
-      A scroll container clips its content at the PADDING box,
-      and border area never scrolls — so these transparent
-      borders carve out a strip at the top and bottom that
-      scrolled fields are clipped away in. The heading and
-      NEXT button then sit in those strips over bare
-      parchment, with nothing behind them, exactly like
-      Events' heading and CONFIRM.
-    */
-    border-top: var(--hdr-height) solid transparent;
-    border-bottom: var(--ftr-height) solid transparent;
+    border-bottom:
+      var(--ftr-height)
+      solid transparent;
 
     overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
 
-    /* native bar hidden, same as the Events list */
+    overflow-x: hidden;
+
+    -webkit-overflow-scrolling:
+      touch;
+
+    overscroll-behavior:
+      contain;
+
     scrollbar-width: none;
+
     -ms-overflow-style: none;
   }
 
   .formContainer::-webkit-scrollbar {
     display: none;
+
     width: 0;
+
     height: 0;
   }
-
-  /* ========================================= */
-  /* FIELD COLUMN                               */
-  /* Targets the fields themselves, which are   */
-  /* direct children now that .formColumn is    */
-  /* display: contents.                         */
-  /* ========================================= */
 
   .formColumn > * {
     width: 100%;
 
     margin-left: auto;
+
     margin-right: auto;
 
     flex-shrink: 0;
   }
 
-  /* ========================================= */
-  /* HEADING — sits in the top strip carved     */
-  /* out by .formContainer's border, over bare  */
-  /* parchment. No background: the fields are   */
-  /* clipped before they reach it.              */
-  /*                                            */
-  /* position: fixed resolves against           */
-  /* .bookContainer, because that element is    */
-  /* transformed (translateY) and a transformed */
-  /* ancestor becomes the containing block for  */
-  /* fixed descendants. That's what takes the   */
-  /* heading out of the scroller without a      */
-  /* wrapper div. Keep the transform on         */
-  /* .bookContainer or this will anchor to the  */
-  /* viewport instead.                          */
-  /* ========================================= */
-
   .regTitle {
     position: fixed;
 
-    top: var(--lp-top);
+    top: calc(var(--lp-top) + 5%);
+
     left: var(--lp-left);
+
     width: var(--lp-width);
+
     height: var(--hdr-height);
 
-    z-index: 10;
+    z-index: 20;
 
     margin: 0 !important;
+
     padding: 0;
 
     display: flex;
+
     align-items: center;
+
     justify-content: center;
 
-    font-size: clamp(1.2rem, 6vw, 1.7rem);
+    font-size:
+      clamp(
+        1.2rem,
+        12vw,
+        15rem
+      );
+
     line-height: 1;
+
     text-align: center;
 
     background: none;
@@ -607,43 +1603,69 @@
     pointer-events: none;
   }
 
-  .yearOptions {
+  .genderOptions {
     width: 100%;
-    height: auto;
-
-    padding: 4px 0;
 
     gap: 4vw;
+
+    padding: 4px 0;
   }
 
-  /* ========================================= */
-  /* NEXT — sits in the bottom strip, same      */
-  /* mechanism as the heading. Transparent, so  */
-  /* the parchment shows around the button art. */
-  /* ========================================= */
+  .yearOptions {
+    width: 100%;
 
-  .formColumn > .nextButton {
+    gap: 4vw;
+
+    padding: 4px 0;
+  }
+
+  .dobOptions {
+    width: 100%;
+
+    gap: 2vw;
+
+    padding: 4px 0;
+  }
+
+  .dobSelect {
+    width: 30%;
+
+    height: 32px;
+
+    font-size: 0.7rem;
+  }
+
+
+
+  .formColumn
+    > .nextButton {
     position: fixed;
 
-    left: var(--lp-left);
-    width: var(--lp-width);
+    left: calc(var(--lp-left) + 12.5vw);
+
+    width: calc(var(--lp-width) - 25vw);
+
     height: var(--ftr-height);
 
-    /* 100% - (--lp-top + --lp-height) */
-    bottom: var(--lp-bottom);
+    bottom: calc(var(--lp-bottom) + 5%);
 
-    z-index: 10;
+    z-index: 20;
 
     min-width: 0;
+
     min-height: 0;
 
     margin: 0;
+
     padding: 0;
 
-    background-color: transparent;
-    background-size: contain;
+    background-color:
+      transparent;
 
-    font-size: 0.95rem;
+    background-size:
+      contain;
+
+    font-size: clamp(0.5rem,3vw,2rem);
   }
 
   .lefttop {
@@ -663,17 +1685,14 @@
   }
 }
 
-/* =========================================================== */
-/* SMALL MOBILE (<=600px)                                       */
-/*                                                               */
-/* No --lp-* overrides on purpose: the book crop is the same     */
-/* 180% 100% / left top at every mobile width, so the fractions  */
-/* set above already land correctly.                             */
-/* =========================================================== */
+/* ========================================================= */
+/* SMALL MOBILE                                                */
+/* ========================================================= */
 
 @media (max-width: 600px) {
   .registerContainer {
     --hdr-height: 40px;
+
     --ftr-height: 50px;
   }
 
@@ -681,16 +1700,29 @@
     left: 8vw;
 
     width: 98vw;
+
     height: 74vh;
 
-    background-size: 180% 100%;
+    background-size:
+      180% 100%;
   }
 
   .formContainer {
     gap: 8px;
+    margin-top: 0;
+    padding: 0;
   }
 
-  .formColumn > .nextButton {
+  .formColumn
+    > .nextButton {
     font-size: 0.85rem;
+  }
+
+  .tajmahal {
+    width: 36%;
+
+    right: 3%;
+
+    bottom: 3%;
   }
 }

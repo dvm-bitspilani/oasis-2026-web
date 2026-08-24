@@ -1,3 +1,244 @@
+// // // .reginputContainer {
+// // //   width: 100%;
+// // //   height: 20%;
+// // //   display: flex;
+// // //   flex-direction: column;
+// // //   align-items: center;
+// // //   justify-content: center;
+
+// // //   .inputContainer {
+// // //     width: 80%;
+// // //     height: 40%;
+// // //     display: flex;
+// // //     flex-direction: column;
+// // //     align-items: center;
+// // //     background-position: center;
+// // //     background-size: contain;
+// // //     background-repeat: no-repeat;
+
+// // //     /* ONLY normal text inputs */
+// // //     > input:not([type="radio"]):not([type="checkbox"]) {
+// // //       width: 100%;
+// // //       height: 100%;
+// // //       border: none;
+// // //       outline: none;
+// // //       background: transparent;
+// // //     }
+// // //   }
+// // // }
+
+// // // .inputTitle {
+// // //   margin: 0;
+// // //   padding: 0;
+// // //   font-family: "Cinzel", sans-serif;
+// // //   font-size: 1.5rem;
+// // //   font-weight: 700;
+// // //   color: #38170B;
+// // // }
+
+// // .reginputContainer {
+// //   width: 100%;
+// //   height: 20%;
+// //   display: flex;
+// //   flex-direction: column;
+// //   align-items: center;
+// //   justify-content: center;
+// // }
+
+// // .inputTitle {
+// //   margin: 0;
+// //   padding: 0;
+
+// //   font-family: "Cinzel", sans-serif;
+// //   font-size: 1.2rem;
+// //   font-weight: 700;
+
+// //   color: #38170b;
+// // }
+
+// // .inputContainer {
+// //   width: 100%;
+// //   height: 7vh;
+
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: center;
+
+// //   background-position: center;
+// //   background-size: contain;
+// //   background-repeat: no-repeat;
+
+// //   input {
+// //     width: 50%;
+// //     height: 100%;
+// //     border: none;
+// //     outline: none;
+// //     background: transparent;
+// //     font-family: "Cinzel", sans-serif;
+// //     font-size: 1rem;
+// //     color: #38170b;
+// //     text-align: center;
+// //     &::placeholder {
+// //       color: #777;
+// //     }
+
+// //     &:disabled {
+// //       opacity: 1;
+// //       color: #777;
+// //       cursor: default;
+// //     }
+// //   }
+// // }
+
+// // /* ========================================= */
+// // /* REACT SELECT                              */
+// // /* ========================================= */
+
+// // /*
+// //   React Select generates classes such as:
+// //   .regselect__control
+// //   .regselect__value-container
+// //   etc.
+
+// //   Since this file is a CSS module,
+// //   :global() is required.
+// // */
+
+// // :global(.regselect__control) {
+// //   width: 100% !important;
+// //   min-height: 0 !important;
+
+// //   background: transparent !important;
+
+// //   border: none !important;
+// //   border-color: transparent !important;
+
+// //   box-shadow: none !important;
+
+// //   cursor: pointer !important;
+// // }
+
+// // :global(.regselect__control:hover) {
+// //   border: none !important;
+// //   border-color: transparent !important;
+
+// //   box-shadow: none !important;
+// // }
+
+// // :global(.regselect__control--is-focused) {
+// //   border: none !important;
+// //   border-color: transparent !important;
+
+// //   box-shadow: none !important;
+// // }
+
+// // :global(.regselect__value-container) {
+// //   padding: 0 !important;
+
+// //   background: transparent !important;
+
+// //   display: flex !important;
+// //   justify-content: center !important;
+// // }
+
+// // :global(.regselect__placeholder) {
+// //   margin: 0 !important;
+
+// //   color: #777 !important;
+
+// //   font-family: "Cinzel", sans-serif !important;
+// //   font-size: 1rem !important;
+
+// //   text-align: center !important;
+// // }
+
+// // :global(.regselect__single-value) {
+// //   margin: 0 !important;
+
+// //   color: #38170b !important;
+
+// //   font-family: "Cinzel", sans-serif !important;
+// //   font-size: 1rem !important;
+
+// //   text-align: center !important;
+// // }
+
+// // :global(.regselect__input-container) {
+// //   margin: 0 !important;
+// //   padding: 0 !important;
+
+// //   background: transparent !important;
+// // }
+
+// // :global(.regselect__input) {
+// //   margin: 0 !important;
+// //   padding: 0 !important;
+
+// //   background: transparent !important;
+
+// //   border: none !important;
+// //   outline: none !important;
+// //   box-shadow: none !important;
+// // }
+
+// // :global(.regselect__indicators) {
+// //   background: transparent !important;
+// // }
+
+// // :global(.regselect__indicator-separator) {
+// //   display: block !important;
+
+// //   background: rgba(56, 23, 11, 0.3) !important;
+// // }
+
+// // :global(.regselect__indicator) {
+// //   padding: 4px !important;
+
+// //   color: #38170b !important;
+// // }
+
+// // :global(.regselect__indicator:hover) {
+// //   color: #38170b !important;
+// // }
+
+// // :global(.regselect__menu) {
+// //   z-index: 1000 !important;
+
+// //   color: #38170b !important;
+
+// //   font-family: "Cinzel", sans-serif !important;
+// // }
+
+// // :global(.regselect__option) {
+// //   color: #38170b !important;
+
+// //   cursor: pointer !important;
+// // }
+
+// // :global(.regselect__option--is-selected) {
+// //   background: #d6b77a !important;
+// //   color: #38170b !important;
+// // }
+
+// // :global(.regselect__option--is-focused) {
+// //   background: #ead5a8 !important;
+// //   color: #38170b !important;
+// // }
+
+// // /* Remove the white background when select is disabled */
+
+// // :global(.regselect__control--is-disabled) {
+// //   background: transparent !important;
+// //   border: none !important;
+// //   opacity: 1 !important;
+// // }
+
+// // :global(.regselect__single-value--is-disabled) {
+// //   color: #777 !important;
+// // }
+
+
+
 // // .reginputContainer {
 // //   width: 100%;
 // //   height: 20%;
@@ -43,12 +284,20 @@
 //   flex-direction: column;
 //   align-items: center;
 //   justify-content: center;
+//   overflow-y: hidden;
+// }
+// .inputWrapper{
+//   padding-left:9%;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: flex-start;
+//   justify-content: center;
+//   width: 80%;
 // }
 
 // .inputTitle {
 //   margin: 0;
 //   padding: 0;
-
 //   font-family: "Cinzel", sans-serif;
 //   font-size: 1.2rem;
 //   font-weight: 700;
@@ -59,24 +308,24 @@
 // .inputContainer {
 //   width: 100%;
 //   height: 7vh;
-
 //   display: flex;
 //   align-items: center;
 //   justify-content: center;
-
 //   background-position: center;
 //   background-size: contain;
 //   background-repeat: no-repeat;
 
 //   input {
-//     width: 50%;
+//     width: 100%;
 //     height: 100%;
 //     border: none;
+//     position: relative;
 //     outline: none;
 //     background: transparent;
 //     font-family: "Cinzel", sans-serif;
-//     font-size: 1rem;
-//     color: #38170b;
+//     font-size: 1.3rem;
+//     color: #6C1700;
+//     font-weight: 800;
 //     text-align: center;
 //     &::placeholder {
 //       color: #777;
@@ -84,13 +333,28 @@
 
 //     &:disabled {
 //       opacity: 1;
-//       color: #777;
+    
+//        color: #6c1700 !important;
+//       -webkit-text-fill-color: #6c1700 !important;
 //       cursor: default;
 //     }
-//   }
-// }
 
-// /* ========================================= */
+    
+//   }
+
+// }
+// .input{
+//         height: 5%;
+//         width: 90%;
+//     content: "";
+//     position: absolute;
+//     inset: 0;
+//     background-image: url("../../../../assets/registration/reg/inputLine.png");
+//     background-size: cover;
+//     background-position: center;
+//     z-index: 71;
+//     }
+// /* ========================================= */x
 // /* REACT SELECT                              */
 // /* ========================================= */
 
@@ -155,10 +419,10 @@
 // :global(.regselect__single-value) {
 //   margin: 0 !important;
 
-//   color: #38170b !important;
-
+//   color: #6C1700 !important;
+// font-weight: 800;
 //   font-family: "Cinzel", sans-serif !important;
-//   font-size: 1rem !important;
+//   font-size: 1.2rem !important;
 
 //   text-align: center !important;
 // }
@@ -204,25 +468,51 @@
 // :global(.regselect__menu) {
 //   z-index: 1000 !important;
 
+//   /* wider than the input box, centered under it */
+//   width: calc(100% + 160px) !important;
+//   min-width: calc(100% + 80px) !important;
+//   left: -80px !important;
+//   box-sizing: border-box !important;
+
+//   /* dropdown looks like the book/parchment background */
+//   background: #ecdcb0 !important;
+//   border: 1px solid #c9a769 !important;
+//   border-radius: 8px !important;
+
+//   overflow: hidden !important;
+
 //   color: #38170b !important;
 
 //   font-family: "Cinzel", sans-serif !important;
 // }
 
+// :global(.regselect__menu-portal) {
+//   box-sizing: border-box !important;
+// }
+
+// :global(.regselect__menu-list) {
+//   background: transparent !important;
+//   padding: 4px !important;
+// }
+
 // :global(.regselect__option) {
+//   background: transparent !important;
 //   color: #38170b !important;
 
 //   cursor: pointer !important;
+
+//   transition: background 0.15s ease, color 0.15s ease;
 // }
 
 // :global(.regselect__option--is-selected) {
-//   background: #d6b77a !important;
+//   background: #c9a769 !important;
 //   color: #38170b !important;
 // }
 
+// /* hover / keyboard-focus -> color of the main (outer) background */
 // :global(.regselect__option--is-focused) {
-//   background: #ead5a8 !important;
-//   color: #38170b !important;
+//   background: #2a180d !important;
+//   color: #f5e6c8 !important;
 // }
 
 // /* Remove the white background when select is disabled */
@@ -234,278 +524,555 @@
 // }
 
 // :global(.regselect__single-value--is-disabled) {
-//   color: #777 !important;
-// }
-
-
-
-// .reginputContainer {
-//   width: 100%;
-//   height: 20%;
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   justify-content: center;
-
-//   .inputContainer {
-//     width: 80%;
-//     height: 40%;
-//     display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     background-position: center;
-//     background-size: contain;
-//     background-repeat: no-repeat;
-
-//     /* ONLY normal text inputs */
-//     > input:not([type="radio"]):not([type="checkbox"]) {
-//       width: 100%;
-//       height: 100%;
-//       border: none;
-//       outline: none;
-//       background: transparent;
-//     }
-//   }
-// }
-
-// .inputTitle {
-//   margin: 0;
-//   padding: 0;
-//   font-family: "Cinzel", sans-serif;
-//   font-size: 1.5rem;
-//   font-weight: 700;
-//   color: #38170B;
+//   color: #6C1700 !important;
+//   font-weight: 800;
 // }
 
 .reginputContainer {
   width: 100%;
-  height: 20%;
+
+  /*
+   * Each field gets a controlled amount
+   * of vertical space so the six left-page
+   * fields fit like the reference.
+   */
+
+  min-height: 0;
+
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
+
   justify-content: center;
-  overflow-y: hidden;
+
+  overflow: visible;
+
+  flex-shrink: 0;
+}
+
+.inputWrapper {
+  // padding-left: 9%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  justify-content: center;
+
+  width: 80%;
 }
 
 .inputTitle {
   margin: 0;
+
   padding: 0;
 
-  font-family: "Cinzel", sans-serif;
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-family:
+    "EBGaramond",
+    sans-serif;
+
+  font-size: clamp(
+    1rem,
+    1.6vw,
+    2rem
+  );
+
+  line-height: 1.15;
+letter-spacing: 1.4;
+  font-weight: 400;
 
   color: #38170b;
 }
 
 .inputContainer {
+  position: relative;
+
   width: 100%;
-  height: 7vh;
+
+  height: clamp(
+    38px,
+    4.3vh,
+    58px
+  );
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
-
-  input {
-    width: 50%;
-    height: 100%;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-family: "Cinzel", sans-serif;
-    font-size: 1.3rem;
-    color: #6C1700;
-    font-weight: 800;
-    text-align: center;
-    &::placeholder {
-      color: #777;
-    }
-
-    &:disabled {
-      opacity: 1;
-    
-       color: #6c1700 !important;
-      -webkit-text-fill-color: #6c1700 !important;
-      cursor: default;
-    }
-  }
-
+  overflow: visible;
 }
 
-/* ========================================= */x
-/* REACT SELECT                              */
-/* ========================================= */
+/* ========================================================= */
+/* FIELD CONTENT                                               */
+/* ========================================================= */
 
-/*
-  React Select generates classes such as:
+.fieldContent {
+  position: relative;
+
+  z-index: 2;
+padding-left: 10px;
+padding-right: 10px;
+  width: 100%;
+
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-start;
+}
+
+/* ========================================================= */
+/* INPUT                                                       */
+/* ========================================================= */
+
+.input {
+  width: 90%;
+
+  height: 100%;
+
+  border: none;
+
+  outline: none;
+
+  background: transparent;
+
+  font-family:
+    "Cinzel",
+    sans-serif;
+
+  font-size: clamp(
+    0.85rem,
+    1.45vw,
+    1.55rem
+  );
+
+  color: #6c1700;
+font-family: "Dancing Script";
+  font-weight: 700;
+
+  text-align: center;
+}
+
+.input::placeholder {
+  color: #777;
+font-family: "Dancing Script";
+  opacity: 1;
+}
+
+.input:disabled {
+  opacity: 1;
+
+  color: #6c1700 !important;
+
+  -webkit-text-fill-color:
+    #6c1700 !important;
+
+  cursor: default;
+}
+
+/* ========================================================= */
+/* LINE                                                        */
+/* ========================================================= */
+
+.fieldLine {
+  position: absolute;
+
+  left: 0;
+
+  bottom: 3px;
+
+  width: 100%;
+
+  height: 18px;
+
+  display: flex;
+
+  align-items: center;
+
+  pointer-events: none;
+
+  z-index: 10;
+}
+
+.lineImage {
+  display: block;
+
+  width: calc(
+    100% - 25px
+  );
+
+  height: 1px;
+
+  min-height: 1px;
+
+  max-height: 3px;
+
+  object-fit: fill;
+
+  object-position: center;
+
+  flex-shrink: 0;
+}
+
+.leaf {
+  display: block;
+
+  width: 24px;
+
+  height: 24px;
+
+  object-fit: contain;
+
+  flex-shrink: 0;
+
+  margin-left: -1px;
+}
+
+/* ========================================================= */
+/* REACT SELECT                                                */
+/* ========================================================= */
+
+:global(
   .regselect__control
-  .regselect__value-container
-  etc.
-
-  Since this file is a CSS module,
-  :global() is required.
-*/
-
-:global(.regselect__control) {
+) {
   width: 100% !important;
+
   min-height: 0 !important;
 
-  background: transparent !important;
+  height: 100% !important;
 
-  border: none !important;
-  border-color: transparent !important;
+  background:
+    transparent !important;
 
-  box-shadow: none !important;
+  border:
+    none !important;
 
-  cursor: pointer !important;
+  border-color:
+    transparent !important;
+
+  box-shadow:
+    none !important;
+
+  cursor:
+    pointer !important;
 }
 
-:global(.regselect__control:hover) {
-  border: none !important;
-  border-color: transparent !important;
+:global(
+  .regselect__control:hover
+) {
+  border:
+    none !important;
 
-  box-shadow: none !important;
+  box-shadow:
+    none !important;
 }
 
-:global(.regselect__control--is-focused) {
-  border: none !important;
-  border-color: transparent !important;
+:global(
+  .regselect__control--is-focused
+) {
+  border:
+    none !important;
 
-  box-shadow: none !important;
+  box-shadow:
+    none !important;
 }
 
-:global(.regselect__value-container) {
-  padding: 0 !important;
+:global(
+  .regselect__control--is-disabled
+) {
+  background:
+    transparent !important;
 
-  background: transparent !important;
+  border:
+    none !important;
 
-  display: flex !important;
-  justify-content: center !important;
-}
-
-:global(.regselect__placeholder) {
-  margin: 0 !important;
-
-  color: #777 !important;
-
-  font-family: "Cinzel", sans-serif !important;
-  font-size: 1rem !important;
-
-  text-align: center !important;
-}
-
-:global(.regselect__single-value) {
-  margin: 0 !important;
-
-  color: #6C1700 !important;
-font-weight: 800;
-  font-family: "Cinzel", sans-serif !important;
-  font-size: 1.2rem !important;
-
-  text-align: center !important;
-}
-
-:global(.regselect__input-container) {
-  margin: 0 !important;
-  padding: 0 !important;
-
-  background: transparent !important;
-}
-
-:global(.regselect__input) {
-  margin: 0 !important;
-  padding: 0 !important;
-
-  background: transparent !important;
-
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-:global(.regselect__indicators) {
-  background: transparent !important;
-}
-
-:global(.regselect__indicator-separator) {
-  display: block !important;
-
-  background: rgba(56, 23, 11, 0.3) !important;
-}
-
-:global(.regselect__indicator) {
-  padding: 4px !important;
-
-  color: #38170b !important;
-}
-
-:global(.regselect__indicator:hover) {
-  color: #38170b !important;
-}
-
-:global(.regselect__menu) {
-  z-index: 1000 !important;
-
-  /* wider than the input box, centered under it */
-  width: calc(100% + 160px) !important;
-  min-width: calc(100% + 80px) !important;
-  left: -80px !important;
-  box-sizing: border-box !important;
-
-  /* dropdown looks like the book/parchment background */
-  background: #ecdcb0 !important;
-  border: 1px solid #c9a769 !important;
-  border-radius: 8px !important;
-
-  overflow: hidden !important;
-
-  color: #38170b !important;
-
-  font-family: "Cinzel", sans-serif !important;
-}
-
-:global(.regselect__menu-portal) {
-  box-sizing: border-box !important;
-}
-
-:global(.regselect__menu-list) {
-  background: transparent !important;
-  padding: 4px !important;
-}
-
-:global(.regselect__option) {
-  background: transparent !important;
-  color: #38170b !important;
-
-  cursor: pointer !important;
-
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-:global(.regselect__option--is-selected) {
-  background: #c9a769 !important;
-  color: #38170b !important;
-}
-
-/* hover / keyboard-focus -> color of the main (outer) background */
-:global(.regselect__option--is-focused) {
-  background: #2a180d !important;
-  color: #f5e6c8 !important;
-}
-
-/* Remove the white background when select is disabled */
-
-:global(.regselect__control--is-disabled) {
-  background: transparent !important;
-  border: none !important;
   opacity: 1 !important;
 }
 
-:global(.regselect__single-value--is-disabled) {
-  color: #6C1700 !important;
-  font-weight: 800;
+:global(
+  .regselect__value-container
+) {
+  width: 100% !important;
+
+  height: 100% !important;
+
+  padding:
+    0 !important;
+
+  background:
+    transparent !important;
+
+  display:
+    flex !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    center !important;
+}
+
+:global(
+  .regselect__placeholder
+) {
+  margin: 0 !important;
+
+  color:
+    #777 !important;
+
+  font-family:
+    "Cinzel",
+    sans-serif !important;
+
+  font-size:
+    clamp(
+      0.75rem,
+      0.9vw,
+      1rem
+    ) !important;
+
+  text-align:
+    center !important;
+}
+
+:global(
+  .regselect__single-value
+) {
+  margin: 0 !important;
+
+  color:
+    #6c1700 !important;
+
+  font-family:
+    "Cinzel",
+    sans-serif !important;
+
+  font-size:
+    clamp(
+      0.8rem,
+      0.95vw,
+      1.15rem
+    ) !important;
+
+  font-weight:
+    700 !important;
+
+  text-align:
+    center !important;
+}
+
+:global(
+  .regselect__input-container
+) {
+  margin:
+    0 !important;
+
+  padding:
+    0 !important;
+
+  background:
+    transparent !important;
+}
+
+:global(
+  .regselect__input
+) {
+  margin:
+    0 !important;
+
+  padding:
+    0 !important;
+
+  background:
+    transparent !important;
+
+  border:
+    none !important;
+
+  outline:
+    none !important;
+
+  box-shadow:
+    none !important;
+}
+
+:global(
+  .regselect__indicators
+) {
+  background:
+    transparent !important;
+}
+
+:global(
+  .regselect__indicator-separator
+) {
+  display:
+    none !important;
+}
+
+:global(
+  .regselect__indicator
+) {
+  padding:
+    4px !important;
+
+  color:
+    #38170b !important;
+}
+
+:global(
+  .regselect__indicator:hover
+) {
+  color:
+    #38170b !important;
+}
+
+/* ========================================================= */
+/* SELECT MENU                                                 */
+/* ========================================================= */
+
+:global(
+  .regselect__menu
+) {
+  z-index:
+    9999 !important;
+
+  width:
+    calc(
+      100% + 160px
+    ) !important;
+
+  min-width:
+    calc(
+      100% + 80px
+    ) !important;
+
+  left:
+    -80px !important;
+
+  box-sizing:
+    border-box !important;
+
+  background:
+    #ecdcb0 !important;
+
+  border:
+    1px solid
+    #c9a769 !important;
+
+  border-radius:
+    8px !important;
+
+  overflow:
+    hidden !important;
+
+  color:
+    #38170b !important;
+
+  font-family:
+    "Cinzel",
+    sans-serif !important;
+}
+
+:global(
+  .regselect__menu-list
+) {
+  background:
+    transparent !important;
+
+  padding:
+    4px !important;
+}
+
+:global(
+  .regselect__option
+) {
+  background:
+    transparent !important;
+
+  color:
+    #38170b !important;
+
+  cursor:
+    pointer !important;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+:global(
+  .regselect__option--is-selected
+) {
+  background:
+    #c9a769 !important;
+
+  color:
+    #38170b !important;
+}
+
+:global(
+  .regselect__option--is-focused
+) {
+  background:
+    #2a180d !important;
+
+  color:
+    #f5e6c8 !important;
+}
+
+/* ========================================================= */
+/* MOBILE                                                      */
+/* ========================================================= */
+
+@media (max-width: 900px) {
+  .reginputContainer {
+    height: auto;
+
+    min-height: 75px;
+  }
+
+  .inputWrapper {
+    width: 90%;
+
+    padding-left: 5%;
+  }
+
+  .inputTitle {
+    font-size: 1rem;
+  }
+
+  .inputContainer {
+    height: 42px;
+  }
+
+  .input {
+    font-size: 0.9rem;
+  }
+
+  .fieldLine {
+    bottom: 1px;
+  }
+
+  .lineImage {
+    height: 2px;
+
+    min-height: 2px;
+
+    max-height: 2px;
+  }
+
+  .leaf {
+    width: 20px;
+
+    height: 20px;
+  }
 }

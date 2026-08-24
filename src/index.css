@@ -48,3 +48,14 @@ a {
   font-family: "EB";
   src: url(./assets/fonts/EBGaramond-Medium.ttf);
 }
+
+@font-face {
+  font-family: "Dancing Script";
+  src: url(./assets/fonts/DancingScript-VariableFont_wght.ttf);
+}
+
+
+@font-face {
+  font-family: "EBGaramond";
+  src: url(./assets/fonts/EBGaramond-Medium.ttf);
+}
