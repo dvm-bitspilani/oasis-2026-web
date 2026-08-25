@@ -121,8 +121,6 @@ const CLOUDS_MOBILE: Cloud[] = [
   },
 ];
 
-const bgImg = window.innerWidth < 650 ? sandMob : sandImg;
-
 const MOON_CLOUD_TINT =
   "brightness(0.35) sepia(0.8) hue-rotate(20deg) saturate(1.5)";
 
@@ -182,6 +180,8 @@ export default function Home({
   }, []);
 
   const CLOUDS = isMobile ? CLOUDS_MOBILE : CLOUDS_DESKTOP;
+
+  const bgImg = isMobile ? sandMob : sandImg;
 
   useLayoutEffect(() => {
     if (!preloaderDone) return;
@@ -1078,32 +1078,32 @@ export default function Home({
         <img src={LogoOasis} alt="Oasis" />
       </div>
 
-      <div className={styles.regBtn}>
-        <img src={RegBtn} alt="Register" />
+      <button
+        type="button"
+        className={styles.regBtn}
+        aria-label="Register"
+        onClick={() => navigateWithTransition("/register")}
+      >
+        <img src={RegBtn} alt="" />
 
         <svg
           className={styles.regBtnText}
           viewBox="0 0 220 90"
           preserveAspectRatio="xMidYMid meet"
+          aria-hidden="true"
+          focusable="false"
         >
           <path id="curve" d="M -4,4 Q 110,84 224,4" fill="transparent" />
 
-          <text
-            textLength="120"
-            lengthAdjust="spacingAndGlyphs"
-            onClick={() => navigateWithTransition("/register")}
-            style={{
-              cursor: "pointer",
-            }}
-          >
+          <text textLength="120" lengthAdjust="spacingAndGlyphs">
             <textPath href="#curve" startOffset="50%" textAnchor="middle">
               REGISTER
             </textPath>
           </text>
         </svg>
 
-        <img src={RegBtn} alt="Register" />
-      </div>
+        <img src={RegBtn} alt="" />
+      </button>
 
       <div
         ref={camelRef}

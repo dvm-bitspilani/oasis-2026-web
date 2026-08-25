@@ -108,27 +108,8 @@
    REGISTRATION BUTTON
    ========================================================= */
 
-.regBtn {
-  position: absolute;
-  bottom: -1%;
-  right: 6%;
-  height: clamp(198px, 33vh, 356px);
-  width: clamp(280px, 36vw, 800px);
-  z-index: 10;
-  cursor: pointer;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-    will-change: filter;
-
-    &:hover {
-      cursor: pointer;
-    }
-  }
-}
+/* The single source of truth for .regBtn lives near the bottom of this
+   file, after the media query — see the note there. */
 
 /* =========================================================
    CAMEL CARAVAN
@@ -375,6 +356,12 @@
     display: none;
   }
 }
+/* NOTE: this rule sits AFTER the max-width: 750px media query, so at equal
+   specificity it overrides the mobile values for every property it declares
+   (bottom, right, height, width). That was already true before this edit and
+   is preserved here so the layout does not shift. If you want the mobile
+   overrides to actually win, move this block above the media query. */
+
 .regBtn {
   position: absolute;
   bottom: -4%;
@@ -383,6 +370,19 @@
   width: clamp(280px, 36vw, 800px);
   z-index: 10;
 
+  /* Button reset — the element is now a real <button> so it is keyboard
+     focusable and clickable in every browser. */
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  cursor: pointer;
+
   img {
     width: 100%;
     height: 100%;
@@ -390,6 +390,12 @@
     display: block;
     will-change: filter;
     pointer-events: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ffcf6b;
+    outline-offset: 4px;
+    border-radius: 8px;
   }
 
   .regBtnText {
@@ -409,8 +415,12 @@
       fill: #ffffa4;
       stroke: none; // no stroke at all in base state — removes the thickness
       paint-order: fill;
-      cursor: pointer;
-      pointer-events: bounding-box;
+
+      /* Was `pointer-events: bounding-box`, which Firefox does not implement.
+         The declaration was dropped there, so the text inherited
+         `pointer-events: none` from .regBtnText and nothing was clickable.
+         The <button> owns the hit area now, so this stays inert everywhere. */
+      pointer-events: none;
 
       filter: drop-shadow(0 0 4px rgba(255, 255, 164, 0.6));
 
@@ -418,16 +428,18 @@
         fill 0.25s ease,
         stroke 0.25s ease,
         filter 0.25s ease;
-
-      &:hover {
-        fill: #ffcf6b;
-        stroke: #d9480f;
-        stroke-width: 1px;
-        paint-order: stroke fill;
-
-        filter: drop-shadow(0 0 3px #ff7a1a);
-      }
     }
+  }
+
+  /* Hover/focus is driven by the button, not by hit-testing curved glyphs. */
+  &:hover .regBtnText text,
+  &:focus-visible .regBtnText text {
+    fill: #ffcf6b;
+    stroke: #d9480f;
+    stroke-width: 1px;
+    paint-order: stroke fill;
+
+    filter: drop-shadow(0 0 3px #ff7a1a);
   }
 }
 .regBtn .regBtnText text {
