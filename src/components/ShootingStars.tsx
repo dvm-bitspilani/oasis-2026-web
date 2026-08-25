@@ -87,7 +87,7 @@ export default function ShootingStars() {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     if (!paused) {
-      timeoutId = setTimeout(spawnStar, 500 + Math.random() * 1000);
+      timeoutId = setTimeout(spawnStar, 100 + Math.random() * 1000);
     }
 
     return () => {

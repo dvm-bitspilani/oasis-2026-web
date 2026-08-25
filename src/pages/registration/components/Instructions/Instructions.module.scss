@@ -87,7 +87,7 @@
     cursor: pointer;
     background: center / cover no-repeat url(/googleReg.svg);
     border: none;
-    z-index: 4;
+    z-index: 400;
     transition: filter 0.3s;
     width: 22vw;
     height: 3.216vw;
@@ -167,6 +167,7 @@
   left: 0;
   scale: 0.8;
   transition: all 0.3s ease;
+  z-index: 100;
 
   &:hover {
     scale: 0.9;

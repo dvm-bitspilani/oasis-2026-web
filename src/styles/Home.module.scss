@@ -433,3 +433,16 @@
 .regBtn .regBtnText text {
   font-size: clamp(16px, 5.5vw, 26px);
 }
+.path {
+  fill: none;
+
+  stroke: white;
+
+  stroke-width: 2;
+
+  stroke-linecap: round;
+
+  filter: drop-shadow(
+    0 0 6px rgba(255, 255, 255, 0.45)
+  );
+}
