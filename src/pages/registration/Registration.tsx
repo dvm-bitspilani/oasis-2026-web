@@ -143,7 +143,7 @@ const Registration = () => {
   const handleSuccess = (response: any) => {
     const idToken = response.credential;
 
-    console.log(response);
+
 
     axios
       .post(
@@ -185,7 +185,7 @@ const Registration = () => {
       });
   };
 
-  console.log("CURRENT PAGE:", currentPage);
+
 
   return (
     <div>
