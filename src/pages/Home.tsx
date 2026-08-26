@@ -819,7 +819,6 @@ export default function Home({
   }, [isMobile]);
 
   useEffect(() => {
-    // Stop camel animation on mobile (650px and below)
     if (window.innerWidth <= 650) {
       return;
     }
@@ -868,9 +867,9 @@ export default function Home({
         { xPct: -32, yPct: 14 },
         { xPct: -25, yPct: 15 },
         { xPct: -17, yPct: 16 },
-        { xPct: -10, yPct: 16 },
-        { xPct: -3, yPct: 16 },
-        { xPct: 4, yPct: 14 },
+        { xPct: -9, yPct: 16 },
+        { xPct: -4, yPct: 16 },
+        { xPct: 4, yPct: 15 },
         { xPct: 15, yPct: 14 },
         { xPct: 18, yPct: 13 },
         { xPct: 25, yPct: 12 },
