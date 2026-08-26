@@ -48,11 +48,7 @@ const FAR_STARS = 320;
 const MID_STARS = 190;
 const NEAR_STARS = 110;
 const SHOOTING_STARS = 10;
-// Delta-time clamp: prevents huge position jumps when the tab is
-// backgrounded / throttled and rAF resumes with a large elapsed gap.
 const MAX_FRAME_DT = 1000 / 30;
-// Debounce window for the resize handler so mobile URL-bar show/hide
-// doesn't repeatedly re-sample the SVG path and rebuild star fields.
 const RESIZE_DEBOUNCE = 150;
 
 const PATH_D = `
@@ -175,13 +171,6 @@ const PATH_D = `
   M 313 89 L 317 93 L 319 99 L 320 100 L 323 100 L 325 102 L 324 109 L 325 110 L 326 109 L 328 109 L 329 110 L 329 114 L 328 115 L 330 114 L 332 115 L 331 120 L 332 120 L 334 123 L 334 141 L 333 142 L 333 147 L 330 150 L 327 148 L 327 154 L 328 155 L 327 156 L 327 159 L 322 165 L 322 168 L 317 173 L 318 172 L 319 173 L 318 177 L 307 189 L 305 189 L 304 190 L 299 187 L 297 190 L 298 189 L 300 189 L 301 190 L 301 192 L 297 196 L 292 198 L 292 200 L 283 208 L 273 214 L 268 215 L 261 221 L 259 221 L 258 222 L 256 220 L 260 215 L 255 218 L 253 222 L 253 224 L 251 226 L 249 226 L 246 228 L 225 249 L 225 250 L 217 259 L 213 267 L 213 269 L 210 276 L 210 279 L 208 284 L 208 289 L 207 290 L 207 298 L 206 299 L 206 303 L 204 306 L 207 312 L 207 315 L 203 319 L 202 319 L 200 322 L 204 326 L 203 325 L 202 320 L 205 318 L 208 322 L 208 327 L 209 328 L 209 335 L 212 341 L 207 347 L 204 347 L 203 346 L 203 344 L 207 340 L 203 336 L 202 338 L 196 332 L 191 324 L 191 323 L 193 322 L 195 325 L 196 325 L 196 323 L 189 317 L 184 308 L 184 304 L 185 303 L 187 305 L 187 307 L 187 304 L 182 296 L 182 292 L 186 286 L 185 286 L 183 289 L 181 289 L 178 285 L 183 276 L 183 275 L 180 275 L 179 274 L 179 271 L 178 270 L 179 248 L 180 247 L 181 238 L 184 233 L 184 230 L 183 229 L 188 220 L 187 217 L 198 204 L 199 201 L 203 197 L 212 192 L 214 190 L 224 186 L 227 186 L 228 185 L 236 183 L 239 181 L 252 179 L 264 171 L 270 171 L 276 165 L 283 165 L 283 161 L 288 157 L 294 157 L 294 152 L 295 150 L 300 145 L 305 144 L 305 139 L 312 128 L 312 120 L 314 117 L 314 103 L 313 102 L 313 100 L 311 99 L 309 96 L 309 92 Z
   `;
 
-/**
- * Build a small offscreen "glow sprite" once — a soft radial gradient.
- * We drawImage() this instead of using ctx.shadowBlur per-shape, since
- * shadowBlur forces a real blur pass on every single fill() call and is
- * by far the most expensive canvas operation used here (the main source
- * of the jitter with ~700 logo dots + ~600 background stars per frame).
- */
 function makeGlowSprite(size = 64) {
   const c = document.createElement("canvas");
   c.width = c.height = size;
@@ -276,13 +265,9 @@ export default function Preloader({
     let logoDots: LogoDot[] = [];
     let backgroundStars: BackgroundStar[] = [];
     let shootingStars: ShootingStar[] = [];
-    // Pre-rendered glow sprite, reused every frame instead of shadowBlur.
     const glowSprite = makeGlowSprite(64);
-    // Clock bookkeeping for clamped delta-time (fixes teleport/jitter
-    // after the tab is backgrounded or the browser throttles rAF).
     let lastFrameTime = performance.now();
     let virtualElapsed = 0;
-    // Debounced resize bookkeeping.
     let resizeTimer: number | null = null;
 
     const ease = (v: number) => v * v * (3 - 2 * v);
@@ -381,8 +366,6 @@ export default function Preloader({
       star.depth = depth;
       star.opacity = opacity;
       star.nextSpawn = initial
-        // ? now - Math.random() * 5500
-        // : now + 30 + Math.random() * 650;
         ? 0
         : now + 10 + Math.random() * 650;
     };
@@ -419,9 +402,6 @@ export default function Preloader({
       makeShooting();
       makeLogo();
     };
-    // Debounced resize: only rebuild after resizing has settled, so
-    // rapid-fire mobile viewport events (URL bar show/hide) don't cause
-    // repeated full rebuilds mid-frame.
     const resize = () => {
       if (resizeTimer !== null) window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(() => {
@@ -432,8 +412,6 @@ export default function Preloader({
     const animate = (time: number) => {
       if (dead) return;
 
-      // Clamp per-frame delta so a throttled/backgrounded tab resuming
-      // doesn't cause everything to jump/teleport in one frame.
       const rawDt = time - lastFrameTime;
       lastFrameTime = time;
       const dt = Math.min(Math.max(rawDt, 0), MAX_FRAME_DT);
@@ -461,7 +439,6 @@ export default function Preloader({
             2,
           op = star.opacity * (0.7 + tw * 0.3);
 
-        // Cheap glow via sprite instead of shadowBlur for near stars.
         if (star.depth > 0.75) {
           const glowSize = star.size * 10;
           ctx.globalAlpha = op * 0.5;
@@ -480,56 +457,46 @@ export default function Preloader({
         ctx.fill();
       });
 
-      // Shooting stars are rendered as real DOM elements (styles.star) so the
-      // CSS blur / glow (drop-shadow + radial box-shadow head) applies to them.
-      // Positioned purely via `transform` (translate3d + rotate + scaleX) so
-      // the browser can composite them on the GPU without triggering layout,
-      // which is what left/top updates were doing 20x per frame before.
       shootingStars.forEach((star, i) => {
-  const el = starRefs.current[i];
-  if (!el) return;
+        const el = starRefs.current[i];
+        if (!el) return;
 
-  if (time < star.nextSpawn) {
-    el.style.opacity = "0";
-    return;
-  }
+        if (time < star.nextSpawn) {
+          el.style.opacity = "0";
+          return;
+        }
 
-  // Accumulate with dt (already clamped to MAX_FRAME_DT above) instead
-  // of recomputing from (time - star.nextSpawn) each frame — avoids a
-  // teleport if the tab was backgrounded/throttled and `time` jumps.
-  star.x += Math.cos(star.angle) * star.speed * (dt / 1000);
-  star.y += Math.sin(star.angle) * star.speed * (dt / 1000);
+        star.x += Math.cos(star.angle) * star.speed * (dt / 1000);
+        star.y += Math.sin(star.angle) * star.speed * (dt / 1000);
 
-  const x = star.x;
-  const y = star.y;
+        const x = star.x;
+        const y = star.y;
 
-  if (x > width + 450 || y > height + 450 || x < -450 || y < -450) {
-    randomizeShootingStar(star, time, false);
-    el.style.opacity = "0";
-    return;
-  }
+        if (x > width + 450 || y > height + 450 || x < -450 || y < -450) {
+          randomizeShootingStar(star, time, false);
+          el.style.opacity = "0";
+          return;
+        }
 
-  const lengthScale = star.length / 140;
-  const angleDeg = (star.angle * 180) / Math.PI;
-  const trailHeight = Math.max(1.5, star.size * 2.2);
-  const headSize = Math.max(7, star.size * 10);
+        const lengthScale = star.length / 140;
+        const angleDeg = (star.angle * 180) / Math.PI;
+        const trailHeight = Math.max(1.5, star.size * 2.2);
+        const headSize = Math.max(7, star.size * 10);
 
-  el.style.setProperty("--star-length", `${star.length}px`);
-  el.style.setProperty("--star-height", `${trailHeight}px`);
-  el.style.setProperty("--head-size", `${headSize}px`);
-  el.style.setProperty("--star-glow", `${3 + star.size * 3}px`);
-  el.style.setProperty("--star-opacity", String(star.opacity));
+        el.style.setProperty("--star-length", `${star.length}px`);
+        el.style.setProperty("--star-height", `${trailHeight}px`);
+        el.style.setProperty("--head-size", `${headSize}px`);
+        el.style.setProperty("--star-glow", `${3 + star.size * 3}px`);
+        el.style.setProperty("--star-opacity", String(star.opacity));
 
-  el.style.zIndex = String(20 + star.depth * 10);
-  el.style.opacity = String(star.opacity);
-  el.style.transform =
-    `translate3d(${x}px, ${y}px, 0) ` +
-    `translate(-100%, -50%) ` +
-    `rotate(${angleDeg}deg) ` +
-    `scaleX(${lengthScale})`;
-});
-      // Logo dots: single glow sprite pass (cheap) + crisp core pass,
-      // no per-dot shadowBlur.
+        el.style.zIndex = String(20 + star.depth * 10);
+        el.style.opacity = String(star.opacity);
+        el.style.transform =
+          `translate3d(${x}px, ${y}px, 0) ` +
+          `translate(-100%, -50%) ` +
+          `rotate(${angleDeg}deg) ` +
+          `scaleX(${lengthScale})`;
+      });
       logoDots.forEach((dot) => {
         const local = ease(
             Math.min(1, Math.max(0, (logoP - dot.order) / 0.1)),
@@ -620,7 +587,6 @@ export default function Preloader({
             style={{
               opacity: 0,
               zIndex: 20,
-              // GPU-composited transform updates only; no layout thrash.
               willChange: "transform, opacity",
               left: 0,
               top: 0,
@@ -628,11 +594,16 @@ export default function Preloader({
           />
         ))}
       </div>
-      <div className={styles.loadingBar}>
-        <div
-          className={styles.loadingBarFill}
-          style={{ width: `${assetProgress * 100}%` }}
-        />
+      <div className={styles.loadingBarRow}>
+        <span className={styles.loadingBarPercent}>
+          {Math.round(assetProgress * 100)}%
+        </span>
+        <div className={styles.loadingBar}>
+          <div
+            className={styles.loadingBarFill}
+            style={{ width: `${assetProgress * 100}%` }}
+          />
+        </div>
       </div>
       <div className={styles.vignette} />
     </div>
