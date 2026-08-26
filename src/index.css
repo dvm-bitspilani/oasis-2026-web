@@ -3,6 +3,7 @@ body, index, html {
   padding: 0;
   box-sizing: border-box;
   overflow:none;
+  overscroll-behavior: none;
 }
 
 img {

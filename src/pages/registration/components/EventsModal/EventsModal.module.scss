@@ -26,7 +26,7 @@
   // min() picks whichever of "88% of viewport width" or "the width that
   // makes the frame exactly 82svh tall" is smaller, so the frame always
   // fits inside the screen on both axes instead of overflowing it.
-  --modal-w: min(88vw, 82svh * 0.4702);
+  --modal-w: min(90vw, 95svh * 0.4702);
 
   width: var(--modal-w);
   aspect-ratio: 860 / 1829;
@@ -259,7 +259,12 @@
 
   /* ADD — plain banner outline, same as an unselected event item */
   .confirmButton {
-    color: #38170b;
+    color: #671c07;
+
+
+  filter:
+    drop-shadow(0 0 1.5px #241006)
+   ;
   }
 
   /* REMOVE — permanently in the "selected" state, i.e. already   */

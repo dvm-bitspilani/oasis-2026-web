@@ -112,53 +112,19 @@
 .star {
   position: absolute;
 
-  /*
-    ==================================================
-    DEFAULT VALUES
-
-    These are replaced individually by TSX:
-
-      --star-length
-      --star-height
-      --head-size
-      --star-glow
-      --star-opacity
-    ==================================================
-  */
-
   --star-length: 140px;
   --star-height: 4px;
   --head-size: 14px;
   --star-glow: 6px;
   --star-opacity: 1;
 
-  /*
-    The actual width is controlled independently
-    for every star.
-  */
-
   width: var(--star-length);
-
-  /*
-    The trail thickness is also independently
-    controlled.
-  */
 
   height: var(--star-height);
 
   transform-origin: right center;
 
   pointer-events: none;
-
-  /*
-    ==================================================
-    TRAIL GRADIENT
-    ==================================================
-
-    Brightest near the star head on the RIGHT.
-
-    Fades progressively toward the LEFT.
-  */
 
   background:
     linear-gradient(
@@ -181,22 +147,6 @@
       rgba(60, 145, 255, 0) 100%
     );
 
-  /*
-    ==================================================
-    TRAIL SHAPE
-    ==================================================
-
-    Narrow toward the head.
-    Slightly wider toward the back.
-
-             head
-               ✦
-              /
-             /
-            /
-           /
-    """
-
   clip-path:
     polygon(
       0% 20%,
@@ -209,12 +159,6 @@
 
       0% 80%
     );
-
-  /*
-    ==================================================
-    ATMOSPHERIC BLUE GLOW
-    ==================================================
-  */
 
   filter:
     drop-shadow(
@@ -231,12 +175,6 @@
       0 0 calc(var(--star-glow) * 4)
       rgba(40, 130, 255, 0.18)
     );
-
-  /*
-    ==================================================
-    PERFORMANCE
-    ==================================================
-  */
 
   will-change:
     transform,
@@ -261,120 +199,59 @@
   top: 50%;
   right: 0;
 
-  /*
-    JS controls this independently.
-
-    This means a large shooting star can
-    have a large star head while a distant
-    shooting star can have a tiny head.
-  */
-
   width: var(--head-size);
   height: var(--head-size);
-
-  /*
-    Move the center of the star exactly onto
-    the RIGHT tip of the trail.
-  */
 
   transform:
     translate(50%, -50%);
 
-  /*
-    ==================================================
-    8-POINT STAR
-    ==================================================
-
-                  ▲
-                  |
-             ◀────┼────▶
-                  |
-                  ▼
-
-       Plus four smaller diagonal points.
-  */
-
   clip-path:
     polygon(
 
-      /* TOP */
       50% 0%,
 
-      /* upper-right inner */
       57% 35%,
 
-      /* upper-right diagonal point */
       72% 22%,
 
-      /* right-upper inner */
       65% 40%,
 
-      /* RIGHT */
       100% 50%,
 
-      /* right-lower inner */
       65% 60%,
 
-      /* lower-right diagonal */
       72% 78%,
 
-      /* lower-right inner */
       57% 65%,
 
-      /* BOTTOM */
       50% 100%,
 
-      /* lower-left inner */
       43% 65%,
 
-      /* lower-left diagonal */
       28% 78%,
 
-      /* left-lower inner */
       35% 60%,
 
-      /* LEFT */
       0% 50%,
 
-      /* left-upper inner */
       35% 40%,
 
-      /* upper-left diagonal */
       28% 22%,
 
-      /* upper-left inner */
       43% 35%
     );
-
-  /*
-    ==================================================
-    STAR COLOR
-    ==================================================
-  */
 
   background:
     radial-gradient(
       circle at center,
 
-      /*
-        White-hot center
-      */
-
       rgba(255, 255, 255, 1) 0%,
 
       rgba(255, 255, 255, 1) 15%,
 
-      /*
-        Slight blue-white transition
-      */
-
       rgba(240, 252, 255, 1) 28%,
 
       rgba(215, 244, 255, 1) 42%,
-
-      /*
-        Blue atmospheric edge
-      */
 
       rgba(155, 220, 255, 0.92) 56%,
 
@@ -385,44 +262,22 @@
       rgba(60, 150, 255, 0) 100%
     );
 
-  /*
-    ==================================================
-    STAR GLOW
-    ==================================================
-  */
-
   filter:
-
-    /*
-      Sharp white edge
-    */
 
     drop-shadow(
       0 0 2px
       rgba(255, 255, 255, 1)
     )
 
-    /*
-      White-blue glow
-    */
-
     drop-shadow(
       0 0 5px
       rgba(225, 248, 255, 1)
     )
 
-    /*
-      Main blue glow
-    */
-
     drop-shadow(
       0 0 10px
       rgba(130, 210, 255, 0.95)
     )
-
-    /*
-      Larger atmospheric glow
-    */
 
     drop-shadow(
       0 0 18px
@@ -454,10 +309,6 @@
   top: 50%;
   right: 0;
 
-  /*
-    Small circular white center.
-  */
-
   width:
     calc(var(--head-size) * 0.34);
 
@@ -484,30 +335,14 @@
 
   box-shadow:
 
-    /*
-      Tiny sharp core
-    */
-
     0 0 3px
     rgba(255, 255, 255, 1),
-
-    /*
-      White glow
-    */
 
     0 0 7px
     rgba(255, 255, 255, 1),
 
-    /*
-      Blue glow
-    */
-
     0 0 14px
     rgba(155, 225, 255, 1),
-
-    /*
-      Atmospheric glow
-    */
 
     0 0 22px
     rgba(70, 170, 255, 0.8);
@@ -549,24 +384,57 @@
 
 
 /* ======================================================
-   LOADING BAR
+   LOADING BAR ROW
 ====================================================== */
 
-.loadingBar {
+.loadingBarRow {
   position: fixed;
 
   left: 50%;
   bottom: 42px;
 
+  transform: translateX(-50%);
+
+  z-index: 4;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  pointer-events: none;
+}
+
+
+/* ======================================================
+   LOADING BAR PERCENT
+====================================================== */
+.loadingBarPercent {
+  font-variant-numeric: tabular-nums;
+
+  min-width: 3ch;
+
+  text-align: right;
+
+  color: rgba(220, 245, 255, 0.9);
+
+  font-size: 12px;
+
+  letter-spacing: 0.02em;
+
+  text-shadow: 0 0 6px rgba(100, 190, 255, 0.5);
+}
+
+/* ======================================================
+   LOADING BAR
+====================================================== */
+
+.loadingBar {
+  position: relative;
+
   width:
     min(320px, 55vw);
 
   height: 2px;
-
-  transform:
-    translateX(-50%);
-
-  z-index: 4;
 
   overflow: hidden;
 
@@ -623,10 +491,6 @@
 
 @media (max-width: 900px) {
 
-  /* --------------------------------------------------
-     VIGNETTE
-  -------------------------------------------------- */
-
   .vignette {
     background:
       radial-gradient(
@@ -643,17 +507,7 @@
   }
 
 
-  /* --------------------------------------------------
-     SHOOTING STAR
-  -------------------------------------------------- */
-
   .star {
-
-    /*
-      Do NOT set width here.
-
-      JS controls the length individually.
-    */
 
     --star-height:
       max(
@@ -679,10 +533,6 @@
   }
 
 
-  /* --------------------------------------------------
-     STAR HEAD
-  -------------------------------------------------- */
-
   .star::before {
 
     transform:
@@ -707,10 +557,6 @@
   }
 
 
-  /* --------------------------------------------------
-     STAR CORE
-  -------------------------------------------------- */
-
   .star::after {
 
     transform:
@@ -725,10 +571,6 @@
 ====================================================== */
 
 @media (max-width: 600px) {
-
-  /* --------------------------------------------------
-     VIGNETTE
-  -------------------------------------------------- */
 
   .vignette {
     background:
@@ -746,16 +588,7 @@
   }
 
 
-  /* --------------------------------------------------
-     SHOOTING STAR
-  -------------------------------------------------- */
-
   .star {
-
-    /*
-      JS still controls the length and
-      individual size.
-    */
 
     --star-height:
       max(
@@ -781,10 +614,6 @@
   }
 
 
-  /* --------------------------------------------------
-     STAR HEAD
-  -------------------------------------------------- */
-
   .star::before {
 
     transform:
@@ -809,10 +638,6 @@
   }
 
 
-  /* --------------------------------------------------
-     STAR CORE
-  -------------------------------------------------- */
-
   .star::after {
 
     transform:
@@ -831,13 +656,12 @@
   }
 
 
-  /* --------------------------------------------------
-     LOADING BAR
-  -------------------------------------------------- */
-
-  .loadingBar {
+  .loadingBarRow {
 
     bottom: 28px;
+  }
+
+  .loadingBar {
 
     width:
       min(230px, 62vw);
@@ -865,9 +689,12 @@
       scale(0.65);
   }
 
-  .loadingBar {
+  .loadingBarRow {
 
     bottom: 24px;
+  }
+
+  .loadingBar {
 
     width:
       min(200px, 65vw);
@@ -882,12 +709,6 @@
 @media (min-width: 1400px) {
 
   .star {
-
-    /*
-      Don't force width.
-
-      The JS-generated size remains variable.
-    */
 
     filter:
       drop-shadow(
