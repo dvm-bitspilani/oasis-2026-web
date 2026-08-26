@@ -11,19 +11,9 @@ import righttop from "../../../../assets/registration/reg/righttop.png";
 import rightmid from "../../../../assets/registration/reg/rightmid.png";
 import book from "/closedBook.png";
 
-// =====================================================
-// DEV ONLY — BACKEND BYPASS
-// Shows a plain "skip sign-in" button and also lets a failed Google
-// login fall through, so the flow is reachable even if OAuth itself
-// is misconfigured.
-// TODO: SET BACK TO false BEFORE DEPLOYING.
-// (Keep this in sync with DEV_BYPASS inside Registration.tsx)
-// =====================================================
-const DEV_BYPASS = true;
-
 /* Scroll slide-out. Runs at t=0 of the book timeline, so the
    scroll is on its way off screen while the book lifts off
-   (BookTransition's FLY_DELAY is 350ms). */
+   (Booktransition's FLY_DELAY is 350ms). */
 const LEAVE_MS = 700;
 
 interface InstructionsProps {
@@ -32,7 +22,7 @@ interface InstructionsProps {
   /*
    * Set by Registration once the book transition starts. The scroll
    * and the back button clear out of the way; the book itself is
-   * deliberately untouched, because BookTransition hides the real
+   * deliberately untouched, because Booktransition hides the real
    * element and takes over the flight with its own copy.
    */
   leaving?: boolean;
@@ -92,7 +82,7 @@ const Instructions = ({
       <img src={righttop} className={styles.righttop} alt="righttop" />
       <img src={rightmid} className={styles.rightmid} alt="rightmid" />
 
-      {/* data-book-start is what BookTransition measures to find
+      {/* data-book-start is what Booktransition measures to find
           the origin of the flight. Do not remove it. */}
       <img
         src={book}
@@ -138,13 +128,7 @@ const Instructions = ({
         <div className={styles.googleButton}>
           <GoogleLogin
             onSuccess={onGoogleSignIn}
-            onError={() => {
-              console.log("Login Failed");
-
-              if (DEV_BYPASS) {
-                onGoogleSignIn({ credential: "dev-token" });
-              }
-            }}
+            onError={() => console.log("Login Failed")}
             theme="filled_blue"
             shape="pill"
             size="large"
@@ -152,28 +136,6 @@ const Instructions = ({
             width={isMobile ? 65 : 250}
           />
         </div>
-
-        {/* Deliberately OUTSIDE .googleButton — that box is a fixed
-            3.216vw tall and sets overflow: hidden, so anything nested
-            inside it gets clipped out of sight. */}
-        {DEV_BYPASS && (
-          <button
-            type="button"
-            onClick={() => onGoogleSignIn({ credential: "dev-token" })}
-            style={{
-              marginTop: "1.5rem",
-              padding: "0.5rem 1rem",
-              cursor: "pointer",
-              border: "1px dashed red",
-              background: "transparent",
-              color: "red",
-              fontSize: "0.8rem",
-              zIndex: 500,
-            }}
-          >
-            DEV: skip sign-in →
-          </button>
-        )}
       </div>
     </>
   );

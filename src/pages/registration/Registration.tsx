@@ -14,21 +14,6 @@ import axios from "axios";
 import BreadCrumb from "../../components/breadCrumb/BreadCrumb";
 
 // =====================================================
-// DEV ONLY — BACKEND BYPASS
-// While the google-reg endpoint is broken, set this to true so that
-// clicking the sign-in button runs the book transition and lands on
-// the Register page without any network call.
-// TODO: SET BACK TO false BEFORE DEPLOYING.
-// (Keep this in sync with DEV_BYPASS inside Instructions.tsx)
-// =====================================================
-const DEV_BYPASS = true;
-
-const DEV_USER = {
-  email: "dev.tester@bits-pilani.ac.in",
-  exists: false,
-};
-
-// =====================================================
 // ASSETS PRELOADED BEFORE THE REGISTRATION FLOW MOUNTS
 // Covers Instructions, Register, Events, and all their modals
 // (ConfirmModal, EventsModal, InstructionModal, Reginput)
@@ -98,7 +83,7 @@ const Registration = () => {
      BOOK TRANSITION
      While this is true the overlay is mounted. Instructions
      stays mounted underneath it until the cover has finished
-     opening, because BookTransition measures the real .book
+     opening, because Booktransition measures the real .book
      element to work out where the flight starts.
      ===================================================== */
   const [transitioning, setTransitioning] = useState(false);
@@ -148,7 +133,7 @@ const Registration = () => {
 
   /* Cover has finished rotating — mount the real <Register />
      underneath the overlay so the two spreads line up.
-     Memoised: BookTransition lists these in its effect deps,
+     Memoised: Booktransition lists these in its effect deps,
      so a new function identity every render would re-measure
      and restart the timeline mid-flight. */
   const handleBookOpened = useCallback(() => {
@@ -186,21 +171,6 @@ const Registration = () => {
   }
 
   const handleSuccess = (response: any) => {
-    // =====================================================
-    // DEV BYPASS — no network call, straight into the animation
-    // =====================================================
-    if (DEV_BYPASS) {
-      console.warn(
-        "[DEV_BYPASS] Skipping google-reg backend call. Remember to disable before deploying.",
-      );
-
-      setCookies("user-auth", DEV_USER);
-      setUserEmail(DEV_USER.email);
-      startBookTransition();
-
-      return;
-    }
-
     const idToken = response.credential;
 
     axios
@@ -208,19 +178,16 @@ const Registration = () => {
         "https://bits-oasis.org/2026/main/registrations/google-reg/",
         {
           id_token: idToken,
-       
-
-      
         },
       )
       .then((res) => {
         setCookies("id_token", idToken);
-// console.log(res.data.access.tokens);
+
         if (res.data.exists) {
+          const accessToken = res.data.tokens.access;
 
-           const accessToken = res.data.tokens.access;
+          console.log("ACCESS TOKEN:", accessToken);
 
-    console.log("ACCESS TOKEN:", accessToken);
           setCookies("user-auth", res.data);
           setCookies(
             "Authorization",
@@ -231,7 +198,7 @@ const Registration = () => {
             "https://bits-oasis.org/2026/main/registrations/",
             {
               token: res.data.tokens.access,
-               dummy:"hello",
+              dummy: "hello",
             },
           );
 
