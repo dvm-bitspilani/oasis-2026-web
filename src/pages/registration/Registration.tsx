@@ -4,13 +4,29 @@ import styles from "./Registration.module.scss";
 import Instructions from "../../pages/registration/components/Instructions/Instructions";
 import Register from "../registration/components/Register/Register";
 import Events from "../../pages/registration/components/Events/Events";
+import Booktransition from "./Booktransition";
 // import Preloader from "../Preloader";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useCookies } from "react-cookie";
 
 import axios from "axios";
 import BreadCrumb from "../../components/breadCrumb/BreadCrumb";
+
+// =====================================================
+// DEV ONLY — BACKEND BYPASS
+// While the google-reg endpoint is broken, set this to true so that
+// clicking the sign-in button runs the book transition and lands on
+// the Register page without any network call.
+// TODO: SET BACK TO false BEFORE DEPLOYING.
+// (Keep this in sync with DEV_BYPASS inside Instructions.tsx)
+// =====================================================
+const DEV_BYPASS = true;
+
+const DEV_USER = {
+  email: "dev.tester@bits-pilani.ac.in",
+  exists: false,
+};
 
 // =====================================================
 // ASSETS PRELOADED BEFORE THE REGISTRATION FLOW MOUNTS
@@ -78,6 +94,15 @@ const Registration = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userData, setUserData] = useState<any>(null);
 
+  /* =====================================================
+     BOOK TRANSITION
+     While this is true the overlay is mounted. Instructions
+     stays mounted underneath it until the cover has finished
+     opening, because BookTransition measures the real .book
+     element to work out where the flight starts.
+     ===================================================== */
+  const [transitioning, setTransitioning] = useState(false);
+
   const [_cookies, setCookies] = useCookies([
     "Authorization",
     "user-auth",
@@ -115,6 +140,26 @@ const Registration = () => {
     setCurrentPage(3);
   };
 
+  /* Sign-in succeeded: don't jump to page 2 yet. Kick off the
+     book animation and let it decide when to swap the pages. */
+  const startBookTransition = () => {
+    setTransitioning(true);
+  };
+
+  /* Cover has finished rotating — mount the real <Register />
+     underneath the overlay so the two spreads line up.
+     Memoised: BookTransition lists these in its effect deps,
+     so a new function identity every render would re-measure
+     and restart the timeline mid-flight. */
+  const handleBookOpened = useCallback(() => {
+    setCurrentPage(2);
+  }, []);
+
+  /* Cross-fade finished — tear the overlay down. */
+  const handleBookDone = useCallback(() => {
+    setTransitioning(false);
+  }, []);
+
   function redirectWithPost(
     url: string,
     data: { [key: string]: string },
@@ -141,9 +186,22 @@ const Registration = () => {
   }
 
   const handleSuccess = (response: any) => {
+    // =====================================================
+    // DEV BYPASS — no network call, straight into the animation
+    // =====================================================
+    if (DEV_BYPASS) {
+      console.warn(
+        "[DEV_BYPASS] Skipping google-reg backend call. Remember to disable before deploying.",
+      );
+
+      setCookies("user-auth", DEV_USER);
+      setUserEmail(DEV_USER.email);
+      startBookTransition();
+
+      return;
+    }
+
     const idToken = response.credential;
-
-
 
     axios
       .post(
@@ -176,7 +234,7 @@ const Registration = () => {
           setUserEmail(res.data.email);
 
           if (res.data.email) {
-            toRegPage();
+            startBookTransition();
           }
         }
       })
@@ -270,6 +328,7 @@ const Registration = () => {
             <div className={styles.instrback}>
               <Instructions
                 onGoogleSignIn={handleSuccess}
+                leaving={transitioning}
               />
             </div>
           )}
@@ -296,6 +355,18 @@ const Registration = () => {
               userData={userData}
               setUserData={setUserData}
               onClickBack={toRegPage}
+            />
+          )}
+
+          {/* =====================================================
+              BOOK TRANSITION OVERLAY
+              Mounted across the 1 -> 2 handover only.
+          ===================================================== */}
+
+          {transitioning && (
+            <Booktransition
+              onOpened={handleBookOpened}
+              onDone={handleBookDone}
             />
           )}
         </>
