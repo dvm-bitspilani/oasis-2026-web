@@ -87,7 +87,7 @@
     cursor: pointer;
     background: center / cover no-repeat url(/googleReg.svg);
     border: none;
-    z-index: 400;
+    z-index: 999;
     transition: filter 0.3s;
     width: 22vw;
     height: 3.216vw;
@@ -120,7 +120,9 @@
     bottom: 6%;
     scale: 1.4;
     width: 20%;
-    z-index: 100;
+    z-index: 1;
+    clip-path: polygon(0);
+    box-sizing: border-box;
 }
 
 
@@ -286,9 +288,9 @@
   }
 
   .leftbottom {
-    left: 20%;
-    bottom: 7%;
-    scale: 3;
+    left: 10%;
+    bottom: 4%;
+    scale: 2;
   }
 
   .lefttop{

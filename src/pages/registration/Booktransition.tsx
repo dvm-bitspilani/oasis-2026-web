@@ -3,10 +3,21 @@ import styles from "./Booktransition.module.scss";
 
 import closedBook from "/closedBook.png";
 import openBook from "../../assets/registration/reg/book.png";
+import closedBook from "/closedBook.png";
+import openBook from "../../assets/registration/reg/book.png";
 
 /* =====================================================
    TIMELINE (ms)
+/* =====================================================
+   TIMELINE (ms)
 
+   0            scroll starts sliding up (owned by Registration)
+   FLY_DELAY    book lifts off from its Instructions position
+   +FLY         book has landed on the right half of the spread
+   +HOLD        beat
+   +OPEN        cover has rotated 180deg into the left page
+   +REVEAL      real <Register /> has faded in, overlay unmounts
+   ===================================================== */
    0            scroll starts sliding up (owned by Registration)
    FLY_DELAY    book lifts off from its Instructions position
    +FLY         book has landed on the right half of the spread
@@ -48,7 +59,19 @@ type Rect = {
   width: number;
   height: number;
 };
+type Rect = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
 
+type Geometry = {
+  /* Where the closed book currently sits on the Instructions page */
+  start: Rect;
+  /* Right half of the final open spread — the flap's resting place */
+  page: Rect;
+};
 type Geometry = {
   /* Where the closed book currently sits on the Instructions page */
   start: Rect;
@@ -70,7 +93,12 @@ export default function Booktransition({ onOpened, onDone }: Props) {
   const [stage, setStage] = useState<Stage>("armed");
 
   const sourceRef = useRef<HTMLElement | null>(null);
+  const sourceRef = useRef<HTMLElement | null>(null);
 
+  /* ---------------- MEASURE ----------------
+     Read both ends of the flight off the real DOM / real CSS
+     instead of hardcoding percentages, so the many breakpoints
+     in Instructions.module.scss keep working. */
   /* ---------------- MEASURE ----------------
      Read both ends of the flight off the real DOM / real CSS
      instead of hardcoding percentages, so the many breakpoints
@@ -99,7 +127,10 @@ export default function Booktransition({ onOpened, onDone }: Props) {
       document.querySelector<HTMLElement>('img[alt="Frontend Goated"]');
 
     sourceRef.current = source;
+    sourceRef.current = source;
 
+    const spreadImage = new Image();
+    spreadImage.src = openBook;
     const spreadImage = new Image();
     spreadImage.src = openBook;
 
@@ -115,18 +146,37 @@ export default function Booktransition({ onOpened, onDone }: Props) {
          letterboxed inside that box. */
       const boxWidth = vw * 0.75;
       const boxHeight = boxWidth / 1.4;
+      /* .bookContainer in Register.module.scss:
+         width 75vw, aspect-ratio 1.4, centred at (50%, 52%),
+         background-size: contain — so the painted spread is
+         letterboxed inside that box. */
+      const boxWidth = vw * 0.75;
+      const boxHeight = boxWidth / 1.4;
 
+      const imageRatio =
+        spreadImage.naturalWidth / spreadImage.naturalHeight || 1.4;
       const imageRatio =
         spreadImage.naturalWidth / spreadImage.naturalHeight || 1.4;
 
       const isWide = imageRatio > boxWidth / boxHeight;
+      const isWide = imageRatio > boxWidth / boxHeight;
 
+      const spreadWidth = isWide ? boxWidth : boxHeight * imageRatio;
+      const spreadHeight = isWide ? boxWidth / imageRatio : boxHeight;
       const spreadWidth = isWide ? boxWidth : boxHeight * imageRatio;
       const spreadHeight = isWide ? boxWidth / imageRatio : boxHeight;
 
       const centreX = vw / 2;
       const centreY = vh * 0.52;
+      const centreX = vw / 2;
+      const centreY = vh * 0.52;
 
+      const spread: Rect = {
+        left: centreX - spreadWidth / 2,
+        top: centreY - spreadHeight / 2,
+        width: spreadWidth,
+        height: spreadHeight,
+      };
       const spread: Rect = {
         left: centreX - spreadWidth / 2,
         top: centreY - spreadHeight / 2,
@@ -142,9 +192,27 @@ export default function Booktransition({ onOpened, onDone }: Props) {
         width: spread.width / 2,
         height: spread.height,
       };
+      /* The closed book sits where the RIGHT half of the spread
+         will be — that is what the cover swings off of. */
+      const page: Rect = {
+        left: spread.left + spread.width / 2,
+        top: spread.top,
+        width: spread.width / 2,
+        height: spread.height,
+      };
 
       const box = source?.getBoundingClientRect();
+      const box = source?.getBoundingClientRect();
 
+      const start: Rect =
+        box && box.width > 0
+          ? {
+              left: box.left,
+              top: box.top,
+              width: box.width,
+              height: box.height,
+            }
+          : page;
       const start: Rect =
         box && box.width > 0
           ? {
@@ -158,10 +226,17 @@ export default function Booktransition({ onOpened, onDone }: Props) {
       /* Hand the book over to the overlay in the same frame it
          appears, so there is never two of them on screen. */
       if (source) source.style.visibility = "hidden";
+      /* Hand the book over to the overlay in the same frame it
+         appears, so there is never two of them on screen. */
+      if (source) source.style.visibility = "hidden";
 
       setGeo({ start, page });
     };
+      setGeo({ start, page });
+    };
 
+    if (spreadImage.complete) measure();
+    else spreadImage.onload = measure;
     if (spreadImage.complete) measure();
     else spreadImage.onload = measure;
 
@@ -174,10 +249,14 @@ export default function Booktransition({ onOpened, onDone }: Props) {
   }, [onOpened, onDone]);
 
   /* ---------------- RUN THE TIMELINE ---------------- */
+  /* ---------------- RUN THE TIMELINE ---------------- */
 
   useEffect(() => {
     if (!geo) return;
+  useEffect(() => {
+    if (!geo) return;
 
+    const timers: number[] = [];
     const timers: number[] = [];
 
     timers.push(
@@ -192,9 +271,13 @@ export default function Booktransition({ onOpened, onDone }: Props) {
 
     return () => timers.forEach(window.clearTimeout);
   }, [geo, onOpened, onDone]);
+    return () => timers.forEach(window.clearTimeout);
+  }, [geo, onOpened, onDone]);
 
   if (!geo) return null;
+  if (!geo) return null;
 
+  const { start, page } = geo;
   const { start, page } = geo;
 
   const isOpen = stage === "opening" || stage === "revealed";
@@ -208,6 +291,12 @@ export default function Booktransition({ onOpened, onDone }: Props) {
         ` scale(${start.width / page.width}, ${start.height / page.height})`
       : "none";
 
+  const pageRect = {
+    left: `${page.left}px`,
+    top: `${page.top}px`,
+    width: `${page.width}px`,
+    height: `${page.height}px`,
+  };
   const pageRect = {
     left: `${page.left}px`,
     top: `${page.top}px`,

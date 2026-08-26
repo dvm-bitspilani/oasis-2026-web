@@ -208,12 +208,19 @@ const Registration = () => {
         "https://bits-oasis.org/2026/main/registrations/google-reg/",
         {
           id_token: idToken,
+       
+
+      
         },
       )
       .then((res) => {
         setCookies("id_token", idToken);
-
+// console.log(res.data.access.tokens);
         if (res.data.exists) {
+
+           const accessToken = res.data.tokens.access;
+
+    console.log("ACCESS TOKEN:", accessToken);
           setCookies("user-auth", res.data);
           setCookies(
             "Authorization",
@@ -224,6 +231,7 @@ const Registration = () => {
             "https://bits-oasis.org/2026/main/registrations/",
             {
               token: res.data.tokens.access,
+               dummy:"hello",
             },
           );
 

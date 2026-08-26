@@ -389,7 +389,7 @@ const Confirmation = (props: PropsType) => {
          * the ID token under a different property.
          */
         const token =
-          response.data.tokens?.id_token ??
+          response.data.tokens?.access ??
           response.data.id_token;
 
         setId_token(token || "");
