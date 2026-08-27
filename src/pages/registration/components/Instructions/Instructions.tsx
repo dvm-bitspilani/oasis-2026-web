@@ -115,9 +115,9 @@ const Instructions = ({
           <li>All prof shows are free. </li>
           <li>All team members are required to register separately.</li>
           <li>
-            For further details contact, Parimal:{" "}
-            <a href="tel:8638304074">8638304074</a>, Ishita:{" "}
-            <a href="tel:7804051996">7804051996</a>
+            For further details contact, Devang:{" "}
+            <a href="tel:+91 92574 91386">+91 92574 91386</a>, Sneha:{" "}
+            <a href="tel:+91 90268 55597">+91 90268 55597</a>
           </li>
           <li>
             For detailed Instructions{" "}
