@@ -38,6 +38,7 @@ type LogoDot = {
 const SVG_VIEWBOX_WIDTH = 1578;
 const SVG_VIEWBOX_HEIGHT = 744;
 const PATH_STAR_COUNT = 700;
+const MOBILE_PATH_STAR_COUNT = 500;
 const MIN_LOGO_TIME = 2000;
 const LOGO_HOLD = 1000;
 const EXIT_DURATION = 1200;
@@ -272,14 +273,27 @@ export default function Preloader({
 
     const ease = (v: number) => v * v * (3 - 2 * v);
     const sample = () => {
-      const len = path.getTotalLength(),
-        out: Point[] = [];
-      for (let i = 0; i < PATH_STAR_COUNT; i++) {
-        const p = path.getPointAtLength((len * i) / (PATH_STAR_COUNT - 1));
-        out.push({ x: p.x, y: p.y });
-      }
-      return out;
-    };
+  const len = path.getTotalLength();
+  const out: Point[] = [];
+
+  const starCount =
+    window.innerWidth <= 650
+      ? MOBILE_PATH_STAR_COUNT
+      : PATH_STAR_COUNT;
+
+  for (let i = 0; i < starCount; i++) {
+    const p = path.getPointAtLength(
+      (len * i) / (starCount - 1)
+    );
+
+    out.push({
+      x: p.x,
+      y: p.y,
+    });
+  }
+
+  return out;
+};
     const screen = (p: Point): Point => {
       const scale = Math.min(
         (width * 0.96) / SVG_VIEWBOX_WIDTH,
