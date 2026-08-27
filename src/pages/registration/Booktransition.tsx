@@ -28,7 +28,7 @@ const REVEAL = 400;
    correction below is animated in rather than applied instantly.
    SCALING LOGIC: tweak the scale() to close any remaining
    transparent gap at the corners once it's fully rotated. */
-const CORRECTED_TRANSFORM = "rotate(-11deg) scale(1.2) translate(-9%,-3%)";
+const CORRECTED_TRANSFORM = "rotate(-11deg) scale(1.2) translate(-8%,-3%)";
 const CORRECT = FLY; // how long the correction takes to animate in
 
 /* Below this width Register swaps to a completely different
