@@ -251,12 +251,14 @@
    MOBILE
    ========================================================= */
 
+  
 @media (max-width: 750px) {
 
   .castle {
-    width: clamp(340px, 100vw, 480px);
+    width: 100vw;
     left: 50%;
     bottom: 39%;
+    
   }
   .camelLand2{
     right:-3%;
