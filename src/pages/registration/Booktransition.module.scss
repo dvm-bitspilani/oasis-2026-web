@@ -18,6 +18,8 @@
      passes it down to the rotating .flap. */
   perspective: 2400px;
   perspective-origin: 50% 45%;
+
+  /* Set from JS: opacity + its transition (the reveal cross-fade) */
 }
 
 /* ---------------------------------------------------------
@@ -61,6 +63,13 @@
    The cover. Hinges on its left edge and swings 180deg onto
    the left half of the spread, where its back face is the
    left page.
+
+   NOTE: nothing here should ever carry a rotation to correct
+   for the closedBook.png artwork being tilted — that would
+   also tilt .leftPage's back face, since both faces are
+   children of this same rotateY'd element. Any artwork
+   correction belongs entirely inside .cover's own subtree
+   (see .coverImage below).
    --------------------------------------------------------- */
 
 .flap {
@@ -90,10 +99,40 @@
 }
 
 /* Front face — closedBook.png, shown for the flight and the
-   first half of the swing. */
+   first half of the swing.
+
+   This is now just a clipping box sized to the flap's rect.
+   The actual artwork lives in .coverImage so the counter-
+   rotation below never leaks into .flap or .leftPage. */
 .cover {
+  overflow: hidden;
+}
+
+/* closedBook.png has the book drawn ~11deg clockwise inside
+   its own frame, with transparent padding around it. Rotating
+   it back straight would normally expose that transparent
+   padding at the corners of .cover's rect, so this layer is
+   scaled up around its own center before rotating, then
+   clipped by .cover's overflow: hidden. */
+.coverImage {
+  position: absolute;
+  inset: 0;
+
   background-size: 100% 100%;
   background-position: center;
+
+  transform-origin: center;
+
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.55, 0.05, 0.2, 1);
+
+  /* Set from JS: transform (identity -> corrected) + transition-duration.
+     Starts at identity so frame one matches the plain, uncorrected
+     <img> it's replacing on the Instructions page — no pop — then
+     animates into the corrected rotation/scale as the flight starts.
+     SCALING LOGIC lives in Booktransition.tsx's CORRECTED_TRANSFORM:
+     tweak the scale() there to close any remaining transparent gap
+     at the corners. */
 }
 
 /* Back face — left half of book.png. Pre-rotated so that when

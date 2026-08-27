@@ -4,9 +4,10 @@ import styles from "./Registration.module.scss";
 import Instructions from "../../pages/registration/components/Instructions/Instructions";
 import Register from "../registration/components/Register/Register";
 import Events from "../../pages/registration/components/Events/Events";
+import Booktransition from "./Booktransition";
 // import Preloader from "../Preloader";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useCookies } from "react-cookie";
 
 import axios from "axios";
@@ -78,6 +79,15 @@ const Registration = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userData, setUserData] = useState<any>(null);
 
+  /* =====================================================
+     BOOK TRANSITION
+     While this is true the overlay is mounted. Instructions
+     stays mounted underneath it until the cover has finished
+     opening, because Booktransition measures the real .book
+     element to work out where the flight starts.
+     ===================================================== */
+  const [transitioning, setTransitioning] = useState(false);
+
   const [_cookies, setCookies] = useCookies([
     "Authorization",
     "user-auth",
@@ -115,6 +125,26 @@ const Registration = () => {
     setCurrentPage(3);
   };
 
+  /* Sign-in succeeded: don't jump to page 2 yet. Kick off the
+     book animation and let it decide when to swap the pages. */
+  const startBookTransition = () => {
+    setTransitioning(true);
+  };
+
+  /* Cover has finished rotating — mount the real <Register />
+     underneath the overlay so the two spreads line up.
+     Memoised: Booktransition lists these in its effect deps,
+     so a new function identity every render would re-measure
+     and restart the timeline mid-flight. */
+  const handleBookOpened = useCallback(() => {
+    setCurrentPage(2);
+  }, []);
+
+  /* Cross-fade finished — tear the overlay down. */
+  const handleBookDone = useCallback(() => {
+    setTransitioning(false);
+  }, []);
+
   function redirectWithPost(
     url: string,
     data: { [key: string]: string },
@@ -143,26 +173,21 @@ const Registration = () => {
   const handleSuccess = (response: any) => {
     const idToken = response.credential;
 
-
-
     axios
       .post(
         "https://bits-oasis.org/2026/main/registrations/google-reg/",
         {
           id_token: idToken,
-       
-
-      
         },
       )
       .then((res) => {
         setCookies("id_token", idToken);
-// console.log(res.data.access.tokens);
+
         if (res.data.exists) {
+          const accessToken = res.data.tokens.access;
 
-           const accessToken = res.data.tokens.access;
+          console.log("ACCESS TOKEN:", accessToken);
 
-    console.log("ACCESS TOKEN:", accessToken);
           setCookies("user-auth", res.data);
           setCookies(
             "Authorization",
@@ -173,7 +198,7 @@ const Registration = () => {
             "https://bits-oasis.org/2026/main/registrations/",
             {
               token: res.data.tokens.access,
-               dummy:"hello",
+              dummy: "hello",
             },
           );
 
@@ -184,7 +209,7 @@ const Registration = () => {
           setUserEmail(res.data.email);
 
           if (res.data.email) {
-            toRegPage();
+            startBookTransition();
           }
         }
       })
@@ -278,6 +303,7 @@ const Registration = () => {
             <div className={styles.instrback}>
               <Instructions
                 onGoogleSignIn={handleSuccess}
+                leaving={transitioning}
               />
             </div>
           )}
@@ -304,6 +330,18 @@ const Registration = () => {
               userData={userData}
               setUserData={setUserData}
               onClickBack={toRegPage}
+            />
+          )}
+
+          {/* =====================================================
+              BOOK TRANSITION OVERLAY
+              Mounted across the 1 -> 2 handover only.
+          ===================================================== */}
+
+          {transitioning && (
+            <Booktransition
+              onOpened={handleBookOpened}
+              onDone={handleBookDone}
             />
           )}
         </>
