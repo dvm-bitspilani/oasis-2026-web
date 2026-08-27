@@ -89,38 +89,37 @@ const CLOUDS_MOBILE: Cloud[] = [
     top: "30%",
     left: "-25%",
     width: "50%",
-    duration: 340,
+    duration: 200,
   },
   {
     src: cloudBig,
     top: "8%",
     left: "5%",
     width: "60%",
-    duration: 450,
+    duration: 270,
   },
   {
     src: cloudThree,
     top: "18%",
     left: "40%",
     width: "45%",
-    duration: 280,
+    duration: 170,
   },
   {
     src: cloudSmall,
     top: "38%",
     left: "60%",
     width: "40%",
-    duration: 250,
+    duration: 150,
   },
   {
     src: cloudBig,
     top: "5%",
     left: "85%",
     width: "55%",
-    duration: 530,
+    duration: 320,
   },
 ];
-
 const MOON_CLOUD_TINT =
   "brightness(0.35) sepia(0.8) hue-rotate(20deg) saturate(1.5)";
 
@@ -731,6 +730,25 @@ export default function Home({
   }, [preloaderDone]);
 
   useEffect(() => {
+  let resizeTimer: ReturnType<typeof setTimeout>;
+
+  const handleResize = () => {
+    clearTimeout(resizeTimer);
+
+    resizeTimer = setTimeout(() => {
+      window.location.reload();
+    }, 300);
+  };
+
+  window.addEventListener("resize", handleResize);
+
+  return () => {
+    clearTimeout(resizeTimer);
+    window.removeEventListener("resize", handleResize);
+  };
+}, []);
+
+  useEffect(() => {
     const ctx = gsap.context(() => {
       cloudRefs.current.forEach((cloud, i) => {
         if (!cloud) return;
@@ -819,7 +837,6 @@ export default function Home({
   }, [isMobile]);
 
   useEffect(() => {
-    // Stop camel animation on mobile (650px and below)
     if (window.innerWidth <= 650) {
       return;
     }
@@ -868,9 +885,9 @@ export default function Home({
         { xPct: -32, yPct: 14 },
         { xPct: -25, yPct: 15 },
         { xPct: -17, yPct: 16 },
-        { xPct: -10, yPct: 16 },
-        { xPct: -3, yPct: 16 },
-        { xPct: 4, yPct: 14 },
+        { xPct: -9, yPct: 16 },
+        { xPct: -4, yPct: 16 },
+        { xPct: 4, yPct: 15 },
         { xPct: 15, yPct: 14 },
         { xPct: 18, yPct: 13 },
         { xPct: 25, yPct: 12 },
@@ -1102,7 +1119,6 @@ export default function Home({
           </text>
         </svg>
 
-        <img src={RegBtn} alt="" />
       </button>
 
       <div

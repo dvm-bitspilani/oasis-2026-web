@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import styles from "./BookTransition.module.scss";
+import styles from "./Booktransition.module.scss";
 
 import closedBook from "/closedBook.png";
 import openBook from "../../assets/registration/reg/book.png";
@@ -21,9 +21,25 @@ const HOLD = 180;
 const OPEN = 1000;
 const REVEAL = 400;
 
-/* Below this width Instructions hides .book entirely and
-   Register uses a completely different single-page layout,
-   so the flight has nothing to fly between. */
+/* closedBook.png has the book drawn ~11deg clockwise inside its own
+   frame, with transparent padding around it. Frame one of the
+   overlay has to match that raw, uncorrected look exactly (it's
+   standing in for the plain <img> on the Instructions page), so the
+   correction below is animated in rather than applied instantly.
+   SCALING LOGIC: tweak the scale() to close any remaining
+   transparent gap at the corners once it's fully rotated. */
+const CORRECTED_TRANSFORM = "rotate(-11deg) scale(1.2) translate(-8%,-3%)";
+const CORRECT = FLY; // how long the correction takes to animate in
+
+/* Below this width Register swaps to a completely different
+   single-page book layout (@media max-width: 900px), so the
+   measured destination rect no longer describes anything real
+   and the flight is skipped.
+
+   Note: Instructions itself hides .book below 1401px. Between
+   901px and 1401px there is no source element, so `start` falls
+   back to `page` and the flight silently collapses into a
+   plain open-in-place. That is intentional. */
 const FLIGHT_MIN_WIDTH = 901;
 
 type Rect = {
@@ -40,6 +56,8 @@ type Geometry = {
   page: Rect;
 };
 
+type Stage = "armed" | "flying" | "opening" | "revealed";
+
 type Props = {
   /* Cover has finished rotating — Registration reveals <Register /> */
   onOpened: () => void;
@@ -47,9 +65,9 @@ type Props = {
   onDone: () => void;
 };
 
-export default function BookTransition({ onOpened, onDone }: Props) {
+export default function Booktransition({ onOpened, onDone }: Props) {
   const [geo, setGeo] = useState<Geometry | null>(null);
-  const [stage, setStage] = useState<"armed" | "flying" | "opening">("armed");
+  const [stage, setStage] = useState<Stage>("armed");
 
   const sourceRef = useRef<HTMLElement | null>(null);
 
@@ -59,14 +77,21 @@ export default function BookTransition({ onOpened, onDone }: Props) {
      in Instructions.module.scss keep working. */
 
   useLayoutEffect(() => {
+    let cancelled = false;
+
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
     if (reduced || window.innerWidth < FLIGHT_MIN_WIDTH) {
       onOpened();
-      window.setTimeout(onDone, REVEAL);
-      return;
+
+      const skip = window.setTimeout(onDone, REVEAL);
+
+      return () => {
+        cancelled = true;
+        window.clearTimeout(skip);
+      };
     }
 
     const source =
@@ -79,6 +104,8 @@ export default function BookTransition({ onOpened, onDone }: Props) {
     spreadImage.src = openBook;
 
     const measure = () => {
+      if (cancelled) return;
+
       const vw = window.innerWidth;
       const vh = window.innerHeight;
 
@@ -139,6 +166,9 @@ export default function BookTransition({ onOpened, onDone }: Props) {
     else spreadImage.onload = measure;
 
     return () => {
+      cancelled = true;
+      spreadImage.onload = null;
+
       if (sourceRef.current) sourceRef.current.style.visibility = "";
     };
   }, [onOpened, onDone]);
@@ -153,7 +183,10 @@ export default function BookTransition({ onOpened, onDone }: Props) {
     timers.push(
       window.setTimeout(() => setStage("flying"), FLY_DELAY),
       window.setTimeout(() => setStage("opening"), FLY_DELAY + FLY + HOLD),
-      window.setTimeout(onOpened, FLY_DELAY + FLY + HOLD + OPEN),
+      window.setTimeout(() => {
+        setStage("revealed");
+        onOpened();
+      }, FLY_DELAY + FLY + HOLD + OPEN),
       window.setTimeout(onDone, FLY_DELAY + FLY + HOLD + OPEN + REVEAL)
     );
 
@@ -163,6 +196,8 @@ export default function BookTransition({ onOpened, onDone }: Props) {
   if (!geo) return null;
 
   const { start, page } = geo;
+
+  const isOpen = stage === "opening" || stage === "revealed";
 
   /* FLIP: the flap is laid out at its final rect, then pushed
      back to the closed book's rect for frame one. Origin is
@@ -181,15 +216,26 @@ export default function BookTransition({ onOpened, onDone }: Props) {
   };
 
   return (
-    <div className={styles.stage} aria-hidden="true">
+    <div
+      className={styles.stage}
+      aria-hidden="true"
+      style={{
+        /* Cross-fades into the real <Register /> that mounts
+           underneath the moment the cover finishes opening. */
+        opacity: stage === "revealed" ? 0 : 1,
+        transition: `opacity ${REVEAL}ms ease`,
+      }}
+    >
       {/* RIGHT PAGE — under the cover the whole time, uncovered
-          as the flap swings away. Right half of book.png. */}
+          as the flap swings away. Right half of book.png.
+          Only switched on once the flap is in place over it,
+          so it never flashes at the destination mid-flight. */}
       <div
         className={styles.rightPage}
         style={{
           ...pageRect,
           backgroundImage: `url(${openBook})`,
-          opacity: stage === "armed" ? 0 : 1,
+          opacity: isOpen ? 1 : 0,
         }}
       />
 
@@ -204,19 +250,37 @@ export default function BookTransition({ onOpened, onDone }: Props) {
         }}
       >
         {/* FLAP — hinges on its left edge. Front face is the
-            closed cover, back face is the left page. */}
+            closed cover, back face is the left page.
+
+            IMPORTANT: this element's transform is reserved for
+            the open/close rotateY animation only. Do not add any
+            correction here for closedBook.png's tilted artwork —
+            it would rotate .leftPage's back face too. That
+            correction lives on .coverImage below instead. */}
         <div
           className={styles.flap}
           style={{
-            transform:
-              stage === "opening" ? "rotateY(-180deg)" : "rotateY(0deg)",
+            transform: isOpen ? "rotateY(-180deg)" : "rotateY(0deg)",
             transitionDuration: `${OPEN}ms`,
           }}
         >
-          <div
-            className={styles.cover}
-            style={{ backgroundImage: `url(${closedBook})` }}
-          />
+          <div className={styles.cover}>
+            {/* The counter-rotation + scale that corrects
+                closedBook.png's tilt live on this inner layer,
+                clipped by .cover's overflow: hidden, so they never
+                touch .flap's transform. Starts at identity (frame
+                one matches the plain source <img>, no pop) and
+                animates into CORRECTED_TRANSFORM once the flight
+                starts. */}
+            <div
+              className={styles.coverImage}
+              style={{
+                backgroundImage: `url(${closedBook})`,
+                transform: stage === "armed" ? "none" : CORRECTED_TRANSFORM,
+                transitionDuration: `${CORRECT}ms`,
+              }}
+            />
+          </div>
           <div
             className={styles.leftPage}
             style={{ backgroundImage: `url(${openBook})` }}

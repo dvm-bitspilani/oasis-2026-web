@@ -11,7 +11,6 @@ import curtainVideo from "../../assets/video/curtain.mp4";
 const CLOUD_SELECTOR = "[data-cloud-string]";
 const CASTLE_SELECTOR = "[data-castle-drown]";
 const MOON_SELECTOR = "[data-moon-shrink]";
-const SAND_SELECTOR = "[data-sand-parallax]";
 const FADE_SELECTOR = "[data-transition-fade]";
 
 type CloudRig = {
@@ -135,7 +134,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       );
       const castleEl = document.querySelector<HTMLElement>(CASTLE_SELECTOR);
       const moonEl = document.querySelector<HTMLElement>(MOON_SELECTOR);
-      const sandEl = document.querySelector<HTMLElement>(SAND_SELECTOR);
+
 
       while (layer.firstChild) {
         layer.removeChild(layer.firstChild);
@@ -370,9 +369,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           applyDrown(moonEl, MOON_DURATION, SINK_DISTANCE, { xPercent: -50 });
         }
 
-        if (sandEl) {
-          applyDrown(sandEl, FOREGROUND_DURATION, SINK_DISTANCE * 0.02);
-        }
+       
 
         if (fadeEls.length > 0) {
           tl.to(
@@ -411,7 +408,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
         const totalDuration = tl.duration();
         tl.call(startVideo, [], totalDuration * VIDEO_START_PERCENT);
-      }, rootRef);
+      });
 
       return () => {
         ctx.revert();
