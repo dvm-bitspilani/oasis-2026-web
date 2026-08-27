@@ -137,7 +137,7 @@
   height: clamp(70px, 12vh, 130px);
   width: clamp(90px, 22vw, 220px);
 
-  z-index: 8;
+  z-index: 10;
 
   opacity: 0;
 
@@ -165,7 +165,7 @@
   height: clamp(70px, 12vh, 130px);
   width: clamp(120px, 28vw, 280px);
 
-  z-index: 8;
+  z-index: 10;
   opacity: 0;
   will-change: transform, opacity;
   pointer-events: none;
@@ -189,7 +189,7 @@
   margin-left: calc(
     75% - clamp(0px, 5vw, 40px)
   );
-  z-index: 3;
+  z-index: 5;
 }
 
 .linksSvg {
@@ -255,8 +255,9 @@
 @media (max-width: 750px) {
 
   .castle {
-    width: 100vw;
-    left: 50%;
+    width: clamp(340px, 100vw, 480px);
+    left: 0%;
+    transform: none;
     bottom: 39%;
     
   }
