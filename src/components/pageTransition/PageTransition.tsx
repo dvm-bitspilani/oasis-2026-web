@@ -408,7 +408,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
         const totalDuration = tl.duration();
         tl.call(startVideo, [], totalDuration * VIDEO_START_PERCENT);
-      }, rootRef);
+      });
 
       return () => {
         ctx.revert();

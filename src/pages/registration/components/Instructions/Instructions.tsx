@@ -138,8 +138,8 @@ const Instructions = ({ onGoogleSignIn }: InstructionsProps) => {
             <li>All prof shows are free. </li>
             <li>All team members are required to register separately.</li>
             <li>
-              For further details contact, Parimal: <a href="tel:8638304074">8638304074</a>,
-              Ishita: <a href="tel:7804051996">7804051996</a>
+              For further details contact, Sneha: <a href="tel:9026855597">9026855597</a>,
+              Devang: <a href="tel:9257491386">9257491386</a>
             </li>
             <li>
               For detailed Instructions{" "}

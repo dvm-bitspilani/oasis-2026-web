@@ -1101,7 +1101,6 @@ export default function Home({
           </text>
         </svg>
 
-        <img src={RegBtn} alt="" />
       </button>
 
       <div
