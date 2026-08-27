@@ -4,6 +4,9 @@
    Sits above the Instructions page and below nothing else.
    Everything is positioned in viewport pixels from JS, so it
    is immune to the two pages' differing layout rules.
+
+   The mobile page turn at the bottom of this file is the one
+   exception — see the note there for why it is done in CSS.
    ========================================================= */
 
 .stage {
@@ -145,9 +148,106 @@
   background-position: left center;
 }
 
+/* =========================================================
+   MOBILE PAGE TURN   —   everything below is mobile only
+
+   Below 901px there is no closed book on screen and no two
+   page spread to open, so instead of a flight the overlay
+   swings a single page in from beyond the right edge of the
+   screen and lands it on top of where Register's mobile
+   .bookContainer is about to render.
+
+   WHY THIS IS CSS AND NOT MEASURED FROM JS LIKE THE DESKTOP
+   FLIGHT: the mobile .bookContainer is sized in vh inside a
+   container sized in svh. Those two units disagree the moment
+   a mobile browser shows or hides its toolbars, so reproducing
+   that rect from window.innerWidth / innerHeight would drift
+   and the page would jump at the cross-fade. Re-declaring the
+   same CSS instead lets the browser resolve the units once,
+   the same way for both elements.
+
+   >>> These rules are a MIRROR of .bookContainer in
+   >>> Register.module.scss (@media max-width: 900px and
+   >>> @media max-width: 600px). If that rect changes, change
+   >>> it here too, or the page will land off target.
+   ========================================================= */
+
+.mobileStage {
+  /* .bookContainer resolves `top: 52%` against .registerContainer,
+     which is height: 100svh on mobile. The stage has to be the same
+     height or the same percentage would land somewhere else. inset: 0
+     stays as the fallback if svh is unsupported. */
+  height: 100svh;
+
+  /* Shallower than the desktop spread, with the vanishing point out
+     near the spine, so the page turns towards the reader instead of
+     skewing across the screen. Lower this number for a heavier, more
+     exaggerated swing; raise it to flatten the whole thing out. */
+  perspective: 1800px;
+  perspective-origin: 92% 50%;
+}
+
+.mobilePage {
+  position: absolute;
+
+  background-repeat: no-repeat;
+
+  overflow: hidden;
+
+  /* Both faces are paper, so the back is deliberately left visible
+     for the part of the swing that is past 90deg. */
+
+  /* Same family as .flap's easing, so the two layouts feel related:
+     a little weight going in, then a long settle as it lands. */
+  transition-property: transform, opacity;
+  transition-timing-function: cubic-bezier(0.45, 0.05, 0.2, 1), linear;
+
+  /* Set from JS: background-image, transform (rotateY), opacity,
+     transition-duration */
+
+  will-change: transform;
+}
+
+/* MIRROR OF: Register.module.scss -> @media (max-width: 900px) .bookContainer */
+@media (max-width: 900px) {
+  .mobilePage {
+    top: 52%;
+    left: 13vw;
+
+    width: 92vw;
+    height: 78vh;
+
+    background-size: 180% 100%;
+    background-position: left top;
+
+    /* THE HINGE. background-position is left top, so the painted
+       spread starts at this element's left edge and the spine sits
+       at half of background-size-x — 180% / 2. On screen that works
+       out at ~96vw, i.e. just past the right edge, which is what
+       puts the page outside the viewport at the start of the turn. */
+    transform-origin: 90% center;
+  }
+}
+
+/* MIRROR OF: Register.module.scss -> @media (max-width: 600px) .bookContainer */
+@media (max-width: 600px) {
+  .mobilePage {
+    left: -2%;
+
+    width: 115vw;
+    height: 85vh;
+
+    background-size: 170% 100%;
+
+    /* 170% / 2 — see the note above */
+    transform-origin: 85% center;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .flight,
-  .flap {
+  .flap,
+  .mobilePage {
     transition: none !important;
   }
 }
