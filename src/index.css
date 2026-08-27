@@ -4,6 +4,7 @@ body, index, html {
   box-sizing: border-box;
   overflow:none;
   overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 img {

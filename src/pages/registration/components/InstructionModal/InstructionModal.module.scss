@@ -228,6 +228,7 @@
     // very narrow/tall phones, so we don't re-declare box dimensions here.
     .heading {
       font: 400 calc(var(--modal-w) * 0.095) "Syamsiah";
+      align-self: center;
     }
     .content {
       ul {
@@ -249,9 +250,11 @@
       }
     }
     .close {
-      right: 15%;
-      top: 10%;
-      visibility: hidden;
+      right: 5%;
+      top: 3.5%;
+      path {
+        fill: #C6A570;
+      }
     }
   }
 }
