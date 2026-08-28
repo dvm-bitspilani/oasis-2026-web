@@ -361,12 +361,11 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
         if (castleEl) {
           applyDrownWobble(castleEl, FOREGROUND_DURATION, SINK_DISTANCE, {
-            xPercent: -50,
           });
         }
 
         if (moonEl) {
-          applyDrown(moonEl, MOON_DURATION, SINK_DISTANCE, { xPercent: -50 });
+          applyDrown(moonEl, MOON_DURATION, SINK_DISTANCE, { });
         }
 
        
