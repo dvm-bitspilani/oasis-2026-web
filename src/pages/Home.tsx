@@ -730,6 +730,8 @@ export default function Home({
   }, [preloaderDone]);
 
   useEffect(() => {
+  if (window.innerWidth > 650) return;
+
   let resizeTimer: ReturnType<typeof setTimeout>;
 
   const handleResize = () => {
