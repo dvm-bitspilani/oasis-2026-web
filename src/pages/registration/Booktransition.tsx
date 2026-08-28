@@ -5,7 +5,7 @@ import closedBook from "/closedBook.png";
 import openBook from "../../assets/registration/reg/book.png";
 
 /* =====================================================
-   TIMELINE (ms)
+   DESKTOP TIMELINE (ms)   —   width >= FLIGHT_MIN_WIDTH
 
    0            scroll starts sliding up (owned by Registration)
    FLY_DELAY    book lifts off from its Instructions position
@@ -19,7 +19,45 @@ const FLY_DELAY = 350;
 const FLY = 900;
 const HOLD = 180;
 const OPEN = 1000;
+
+/* Shared by both layouts: the cross-fade into the real page. */
 const REVEAL = 400;
+
+/* =====================================================
+   MOBILE TIMELINE (ms)   —   width < FLIGHT_MIN_WIDTH
+
+   There is no closed book to fly on mobile: Instructions
+   hides .book below 1401px, and Register swaps to a single
+   page layout, so there is no cover to rotate either. The
+   whole transition is one page swinging in instead.
+
+   0            scroll starts sliding up (owned by Registration)
+   TURN_DELAY   scroll is clear; the page starts swinging in
+                from beyond the right edge of the screen
+   +TURN        the page has landed flat, exactly on top of
+                where the real .bookContainer will render
+   +SETTLE      beat
+   +REVEAL      real <Register /> has faded in — the form text
+                appears on the page just like it does on desktop
+   ===================================================== */
+
+const TURN_DELAY = 540;
+const TURN = 1050;
+const SETTLE = 120;
+
+/* The page hinges on the spine, which on mobile sits at ~96vw —
+   just off the right edge of the screen. Anything past 90deg is
+   therefore folded over to the right and out of view, so starting
+   a little past it is what makes the page read as coming in from
+   outside the screen. Raise this for a longer entrance, but note
+   everything above ~120deg is spent off screen. */
+const TURN_FROM = 108;
+
+/* At TURN_FROM the page is nearly edge on, which still leaves a
+   hairline of the far edge inside the viewport. It is faded in as
+   the turn starts so that hairline is never parked on screen
+   while the scroll is still leaving. */
+const TURN_FADE = 260;
 
 /* closedBook.png has the book drawn ~11deg clockwise inside its own
    frame, with transparent padding around it. Frame one of the
@@ -27,14 +65,20 @@ const REVEAL = 400;
    standing in for the plain <img> on the Instructions page), so the
    correction below is animated in rather than applied instantly.
    SCALING LOGIC: tweak the scale() to close any remaining
-   transparent gap at the corners once it's fully rotated. */
+   transparent gap at the corners once it's fully rotated.
+   DESKTOP ONLY — the mobile path never renders the closed book. */
 const CORRECTED_TRANSFORM = "rotate(-11deg) scale(1.2) translate(-8%,-3%)";
 const CORRECT = FLY; // how long the correction takes to animate in
 
-/* Below this width Register swaps to a completely different
-   single-page book layout (@media max-width: 900px), so the
-   measured destination rect no longer describes anything real
-   and the flight is skipped.
+/* The desktop flight needs the two-page spread to exist, and it
+   stops existing below this width: Register swaps to a completely
+   different single-page book layout (@media max-width: 900px), so
+   the measured destination rect no longer describes anything real.
+   Below this width the mobile page turn runs instead.
+
+   901 is deliberate — it is the first pixel above Register's
+   `@media (max-width: 900px)` / MOBILE_BREAKPOINT = 900. If that
+   breakpoint ever moves, move this with it.
 
    Note: Instructions itself hides .book below 1401px. Between
    901px and 1401px there is no source element, so `start` falls
@@ -56,7 +100,12 @@ type Geometry = {
   page: Rect;
 };
 
-type Stage = "armed" | "flying" | "opening" | "revealed";
+/* "flight"  desktop — closed book flies across, then opens
+   "turn"    mobile  — a single page swings in from the right
+   "skip"    reduced motion — no animation, straight to the reveal */
+type Mode = "flight" | "turn" | "skip";
+
+type Stage = "armed" | "flying" | "opening" | "turning" | "revealed";
 
 type Props = {
   /* Cover has finished rotating — Registration reveals <Register /> */
@@ -66,33 +115,50 @@ type Props = {
 };
 
 export default function Booktransition({ onOpened, onDone }: Props) {
+  const [mode, setMode] = useState<Mode | null>(null);
   const [geo, setGeo] = useState<Geometry | null>(null);
   const [stage, setStage] = useState<Stage>("armed");
 
   const sourceRef = useRef<HTMLElement | null>(null);
 
-  /* ---------------- MEASURE ----------------
-     Read both ends of the flight off the real DOM / real CSS
-     instead of hardcoding percentages, so the many breakpoints
-     in Instructions.module.scss keep working. */
+  /* ---------------- PICK A MODE, THEN MEASURE ----------------
+     Only the desktop flight measures anything. It reads both ends
+     of the flight off the real DOM / real CSS instead of hardcoding
+     percentages, so the many breakpoints in Instructions.module.scss
+     keep working.
+
+     The mobile turn measures nothing: its page is positioned by CSS
+     that mirrors .bookContainer's own mobile rules (see
+     Booktransition.module.scss), which is the only way to land on
+     top of an element sized in svh/vh/vw without guessing how the
+     browser resolved those units. */
 
   useLayoutEffect(() => {
-    let cancelled = false;
-
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
-    if (reduced || window.innerWidth < FLIGHT_MIN_WIDTH) {
+    if (reduced) {
+      setMode("skip");
+
       onOpened();
 
       const skip = window.setTimeout(onDone, REVEAL);
 
-      return () => {
-        cancelled = true;
-        window.clearTimeout(skip);
-      };
+      return () => window.clearTimeout(skip);
     }
+
+    /* ---- MOBILE ---- nothing to measure, nothing to hide. */
+    if (window.innerWidth < FLIGHT_MIN_WIDTH) {
+      setMode("turn");
+
+      return;
+    }
+
+    /* ---- DESKTOP ---- */
+    setMode("flight");
+
+    let cancelled = false;
 
     const source =
       document.querySelector<HTMLElement>("[data-book-start]") ??
@@ -176,22 +242,81 @@ export default function Booktransition({ onOpened, onDone }: Props) {
   /* ---------------- RUN THE TIMELINE ---------------- */
 
   useEffect(() => {
-    if (!geo) return;
-
     const timers: number[] = [];
 
-    timers.push(
-      window.setTimeout(() => setStage("flying"), FLY_DELAY),
-      window.setTimeout(() => setStage("opening"), FLY_DELAY + FLY + HOLD),
-      window.setTimeout(() => {
-        setStage("revealed");
-        onOpened();
-      }, FLY_DELAY + FLY + HOLD + OPEN),
-      window.setTimeout(onDone, FLY_DELAY + FLY + HOLD + OPEN + REVEAL)
-    );
+    if (mode === "turn") {
+      timers.push(
+        window.setTimeout(() => setStage("turning"), TURN_DELAY),
+        window.setTimeout(() => {
+          setStage("revealed");
+          onOpened();
+        }, TURN_DELAY + TURN + SETTLE),
+        window.setTimeout(onDone, TURN_DELAY + TURN + SETTLE + REVEAL)
+      );
+    } else if (mode === "flight" && geo) {
+      timers.push(
+        window.setTimeout(() => setStage("flying"), FLY_DELAY),
+        window.setTimeout(() => setStage("opening"), FLY_DELAY + FLY + HOLD),
+        window.setTimeout(() => {
+          setStage("revealed");
+          onOpened();
+        }, FLY_DELAY + FLY + HOLD + OPEN),
+        window.setTimeout(onDone, FLY_DELAY + FLY + HOLD + OPEN + REVEAL)
+      );
+    }
 
     return () => timers.forEach(window.clearTimeout);
-  }, [geo, onOpened, onDone]);
+  }, [mode, geo, onOpened, onDone]);
+
+  /* =====================================================
+     MOBILE — ONE PAGE SWINGING IN FROM THE RIGHT
+
+     .mobilePage is a copy of Register's mobile .bookContainer:
+     same rect, same background-size / background-position, so
+     when it lands at rotateY(0deg) it is sitting exactly where
+     the real one is about to render and the cross-fade has
+     nothing to move.
+
+     Its transform-origin (set in the SCSS) is the spine — half
+     of the painted spread — which is why the page swings in from
+     off the right edge of the screen rather than from the middle.
+
+     translateY(-50%) is part of .bookContainer's own mobile rule
+     and has to be re-stated here because an inline transform
+     replaces the one from the stylesheet.
+     ===================================================== */
+
+  if (mode === "turn") {
+    const turning = stage !== "armed";
+
+    return (
+      <div
+        className={`${styles.stage} ${styles.mobileStage}`}
+        aria-hidden="true"
+        style={{
+          opacity: stage === "revealed" ? 0 : 1,
+          transition: `opacity ${REVEAL}ms ease`,
+        }}
+      >
+        <div
+          className={styles.mobilePage}
+          style={{
+            backgroundImage: `url(${openBook})`,
+            transform: `translateY(-50%) rotateY(${
+              turning ? 0 : TURN_FROM
+            }deg)`,
+            opacity: turning ? 1 : 0,
+            /* transform, opacity — order matches transition-property */
+            transitionDuration: `${TURN}ms, ${TURN_FADE}ms`,
+          }}
+        />
+      </div>
+    );
+  }
+
+  /* =====================================================
+     DESKTOP — unchanged
+     ===================================================== */
 
   if (!geo) return null;
 
