@@ -187,9 +187,8 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         const buildPath = (r: CloudRig, endY: number, sag: number) => {
           const control1Y = TOP_Y + (endY - TOP_Y) * STRAIGHT_T;
           const control2Y = TOP_Y + (endY - TOP_Y) * HOOK_T;
-          return `M ${r.anchorX} ${TOP_Y} C ${r.anchorX} ${control1Y} ${
-            r.anchorX + sag
-          } ${control2Y} ${r.anchorX} ${endY}`;
+          return `M ${r.anchorX} ${TOP_Y} C ${r.anchorX} ${control1Y} ${r.anchorX + sag
+            } ${control2Y} ${r.anchorX} ${endY}`;
         };
 
         rigs.forEach((r) => {
@@ -296,9 +295,6 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         const SINK_DISTANCE = window.innerHeight;
         const FOREGROUND_DURATION = cloudsDuration * 1.0;
         const MOON_DURATION = cloudsDuration * 1.2;
-        const WOBBLE_AMPLITUDE_X = 10;
-        const WOBBLE_AMPLITUDE_ROT = 2;
-        const WOBBLE_CYCLES = 5;
 
         const applyDrownWobble = (
           el: HTMLElement,
@@ -306,7 +302,11 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           sinkDistance = SINK_DISTANCE,
           basePercent?: { xPercent?: number; yPercent?: number },
         ) => {
-          gsap.set(el, { willChange: "transform", ...(basePercent ?? {}) });
+          gsap.set(el, {
+            willChange: "transform",
+            ...(basePercent ?? {}),
+          });
+
           const state = { p: 0 };
 
           tl.to(
@@ -315,19 +315,24 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
               p: 1,
               duration,
               ease: "power2.in",
+
               onUpdate: () => {
                 const p = state.p;
-                const y = sinkDistance * p;
-                const wobblePhase = p * Math.PI * WOBBLE_CYCLES;
-                const wobbleEnvelope = Math.sin(
-                  Math.min(p / 0.15, 1) * (Math.PI / 2),
-                );
-                const x =
-                  Math.sin(wobblePhase) * WOBBLE_AMPLITUDE_X * wobbleEnvelope;
-                const rot =
-                  Math.sin(wobblePhase) * WOBBLE_AMPLITUDE_ROT * wobbleEnvelope;
 
-                gsap.set(el, { y, x, rotation: rot, ...(basePercent ?? {}) });
+                const y = sinkDistance * p;
+
+                /*
+                 * IMPORTANT:
+                 * Do NOT touch x.
+                 * Do NOT touch rotation.
+                 *
+                 * The castle's horizontal position is controlled
+                 * entirely by its CSS.
+                 */
+                gsap.set(el, {
+                  y,
+                  ...(basePercent ?? {}),
+                });
               },
             },
             0,
@@ -340,7 +345,11 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           sinkDistance = SINK_DISTANCE,
           basePercent?: { xPercent?: number; yPercent?: number },
         ) => {
-          gsap.set(el, { willChange: "transform", ...(basePercent ?? {}) });
+          gsap.set(el, {
+            willChange: "transform",
+            ...(basePercent ?? {}),
+          });
+
           const state = { p: 0 };
 
           tl.to(
@@ -349,10 +358,15 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
               p: 1,
               duration,
               ease: "power2.in",
+
               onUpdate: () => {
                 const p = state.p;
                 const y = sinkDistance * p;
-                gsap.set(el, { y, x: 0, rotation: 0, ...(basePercent ?? {}) });
+
+                gsap.set(el, {
+                  y,
+                  ...(basePercent ?? {}),
+                });
               },
             },
             0,
@@ -365,10 +379,10 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         }
 
         if (moonEl) {
-          applyDrown(moonEl, MOON_DURATION, SINK_DISTANCE, { });
+          applyDrown(moonEl, MOON_DURATION, SINK_DISTANCE, {});
         }
 
-       
+
 
         if (fadeEls.length > 0) {
           tl.to(
