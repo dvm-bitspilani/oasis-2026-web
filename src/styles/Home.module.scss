@@ -58,13 +58,38 @@
   z-index: 6;
 }
 
+/* =========================================================
+   CASTLE
+   ========================================================= */
+
 .castle {
+  --castle-width: clamp(346px, 45vw, 864px);
+
   position: absolute;
   bottom: 24%;
-  left: 41%;
-  transform: translateX(-50%);
-  width: clamp(346px, 45vw, 864px);
+
+  /*
+    IMPORTANT:
+    The castle is centered using left + margin-left,
+    NOT transform: translateX(-50%).
+
+    This leaves transform completely free for GSAP.
+  */
+  left: 50%;
+  margin-left: calc(var(--castle-width) * -0.5);
+
+  width: var(--castle-width);
+
   z-index: 5;
+
+  /*
+    GSAP controls transform.
+    Keeping this here gives the element its own transform
+    layer without adding a horizontal translation.
+  */
+  transform: translateZ(0);
+
+  will-change: transform;
 }
 
 .castleImg {
@@ -72,6 +97,10 @@
   height: auto;
   display: block;
 }
+
+/* =========================================================
+   MOON
+   ========================================================= */
 
 .moon {
   position: absolute;
@@ -87,6 +116,10 @@
   height: auto;
   display: block;
 }
+
+/* =========================================================
+   OASIS LOGO
+   ========================================================= */
 
 .oasisLogo {
   position: absolute;
@@ -108,25 +141,14 @@
    REGISTRATION BUTTON
    ========================================================= */
 
-/* The single source of truth for .regBtn lives near the bottom of this
-   file, after the media query — see the note there. */
+/*
+  The single source of truth for .regBtn lives near the bottom
+  of this file, after the media query.
+*/
 
 /* =========================================================
    CAMEL CARAVAN
    ========================================================= */
-
-/*
-  Both camel1.svg and camel2.svg use this exact same
-  container styling.
-
-  GSAP controls:
-  - x
-  - y
-  - opacity
-
-  Therefore both camels can be animated together
-  using the same GSAP timeline.
-*/
 
 .camelLand {
   position: absolute;
@@ -143,7 +165,6 @@
 
   will-change: transform, opacity;
 
-
   pointer-events: none;
 
   img {
@@ -156,23 +177,28 @@
     pointer-events: none;
   }
 }
+
 .camelLand2 {
   position: absolute;
+
   bottom: 11%;
   left: 35%;
-
 
   height: clamp(70px, 12vh, 130px);
   width: clamp(120px, 28vw, 280px);
 
   z-index: 10;
+
   opacity: 0;
+
   will-change: transform, opacity;
+
   pointer-events: none;
 
   img {
     width: 50%;
     height: 60%;
+
     object-fit: contain;
     display: block;
   }
@@ -185,10 +211,13 @@
 .links {
   position: relative;
   width: clamp(100px, 20vw, 250px);
+
   margin-top: clamp(20px, 7vh, 60px);
+
   margin-left: calc(
     75% - clamp(0px, 5vw, 40px)
   );
+
   z-index: 5;
 }
 
@@ -210,6 +239,7 @@
 
   transform-box: fill-box;
   transform-origin: center;
+
   box-sizing: border-box;
 }
 
@@ -251,45 +281,89 @@
    MOBILE
    ========================================================= */
 
-  
-@media (max-width: 750px) {
+@media (max-width: 650px) {
+
+  /* =======================================================
+     MOBILE CASTLE
+     ======================================================= */
 
   .castle {
-    width: clamp(340px, 100vw, 480px);
+    /*
+      Keep the same responsive width you already had.
+      The important change is that we DON'T use
+      translateX(-50%) anymore.
+    */
+    --castle-width: clamp(340px, 100vw, 480px);
+
+    width: var(--castle-width);
+
     left: 50%;
+
+    /*
+      Precisely center the actual castle width.
+      This is CSS positioning, not transform positioning.
+    */
+    margin-left: calc(
+      var(--castle-width) * -0.5
+    );
+
     bottom: 39%;
-    transform: translateX(-50%) translateZ(0);
+
+    /*
+      GSAP is now the only thing manipulating
+      horizontal transform/x.
+    */
+    transform: translateZ(0);
   }
-  .camelLand2{
-    right:-3%;
-    bottom:23%;
+
+  /* =======================================================
+     MOBILE CAMEL 2
+     ======================================================= */
+
+  .camelLand2 {
+    right: -3%;
+    bottom: 23%;
+
     opacity: 1;
+
     left: auto;
-    
-    img{
-      width:80%;
-      height:80%;
-    }
 
+    img {
+      width: 80%;
+      height: 80%;
+    }
   }
-  .camelLand{
-    right:25%;
+
+  /* =======================================================
+     MOBILE CAMEL 1
+     ======================================================= */
+
+  .camelLand {
+    right: 25%;
     bottom: 20%;
-    left:auto;
+
+    left: auto;
+
     opacity: 1;
 
-
-    img{
-      width:90%;
-      height:80%;
+    img {
+      width: 90%;
+      height: 80%;
     }
   }
 
+  /* =======================================================
+     MOBILE SAND
+     ======================================================= */
 
   .sand {
     height: 46%;
     width: 100vw;
   }
+
+  /* =======================================================
+     MOBILE MOON
+     ======================================================= */
 
   .moon {
     width: clamp(320px, 100vw, 460px);
@@ -297,8 +371,13 @@
     bottom: 30%;
   }
 
+  /* =======================================================
+     MOBILE OASIS LOGO
+     ======================================================= */
+
   .oasisLogo {
     position: absolute;
+
     bottom: 12%;
     left: 5%;
 
@@ -315,6 +394,10 @@
     }
   }
 
+  /* =======================================================
+     MOBILE REGISTRATION BUTTON
+     ======================================================= */
+
   .regBtn {
     position: absolute;
 
@@ -322,14 +405,17 @@
     width: clamp(260px, 70vw, 420px);
 
     z-index: 10;
-     top :auto;
+
+    top: auto;
     bottom: -20%;
+
     left: 15%;
     right: auto;
 
     img {
       width: 90%;
       height: 90%;
+
       object-fit: contain;
       display: block;
     }
@@ -348,49 +434,62 @@
     );
   }
 
-  /* =====================================================
-     MOBILE CAMELS
-     ===================================================== */
-
-
+  /* =======================================================
+     MOBILE LINKS
+     ======================================================= */
 
   .links {
     display: none;
   }
 }
-/* NOTE: this rule sits AFTER the max-width: 750px media query, so at equal
-   specificity it overrides the mobile values for every property it declares
-   (bottom, right, height, width). That was already true before this edit and
-   is preserved here so the layout does not shift. If you want the mobile
-   overrides to actually win, move this block above the media query. */
+
+/* =========================================================
+   REGISTRATION BUTTON
+   ========================================================= */
+
+/*
+  IMPORTANT:
+  This is intentionally AFTER the mobile media query,
+  preserving your original cascade behavior.
+*/
 
 .regBtn {
   position: absolute;
+
   bottom: -4%;
   right: 6%;
+
   height: clamp(198px, 33vh, 356px);
   width: clamp(280px, 36vw, 800px);
+
   z-index: 10;
 
-  /* Button reset — the element is now a real <button> so it is keyboard
-     focusable and clickable in every browser. */
+  /* Button reset */
   appearance: none;
   -webkit-appearance: none;
+
   margin: 0;
   padding: 0;
+
   border: 0;
   background: none;
+
   font: inherit;
   color: inherit;
   text-align: inherit;
+
   cursor: pointer;
 
   img {
     width: 100%;
     height: 100%;
+
     object-fit: contain;
+
     display: block;
+
     will-change: filter;
+
     pointer-events: none;
   }
 
@@ -402,29 +501,38 @@
 
   .regBtnText {
     position: absolute;
+
     top: 22%;
     left: 14%;
+
     width: 72%;
     height: 55%;
+
     z-index: 10;
+
     pointer-events: none;
+
     overflow: visible;
 
     text {
       font-family: "Ramadhan", sans-serif;
+
       font-size: 4px;
+
       letter-spacing: 1px;
+
       fill: #ffffa4;
-      stroke: none; // no stroke at all in base state — removes the thickness
+
+      stroke: none;
+
       paint-order: fill;
 
-      /* Was `pointer-events: bounding-box`, which Firefox does not implement.
-         The declaration was dropped there, so the text inherited
-         `pointer-events: none` from .regBtnText and nothing was clickable.
-         The <button> owns the hit area now, so this stays inert everywhere. */
       pointer-events: none;
 
-      filter: drop-shadow(0 0 4px rgba(255, 255, 164, 0.6));
+      filter:
+        drop-shadow(
+          0 0 4px rgba(255, 255, 164, 0.6)
+        );
 
       transition:
         fill 0.25s ease,
@@ -433,20 +541,35 @@
     }
   }
 
-  /* Hover/focus is driven by the button, not by hit-testing curved glyphs. */
   &:hover .regBtnText text,
   &:focus-visible .regBtnText text {
     fill: #ffcf6b;
+
     stroke: #d9480f;
+
     stroke-width: 1px;
+
     paint-order: stroke fill;
 
-    filter: drop-shadow(0 0 3px #ff7a1a);
+    filter:
+      drop-shadow(
+        0 0 3px #ff7a1a
+      );
   }
 }
+
+/* =========================================================
+   REGISTER TEXT
+   ========================================================= */
+
 .regBtn .regBtnText text {
   font-size: clamp(16px, 5.5vw, 26px);
 }
+
+/* =========================================================
+   CLOUD STRING PATH
+   ========================================================= */
+
 .path {
   fill: none;
 
@@ -456,7 +579,8 @@
 
   stroke-linecap: round;
 
-  filter: drop-shadow(
-    0 0 6px rgba(255, 255, 255, 0.45)
-  );
+  filter:
+    drop-shadow(
+      0 0 6px rgba(255, 255, 255, 0.45)
+    );
 }
