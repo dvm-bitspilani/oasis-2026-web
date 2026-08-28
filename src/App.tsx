@@ -121,7 +121,7 @@ const assets = [
    TRANSITION SETTINGS
 ====================================================== */
 
-const TRANSITION_DURATION = 1150;
+const TRANSITION_DURATION = 1140;
 
 /* ======================================================
    APP
