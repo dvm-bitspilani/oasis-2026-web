@@ -1157,7 +1157,11 @@
 /* ========================================= */
 /* SHORT VIEWPORTS (desktop only)            */
 /* ========================================= */
-
+@media (max-height: 900px) and (min-width: 1300px) and (max-width: 1600px) {
+  .eventsPage {
+    padding-left: 50px;
+  }
+}
 @media (max-height: 800px) and (min-width: 901px) {
   .infoPage {
     padding-right: 35px;

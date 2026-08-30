@@ -383,7 +383,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
     /* ========================================= */
     /* SCROLLBAR WHEEL DRAG MOVE                */
     /* ========================================= */
-
+    console.log(window.innerHeight , window.innerWidth)
     const handleScrollbarPointerMove = (
       e: React.PointerEvent<HTMLImageElement>
     ) => {
