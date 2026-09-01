@@ -197,6 +197,7 @@ export default function Preloader({
   onEnter,
   onExitStart,
 }: PreloaderProps) {
+  const isMobile = window.innerWidth <= 650;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const starRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -273,27 +274,27 @@ export default function Preloader({
 
     const ease = (v: number) => v * v * (3 - 2 * v);
     const sample = () => {
-  const len = path.getTotalLength();
-  const out: Point[] = [];
+      const len = path.getTotalLength();
+      const out: Point[] = [];
 
-  const starCount =
-    window.innerWidth <= 650
-      ? MOBILE_PATH_STAR_COUNT
-      : PATH_STAR_COUNT;
+      const starCount =
+        window.innerWidth <= 650
+          ? MOBILE_PATH_STAR_COUNT
+          : PATH_STAR_COUNT;
 
-  for (let i = 0; i < starCount; i++) {
-    const p = path.getPointAtLength(
-      (len * i) / (starCount - 1)
-    );
+      for (let i = 0; i < starCount; i++) {
+        const p = path.getPointAtLength(
+          (len * i) / (starCount - 1)
+        );
 
-    out.push({
-      x: p.x,
-      y: p.y,
-    });
-  }
+        out.push({
+          x: p.x,
+          y: p.y,
+        });
+      }
 
-  return out;
-};
+      return out;
+    };
     const screen = (p: Point): Point => {
       const scale = Math.min(
         (width * 0.96) / SVG_VIEWBOX_WIDTH,
@@ -441,16 +442,16 @@ export default function Preloader({
 
       backgroundStars.forEach((star) => {
         let x =
-            (star.x + (star.speed * star.depth * elapsed) / 1000) %
-            (width + 40),
+          (star.x + (star.speed * star.depth * elapsed) / 1000) %
+          (width + 40),
           y =
             (star.y + (star.speed * 0.28 * star.depth * elapsed) / 1000) %
             (height + 40);
         if (x < 0) x += width + 40;
         if (y < 0) y += height + 40;
         const tw =
-            (Math.sin(elapsed * 0.001 * star.twinkleSpeed + star.phase) + 1) /
-            2,
+          (Math.sin(elapsed * 0.001 * star.twinkleSpeed + star.phase) + 1) /
+          2,
           op = star.opacity * (0.7 + tw * 0.3);
 
         if (star.depth > 0.75) {
@@ -513,27 +514,54 @@ export default function Preloader({
       });
       logoDots.forEach((dot) => {
         const local = ease(
-            Math.min(1, Math.max(0, (logoP - dot.order) / 0.1)),
-          ),
+          Math.min(1, Math.max(0, (logoP - dot.order) / 0.1)),
+        ),
           pulse = 0.9 + 0.1 * ((Math.sin(elapsed * 0.002 + dot.phase) + 1) / 2),
           op = 0.035 + local * 0.965 * pulse,
           r = dot.size * (0.7 + local * 0.55);
 
         if (local > 0.02) {
-          const glowSize = r * (4 + local * 4);
-          ctx.globalAlpha = op * local * 0.6;
+          const glowWidth = isMobile
+            ? r * (2 + local * 2.5)
+            : r * (4 + local * 4);
+
+          const glowHeight = isMobile
+            ? r * (2.5 + local * 2.5)
+            : r * (4 + local * 4);
+
+          ctx.globalAlpha = isMobile
+            ? op * local * 0.3
+            : op * local * 0.6;
+
           ctx.drawImage(
             glowSprite,
-            dot.x - glowSize / 2,
-            dot.y - glowSize / 2,
-            glowSize,
-            glowSize,
+            dot.x - glowWidth / 2,
+            dot.y - glowHeight / 2,
+            glowWidth,
+            glowHeight,
           );
+
           ctx.globalAlpha = 1;
         }
 
+        
+
         ctx.beginPath();
-        ctx.arc(dot.x, dot.y, r, 0, Math.PI * 2);
+
+        if (isMobile) {
+          ctx.ellipse(
+            dot.x,
+            dot.y,
+            r * 0.35, // width of star
+            r,        // height stays the same
+            0,
+            0,
+            Math.PI * 2,
+          );
+        } else {
+          ctx.arc(dot.x, dot.y, r, 0, Math.PI * 2);
+        }
+
         ctx.fillStyle = `rgba(${LOGO_COLOR},${op})`;
         ctx.fill();
       });
