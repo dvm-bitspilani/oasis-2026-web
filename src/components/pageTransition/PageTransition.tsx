@@ -6,7 +6,7 @@ import {
   useImperativeHandle,
   useRef,
 } from "react";
-import curtainVideo from "../../assets/video/curtain.mp4";
+import curtainVideo from "../../assets/video/curtain1.mp4";
 
 const CLOUD_SELECTOR = "[data-cloud-string]";
 const CASTLE_SELECTOR = "[data-castle-drown]";
