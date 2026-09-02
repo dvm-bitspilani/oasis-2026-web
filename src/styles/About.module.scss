@@ -28,12 +28,36 @@
 }
 
 .cloud {
-  width: clamp(280px, 100vw, 1400px);
-  height: clamp(220px, 100vh, 900px);
-  object-fit: contain;
-  @extend %svgFill;
-}
+  position: relative;
 
+  width: clamp(280px, 150vw, 1600px);
+  height: clamp(220px, 150vh, 1200px);
+
+  @extend %svgFill;
+
+  svg {
+    position: relative;
+    z-index: 1;
+  }
+}
+.text {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 30%;
+  height: auto;
+
+  background: linear-gradient(135deg, rgba(229, 0, 0, 1), rgba(0, 17, 170, 1));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent; // fallback for browsers without background-clip: text support
+
+  z-index: 2;
+}
 // footer-style element — plain img, keeps its natural aspect ratio
 .bgBottom {
   position: absolute;
@@ -135,6 +159,18 @@
   z-index: 2;
   width: clamp(140px, 70vw, 650px);
   height: clamp(220px, 100vh, 1200px);
+  overflow: hidden;
+  @extend %svgFill;
+}
+
+
+.head  {
+  position: absolute;
+  top:  -12%;
+  // right:  -12%;
+  z-index: 2;
+  width: clamp(140px, 50vw, 650px);
+  height: clamp(220px, 50vh, 1200px);
   overflow: hidden;
   @extend %svgFill;
 }

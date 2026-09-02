@@ -9,7 +9,7 @@ import leftCloud from "../assets/about/leftCloud.png";
 import midCloud from "../assets/about/midCloud.png";
 import leftTop from "../assets/about/leftTop.png";
 import pillar from "../assets/about/pillar.png";
-
+import head from "../assets/about/head.png"
 // SVG wrapper for fixed-box elements (clouds, pillars, top corners)
 const SvgImg = ({
   src,
@@ -37,6 +37,9 @@ const About = () => {
     <div className={styles.about} style={{ backgroundImage: `url(${bg})` }}>
       <div className={styles.cloud}>
         <SvgImg src={cloud} />
+        <div className={styles.text}>
+          Oasis, the annual cultural extravaganza of Birla Institute of Technology and Science, Pilani, has been a vibrant part of India's cultural tapestry since 1971. Managed entirely by students, it's a dazzling showcase of talent in Dance, Drama, Literature, Comedy, Fashion, and Music. It's where dreams come alive, laughter fills the air, and creativity knows no bounds. Step into the world of Oasis, where youth's boundless potential shines...
+        </div>
       </div>
 
       {/* footer element — plain img, preserves its own aspect ratio */}
@@ -49,6 +52,9 @@ const About = () => {
       </div>
       <div className={styles.midCloud}>
         <SvgImg src={midCloud} />
+      </div>
+      <div className={styles.head}>
+        <SvgImg src={head} />
       </div>
       <div className={styles.leftTop}>
         <SvgImg src={leftTop} />
