@@ -11,7 +11,7 @@ import cloudThree from "../assets/cloudThree.svg";
 import Castle from "../assets/castlefinal2.png";
 import Moon from "../assets/Moon.png";
 import LogoOasis from "../assets/LogoOasisi.png";
-import RegBtn from "../assets/cactuschange.png";
+import RegBtn from "../assets/cactuschange1.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
 import camelLand from "../assets/camel1.svg";
