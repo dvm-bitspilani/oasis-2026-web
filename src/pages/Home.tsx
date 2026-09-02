@@ -1,4 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import gsap from "gsap";
 
 import styles from "../styles/Home.module.scss";
@@ -1097,10 +1103,18 @@ export default function Home({
         <img src={LogoOasis} alt="Oasis" />
       </div>
 
+      {/* The idle sweep in Home.module.scss masks itself with the button image
+          so the light is clipped to the cactus silhouette. The URL is only
+          known after the bundler hashes the asset, hence the CSS variable. */}
       <button
         type="button"
         className={styles.regBtn}
         aria-label="Register"
+        style={
+          {
+            "--reg-btn-mask": `url(${RegBtn})`,
+          } as CSSProperties
+        }
         onClick={() => navigateWithTransition("/register")}
       >
         <img src={RegBtn} alt="" />

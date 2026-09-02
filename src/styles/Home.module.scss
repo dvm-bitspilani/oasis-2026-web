@@ -366,11 +366,12 @@
 
 .regBtn {
   position: absolute;
-  bottom: -4%;
-  right: 6%;
+  bottom: 0%;
+  right: 2%;
   height: clamp(198px, 33vh, 356px);
   width: clamp(280px, 36vw, 800px);
-  z-index: 10;
+  z-index: 100;
+  scale: 0.9;
 
   /* Button reset — the element is now a real <button> so it is keyboard
      focusable and clickable in every browser. */
@@ -392,7 +393,79 @@
     display: block;
     will-change: filter;
     pointer-events: none;
+
+    transition: filter 0.25s ease;
   }
+
+  /* Desktop-only glow. This is the same drop-shadow the mobile `:active`
+     rule flashes on tap, moved onto hover for real pointers.
+     `hover: hover` / `pointer: fine` keeps it off touch devices, where
+     :hover sticks after a tap and the glow would never go away.
+     It sits after the max-width: 750px block, so at equal specificity it
+     beats that block's `.regBtn:hover img { filter: none; }` in a narrow
+     desktop window — which is what we want, since that rule only exists to
+     suppress hover on touch. */
+  @media (hover: hover) and (pointer: fine) {
+    &:hover img {
+      filter: drop-shadow(0 0 6px rgba(254, 213, 155, 0.4));
+    }
+  }
+
+  /* ---------------------------------------------------------
+     IDLE ATTENTION SWEEP
+
+     A band of light that travels across the cactus every few
+     seconds. The pseudo-element is masked by the same PNG the
+     <img> shows (passed in from Home.tsx as --reg-btn-mask), so
+     the light is clipped to the artwork's silhouette instead of
+     to the rectangular button box.
+
+     mask-size: contain mirrors the img's object-fit: contain in
+     the same box, so mask and artwork line up exactly.
+     --------------------------------------------------------- */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 5; /* above the <img>, below .regBtnText (z-index 10) */
+    pointer-events: none;
+
+    -webkit-mask-image: var(--reg-btn-mask);
+    mask-image: var(--reg-btn-mask);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+
+    background-image: linear-gradient(
+      115deg,
+      rgba(254, 213, 155, 0) 40%,
+      rgba(255, 240, 200, 0.85) 50%,
+      rgba(254, 213, 155, 0) 60%
+    );
+    background-repeat: no-repeat;
+    background-size: 250% 250%;
+
+    mix-blend-mode: screen;
+    opacity: 0;
+
+    animation: regBtnSweep 5s ease-in-out infinite;
+  }
+
+  /* No mobile override for the mask box on purpose.
+
+     The `max-width: 750px` block does declare `img { width: 90%; height: 90% }`,
+     but that block sits ABOVE this one at equal specificity, so the 100%/100%
+     rule above wins there too — the mobile 90% never actually applies (same
+     dead-override situation the note at the top of this block describes).
+     The <img> is therefore full-box on every breakpoint, and `inset: 0` on the
+     mask is already correct everywhere.
+
+     If you ever move the mobile block below this one so its 90% sizing takes
+     effect, the mask has to shrink with it: `&::after { inset: 5%; }` inside a
+     `max-width: 750px` query, assuming the img stays centered. */
 
   &:focus-visible {
     outline: 2px solid #ffcf6b;
@@ -447,6 +520,45 @@
 .regBtn .regBtnText text {
   font-size: clamp(16px, 5.5vw, 26px);
 }
+
+/* =========================================================
+   REGISTER BUTTON — IDLE SWEEP KEYFRAMES
+
+   The band sits parked off the right edge for most of the cycle,
+   then crosses the artwork in the last ~30% (~1.5s of the 5s loop).
+   Change the animation-duration on .regBtn::after to space the
+   sweeps further apart; change the 70% stop to make the pause
+   longer or shorter relative to the crossing.
+   ========================================================= */
+@keyframes regBtnSweep {
+  0%,
+  70% {
+    background-position: 115% 50%;
+    opacity: 0;
+  }
+
+  75% {
+    opacity: 1;
+  }
+
+  96% {
+    background-position: -15% 50%;
+    opacity: 1;
+  }
+
+  100% {
+    background-position: -15% 50%;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .regBtn::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
 .path {
   fill: none;
 
@@ -459,4 +571,14 @@
   filter: drop-shadow(
     0 0 6px rgba(255, 255, 255, 0.45)
   );
+}
+
+@media screen and (max-width: 577px) {
+  .regBtn {
+    scale: 1.2;
+
+    .regBtnText {
+      top: 24%;
+    }
+  }
 }
