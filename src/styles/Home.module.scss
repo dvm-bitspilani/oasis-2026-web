@@ -189,7 +189,7 @@
   margin-left: calc(
     75% - clamp(0px, 5vw, 40px)
   );
-  z-index: 5;
+  z-index: 3;
 }
 
 .linksSvg {
@@ -256,7 +256,8 @@
 
   .castle {
     width: clamp(340px, 100vw, 480px);
-    left: 50%;
+    left: 0;
+    transform: none;
     bottom: 39%;
     width: 100vw;
   }
