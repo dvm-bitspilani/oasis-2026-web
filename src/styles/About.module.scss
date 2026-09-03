@@ -195,3 +195,31 @@
   overflow: hidden;
   @extend %svgFill;
 }
+.play {
+  position: absolute;
+  top: 49%;
+  left: 64%;
+  
+  z-index: 9999;
+
+  width: 23vw;
+  height: 23vh;
+
+  overflow: visible;
+
+  @extend %svgFill;
+}
+.video {
+  position: absolute;
+  inset: 0;
+
+  width: 30%;
+  height: 100%;
+  left: 35%;
+  top: 30%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  z-index: 1000;
+}
