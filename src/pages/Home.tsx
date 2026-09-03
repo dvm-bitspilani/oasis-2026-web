@@ -1194,7 +1194,11 @@ export default function Home({
             />
           </a>
 
-          <a href="" target="_blank" rel="noreferrer">
+          <a
+            href="https://www.youtube.com/@oasisbitspilani6375"
+            target="_blank"
+            rel="noreferrer"
+          >
             <image
               href={youtubeIcon}
               x="53"
@@ -1206,7 +1210,7 @@ export default function Home({
           </a>
 
           <a
-            href="#"
+            href="https://x.com/bitsoasis"
             target="_blank"
             rel="noreferrer"
             onClick={(e) => e.preventDefault()}
