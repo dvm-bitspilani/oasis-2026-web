@@ -755,7 +755,7 @@ export default function Home({
     window.removeEventListener("resize", handleResize);
   };
 }, []);
-
+  
   useEffect(() => {
     const ctx = gsap.context(() => {
       cloudRefs.current.forEach((cloud, i) => {
@@ -793,38 +793,23 @@ export default function Home({
 
     const tick = () => {
       const containerEl = containerRef.current;
-
       const moonEl = moonRef.current;
-
       const porthole = portholeRef.current;
-
       const portholeInner = portholeInnerRef.current;
-
       if (containerEl && moonEl && porthole && portholeInner) {
         const containerBox = containerEl.getBoundingClientRect();
-
         const moonBox = moonEl.getBoundingClientRect();
-
         const top = moonBox.top - containerBox.top;
-
         const left = moonBox.left - containerBox.left;
-
         porthole.style.top = `${top}px`;
-
         porthole.style.left = `${left}px`;
-
         porthole.style.width = `${moonBox.width}px`;
-
         porthole.style.height = `${moonBox.height}px`;
-
         portholeInner.style.top = `${-top}px`;
-
         portholeInner.style.left = `${-left}px`;
-
         portholeInner.style.width = `${containerBox.width}px`;
-
         portholeInner.style.height = `${containerBox.height}px`;
-      }
+            }
 
       cloudRefs.current.forEach((real, i) => {
         const overlay = overlayCloudRefs.current[i];

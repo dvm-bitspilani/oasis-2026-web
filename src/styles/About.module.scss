@@ -44,12 +44,12 @@
   position: absolute;
 
   top: 50%;
-  left: 50%;
+  left: 52%;
   transform: translate(-50%, -50%);
 
   width: 30%;
   height: auto;
-
+  font-size: 1.2rem ;
   background: linear-gradient(135deg, rgba(229, 0, 0, 1), rgba(0, 17, 170, 1));
   background-clip: text;
   -webkit-background-clip: text;
@@ -151,6 +151,27 @@
   overflow: hidden;
   @extend %svgFill;
 }
+.lamp {
+  position: absolute;
+  top: 0%;
+  left: -5%;
+  z-index: 200;
+  width: clamp(140px, 30vw, 650px);
+  height: clamp(220px, 65vh, 1000px);
+  overflow: hidden;
+  @extend %svgFill;
+}
+.lampR {
+  position: absolute;
+  top: 15%;
+  right: 7%;
+  z-index: 200;
+  width: clamp(140px, 15vw, 650px);
+  height: clamp(220px, 55vh, 1000px);
+  overflow: hidden;
+  @extend %svgFill;
+}
+
 
 .pillarR  {
   position: absolute;

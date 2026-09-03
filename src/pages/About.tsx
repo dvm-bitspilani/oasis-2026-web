@@ -10,6 +10,7 @@ import midCloud from "../assets/about/midCloud.png";
 import leftTop from "../assets/about/leftTop.png";
 import pillar from "../assets/about/pillar.png";
 import head from "../assets/about/head.png"
+import lamp from "../assets/about/lamp.png"
 // SVG wrapper for fixed-box elements (clouds, pillars, top corners)
 const SvgImg = ({
   src,
@@ -31,9 +32,9 @@ const SvgImg = ({
 );
 
 const About = () => {
-  console.log(window.innerHeight , window.innerWidth)
+  console.log(window.innerHeight, window.innerWidth)
   return (
-    
+
     <div className={styles.about} style={{ backgroundImage: `url(${bg})` }}>
       <div className={styles.cloud}>
         <SvgImg src={cloud} />
@@ -78,6 +79,12 @@ const About = () => {
       </div>
       <div className={styles.pillarR}>
         <SvgImg src={pillar} />
+      </div>
+      <div className={styles.lamp}>
+        <SvgImg src={lamp} />
+      </div>
+      <div className={styles.lampR}>
+        <SvgImg src={lamp} />
       </div>
     </div>
   );
