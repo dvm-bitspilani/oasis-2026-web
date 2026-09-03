@@ -17,7 +17,12 @@ import cloudThree from "../assets/cloudThree.svg";
 import Castle from "../assets/castlefinal2.png";
 import Moon from "../assets/Moon.png";
 import LogoOasis from "../assets/LogoOasisi.png";
-import RegBtn from "../assets/cactuschange.png";
+/* The register button artwork is split into two layers so the shine can be
+   masked to the carpet alone. Both files are expected to be exported on the
+   SAME canvas as the old cactuschange.png — that is what lets them stack at
+   inset: 0 and line back up into the original composition. */
+import RegCactus from "../assets/regCactus.png";
+import RegCarpet from "../assets/regCarpet.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
 import camelLand from "../assets/camel1.svg";
@@ -1103,21 +1108,25 @@ export default function Home({
         <img src={LogoOasis} alt="Oasis" />
       </div>
 
-      {/* The idle sweep in Home.module.scss masks itself with the button image
-          so the light is clipped to the cactus silhouette. The URL is only
-          known after the bundler hashes the asset, hence the CSS variable. */}
+      {/* The shine in Home.module.scss masks itself with the carpet PNG so the
+          light is clipped to the fabric and never touches the cacti. The URL is
+          only known after the bundler hashes the asset, hence the CSS variable. */}
       <button
         type="button"
         className={styles.regBtn}
         aria-label="Register"
         style={
           {
-            "--reg-btn-mask": `url(${RegBtn})`,
+            "--reg-carpet-mask": `url(${RegCarpet})`,
           } as CSSProperties
         }
         onClick={() => navigateWithTransition("/register")}
       >
-        <img src={RegBtn} alt="" />
+        {/* Cacti sit behind. The carpet's tied ends drape in front of the arms
+            in the original artwork, so the carpet paints second. Swap the two
+            lines if your export has the overlap the other way round. */}
+        <img className={styles.regCactusLayer} src={RegCactus} alt="" />
+        <img className={styles.regCarpetLayer} src={RegCarpet} alt="" />
 
         <svg
           className={styles.regBtnText}
@@ -1134,7 +1143,6 @@ export default function Home({
             </textPath>
           </text>
         </svg>
-
       </button>
 
       <div
