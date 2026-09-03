@@ -1213,7 +1213,6 @@ export default function Home({
             href="https://x.com/bitsoasis"
             target="_blank"
             rel="noreferrer"
-            onClick={(e) => e.preventDefault()}
           >
             <image
               href={twitterIcon}
