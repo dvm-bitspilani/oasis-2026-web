@@ -402,7 +402,14 @@
   font: inherit;
   color: inherit;
   text-align: inherit;
-  cursor: pointer;
+
+  /* Only the carpet is clickable now, so the pointer cursor follows the same
+     hit-test rather than appearing across the whole rectangle. */
+  cursor: default;
+
+  &.carpetHover {
+    cursor: pointer;
+  }
 
   /* Two stacked layers rebuild what used to be one image. Both are absolutely
      positioned in the same box with the same object-fit, so as long as the two
@@ -436,13 +443,16 @@
   /* Desktop-only glow. This is the same drop-shadow the mobile `:active`
      rule flashes on tap, moved onto hover for real pointers.
      `hover: hover` / `pointer: fine` keeps it off touch devices, where
-     :hover sticks after a tap and the glow would never go away.
-     It sits after the max-width: 750px block, so at equal specificity it
-     beats that block's `.regBtn:hover img { filter: none; }` in a narrow
-     desktop window — which is what we want, since that rule only exists to
-     suppress hover on touch. */
+     the state would stick after a tap and the glow would never go away.
+
+     The trigger is .carpetHover, not :hover. Home.tsx sets that class only
+     while the cursor is over an opaque pixel of regCarpet.png, so the glow
+     covers exactly the area the sweep animation travels across instead of
+     the button's full rectangle. It sits after the max-width: 750px block,
+     so at equal specificity it beats that block's
+     `.regBtn:hover img { filter: none; }` in a narrow desktop window. */
   @media (hover: hover) and (pointer: fine) {
-    &:hover img {
+    &.carpetHover img {
       filter: drop-shadow(0 0 6px rgba(254, 213, 155, 0.4));
     }
   }
@@ -535,13 +545,15 @@
     }
   }
 
-  /* Hover/focus is driven by the button, not by hit-testing curved glyphs. */
-  &:hover .regBtnText text,
+  /* Same story for the word: .carpetHover comes from the alpha hit-test in
+     Home.tsx. focus-visible stays on the button itself, since keyboard users
+     have no cursor to place over the carpet. */
+  &.carpetHover .regBtnText text,
   &:focus-visible .regBtnText text {
-    fill: #ffcf6b;
+    /*fill: #ffcf6b;
     stroke: #d9480f;
     stroke-width: 1px;
-    paint-order: stroke fill;
+    paint-order: stroke fill;*/
 
     filter: drop-shadow(0 0 3px #ff7a1a);
   }

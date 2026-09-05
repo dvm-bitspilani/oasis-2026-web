@@ -181,6 +181,85 @@ export default function Home({
 
   const { navigateWithTransition } = useTransition();
 
+  /* ---------------------------------------------------------------
+     CARPET HIT-TESTING
+
+     The sweep animation gets the carpet's exact shape for free: its
+     ::after layer is masked with regCarpet.png, so the browser clips
+     the light using the file's alpha channel.
+
+     Hover and click can't use a mask — masks change what is painted,
+     not what is hoverable, and clip-path would mean hand-tracing the
+     drape. So we read the same alpha channel ourselves: the PNG is
+     drawn once into an offscreen canvas, and each pointer event looks
+     up the alpha of the single pixel under the cursor. Same source of
+     truth as the sweep, no shape to keep in sync.
+     --------------------------------------------------------------- */
+  const carpetImgRef = useRef<HTMLImageElement>(null);
+  const carpetAlphaRef = useRef<{
+    ctx: CanvasRenderingContext2D;
+    w: number;
+    h: number;
+  } | null>(null);
+  const [overCarpet, setOverCarpet] = useState(false);
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = RegCarpet;
+
+    const onLoad = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return;
+
+      ctx.drawImage(img, 0, 0);
+      carpetAlphaRef.current = { ctx, w: canvas.width, h: canvas.height };
+    };
+
+    if (img.complete) onLoad();
+    else img.addEventListener("load", onLoad);
+
+    return () => img.removeEventListener("load", onLoad);
+  }, []);
+
+  const isOverCarpet = (clientX: number, clientY: number) => {
+    const el = carpetImgRef.current;
+    const alpha = carpetAlphaRef.current;
+
+    if (!el) return false;
+    /* Canvas not ready yet — treat the whole button as live rather than
+       leaving it dead for the first few hundred ms after mount. */
+    if (!alpha) return true;
+
+    /* getBoundingClientRect already accounts for the --carpet-* transform,
+       so the only thing left to undo is the object-fit: contain letterbox. */
+    const rect = el.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+
+    const fit = Math.min(rect.width / alpha.w, rect.height / alpha.h);
+    const drawnW = alpha.w * fit;
+    const drawnH = alpha.h * fit;
+
+    const x = (clientX - rect.left - (rect.width - drawnW) / 2) / fit;
+    const y = (clientY - rect.top - (rect.height - drawnH) / 2) / fit;
+
+    if (x < 0 || y < 0 || x >= alpha.w || y >= alpha.h) return false;
+
+    try {
+      const px = alpha.ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1);
+      /* Small threshold so the drape's soft antialiased edge doesn't
+         produce a band of pixels that look solid but don't respond. */
+      return px.data[3] > 10;
+    } catch {
+      /* Cross-origin asset would taint the canvas and make getImageData
+         throw. Fall back to the old whole-button behaviour. */
+      return true;
+    }
+  };
+
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
 
@@ -1098,20 +1177,32 @@ export default function Home({
           only known after the bundler hashes the asset, hence the CSS variable. */}
       <button
         type="button"
-        className={styles.regBtn}
+        className={`${styles.regBtn} ${overCarpet ? styles.carpetHover : ""}`}
         aria-label="Register"
         style={
           {
             "--reg-carpet-mask": `url(${RegCarpet})`,
           } as CSSProperties
         }
-        onClick={() => navigateWithTransition("/register")}
+        onPointerMove={(e) => setOverCarpet(isOverCarpet(e.clientX, e.clientY))}
+        onPointerLeave={() => setOverCarpet(false)}
+        onClick={(e) => {
+          /* detail === 0 means keyboard activation (Enter/Space), where there
+             is no cursor position to test — always allow those through. */
+          if (e.detail !== 0 && !isOverCarpet(e.clientX, e.clientY)) return;
+          navigateWithTransition("/register");
+        }}
       >
         {/* Cacti sit behind. The carpet's tied ends drape in front of the arms
             in the original artwork, so the carpet paints second. Swap the two
             lines if your export has the overlap the other way round. */}
         <img className={styles.regCactusLayer} src={RegCactus} alt="" />
-        <img className={styles.regCarpetLayer} src={RegCarpet} alt="" />
+        <img
+          ref={carpetImgRef}
+          className={styles.regCarpetLayer}
+          src={RegCarpet}
+          alt=""
+        />
 
         <svg
           className={styles.regBtnText}
