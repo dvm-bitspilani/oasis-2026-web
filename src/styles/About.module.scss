@@ -1,22 +1,19 @@
-
 .about {
   height: 100vh;
   width: 100%;
 
   background-color: black;
+
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-
+  z-index: 10;
   overflow: hidden;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   position: relative;
 }
-
 // shared: svg fills its container div, used for fixed-box elements only
 %svgFill {
   svg {
@@ -37,7 +34,7 @@
 
   svg {
     position: relative;
-    z-index: 1;
+    z-index: 10;
   }
 }
 .text {
@@ -46,7 +43,7 @@
   top: 50%;
   left: 52%;
   transform: translate(-50%, -50%);
-
+  
   width: 30%;
   height: auto;
   font-size: 1.2rem ;
@@ -56,7 +53,7 @@
   -webkit-text-fill-color: transparent;
   color: transparent; // fallback for browsers without background-clip: text support
 
-  z-index: 2;
+  z-index: 20;
 }
 // footer-style element — plain img, keeps its natural aspect ratio
 .bgBottom {
@@ -172,7 +169,6 @@
   @extend %svgFill;
 }
 
-
 .pillarR  {
   position: absolute;
   bottom: -12%;
@@ -183,12 +179,9 @@
   overflow: hidden;
   @extend %svgFill;
 }
-
-
 .head  {
   position: absolute;
   top:  -12%;
-  // right:  -12%;
   z-index: 2;
   width: clamp(140px, 50vw, 650px);
   height: clamp(220px, 50vh, 1200px);
@@ -197,29 +190,67 @@
 }
 .play {
   position: absolute;
-  top: 49%;
+  top: 0%;
   left: 64%;
-  
   z-index: 9999;
-
   width: 23vw;
   height: 23vh;
-
   overflow: visible;
-
   @extend %svgFill;
 }
 .video {
   position: absolute;
   inset: 0;
-
   width: 30%;
   height: 100%;
   left: 35%;
-  top: 30%;
+  top: 40%;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-
   z-index: 1000;
+}
+.bgVid {
+  position: absolute;
+  inset: 0;
+  width: 65vw;
+  height: 65vh;
+  left: 18%;
+  top:  18%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1000;
+}
+
+ .arrow{
+  position: absolute;
+  inset: 0;
+  width: 30%;
+  height: 100%;
+  left: 12%;
+  top: 48%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1000;
+}
+ .arrowR{
+  position: absolute;
+  inset: 0;
+  width: 30%;
+  height: 100%;
+  transform: scaleX(-1);
+  left:55%;
+  top: 48%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1000;
+}
+.bgAfter{
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
+  z-index: 0;
 }
