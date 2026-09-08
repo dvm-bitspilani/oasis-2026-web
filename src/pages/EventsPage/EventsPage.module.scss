@@ -1,0 +1,839 @@
+* {
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
+.fullPageContainer {
+    background-image: url(/eventsPagebg.png);
+    background-position: bottom;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    height: 100svh;
+    position: relative;
+}
+
+.spotlightOverlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    backdrop-filter: brightness(0.4);
+    -webkit-backdrop-filter: brightness(0.4);
+    mask-image: radial-gradient(
+        circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        transparent 0px,
+        transparent 250px,
+        black 300px,
+        black 100%
+    );
+    -webkit-mask-image: radial-gradient(
+        circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        transparent 0px,
+        transparent 250px,
+        black 300px,
+        black 100%
+    );
+}
+
+.dramaContainer {
+    position: absolute;
+    bottom: 0%;
+    left: 25%;
+    margin-bottom: 450px;
+}
+
+.photographyContainer {
+    position: absolute;
+    bottom: 0%;
+    right: 25%;
+    margin-bottom: 450px;
+}
+
+.danceContainer {
+    position: absolute;
+    bottom: 0%;
+    left: 5%;
+}
+
+.otherContainer {
+    position: absolute;
+    bottom: 0%;
+    left: 35%;
+    margin-bottom: -140px;
+}
+
+.musicContainer {
+    position: absolute;
+    bottom: 0%;
+    right: 5%;
+}
+
+.title {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    filter: brightness(3);
+}
+
+@media screen and (max-width: 1600px) {
+    .dramaContainer,
+    .photographyContainer,
+    .danceContainer,
+    .otherContainer,
+    .musicContainer,
+    .title {
+        scale: 0.7;
+    }
+
+    .dramaContainer,
+    .photographyContainer {
+        margin-bottom: 270px;
+    }
+
+    .danceContainer,
+    .musicContainer {
+        margin-bottom: -80px;
+    }
+
+    .otherContainer {
+        margin-bottom: -208px;
+        left: 30%;
+    }
+
+    .title {
+        top: -8%;
+    }
+
+    .photographyContainer {
+        right: 15%;
+    }
+
+    .spotlightOverlay {
+        mask-image: radial-gradient(
+        circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        transparent 0px,
+        transparent 140px,
+        black 220px,
+        black 100%
+    );
+    -webkit-mask-image: radial-gradient(
+        circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        transparent 0px,
+        transparent 140px,
+        black 220px,
+        black 100%
+    );
+    }
+}
+
+@media screen and (max-width: 577px) {
+    .spotlightOverlay {
+        display: none;
+    }
+
+    .title {
+        left: -13%;
+        filter: brightness(2);
+    }
+
+    .danceContainer,
+    .otherContainer,
+    .musicContainer {
+        scale: 0.4;
+        margin-bottom: -160px;
+    }
+
+    .dramaContainer,
+    .photographyContainer {
+        scale: 0.45;
+        margin-bottom: 185px;
+    }
+
+    .dramaContainer {
+        left: -25%;
+    }
+
+    .photographyContainer {
+        right: -20%;
+    }
+
+    .danceContainer {
+        left: -33%;
+        margin-bottom: -145px;
+    }
+
+    .otherContainer {
+        left: -17%;
+        margin-bottom: -260px;
+    }
+
+    .musicContainer {
+        right: -35%;
+    }
+}
+/* =========================================================
+   CLICKABLE POTS
+========================================================= */
+
+.dramaContainer,
+.photographyContainer,
+.danceContainer,
+.otherContainer,
+.musicContainer {
+
+    cursor: pointer;
+
+    img {
+        transition:
+            transform 0.35s ease,
+            filter 0.35s ease;
+    }
+
+    &:hover img {
+        transform: scale(1.04);
+
+        filter:
+            drop-shadow(
+                0 0 12px
+                rgba(224, 174, 50, 0.5)
+            )
+            brightness(1.08);
+    }
+}
+
+
+/* =========================================================
+   MODAL OVERLAY
+========================================================= */
+
+.modalOverlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 5000;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 30px;
+
+    background:
+        rgba(5, 5, 20, 0.72);
+
+    backdrop-filter: blur(5px);
+
+    animation:
+        eventsOverlayIn
+        0.3s
+        ease
+        forwards;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal {
+
+    position: relative;
+
+    width: min(920px, 90vw);
+
+    min-height: 430px;
+
+    padding:
+        48px
+        55px
+        30px;
+
+    background:
+        rgba(75, 67, 120, 0.88);
+
+    border:
+        1px solid
+        rgba(210, 190, 255, 0.25);
+
+    box-shadow:
+        0 20px 80px
+        rgba(0, 0, 0, 0.55),
+
+        inset 0 0 80px
+        rgba(170, 150, 230, 0.08);
+
+    backdrop-filter: blur(10px);
+
+    color: #f5eee3;
+
+    animation:
+        eventsModalIn
+        0.4s
+        ease
+        forwards;
+}
+
+
+/* =========================================================
+   CLOSE
+========================================================= */
+
+.closeButton {
+
+    position: absolute;
+
+    top: 12px;
+
+    right: 18px;
+
+    z-index: 10;
+
+    width: 40px;
+
+    height: 40px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #e5ad2f;
+
+    font-size: 36px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.closeButton:hover {
+
+    transform:
+        scale(1.15);
+
+    color:
+        #ffe8a0;
+}
+
+
+/* =========================================================
+   MODAL CONTENT
+========================================================= */
+
+.modalContent {
+
+    position: relative;
+
+    z-index: 2;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 45px;
+
+    align-items: center;
+}
+
+
+/* =========================================================
+   EVENT INFORMATION
+========================================================= */
+
+.eventInfo {
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+}
+
+
+.eventInfo h2 {
+
+    margin:
+        0 0 25px;
+
+    color:
+        #e5ad2f;
+
+    /*
+       Replace this with your actual
+       Arabian/Oasis font if needed.
+    */
+
+    font-family:
+        "Your Arabic Font",
+        serif;
+
+    font-size:
+        clamp(34px, 4vw, 50px);
+
+    line-height: 1.1;
+
+    letter-spacing:
+        1px;
+}
+
+
+.description {
+
+    margin:
+        0 0 28px;
+
+    color:
+        #f5eee3;
+
+    font-size:
+        15px;
+
+    line-height:
+        1.7;
+
+    letter-spacing:
+        0.4px;
+}
+
+
+/* =========================================================
+   EVENT DETAILS
+========================================================= */
+
+.eventDetails {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 13px;
+}
+
+
+.detail {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    color:
+        #f5eee3;
+
+    font-size:
+        15px;
+}
+
+
+.icon {
+
+    width: 24px;
+
+    color:
+        #e5ad2f;
+
+    font-size:
+        18px;
+
+    text-align:
+        center;
+}
+
+
+/* =========================================================
+   EVENT IMAGE
+========================================================= */
+
+.eventImage {
+
+    position: relative;
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.eventImage img {
+
+    display: block;
+
+    width: 100%;
+
+    max-height: 300px;
+
+    object-fit: cover;
+
+    box-shadow:
+        0 12px 35px
+        rgba(0, 0, 0, 0.35);
+}
+
+
+/* Used while image_url is null */
+
+.imagePlaceholder {
+
+    width: 100%;
+
+    min-height: 280px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 30px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(40, 35, 75, 0.8),
+            rgba(90, 70, 120, 0.7)
+        );
+
+    border:
+        1px solid
+        rgba(230, 190, 100, 0.2);
+
+    color:
+        #e5ad2f;
+
+    text-align:
+        center;
+
+    font-family:
+        serif;
+
+    font-size:
+        28px;
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.navigation {
+
+    position: relative;
+
+    z-index: 3;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 25px;
+
+    margin-top: 20px;
+}
+
+
+.navButton {
+
+    width: 45px;
+
+    height: 45px;
+
+    border: none;
+
+    background: transparent;
+
+    color:
+        #dba92d;
+
+    font-size:
+        48px;
+
+    line-height:
+        0.7;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.navButton:hover {
+
+    transform:
+        scale(1.2);
+
+    color:
+        #ffe08a;
+}
+
+
+.counter {
+
+    min-width: 50px;
+
+    color:
+        #f5eee3;
+
+    font-size:
+        14px;
+
+    text-align:
+        center;
+
+    opacity:
+        0.8;
+}
+
+
+/* =========================================================
+   NO EVENTS
+========================================================= */
+
+.noEventsModal {
+
+    position: relative;
+
+    width:
+        min(600px, 90vw);
+
+    min-height:
+        300px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding:
+        50px;
+
+    background:
+        rgba(75, 67, 120, 0.92);
+
+    border:
+        1px solid
+        rgba(210, 190, 255, 0.25);
+
+    box-shadow:
+        0 20px 80px
+        rgba(0, 0, 0, 0.55);
+
+    animation:
+        eventsModalIn
+        0.4s
+        ease
+        forwards;
+}
+
+
+.noEventsContent {
+
+    position: relative;
+
+    z-index: 2;
+
+    text-align:
+        center;
+
+    color:
+        #f5eee3;
+}
+
+
+.noEventsContent h2 {
+
+    margin:
+        0 0 18px;
+
+    color:
+        #e5ad2f;
+
+    font-family:
+        "Your Arabic Font",
+        serif;
+
+    font-size:
+        42px;
+}
+
+
+.noEventsContent p {
+
+    margin:
+        0;
+
+    color:
+        #f5eee3;
+
+    font-size:
+        16px;
+
+    line-height:
+        1.6;
+
+    opacity:
+        0.85;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes eventsOverlayIn {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+@keyframes eventsModalIn {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(25px)
+            scale(0.96);
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .modalOverlay {
+
+        padding:
+            15px;
+    }
+
+
+    .modal {
+
+        width:
+            100%;
+
+        max-height:
+            90vh;
+
+        overflow-y:
+            auto;
+
+        padding:
+            45px 25px 25px;
+    }
+
+
+    .modalContent {
+
+        grid-template-columns:
+            1fr;
+
+        gap:
+            25px;
+    }
+
+
+    .eventImage {
+
+        order:
+            -1;
+    }
+
+
+    .eventImage img {
+
+        max-height:
+            220px;
+    }
+
+
+    .imagePlaceholder {
+
+        min-height:
+            180px;
+    }
+
+
+    .eventInfo h2 {
+
+        margin-bottom:
+            18px;
+
+        font-size:
+            34px;
+    }
+
+
+    .description {
+
+        font-size:
+            14px;
+
+        line-height:
+            1.55;
+    }
+
+
+    .navigation {
+
+        margin-top:
+            15px;
+    }
+
+
+    .noEventsModal {
+
+        min-height:
+            250px;
+
+        padding:
+            35px 25px;
+    }
+
+
+    .noEventsContent h2 {
+
+        font-size:
+            34px;
+    }
+
+}

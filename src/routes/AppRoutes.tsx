@@ -6,7 +6,7 @@ import Home from "../pages/Home";
 import Events from "../pages/registration/components/Events/Events";
 import ComingSoon from "../pages/ComingSoon";
 import About from "../pages/About";
-import EventsPage from "../pages/EventsPage";
+import EventsPage from "../pages/EventsPage/EventsPage";
 
 interface AppRoutesProps {
   preloaderDone: boolean;
