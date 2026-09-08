@@ -18,8 +18,8 @@
     inset: 0;
     z-index: 5;
     pointer-events: none;
-    backdrop-filter: brightness(0.5);
-    -webkit-backdrop-filter: brightness(0.5);
+    backdrop-filter: brightness(0.4);
+    -webkit-backdrop-filter: brightness(0.4);
     mask-image: radial-gradient(
         circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
         transparent 0px,
@@ -73,6 +73,7 @@
     position: absolute;
     top: 0%;
     left: 0%;
+    filter: brightness(3);
 }
 
 @media screen and (max-width: 1600px) {
@@ -133,6 +134,7 @@
 
     .title {
         left: -13%;
+        filter: brightness(2);
     }
 
     .danceContainer,
@@ -149,11 +151,11 @@
     }
 
     .dramaContainer {
-        left: -30%;
+        left: -25%;
     }
 
     .photographyContainer {
-        right: -25%;
+        right: -20%;
     }
 
     .danceContainer {
