@@ -5,8 +5,8 @@ import bgback from "../assets/about/bgBack.png";
 import cloud from "../assets/about/cloud.png";
 import backBg from "../assets/about/bgBottom.png";
 import leftCloud from "../assets/about/leftClouds.png";
-import leftTop from "../assets/about/leftTop.png";
-import pillar from "../assets/about/pillar.png";
+import leftTop from "../assets/about/pillarTop.png";
+import leftTopMob from "../assets/about/leftTop.png";
 import head from "../assets/about/head.png";
 import lamp from "../assets/about/lamp.png";
 import bgCon from "../assets/about/bgCont.png";
@@ -16,7 +16,7 @@ import playBtn from "../assets/about/playBtn.png";
 import { useTransition } from "../context/TransitionProvider";
 import bgVid from "../assets/about/bgVideo.png";
 import cover from "../assets/about/cover.png";
-import backBtn from "../assets/about/backBtn.png"
+import backBtn from "../assets/about/backBtn.png";
 import { useState, useRef, useEffect, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -58,7 +58,10 @@ const SvgImg = ({
 const YOUTUBE_VIDEO_ID = "5MtkggVC0w0";
 
 const About = () => {
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+  const bgLeft = isMobile ? leftTopMob : leftTop;
   const { navigateWithTransition } = useTransition();
+
   const [showVideo, setShowVideo] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const [playerReady, setPlayerReady] = useState(false);
@@ -71,7 +74,7 @@ const About = () => {
   const vidBgRef = useRef<HTMLDivElement | null>(null);
   const vidRef = useRef<HTMLDivElement | null>(null);
   const controlsRef = useRef<HTMLDivElement | null>(null);
-
+  const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
   const leftRef = useRef<HTMLDivElement | null>(null);
   const rightRef = useRef<HTMLDivElement | null>(null);
   const midCloudR = useRef<HTMLDivElement | null>(null);
@@ -84,28 +87,83 @@ const About = () => {
   const bottomR = useRef<HTMLDivElement | null>(null);
   const bottomL = useRef<HTMLDivElement | null>(null);
 
-  const pillarR = useRef<HTMLDivElement | null>(null);
-  const pillarL = useRef<HTMLDivElement | null>(null);
-
   const bottomBack = useRef<HTMLDivElement | null>(null);
   const headRef = useRef<HTMLDivElement | null>(null);
   const cloudRef = useRef<HTMLDivElement | null>(null);
 
   const [clicked, setClicked] = useState(false);
-  const handleBackClick = () => {
+  const isNavigatingRef = useRef(false);
+
+  const handleBackClick = useCallback(() => {
+    if (isNavigatingRef.current) return;
+
+    isNavigatingRef.current = true;
+
+    const player = playerRef.current;
+
+    if (player) {
+      try {
+        if (typeof player.pauseVideo === "function") {
+          player.pauseVideo();
+        }
+      } catch {}
+
+      playerRef.current = null;
+    }
+
+    setPlayerReady(false);
+    setControlsVisible(false);
+    setShowVideo(false);
+
+    const st = scrollTriggerRef.current;
+
+    if (st) {
+      scrollTriggerRef.current = null;
+      st.kill();
+    }
+
+    gsap.killTweensOf([
+      containerRef.current,
+      vidRef.current,
+      vidBgRef.current,
+      controlsRef.current,
+      bgRef.current,
+      bgSolidRef.current,
+      bgBackRef.current,
+      leftRef.current,
+      rightRef.current,
+      midCloudR.current,
+      bottomL.current,
+      bottomR.current,
+      bottomBack.current,
+      headRef.current,
+      cloudRef.current,
+    ]);
+
     navigateWithTransition("/");
-  };
+  }, [navigateWithTransition]);
+
   useEffect(() => {
     if (window.YT && window.YT.Player) return;
+
     const tag = document.createElement("script");
     tag.src = "https://www.youtube.com/iframe_api";
+    tag.async = true;
     document.body.appendChild(tag);
+
+    return () => {
+      if (tag.parentNode) {
+        tag.parentNode.removeChild(tag);
+      }
+    };
   }, []);
 
   useEffect(() => {
     if (!showVideo || playerRef.current || !playerElRef.current) return;
 
     const createPlayer = () => {
+      if (!playerElRef.current || playerRef.current) return;
+
       playerRef.current = new window.YT.Player(playerElRef.current, {
         videoId: YOUTUBE_VIDEO_ID,
         playerVars: {
@@ -118,8 +176,14 @@ const About = () => {
         events: {
           onReady: (e: any) => {
             setPlayerReady(true);
-            e.target.playVideo();
-            setTimeout(() => setControlsVisible(true), 150);
+
+            try {
+              e.target.playVideo();
+            } catch {}
+
+            setTimeout(() => {
+              setControlsVisible(true);
+            }, 150);
           },
           onStateChange: (e: any) => {
             if (e.data === 1) setIsPlaying(true);
@@ -134,27 +198,46 @@ const About = () => {
     } else {
       window.onYouTubeIframeAPIReady = createPlayer;
     }
+
+    return () => {
+      if (window.onYouTubeIframeAPIReady === createPlayer) {
+        window.onYouTubeIframeAPIReady = () => {};
+      }
+    };
   }, [showVideo]);
 
   const togglePlay = useCallback(() => {
     const player = playerRef.current;
+
     if (!player) return;
-    if (isPlaying) {
-      player.pauseVideo();
-    } else {
-      player.playVideo();
-    }
+
+    try {
+      if (isPlaying) {
+        player.pauseVideo();
+      } else {
+        player.playVideo();
+      }
+    } catch {}
   }, [isPlaying]);
 
   const seekBy = useCallback((deltaSeconds: number) => {
     const player = playerRef.current;
+
     if (!player || typeof player.getCurrentTime !== "function") return;
-    const current = player.getCurrentTime();
-    player.seekTo(Math.max(0, current + deltaSeconds), true);
+
+    try {
+      const current = player.getCurrentTime();
+      player.seekTo(Math.max(0, current + deltaSeconds), true);
+    } catch {}
   }, []);
 
-  const rewind = useCallback(() => seekBy(-10), [seekBy]);
-  const fastForward = useCallback(() => seekBy(10), [seekBy]);
+  const rewind = useCallback(() => {
+    seekBy(-10);
+  }, [seekBy]);
+
+  const fastForward = useCallback(() => {
+    seekBy(10);
+  }, [seekBy]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -194,23 +277,12 @@ const About = () => {
         opacity: 1,
       });
 
-      gsap.set(pillarL.current, {
-        x: "-2.5vw",
-        opacity: 1,
-      });
-
-      gsap.set(pillarR.current, {
-        x: "2.5vw",
-        opacity: 1,
-      });
-
       gsap.set(bottomBack.current, {
         y: "15vh",
         opacity: 1,
       });
 
       const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
       const FINAL_BG_SIZE = isMobile ? "85% 24%" : "63% 62%";
 
       const [wStr, hStr] = FINAL_BG_SIZE.split(" ");
@@ -249,7 +321,7 @@ const About = () => {
       });
 
       gsap.set(bgRef.current, {
-        backgroundSize: "120% 120%",
+        backgroundSize: isMobile ? "200% 100%" : "120% 120%",
         backgroundPosition: "center center",
         opacity: 1,
       });
@@ -313,8 +385,6 @@ const About = () => {
       tl.from(midCloudR.current, { x: 0, y: 0, opacity: 1 }, 0);
       tl.from(bottomR.current, { x: 0, y: 0, opacity: 1 }, 0);
       tl.from(bottomL.current, { x: 0, y: 0, opacity: 1 }, 0);
-      tl.from(pillarL.current, { x: 0, y: 0, opacity: 1 }, 0);
-      tl.from(pillarR.current, { x: 0, y: 0, opacity: 1 }, 0);
       tl.from(bottomBack.current, { x: 0, y: 0, opacity: 1 }, 0);
       tl.from(cloudRef.current, { x: 0, y: 0, opacity: 1 }, 0);
       tl.from(headRef.current, { x: 0, y: 0, opacity: 1 }, 0);
@@ -355,7 +425,7 @@ const About = () => {
         "<"
       );
 
-      const VIDEO_REVEAL_TIME = tl.duration() - 900;
+      const VIDEO_REVEAL_TIME = tl.duration() - 0.9;
       const REVEAL_EPSILON = 0.03;
 
       const st = ScrollTrigger.create({
@@ -369,7 +439,7 @@ const About = () => {
 
         onUpdate: (self) => {
           const reached =
-            self.animation.time() >= VIDEO_REVEAL_TIME - REVEAL_EPSILON ||
+            tl.time() >= VIDEO_REVEAL_TIME - REVEAL_EPSILON ||
             self.progress >= 0.985;
 
           setShowVideo((prev) => (prev === reached ? prev : reached));
@@ -379,7 +449,13 @@ const About = () => {
         onEnterBack: () => setShowVideo(true),
       });
 
-      const refresh = () => ScrollTrigger.refresh();
+      scrollTriggerRef.current = st;
+
+      const refresh = () => {
+        if (!isNavigatingRef.current) {
+          ScrollTrigger.refresh();
+        }
+      };
 
       requestAnimationFrame(refresh);
 
@@ -389,15 +465,32 @@ const About = () => {
       return () => {
         window.removeEventListener("load", refresh);
         window.removeEventListener("resize", refresh);
+
+        if (scrollTriggerRef.current === st) {
+          scrollTriggerRef.current = null;
+        }
+
         st.kill();
+        tl.kill();
       };
     }, containerRef);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+    };
   }, []);
 
   function clickHandler() {
-    setClicked((prev) => !prev);
+    const st = scrollTriggerRef.current;
+
+    if (!st) return;
+
+    const target = st.start + (st.end - st.start);
+
+    window.scrollTo({
+      top: target,
+      behavior: "smooth",
+    });
   }
 
   return (
@@ -444,8 +537,9 @@ const About = () => {
       <div className={styles.video} ref={vidRef}>
         <div
           ref={playerHostRef}
-          className={`${styles.videoIframe} ${playerReady ? styles.playerVisible : ""
-            }`}
+          className={`${styles.videoIframe} ${
+            playerReady ? styles.playerVisible : ""
+          }`}
         >
           <div
             ref={playerElRef}
@@ -461,8 +555,9 @@ const About = () => {
       />
 
       <div
-        className={`${styles.videoControls} ${controlsVisible ? styles.controlsVisible : ""
-          }`}
+        className={`${styles.videoControls} ${
+          controlsVisible ? styles.controlsVisible : ""
+        }`}
         ref={controlsRef}
         style={{ backgroundImage: `url(${bgCon})` }}
       >
@@ -511,7 +606,7 @@ const About = () => {
       )}
 
       <div ref={leftRef} className={styles.leftTop}>
-        <SvgImg src={leftTop} />
+        <SvgImg src={bgLeft} />
       </div>
 
       <div ref={bottomR} className={styles.rightCloud}>
@@ -524,14 +619,6 @@ const About = () => {
         <SvgImg src={leftTop} />
       </div>
 
-      <div ref={pillarL} className={styles.pillar}>
-        <SvgImg src={pillar} />
-      </div>
-
-      <div ref={pillarR} className={styles.pillarR}>
-        <SvgImg src={pillar} />
-      </div>
-
       <div className={styles.lamp}>
         <SvgImg src={lamp} />
       </div>
@@ -539,6 +626,7 @@ const About = () => {
       <div className={styles.lampR}>
         <SvgImg src={lamp} />
       </div>
+
       <div
         className={styles.backBtn}
         onClick={handleBackClick}

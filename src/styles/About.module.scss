@@ -80,6 +80,8 @@ body::-webkit-scrollbar {
   position: relative;
   width: clamp(280px, 200vw, 1600px);
   height: clamp(220px, 150vh, 1200px);
+  display: block;
+  pointer-events: none; 
   @extend %svgFill;
   z-index: 22;
   svg {
@@ -111,9 +113,9 @@ body::-webkit-scrollbar {
 .bgBottom {
   position: absolute;
   bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: 22;
+  left: -10%;
+  width: 120%;
+  z-index: 1;
 
   img {
     display: block;
@@ -170,11 +172,14 @@ body::-webkit-scrollbar {
 
 .leftTop {
   position: fixed;
-  top: -12%;
-  left: -10%;
-  height: clamp(140px, 60vh, 650px);
-  width: clamp(160px, 60vw, 800px);
-  z-index: 20;
+  top: -2%;
+  left: -35%;
+  // height: clamp(140px, 60vh, 650px);
+  height: 110vh;
+  // width: clamp(160px, 63vw, 900px);w
+  width: 100vw;
+  // width: 100vw;
+  z-index: 1;
   overflow: hidden;
   @extend %svgFill;
 }
@@ -195,16 +200,18 @@ body::-webkit-scrollbar {
 
 .rightTop {
   position: fixed;
-  top: -12%;
-  right: -10%;
+  top: -2%;
   transform: scaleX(-1);
-  height: clamp(140px, 60vh, 650px);
-  width: clamp(160px, 60vw, 800px);
-  z-index: 25;
+  right: -35%;
+  // height: clamp(140px, 60vh, 650px);
+  height: 110vh;
+  // width: clamp(160px, 63vw, 900px);w
+  width: 100vw;
+  // width: 100vw;
+  z-index: 1;
   overflow: hidden;
   @extend %svgFill;
 }
-
 .pillar {
   position: absolute;
   bottom: -12%;
@@ -263,7 +270,7 @@ body::-webkit-scrollbar {
   position: absolute;
   top: 48%;
   left: 62%;
-  z-index: 9999;
+  z-index: 1000 ;
   width: 23vw;
   height: 23vh;
   overflow: visible;
@@ -285,6 +292,8 @@ body::-webkit-scrollbar {
   background-repeat: no-repeat;
   z-index: 1005;
   pointer-events: none;
+
+
 }
 
 .bgAfter {
@@ -397,6 +406,13 @@ body::-webkit-scrollbar {
     text-align: center;
     z-index: 60;
     pointer-events: none;
+    // color: rgba(255, 232, 189, 1);
+        color: #FFE8BD !important;
+    background: none !important;
+    background-image: none !important;
+    -webkit-background-clip: initial !important;
+    background-clip: initial !important;
+    -webkit-text-fill-color: #d4af37 !important;
   }
 
   .bgBottom {
@@ -456,9 +472,11 @@ body::-webkit-scrollbar {
 
   .leftTop {
     position: absolute;
-    width: 100vw;
+    width: 90vw;
     height: 50vh;
     z-index: 25;
+    left: 0%;
+    top: -12%;
     overflow: visible;
   }
 
@@ -654,4 +672,21 @@ body::-webkit-scrollbar {
     width: 8vw;
     height: 8vw;
   }
+}
+
+
+@media (max-width:1600px) and (max-height : 800px)  {
+    .leftTop{
+      left: -37%;
+    }
+    .rightTop{
+      right: -37%;
+    }
+    .leftCloud{
+      left: -48%;
+    }
+    .rightCloud{
+      right: -48%;
+    }
+
 }
