@@ -1,276 +1,14 @@
-// .mainContainer{
-//   height: 100vh;
-//   width: 100%;
-//   z-index: 2;
-//   background-size: cover;
-//   background-position: center;
-//   background-repeat: no-repeat;
-  
-// }
-// .about {
-//   height: 100vh;
-//   width: 100%;
-
-//   // background-color: black;
-
-//   background-size: cover;
-//   background-position: center;
-//   background-repeat: no-repeat;
-//   z-index: 10;
-//   overflow: hidden;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   position: relative;
-// }
-// // shared: svg fills its container div, used for fixed-box elements only
-// %svgFill {
-//   svg {
-//     display: block;
-//     width: 100%;
-//     height: 100%;
-//     overflow: visible;
-//   }
-// }
-
-// .cloud {
-//   position: relative;
-
-//   width: clamp(280px, 170vw, 1600px);
-//   height: clamp(220px, 150vh, 1200px);
-
-//   @extend %svgFill;
-
-//   svg {
-//     position: relative;
-//     z-index: 10;
-//   }
-// }
-// .text {
-//   position: absolute;
-
-//   top: 50%;
-//   left: 52%;
-//   transform: translate(-50%, -50%);
-  
-//   width: 30%;
-//   height: auto;
-//   font-size: 1.2rem ;
-//   background: linear-gradient(135deg, rgba(229, 0, 0, 1), rgba(0, 17, 170, 1));
-//   background-clip: text;
-//   -webkit-background-clip: text;
-//   -webkit-text-fill-color: transparent;
-//   color: transparent; // fallback for browsers without background-clip: text support
-
-//   z-index: 20;
-// }
-// // footer-style element — plain img, keeps its natural aspect ratio
-// .bgBottom {
-//   position: absolute;
-//   bottom: 0;
-//   left: 0;
-//   width: 100%;
-//   z-index: 22;
-
-//   img {
-//     display: block;
-//     width: 100%;
-//     height: auto;
-//   }
-// }
-
-// .leftCloud {
-//   position: absolute;
-//   bottom: -15%;
-//   left: -8%;
-//   z-index: 22;
-//   width: clamp(160px, 35vw, 650px);
-//   height: clamp(220px, 90vh, 1100px);
-//   overflow: hidden;
-//   @extend %svgFill;
-// }
-// .rightCloud {
-//   position: absolute;
-//   bottom: -15%;
-//   right:  -8%;
-//   z-index: 22;
-//   width: clamp(160px, 35vw, 650px);
-//   height: clamp(220px, 90vh, 1100px);
-//   overflow: hidden;
-//   transform: scaleX(-1);
-//   @extend %svgFill;
-// }
-
-// .midCloud {
-//   position: absolute;
-//   bottom: 10%;
-//   left: -16%;
-//   z-index: 22;
-//   width: clamp(160px, 40vw, 650px);
-//   height: clamp(220px, 80vh, 1100px);
-//   overflow: hidden;
-//   @extend %svgFill;
-// }
-
-// .midCloudR {
-//   position: absolute;
-//   bottom: 10%;
-//   right: -16%;
-//   width: clamp(180px, 40vw, 700px);
-//   height: clamp(200px, 80vh, 1000px);
-//   z-index: 30;
-//   overflow: hidden;
-//   transform: scaleX(-1);
-//   @extend %svgFill;
-// }
-
-// .leftTop {
-//   position: fixed;
-//   top: -12%;
-//   left: -10%;
-//   height: clamp(140px, 60vh, 650px);
-//   width: clamp(160px, 60vw, 800px);
-//   z-index: 20;
-//   overflow: hidden;
-//   @extend %svgFill;
-// }
-
-// .rightTop {
-//   position: fixed;
-//   top: -12%;
-//   right: -10%;
-//   transform: scaleX(-1);
-//   height: clamp(140px, 60vh, 650px);
-//   width: clamp(160px, 60vw, 800px);
-//   z-index: 25;
-//   overflow: hidden;
-//   @extend %svgFill;
-// }
-
-// .pillar {
-//   position: absolute;
-//   bottom: -12%;
-//   left: -17%;
-//   z-index: 2;
-//   width: clamp(140px, 70vw, 650px);
-//   height: clamp(220px, 100vh, 1000px);
-//   overflow: hidden;
-//   @extend %svgFill;
-// }
-// .lamp {
-//   position: absolute;
-//   top: 0%;
-//   left: -1%;
-//   z-index: 200;
-//   width: clamp(140px, 20vw, 650px);
-//   height: clamp(220px, 48vh, 1000px);
-//   overflow: hidden;
-//   @extend %svgFill;
-// }
-// .lampR {
-//   position: absolute;
-//   top: 15%;
-//   right: 7%;
-//   z-index: 200;
-//   width: clamp(140px, 15vw, 650px);
-//   height: clamp(220px, 55vh, 1000px);
-//   overflow: hidden;
-//   @extend %svgFill;
-// }
-
-// .pillarR  {
-//   position: absolute;
-//   bottom: -12%;
-//   right:  -12%;
-//   z-index: 2;
-//   width: clamp(140px, 70vw, 650px);
-//   height: clamp(220px, 100vh, 1200px);
-//   overflow: hidden;
-//   @extend %svgFill;
-// }
-// .head  {
-//   position: absolute;
-//   top:  -12%;
-//   z-index: 2;
-//   width: clamp(140px, 50vw, 650px);
-//   height: clamp(220px, 50vh, 1200px);
-//   overflow: hidden;
-//   @extend %svgFill;
-// }
-// .play {
-//   position: absolute;
-//   top: 0%;
-//   left: 64%;
-//   z-index: 9999;
-//   width: 23vw;
-//   height: 23vh;
-//   overflow: visible;
-//   @extend %svgFill;
-// }
-// .video {
-//   position: absolute;
-//   inset: 0;
-//   width: 30%;
-//   height: 100%;
-//   left: 35%;
-//   top: 40%;
-//   background-size: contain;
-//   background-position: center;
-//   background-repeat: no-repeat;
-//   z-index: 1000;
-// }
-// .bgVid {
-//   position: absolute;
-//   inset: 0;
-//   width: 65vw;
-//   height: 65vh;
-//   left: 18%;
-//   top:  18%;
-//   background-size: contain;
-//   background-position: center;
-//   background-repeat: no-repeat;
-//   z-index: 1000;
-// }
-
-//  .arrow{
-//   position: absolute;
-//   inset: 0;
-//   width: 30%;
-//   height: 100%;
-//   left: 12%;
-//   top: 48%;
-//   background-size: contain;
-//   background-position: center;
-//   background-repeat: no-repeat;
-//   z-index: 1000;
-// }
-//  .arrowR{
-//   position: absolute;
-//   inset: 0;
-//   width: 30%;
-//   height: 100%;
-//   transform: scaleX(-1);
-//   left:55%;
-//   top: 48%;
-//   background-size: contain;
-//   background-position: center;
-//   background-repeat: no-repeat;
-//   z-index: 1000;
-// }
-// .bgAfter{
-//   width: 100vw;
-//   height: 100vh;
-//   object-fit: contain;
-//   z-index: 0;
-// }
-
+html,
+body {
+  overscroll-behavior-y: contain;
+  background-color: black;
+  margin: 0;
+}
 
 .about {
   height: 100vh;
   width: 100%;
-
   background-color: black;
-
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -286,13 +24,6 @@
   position: relative;
 }
 
-
-// =====================================================
-// SECOND BACKGROUND
-// FULL SCREEN
-// DOES NOT SHRINK
-// =====================================================
-
 .bgBack {
   position: absolute;
   inset: 0;
@@ -301,38 +32,37 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0;
+  background-color: black;
   z-index: 0;
-  pointer-events: none;
 }
-
-// =====================================================
-// FIRST BACKGROUND
-// THIS ONE SHRINKS INTO THE FRAME
-// =====================================================
 
 .bgFront {
   position: absolute;
-
   inset: 0;
-
+  opacity: 0.2;
   width: 100%;
   height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: black;
+  mix-blend-mode: screen;
+  z-index: 1;
+}
 
+.bgFrontSolid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   background-size: 120% 120%;
   background-position: center center;
   background-repeat: no-repeat;
-
-  opacity: 1;
-  z-index: 1;
-
+  opacity: 0;
+  mix-blend-mode: normal;
+  z-index: 2;
   pointer-events: none;
 }
-
-
-// =====================================================
-// SHARED SVG
-// =====================================================
 
 %svgFill {
 
@@ -353,56 +83,37 @@
 
 .cloud {
   position: relative;
-
   width: clamp(280px, 200vw, 1600px);
   height: clamp(220px, 150vh, 1200px);
-
   @extend %svgFill;
-
+  z-index: 22;
   svg {
     position: relative;
     z-index: 10;
   }
 }
 
-
-// =====================================================
-// TEXT
-// =====================================================
-
 .text {
   position: absolute;
-
   top: 50%;
   left: 52%;
 
   transform: translate(-50%, -50%);
-
   width: 30%;
   height: auto;
-
   font-size: 1.2rem;
-
   background: linear-gradient(
     135deg,
     rgba(229, 0, 0, 1),
     rgba(0, 17, 170, 1)
   );
-
   background-clip: text;
   -webkit-background-clip: text;
 
   -webkit-text-fill-color: transparent;
-
   color: transparent;
-
   z-index: 20;
 }
-
-
-// =====================================================
-// BOTTOM BACKGROUND
-// =====================================================
 
 .bgBottom {
   position: absolute;
@@ -429,40 +140,25 @@
 
 .leftCloud {
   position: absolute;
-
-  bottom: -15%;
-  left: -8%;
-
-  z-index: 22;
-
-  width: clamp(160px, 35vw, 650px);
-  height: clamp(220px, 90vh, 1100px);
-
+  bottom: -19%;
+  left: -47%;
+  z-index: 5;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
 
   @extend %svgFill;
 }
 
-
-// =====================================================
-// RIGHT CLOUD
-// =====================================================
-
 .rightCloud {
   position: absolute;
-
-  bottom: -15%;
-  right: -8%;
-
+  bottom: -19%;
+  right: -47%;
   z-index: 22;
-
-  width: clamp(160px, 35vw, 650px);
-  height: clamp(220px, 90vh, 1100px);
-
-  overflow: hidden;
-
   transform: scaleX(-1);
-
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   @extend %svgFill;
 }
 
@@ -473,15 +169,12 @@
 
 .midCloud {
   position: absolute;
-
   bottom: 10%;
   left: -16%;
-
   z-index: 22;
 
   width: clamp(160px, 40vw, 650px);
   height: clamp(220px, 80vh, 1100px);
-
   overflow: hidden;
 
   @extend %svgFill;
@@ -497,7 +190,6 @@
 
   bottom: 10%;
   right: -16%;
-
   width: clamp(180px, 40vw, 700px);
   height: clamp(200px, 80vh, 1000px);
 
@@ -530,11 +222,20 @@
 
   @extend %svgFill;
 }
-
-
-// =====================================================
-// RIGHT TOP
-// =====================================================
+.backBtn {
+  position: fixed;
+  top: 4%;
+  left: 0%;
+  
+  height: 15vh;
+  // height: clamp(140px, 60vh, 650px);
+  // width: clamp(160px, 60vw, 800px);
+  width: 15vw;
+  z-index: 200;
+  // mix-blend-mode: color-dodge;
+  overflow: hidden;
+  @extend %svgFill;
+}
 
 .rightTop {
   position: fixed;
@@ -575,31 +276,18 @@
   @extend %svgFill;
 }
 
-
-// =====================================================
-// LEFT LAMP
-// =====================================================
-
 .lamp {
   position: absolute;
 
   top: 0%;
   left: -1%;
-
   z-index: 200;
-
   width: clamp(140px, 20vw, 650px);
   height: clamp(220px, 48vh, 1000px);
-
   overflow: hidden;
 
   @extend %svgFill;
 }
-
-
-// =====================================================
-// RIGHT LAMP
-// =====================================================
 
 .lampR {
   position: absolute;
@@ -617,17 +305,11 @@
   @extend %svgFill;
 }
 
-
-// =====================================================
-// RIGHT PILLAR
-// =====================================================
-
 .pillarR {
   position: absolute;
 
   bottom: -12%;
   right: -12%;
-
   z-index: 2;
 
   width: clamp(140px, 70vw, 650px);
@@ -638,16 +320,9 @@
   @extend %svgFill;
 }
 
-
-// =====================================================
-// HEAD
-// =====================================================
-
 .head {
   position: absolute;
-
   top: -12%;
-
   z-index: 2;
 
   width: clamp(140px, 50vw, 650px);
@@ -658,14 +333,8 @@
   @extend %svgFill;
 }
 
-
-// =====================================================
-// PLAY
-// =====================================================
-
 .play {
   position: absolute;
-
   top: 48%;
   left: 62%;
   z-index: 9999;
@@ -678,112 +347,392 @@
   @extend %svgFill;
 }
 
-
-// =====================================================
-// VIDEO
-// =====================================================
-
 .video {
   position: absolute;
-
-  inset: 0;
-
-  width: 30%;
-  height: 100%;
-
-  left: 35%;
-  top: 40%;
-
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 
   z-index: 1000;
 }
-
-
-// =====================================================
-// VIDEO BACKGROUND
-// =====================================================
 
 .bgVid {
   position: absolute;
-
-  inset: 0;
-
-  width: 65vw;
-  height: 65vh;
-
-  left: 18%;
-  top: 18%;
-
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-
-  z-index: 1000;
+  z-index: 1005;
+  pointer-events: none;
 }
-
-
-// =====================================================
-// LEFT ARROW
-// =====================================================
-
-.arrow {
-  position: absolute;
-
-  inset: 0;
-
-  width: 30%;
-  height: 100%;
-
-  left: 12%;
-  top: 48%;
-
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  z-index: 1000;
-}
-
-
-// =====================================================
-// RIGHT ARROW
-// =====================================================
-
-.arrowR {
-  position: absolute;
-
-  inset: 0;
-
-  width: 30%;
-  height: 100%;
-
-  transform: scaleX(-1);
-
-  left: 55%;
-  top: 48%;
-
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  z-index: 1000;
-}
-
-
-// =====================================================
-// OLD BG AFTER
-// =====================================================
 
 .bgAfter {
   width: 100vw;
   height: 100vh;
-
   object-fit: contain;
-
   z-index: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .about {
+    width: 100vw;
+    height: 100vh;
+    height: 100svh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
+    overflow: hidden;
+    overflow-y: hidden;
+    display: block;
+    background-color: black;
+  }
+
+  .bgBack {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100svh;
+    height: 100dvh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: black;
+    z-index: 0;
+  }
+
+  .bgFront {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100svh;
+    height: 100dvh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: black;
+    z-index: 1;
+  }
+
+  .cloud {
+    position: absolute;
+    width: 100vw;
+    height: 100svh;
+    left: 0;
+    top: 0;
+    margin: 0;
+    padding: 0;
+    z-index: 50;
+    display: block;
+    pointer-events: none;
+
+    svg {
+      opacity: 0;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0;
+      display: block;
+      z-index: 10;
+      overflow: visible;
+    }
+  }
+
+  .play {
+    position: absolute;
+    top: 20.5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: clamp(44px, 15vw, 58px);
+    height: clamp(44px, 15vw, 58px);
+    z-index: 9999;
+    overflow: visible;
+    pointer-events: auto;
+    cursor: pointer;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      position: relative;
+      z-index: 9999;
+    }
+  }
+
+  .text {
+    position: absolute;
+    top: 58%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: clamp(70%, 62vw, 85%);
+    margin: 0;
+    padding: 0;
+    font-size: clamp(15px, 4.2vw, 20px);
+    line-height: 1.4;
+    font-weight: 600;
+    text-align: center;
+    z-index: 60;
+    pointer-events: none;
+  }
+
+  .bgBottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    z-index: 22;
+    display: none;
+    pointer-events: none;
+
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+  }
+
+  .leftCloud {
+    position: absolute;
+    width: 120vw;
+    height: 65vh;
+    left: -55%;
+    z-index: 22;
+    overflow: visible;
+  }
+
+  .rightCloud {
+    position: absolute;
+    width: 120vw;
+    height: 65vh;
+    right: -55%;
+    top: -7%;
+    z-index: 22;
+    overflow: visible;
+  }
+
+  .midCloud {
+    position: absolute;
+    width: 100vw;
+    height: 55vh;
+    left: -27%;
+    bottom: -5%;
+    z-index: 22;
+    overflow: visible;
+  }
+
+  .midCloudR {
+    position: absolute;
+    width: 100vw;
+    height: 55vh;
+    right: -27%;
+    top: -5%;
+    z-index: 22;
+    overflow: visible;
+  }
+
+  .leftTop {
+    position: absolute;
+    width: 100vw;
+    height: 50vh;
+    z-index: 25;
+    overflow: visible;
+  }
+
+  .rightTop {
+    position: absolute;
+    width: 45vw;
+    height: 32vh;
+    top: -7vh;
+    right: -15vw;
+    z-index: 25;
+    overflow: visible;
+    display: none;
+    transform: scaleX(-1);
+  }
+
+  .head {
+    position: absolute;
+    width: clamp(180px, 60vw, 320px);
+    height: clamp(140px, 30vh, 260px);
+    top: clamp(10vh, 12vh, 18vh);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    overflow: visible;
+  }
+
+  .pillar {
+    position: absolute;
+    width: 38vw;
+    height: 55vh;
+    left: -18vw;
+    bottom: -14vh;
+    z-index: 2;
+    display: none;
+    overflow: visible;
+  }
+
+  .pillarR {
+    position: absolute;
+    width: 38vw;
+    height: 55vh;
+    display: none;
+    right: -18vw;
+    bottom: -14vh;
+    z-index: 2;
+    overflow: visible;
+  }
+
+  .lamp {
+    position: absolute;
+    width: 18vw;
+    height: 27vh;
+    top: 0;
+    left: -2vw;
+    z-index: 200;
+    overflow: visible;
+  }
+
+  .lampR {
+    position: absolute;
+    width: 16vw;
+    height: 29vh;
+    top: 9vh;
+    right: 2vw;
+    z-index: 200;
+    overflow: visible;
+  }
+
+  .video {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1000;
+  }
+
+  .bgVid {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1005;
+    pointer-events: none;
+  }
+
+  .arrow {
+    position: absolute;
+    width: 25%;
+    height: 80%;
+    left: 5%;
+    top: 45%;
+    z-index: 1000;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .arrowR {
+    position: absolute;
+    width: 25%;
+    height: 80%;
+    left: 70%;
+    top: 45%;
+    z-index: 1000;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    transform: scaleX(-1);
+  }
+}
+
+.videoIframe {
+  position: absolute;
+
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  z-index: 1001;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.playerVisible {
+  opacity: 1;
+}
+
+.videoControls {
+  position: absolute;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8%;
+  pointer-events: none;
+}
+
+.controlsVisible {
+  pointer-events: auto;
+}
+
+.controlBtn {
+  position: relative;
+  z-index: 1201;
+  pointer-events: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex: 0 0 auto;
+  width: 2.5vw;
+  height: 2vh;
+  padding: 0;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+.controlsVisible .controlBtn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.controlsVisible .controlBtn:nth-child(1) {
+  transition-delay: 0s;
+}
+
+.controlsVisible .controlBtn:nth-child(2) {
+  transition-delay: 0.08s;
+}
+
+.controlsVisible .controlBtn:nth-child(3) {
+  transition-delay: 0.16s;
+}
+
+.rewindBtn img {
+  transform: scaleX(-1);
+}
+
+@media screen and (max-width: 768px) {
+  .videoControls {
+    gap: 10%;
+  }
+
+  .controlBtn {
+    width: 8vw;
+    height: 8vw;
+  }
 }
 
 
