@@ -1,25 +1,38 @@
 import "../styles/About.module.scss";
 import styles from "../styles/About.module.scss";
 
-import bg from "../assets/about/bgf.png";
+import bgback from "../assets/about/bgBack.png";
 import cloud from "../assets/about/cloud.png";
 import backBg from "../assets/about/bgBottom.png";
-import leftCloud from "../assets/about/leftCloud.png";
-import midCloud from "../assets/about/midCloud.png";
+import leftCloud from "../assets/about/leftClouds.png";
 import leftTop from "../assets/about/leftTop.png";
 import pillar from "../assets/about/pillar.png";
 import head from "../assets/about/head.png";
 import lamp from "../assets/about/lamp.png";
 import bgCon from "../assets/about/bgCont.png";
 import play from "../assets/about/play.png";
-import arrow from "../assets/about/arrow.png";
+import ff from "../assets/about/ffControl.png";
+import playBtn from "../assets/about/playBtn.png";
+import { useTransition } from "../context/TransitionProvider";
 import bgVid from "../assets/about/bgVideo.png";
-
-import { useState, useRef, useEffect } from "react";
+import cover from "../assets/about/cover.png";
+import backBtn from "../assets/about/backBtn.png"
+import { useState, useRef, useEffect, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+declare global {
+  interface Window {
+    YT: any;
+    onYouTubeIframeAPIReady: () => void;
+  }
+}
+
 gsap.registerPlugin(ScrollTrigger);
+
+ScrollTrigger.config({
+  ignoreMobileResize: true,
+});
 
 const SvgImg = ({
   src,
@@ -42,32 +55,107 @@ const SvgImg = ({
   </svg>
 );
 
+const YOUTUBE_VIDEO_ID = "5MtkggVC0w0";
+
 const About = () => {
+  const { navigateWithTransition } = useTransition();
+  const [showVideo, setShowVideo] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [playerReady, setPlayerReady] = useState(false);
+  const [controlsVisible, setControlsVisible] = useState(false);
+
+  const playerHostRef = useRef<HTMLDivElement | null>(null);
+  const playerElRef = useRef<HTMLDivElement | null>(null);
+  const playerRef = useRef<any>(null);
+
   const vidBgRef = useRef<HTMLDivElement | null>(null);
   const vidRef = useRef<HTMLDivElement | null>(null);
+  const controlsRef = useRef<HTMLDivElement | null>(null);
+
   const leftRef = useRef<HTMLDivElement | null>(null);
   const rightRef = useRef<HTMLDivElement | null>(null);
-  const midCloudL = useRef<HTMLDivElement | null>(null);
   const midCloudR = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const bgBackRef = useRef<HTMLDivElement | null>(null);
+  const bgRef = useRef<HTMLDivElement | null>(null);
+  const bgSolidRef = useRef<HTMLDivElement | null>(null);
+
   const bottomR = useRef<HTMLDivElement | null>(null);
   const bottomL = useRef<HTMLDivElement | null>(null);
   const pillarR = useRef<HTMLDivElement | null>(null);
   const pillarL = useRef<HTMLDivElement | null>(null);
   const bottomBack = useRef<HTMLDivElement | null>(null);
   const headRef = useRef<HTMLDivElement | null>(null);
-  const bgRef = useRef<HTMLDivElement | null>(null);
   const cloudRef = useRef<HTMLDivElement | null>(null);
 
   const [clicked, setClicked] = useState(false);
+  const handleBackClick = () => {
+    navigateWithTransition("/");
+  };
+  useEffect(() => {
+    if (window.YT && window.YT.Player) return;
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(tag);
+  }, []);
+
+  useEffect(() => {
+    if (!showVideo || playerRef.current || !playerElRef.current) return;
+
+    const createPlayer = () => {
+      playerRef.current = new window.YT.Player(playerElRef.current, {
+        videoId: YOUTUBE_VIDEO_ID,
+        playerVars: {
+          autoplay: 1,
+          mute: 1,
+          playsinline: 1,
+          enablejsapi: 1,
+          origin: window.location.origin,
+        },
+        events: {
+          onReady: (e: any) => {
+            setPlayerReady(true);
+            e.target.playVideo();
+            setTimeout(() => setControlsVisible(true), 150);
+          },
+          onStateChange: (e: any) => {
+            if (e.data === 1) setIsPlaying(true);
+            if (e.data === 2) setIsPlaying(false);
+          },
+        },
+      });
+    };
+
+    if (window.YT && window.YT.Player) {
+      createPlayer();
+    } else {
+      window.onYouTubeIframeAPIReady = createPlayer;
+    }
+  }, [showVideo]);
+
+  const togglePlay = useCallback(() => {
+    const player = playerRef.current;
+    if (!player) return;
+    if (isPlaying) {
+      player.pauseVideo();
+    } else {
+      player.playVideo();
+    }
+  }, [isPlaying]);
+
+  const seekBy = useCallback((deltaSeconds: number) => {
+    const player = playerRef.current;
+    if (!player || typeof player.getCurrentTime !== "function") return;
+    const current = player.getCurrentTime();
+    player.seekTo(Math.max(0, current + deltaSeconds), true);
+  }, []);
+
+  const rewind = useCallback(() => seekBy(-10), [seekBy]);
+  const fastForward = useCallback(() => seekBy(10), [seekBy]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      
-      // --------------------------------
-      // INITIAL STATES
-      // --------------------------------
-
       gsap.set(leftRef.current, {
         x: "-2.5vw",
         opacity: 1,
@@ -82,23 +170,13 @@ const About = () => {
         opacity: 0,
       });
 
-      gsap.set(midCloudL.current, {
-        x: "-2.5vw",
-        opacity: 1,
-      });
-
       gsap.set(headRef.current, {
         y: "-20vh",
         opacity: 1,
       });
 
-      gsap.set(bgRef.current, {
-        y: "-20vh",
-        opacity: 1,
-      });
-
-      gsap.set(midCloudR.current, {
-        x: "2.5vw",
+      gsap.set(headRef.current, {
+        y: "-40vh",
         opacity: 1,
       });
 
@@ -129,211 +207,156 @@ const About = () => {
         opacity: 1,
       });
 
+      const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
+      const FINAL_BG_SIZE = isMobile ? "85% 24%" : "63% 62%";
+
+      const [wStr, hStr] = FINAL_BG_SIZE.split(" ");
+
+      const widthPct = parseFloat(wStr);
+      const heightPct = parseFloat(hStr);
+
+      const leftPct = (100 - widthPct) / 2;
+      const topPct = (100 - heightPct) / 2;
+
+      const CONTROLS_HEIGHT_PCT = isMobile ? 9 : 7;
+      const CONTROLS_GAP_PCT = 0.5;
+
       gsap.set(vidRef.current, {
+        width: `${widthPct}%`,
+        height: `${heightPct}%`,
+        left: `${leftPct}%`,
+        top: `${topPct}%`,
         opacity: 0,
       });
 
       gsap.set(vidBgRef.current, {
+        width: `${widthPct}%`,
+        height: `${heightPct}%`,
+        left: `${leftPct}%`,
+        top: `${topPct}%`,
         opacity: 0,
       });
 
-      // --------------------------------
-      // BACKGROUND INITIAL STATE
-      // --------------------------------
-
-      gsap.set(containerRef.current, {
-        backgroundSize: "120% 120%",
-        backgroundPosition: "center center",
+      gsap.set(controlsRef.current, {
+        width: `${widthPct}%`,
+        height: `${CONTROLS_HEIGHT_PCT}%`,
+        left: `${leftPct}%`,
+        top: `${topPct + heightPct + CONTROLS_GAP_PCT}%`,
+        opacity: 0,
       });
 
+      gsap.set(bgRef.current, {
+        backgroundSize: "120% 120%",
+        backgroundPosition: "center center",
+        opacity: 1,
+      });
 
-      // --------------------------------
-      // MAIN TIMELINE
-      // --------------------------------
+      gsap.set(bgSolidRef.current, {
+        backgroundSize: "120% 120%",
+        backgroundPosition: "center center",
+        opacity: 0,
+      });
+
+      gsap.set(bgBackRef.current, {
+        opacity: 0.4,
+      });
 
       const tl = gsap.timeline();
 
+      const SHRINK_DURATION = 0.5;
+      const CROSSFADE_DURATION = 0.35;
 
-      // BACKGROUND SHRINK
       tl.to(
-        containerRef.current,
+        [bgRef.current, bgSolidRef.current],
         {
-          backgroundSize: "63% 62%",
+          backgroundSize: FINAL_BG_SIZE,
           ease: "none",
+          duration: SHRINK_DURATION,
         },
         0
       );
 
-
-      // LEFT TOP
-      tl.from(
-        leftRef.current,
+      tl.to(
+        bgRef.current,
         {
-          x: 0,
-          y: 0,
-          opacity: 1,
+          opacity: 0,
+          duration: CROSSFADE_DURATION,
+          ease: "power1.inOut",
         },
-        0
+        SHRINK_DURATION - CROSSFADE_DURATION / 2
       );
 
-
-      // RIGHT TOP
-      tl.from(
-        rightRef.current,
+      tl.to(
+        bgSolidRef.current,
         {
-          x: 0,
-          y: 0,
           opacity: 1,
+          duration: CROSSFADE_DURATION,
+          ease: "power1.inOut",
         },
-        0
+        SHRINK_DURATION - CROSSFADE_DURATION / 2
       );
 
-
-      // LEFT MID CLOUD
-      tl.from(
-        midCloudL.current,
+      tl.to(
+        bgBackRef.current,
         {
-          x: 0,
-          y: 0,
           opacity: 1,
+          duration: 0.3,
         },
-        0
+        0.4
       );
 
+      tl.from(leftRef.current, { x: 0, y: 0, opacity: 1 }, 0);
+      tl.from(rightRef.current, { x: 0, y: 0, opacity: 1 }, 0);
+      tl.from(midCloudR.current, { x: 0, y: 0, opacity: 1 }, 0);
+      tl.from(bottomR.current, { x: 0, y: 0, opacity: 1 }, 0);
+      tl.from(bottomL.current, { x: 0, y: 0, opacity: 1 }, 0);
+      tl.from(pillarL.current, { x: 0, y: 0, opacity: 1 }, 0);
+      tl.from(pillarR.current, { x: 0, y: 0, opacity: 1 }, 0);
+      tl.from(bottomBack.current, { x: 0, y: 0, opacity: 1 }, 0);
+      tl.from(cloudRef.current, { x: 0, y: 0, opacity: 1 }, 0);
+      tl.from(headRef.current, { x: 0, y: 0, opacity: 1 }, 0);
 
-      // RIGHT MID CLOUD
-      tl.from(
-        midCloudR.current,
-        {
-          x: 0,
-          y: 0,
-          opacity: 1,
-        },
-        0
-      );
-
-
-      // BOTTOM RIGHT
-      tl.from(
-        bottomR.current,
-        {
-          x: 0,
-          y: 0,
-          opacity: 1,
-        },
-        0
-      );
-
-
-      // BOTTOM LEFT
-      tl.from(
-        bottomL.current,
-        {
-          x: 0,
-          y: 0,
-          opacity: 1,
-        },
-        0
-      );
-
-
-      // LEFT PILLAR
-      tl.from(
-        pillarL.current,
-        {
-          x: 0,
-          y: 0,
-          opacity: 1,
-        },
-        0
-      );
-
-
-      // RIGHT PILLAR
-      tl.from(
-        pillarR.current,
-        {
-          x: 0,
-          y: 0,
-          opacity: 1,
-        },
-        0
-      );
-
-
-      // BACKGROUND BOTTOM
-      tl.from(
-        bottomBack.current,
-        {
-          x: 0,
-          y: 0,
-          opacity: 1,
-        },
-        0
-      );
-
-
-      // CLOUD
-      tl.from(
-        cloudRef.current,
-        {
-          x: 0,
-          y: 0,
-          opacity: 1,
-        },
-        0
-      );
-
-
-      // HEAD
-      tl.from(
-        headRef.current,
-        {
-          x: 0,
-          y: 0,
-          opacity: 1,
-        },
-        0
-      );
-
-
-      // VIDEO
       tl.to(
         vidRef.current,
         {
           x: 0,
           y: 0,
           opacity: 1,
-        }
+          duration: 0.4,
+          ease: "power1.inOut",
+        },
+        0.5
       );
+
       tl.to(
-  vidBgRef.current,
-  {
-    x: 0,
-    y: 0,
-    opacity: 1
-  },
-  "<-0.2"
-);
-
-
-      // BG REF
-      tl.from(
-        bgRef.current,
+        vidBgRef.current,
         {
           x: 0,
           y: 0,
           opacity: 1,
+          duration: 0.4,
+          ease: "power1.inOut",
         },
-        0
+        "<-0.15"
       );
 
+      tl.to(
+        controlsRef.current,
+        {
+          x: 0,
+          y: 0,
+          opacity: 1,
+          duration: 0.4,
+          ease: "power1.inOut",
+        },
+        "<"
+      );
 
-      // --------------------------------
-      // SCROLL TRIGGER
-      // --------------------------------
+      const VIDEO_REVEAL_TIME = tl.duration() - 900;
+      const REVEAL_EPSILON = 0.03;
 
-      ScrollTrigger.create({
+      const st = ScrollTrigger.create({
         trigger: containerRef.current,
 
         start: "top top",
@@ -345,205 +368,172 @@ const About = () => {
         scrub: 2,
 
         animation: tl,
+        invalidateOnRefresh: true,
+
+        onUpdate: (self) => {
+          const reached =
+            self.animation.time() >= VIDEO_REVEAL_TIME - REVEAL_EPSILON ||
+            self.progress >= 0.985;
+
+          setShowVideo((prev) => (prev === reached ? prev : reached));
+        },
+
+        onLeave: () => setShowVideo(true),
+        onEnterBack: () => setShowVideo(true),
       });
 
+      const refresh = () => ScrollTrigger.refresh();
+
+      requestAnimationFrame(refresh);
+
+      window.addEventListener("load", refresh);
+      window.addEventListener("resize", refresh);
+
+      return () => {
+        window.removeEventListener("load", refresh);
+        window.removeEventListener("resize", refresh);
+        st.kill();
+      };
     }, containerRef);
 
     return () => ctx.revert();
-
   }, []);
-
-
-  // --------------------------------
-  // CLICK HANDLER
-  // --------------------------------
 
   function clickHandler() {
     setClicked((prev) => !prev);
   }
 
-
-  // --------------------------------
-  // JSX
-  // --------------------------------
-
   return (
-    <div
-      ref={containerRef}
-      className={styles.about}
-      style={{
-        backgroundImage: `url(${bg})`,
-      }}
-    >
+    <div ref={containerRef} className={styles.about}>
+      <div
+        ref={bgBackRef}
+        className={styles.bgBack}
+        style={{ backgroundImage: `url(${bgback})` }}
+      />
 
-      {/* CLOUD / ABOUT CONTENT */}
+      <div
+        ref={bgRef}
+        className={styles.bgFront}
+        style={{ backgroundImage: `url(${cover})` }}
+      />
+
+      <div
+        ref={bgSolidRef}
+        className={styles.bgFrontSolid}
+        style={{ backgroundImage: `url(${cover})` }}
+      />
 
       {!clicked && (
-        <div
-          ref={cloudRef}
-          className={styles.cloud}
-        >
+        <div ref={cloudRef} className={styles.cloud}>
           <SvgImg src={cloud} />
 
-          <div
-            onClick={clickHandler}
-            className={styles.play}
-          >
+          <div onClick={clickHandler} className={styles.play}>
             <SvgImg src={play} />
           </div>
 
           <div className={styles.text}>
-            Oasis, the annual cultural extravaganza of Birla Institute
-            of Technology and Science, Pilani, has been a vibrant part
-            of India's cultural tapestry since 1971. Managed entirely
-            by students, it's a dazzling showcase of talent in Dance,
-            Drama, Literature, Comedy, Fashion, and Music. It's where
-            dreams come alive, laughter fills the air, and creativity
-            knows no bounds. Step into the world of Oasis, where
-            youth's boundless potential shines...
+            Oasis, the annual cultural extravaganza of Birla Institute of
+            Technology and Science, Pilani, has been a vibrant part of
+            India's cultural tapestry since 1971. Managed entirely by
+            students, it's a dazzling showcase of talent in Dance, Drama,
+            Literature, Comedy, Fashion, and Music. It's where dreams come
+            alive, laughter fills the air, and creativity knows no bounds.
+            Step into the world of Oasis, where youth's boundless potential
+            shines...
           </div>
         </div>
       )}
 
-
-      {/* VIDEO */}
+      <div className={styles.video} ref={vidRef}>
+        <div
+          ref={playerHostRef}
+          className={`${styles.videoIframe} ${playerReady ? styles.playerVisible : ""
+            }`}
+        >
+          <div
+            ref={playerElRef}
+            style={{ width: "100%", height: "100%" }}
+          />
+        </div>
+      </div>
 
       <div
-        className={styles.video}
-        ref={vidRef}
-        style={{
-          backgroundImage: `url(${bgCon})`,
-        }}
+        className={styles.bgVid}
+        ref={vidBgRef}
+        style={{ backgroundImage: `url(${bgVid})` }}
+      />
+
+      <div
+        className={`${styles.videoControls} ${controlsVisible ? styles.controlsVisible : ""
+          }`}
+        ref={controlsRef}
+        style={{ backgroundImage: `url(${bgCon})` }}
       >
-        <div className={styles.arrow}>
-          <img src={arrow} />
-        </div>
+        <button
+          type="button"
+          className={`${styles.controlBtn} ${styles.rewindBtn}`}
+          onClick={rewind}
+          aria-label="Rewind 10 seconds"
+        >
+          <img src={ff} alt="" />
+        </button>
 
-        <div className={styles.arrowR}>
-          <img src={arrow} />
-        </div>  
+        <button
+          type="button"
+          className={`${styles.controlBtn} ${styles.playPauseBtn}`}
+          onClick={togglePlay}
+          aria-label={isPlaying ? "Pause video" : "Play video"}
+        >
+          <img src={playBtn} alt="" />
+        </button>
+
+        <button
+          type="button"
+          className={`${styles.controlBtn} ${styles.ffBtn}`}
+          onClick={fastForward}
+          aria-label="Fast forward 10 seconds"
+        >
+          <img src={ff} alt="" />
+        </button>
       </div>
-        <div
-          className={styles.bgVid}
-          ref={vidBgRef}
-          style={{
-            backgroundImage: `url(${bgVid})`,
-          }}
-        />
-
-
-
-
-
-      {/* BOTTOM BACKGROUND */}
 
       {!clicked && (
-        <div
-          className={styles.bgBottom}
-          ref={bottomBack}
-        >
-          <img
-            src={backBg}
-            alt=""
-          />
+        <div className={styles.bgBottom} ref={bottomBack}>
+          <img src={backBg} alt="" />
         </div>
       )}
 
-
-      {/* LEFT CLOUD */}
-
-      <div
-        ref={bottomL}
-        data-castle-drown
-        className={styles.leftCloud}
-      >
+      <div ref={bottomL} data-castle-drown className={styles.leftCloud}>
         <SvgImg src={leftCloud} />
       </div>
 
-
-      {/* MIDDLE LEFT CLOUD */}
-
-      <div
-        ref={midCloudL}
-        className={styles.midCloud}
-      >
-        <SvgImg src={midCloud} />
-      </div>
-
-
-      {/* HEAD */}
-
       {!clicked && (
-        <div
-          ref={headRef}
-          className={styles.head}
-        >
+        <div ref={headRef} className={styles.head}>
           <SvgImg src={head} />
         </div>
       )}
 
-
-      {/* LEFT TOP */}
-
-      <div
-        ref={leftRef}
-        className={styles.leftTop}
-      >
+      <div ref={leftRef} className={styles.leftTop}>
         <SvgImg src={leftTop} />
       </div>
 
-
-      {/* RIGHT CLOUD */}
-
-      <div
-        ref={bottomR}
-        className={styles.rightCloud}
-      >
+      <div ref={bottomR} className={styles.rightCloud}>
         <SvgImg src={leftCloud} />
       </div>
 
+      <div ref={midCloudR} className={styles.midCloudR} />
 
-      {/* MIDDLE RIGHT CLOUD */}
-
-      <div
-        ref={midCloudR}
-        className={styles.midCloudR}
-      >
-        <SvgImg src={midCloud} />
-      </div>
-
-
-      {/* RIGHT TOP */}
-
-      <div
-        ref={rightRef}
-        className={styles.rightTop}
-      >
+      <div ref={rightRef} className={styles.rightTop}>
         <SvgImg src={leftTop} />
       </div>
 
-
-      {/* LEFT PILLAR */}
-
-      <div
-        ref={pillarL}
-        className={styles.pillar}
-      >
+      <div ref={pillarL} className={styles.pillar}>
         <SvgImg src={pillar} />
       </div>
 
-
-      {/* RIGHT PILLAR */}
-
-      <div
-        ref={pillarR}
-        className={styles.pillarR}
-      >
+      <div ref={pillarR} className={styles.pillarR}>
         <SvgImg src={pillar} />
       </div>
-
-
-      {/* LAMPS */}
 
       <div className={styles.lamp}>
         <SvgImg src={lamp} />
@@ -552,7 +542,12 @@ const About = () => {
       <div className={styles.lampR}>
         <SvgImg src={lamp} />
       </div>
-
+      <div
+        className={styles.backBtn}
+        onClick={handleBackClick}
+      >
+        <SvgImg src={backBtn} />
+      </div>
     </div>
   );
 };
