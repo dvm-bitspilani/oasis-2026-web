@@ -6,6 +6,8 @@ import Home from "../pages/Home";
 import Events from "../pages/registration/components/Events/Events";
 import ComingSoon from "../pages/ComingSoon";
 import About from "../pages/About";
+import EventsPage from "../pages/EventsPage";
+
 interface AppRoutesProps {
   preloaderDone: boolean;
   preloaderExiting: boolean;
@@ -42,9 +44,15 @@ export default function AppRoutes({
           path="/eventReg"
           element={<Events />}
         />
+
         <Route
           path="/aboutUs"
           element={<About />}
+        />
+
+        <Route
+          path="/events"
+          element={<EventsPage />}
         />
       </Routes>
     </TransitionProvider>

@@ -5,7 +5,7 @@ import { useTransition } from "../context/TransitionProvider";
 
 const LINKS = [
   { label: "Home", to: "/" },
-  { label: "Events", to: "/comingsoon" },
+  { label: "Events", to: "/events" },
   { label: "About Us", to: "/aboutUs" },
   { label: "Contact Us", to: "/comingsoon" },
 ];
