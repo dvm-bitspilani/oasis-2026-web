@@ -90,7 +90,7 @@ const About = () => {
   const headRef = useRef<HTMLDivElement | null>(null);
   const cloudRef = useRef<HTMLDivElement | null>(null);
 
-  const [clicked, setClicked] = useState(false);
+  const [clicked] = useState(false);
   const isNavigatingRef = useRef(false);
 
   const handleBackClick = useCallback(() => {
