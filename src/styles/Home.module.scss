@@ -43,7 +43,7 @@
 
 .sand {
   position: absolute;
-  bottom: -1%;
+  bottom: -1.85%;
   left: 0;
   width: 100%;
   height: 46%;
@@ -325,7 +325,7 @@
     z-index: 10;
      top :auto;
     bottom: -20%;
-    left: 15%;
+    left: 18%;
     right: auto;
 
     img {
@@ -625,5 +625,339 @@
     .regBtnText {
       top: 21%;
     }
+  }
+}
+
+
+
+
+/* =========================================================
+   TABLET = EXACT MOBILE LAYOUT
+   ONLY 751px - 1100px
+   ========================================================= */
+
+@media screen and (min-width: 751px) and (max-width: 1100px) {
+
+  /* -------------------------------------------------------
+     SCREEN
+     ------------------------------------------------------- */
+
+  .container {
+    width: 100vw;
+    height: 100vh;
+    height: 100svh;
+
+    overflow: hidden;
+  }
+
+
+  /* -------------------------------------------------------
+     BACKGROUND
+     ------------------------------------------------------- */
+
+  .background {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100vw;
+    height: 100svh;
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    z-index: 0;
+  }
+
+
+  /* -------------------------------------------------------
+     CLOUD CONTAINER
+     ------------------------------------------------------- */
+
+  .clouds {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100vw;
+    height: 100svh;
+
+    overflow: hidden;
+
+    z-index: 4;
+  }
+
+
+  /* =======================================================
+     FORCE DESKTOP CLOUDS TO USE MOBILE VALUES
+     
+     Your TSX still supplies desktop inline values at
+     820px, so !important is necessary here.
+     ======================================================= */
+
+  .clouds > .cloud:nth-child(1) {
+    top: 30% !important;
+    left: -25% !important;
+    width: 50% !important;
+  }
+
+  .clouds > .cloud:nth-child(2) {
+    top: 8% !important;
+    left: 5% !important;
+    width: 60% !important;
+  }
+
+  .clouds > .cloud:nth-child(3) {
+    top: 18% !important;
+    left: 40% !important;
+    width: 45% !important;
+  }
+
+  .clouds > .cloud:nth-child(4) {
+    top: 38% !important;
+    left: 60% !important;
+    width: 40% !important;
+  }
+
+  .clouds > .cloud:nth-child(5) {
+    top: 5% !important;
+    left: 85% !important;
+    width: 55% !important;
+  }
+
+
+  /* Make cloud images behave exactly like mobile */
+
+  .cloud {
+    position: absolute;
+
+    z-index: 4;
+
+    height: auto;
+
+    will-change: transform;
+
+    img {
+      display: block;
+
+      width: 70%;
+      height: auto;
+
+      object-fit: contain;
+    }
+  }
+
+
+  /* -------------------------------------------------------
+     CASTLE
+     ------------------------------------------------------- */
+
+  .castle {
+    position: absolute;
+
+    width: 100vw !important;
+
+    left: 0 !important;
+
+    bottom: 26% !important;
+
+    transform: none !important;
+
+    z-index: 6;
+  }
+
+  .castleImg {
+    width: 100%;
+    height: auto;
+
+    display: block;
+  }
+
+
+  /* -------------------------------------------------------
+     MOON
+     ------------------------------------------------------- */
+
+  .moon {
+    position: absolute;
+
+    width: clamp(320px, 100vw, 700px) !important;
+
+    left: 50% !important;
+
+    bottom: 20% !important;
+
+    transform: translateX(-50%);
+
+    z-index: 0;
+  }
+
+  .moonImg {
+    width: 100%;
+    height: auto;
+
+    display: block;
+  }
+
+
+  /* -------------------------------------------------------
+     SAND
+     ------------------------------------------------------- */
+
+  .sand {
+    position: absolute;
+
+    bottom: -1.85%;
+
+    left: 0;
+
+    width: 200vw !important;
+    height: 46% !important;
+
+    z-index: 8;
+
+    overflow: hidden;
+  }
+
+  .sandImg {
+    position: absolute;
+    width: 125%;
+    height: 100%;
+right: 8%;
+    object-position: center bottom;
+  }
+
+
+  /* -------------------------------------------------------
+     OASIS LOGO
+     ------------------------------------------------------- */
+
+  .oasisLogo {
+    position: absolute;
+
+    bottom: 5% !important;
+    left: 1% !important;
+
+    width: clamp(160px, 50vw, 380px) !important;
+    height: clamp(160px, 50vh, 320px) !important;
+
+    z-index: 10;
+
+    img {
+      width: 100%;
+      height: 100%;
+
+      object-fit: contain;
+      display: block;
+    }
+  }
+
+
+  /* -------------------------------------------------------
+     REGISTER BUTTON
+     
+     IMPORTANT:
+     This overrides the .regBtn that appears AFTER your
+     existing mobile media query.
+     ------------------------------------------------------- */
+
+  .regBtn {
+    position: absolute;
+
+    top: auto !important;
+
+    bottom: -10% !important;
+
+    left: 50% !important;
+    right: auto !important;
+
+    width: clamp(260px, 70vw, 420px) !important;
+    height: clamp(300px, 70vh, 480px) !important;
+
+    scale: 1.2;
+
+    z-index: 100;
+
+    --carpet-x: 1%;
+    --carpet-y: -7%;
+    --carpet-scale: 0.75;
+  }
+
+
+  /* -------------------------------------------------------
+     REGISTER BUTTON IMAGES
+     ------------------------------------------------------- */
+
+  .regBtn img {
+    width: 90%;
+    height: 90%;
+
+    object-fit: contain;
+  }
+
+
+  /* -------------------------------------------------------
+     REGISTER TEXT
+     ------------------------------------------------------- */
+
+  .regBtn .regBtnText {
+    top: 17%;
+    left: 10%;
+  }
+
+
+  /* -------------------------------------------------------
+     CAMEL 1
+     ------------------------------------------------------- */
+
+  .camelLand {
+    right: 25% !important;
+    bottom: 20% !important;
+
+    left: auto !important;
+
+    opacity: 1;
+
+    z-index: 10;
+
+    img {
+      width: 90%;
+      height: 80%;
+
+      object-fit: contain;
+    }
+  }
+
+
+  /* -------------------------------------------------------
+     CAMEL 2
+     ------------------------------------------------------- */
+
+  .camelLand2 {
+    right: -3% !important;
+    bottom: 23% !important;
+
+    left: auto !important;
+
+    opacity: 1;
+
+    z-index: 10;
+
+    img {
+      width: 80%;
+      height: 80%;
+
+      object-fit: contain;
+    }
+  }
+
+
+  /* -------------------------------------------------------
+     SOCIAL LINKS
+     ------------------------------------------------------- */
+
+  .links {
+    display: none;
   }
 }

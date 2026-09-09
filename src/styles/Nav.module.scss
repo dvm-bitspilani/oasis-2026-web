@@ -52,9 +52,13 @@
 
 a {
   text-decoration: none;
-  color: #eed8af;
-  font-size: 1.25rem;
+  color: transparent;
+  font-size: 1.65rem;
   font-family: "Ramadhan", sans-serif;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-color: #000;
+  text-shadow: 0 -2.5px 0 #EED8AF;
 }
 
 .rectangle a {
@@ -65,10 +69,32 @@ a {
   &:hover,
   &:focus-visible {
     transform: scale(1.15);
-    text-shadow: 0 0 10px rgba(238, 216, 175, 0.7);
+    text-shadow: 0 -2.875px 0 #EED8AF;
+    outline: none;
+    //text-shadow: 0 0 10px rgba(238, 216, 175, 0.7);
   }
 }
 
+@media screen and (max-width: 1600px) {
+  a {
+    font-size: 1.25rem;
+  }
+}
+@media(min-width: 751px) and (max-width: 1100px){
+ .container{
+  position: absolute;
+  top: 24px;
+  left: -50%;
+  width: 150vw;
+  height: 10vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  margin-left: 5%;
+  z-index: 5000;
+ }
+}
 @media (max-width: 650px) {
   .container {
     top: auto;
