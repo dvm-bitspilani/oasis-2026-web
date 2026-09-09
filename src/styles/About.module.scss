@@ -177,7 +177,7 @@ body::-webkit-scrollbar {
 
 .leftTop {
   position: fixed;
-  top: -0%;
+  top: -2%;
   left: -35%;
   // height: clamp(140px, 60vh, 650px);
   height: 110vh;
@@ -243,8 +243,8 @@ body::-webkit-scrollbar {
 
 .lampR {
   position: absolute;
-  top: 15%;
-  right: 7%;
+  top: 25%;
+  right: 2%;
   z-index: 200;
   width: clamp(140px, 15vw, 650px);
   height: clamp(220px, 55vh, 1000px);

@@ -1,6 +1,6 @@
 import "../styles/About.module.scss";
 import styles from "../styles/About.module.scss";
-
+import Preloader from "./Preloader";
 import bgback from "../assets/about/bgBack.png";
 import cloud from "../assets/about/cloud.png";
 import backBg from "../assets/about/bgBottom.png";
@@ -20,13 +20,33 @@ import backBtn from "../assets/about/backBtn.png";
 import { useState, useRef, useEffect, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import scrollVid from "../assets/about/scrollVid.png"
+import scrollVid from "../assets/about/scrollVid.png";
+
 declare global {
   interface Window {
     YT: any;
     onYouTubeIframeAPIReady: () => void;
   }
 }
+
+const ABOUT_ASSETS = [
+  bgback,
+  cloud,
+  backBg,
+  leftCloud,
+  leftTop,
+  leftTopMob,
+  head,
+  lamp,
+  bgCon,
+  play,
+  ff,
+  playBtn,
+  bgVid,
+  cover,
+  backBtn,
+  scrollVid,
+];
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -58,7 +78,6 @@ const SvgImg = ({
 const YOUTUBE_VIDEO_ID = "5MtkggVC0w0";
 
 const About = () => {
-  console.log(window.innerHeight, window.innerWidth)
   const isMobile = window.matchMedia("(max-width: 1000px)").matches;
   const bgLeft = isMobile ? leftTopMob : leftTop;
   const { navigateWithTransition } = useTransition();
@@ -67,6 +86,7 @@ const About = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [playerReady, setPlayerReady] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(false);
+  const [aboutPreloaderDone, setAboutPreloaderDone] = useState(false);
 
   const playerHostRef = useRef<HTMLDivElement | null>(null);
   const playerElRef = useRef<HTMLDivElement | null>(null);
@@ -93,6 +113,11 @@ const About = () => {
   const cloudRef = useRef<HTMLDivElement | null>(null);
   const clicked = false;
   const isNavigatingRef = useRef(false);
+
+  const handleAboutPreloaderEnter = useCallback(() => {
+    setAboutPreloaderDone(true);
+    ScrollTrigger.refresh();
+  }, []);
 
   const handleBackClick = useCallback(() => {
     if (isNavigatingRef.current) return;
@@ -209,13 +234,21 @@ const About = () => {
       }
     };
   }, [showVideo]);
-  gsap.to(scrollVidRef.current, {
-    y: 10,
-    duration: 0.5,
-    repeat: -1,
-    yoyo: true,
-    ease: "power1.inOut",
-  });
+
+  useEffect(() => {
+    const tween = gsap.to(scrollVidRef.current, {
+      y: 10,
+      duration: 0.5,
+      repeat: -1,
+      yoyo: true,
+      ease: "power1.inOut",
+    });
+
+    return () => {
+      tween.kill();
+    };
+  }, []);
+
   const togglePlay = useCallback(() => {
     const player = playerRef.current;
 
@@ -284,13 +317,13 @@ const About = () => {
         x: "-2.5vw",
         y: "2.5vh",
         opacity: 1,
-        scale:0.7,
+        scale: 0.7,
       });
       gsap.set(LampRRef.current, {
         x: "2.5vw",
         y: "2.5vh",
         opacity: 1,
-        scale:0.7,
+        scale: 0.7,
       });
 
       gsap.set(bottomR.current, {
@@ -346,14 +379,6 @@ const About = () => {
         opacity: 0,
       });
 
-      // The box's position/size is set ONCE to its final target (the exact
-      // video frame), never tweened — GSAP can't reliably interpolate a
-      // compound calc(min(...)) string against a plain "100vw" value, which
-      // is what was causing the visible slide-in from the left. Instead,
-      // the "full screen at first, shrinks to the frame" look is produced
-      // by a pure numeric scale transform, which GSAP tweens cleanly and
-      // which stays perfectly centered on the box's own center (default
-      // transform-origin), so there's no left/top drift at all.
       gsap.set([bgRef.current, bgSolidRef.current], {
         width: widthExpr,
         height: heightExpr,
@@ -444,8 +469,8 @@ const About = () => {
       tl.from(bottomBack.current, { x: 0, y: 0, opacity: 1 }, 0);
       tl.from(cloudRef.current, { x: 0, y: 0, opacity: 1 }, 0);
       tl.from(headRef.current, { x: 0, y: 0, opacity: 1 }, 0);
-      tl.from(lampLRef.current, { x: 0, y: 0, opacity: 1 ,  scale:1}, 0);
-      tl.from(LampRRef.current, { x: 0, y: 0, opacity: 1  , scale : 1}, 0);
+      tl.from(lampLRef.current, { x: 0, y: 0, opacity: 1, scale: 1 }, 0);
+      tl.from(LampRRef.current, { x: 0, y: 0, opacity: 1, scale: 1 }, 0);
       tl.to(scrollVidRef.current, {
         opacity: 0,
         y: "10vh"
@@ -461,7 +486,6 @@ const About = () => {
         },
         0.5
       );
-
 
       tl.to(
         vidBgRef.current,
@@ -705,6 +729,13 @@ const About = () => {
       >
         <SvgImg src={backBtn} />
       </div>
+
+      {!aboutPreloaderDone && (
+        <Preloader
+          assets={ABOUT_ASSETS}
+          onEnter={handleAboutPreloaderEnter}
+        />
+      )}
     </div>
   );
 };
