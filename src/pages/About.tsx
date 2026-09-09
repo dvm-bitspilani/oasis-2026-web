@@ -70,7 +70,6 @@ const About = () => {
   const playerHostRef = useRef<HTMLDivElement | null>(null);
   const playerElRef = useRef<HTMLDivElement | null>(null);
   const playerRef = useRef<any>(null);
-
   const vidBgRef = useRef<HTMLDivElement | null>(null);
   const vidRef = useRef<HTMLDivElement | null>(null);
   const controlsRef = useRef<HTMLDivElement | null>(null);
@@ -166,11 +165,15 @@ const About = () => {
 
       playerRef.current = new window.YT.Player(playerElRef.current, {
         videoId: YOUTUBE_VIDEO_ID,
+        width: "100%",
+        height: "100%",
         playerVars: {
           autoplay: 1,
           mute: 1,
           playsinline: 1,
           enablejsapi: 1,
+          rel: 0,
+          modestbranding: 1,
           origin: window.location.origin,
         },
         events: {
@@ -283,52 +286,82 @@ const About = () => {
       });
 
       const isMobile = window.matchMedia("(max-width: 768px)").matches;
-      const FINAL_BG_SIZE = isMobile ? "85% 24%" : "63% 62%";
 
-      const [wStr, hStr] = FINAL_BG_SIZE.split(" ");
+      const boxWidthVw = isMobile ? 85 : 63;
+      const boxHeightVh = isMobile ? 24 : 62;
+      const VIDEO_ASPECT = 16 / 9;
 
-      const widthPct = parseFloat(wStr);
-      const heightPct = parseFloat(hStr);
-
-      const leftPct = (100 - widthPct) / 2;
-      const topPct = (100 - heightPct) / 2;
+      const widthExpr = `min(${boxWidthVw}vw, ${(
+        boxHeightVh * VIDEO_ASPECT
+      ).toFixed(4)}vh)`;
+      const heightExpr = `min(${boxHeightVh}vh, ${(
+        boxWidthVw / VIDEO_ASPECT
+      ).toFixed(4)}vw)`;
+      const leftExpr = `calc(50% - (${widthExpr}) / 2)`;
+      const topExpr = `calc(50% - (${heightExpr}) / 2)`;
 
       const CONTROLS_HEIGHT_PCT = isMobile ? 9 : 7;
       const CONTROLS_GAP_PCT = 0.5;
 
       gsap.set(vidRef.current, {
-        width: `${widthPct}%`,
-        height: `${heightPct}%`,
-        left: `${leftPct}%`,
-        top: `${topPct}%`,
+        width: widthExpr,
+        height: heightExpr,
+        left: leftExpr,
+        top: topExpr,
         opacity: 0,
       });
 
       gsap.set(vidBgRef.current, {
-        width: `${widthPct}%`,
-        height: `${heightPct}%`,
-        left: `${leftPct}%`,
-        top: `${topPct}%`,
+        width: widthExpr,
+        height: heightExpr,
+        left: leftExpr,
+        top: topExpr,
         opacity: 0,
       });
 
       gsap.set(controlsRef.current, {
-        width: `${widthPct}%`,
-        height: `${CONTROLS_HEIGHT_PCT}%`,
-        left: `${leftPct}%`,
-        top: `${topPct + heightPct + CONTROLS_GAP_PCT}%`,
+        width: widthExpr,
+        height: `${CONTROLS_HEIGHT_PCT}vh`,
+        left: leftExpr,
+        top: `calc(${topExpr} + (${heightExpr}) + ${CONTROLS_GAP_PCT}vh)`,
         opacity: 0,
       });
 
-      gsap.set(bgRef.current, {
-        backgroundSize: isMobile ? "200% 100%" : "120% 120%",
+      // The box's position/size is set ONCE to its final target (the exact
+      // video frame), never tweened — GSAP can't reliably interpolate a
+      // compound calc(min(...)) string against a plain "100vw" value, which
+      // is what was causing the visible slide-in from the left. Instead,
+      // the "full screen at first, shrinks to the frame" look is produced
+      // by a pure numeric scale transform, which GSAP tweens cleanly and
+      // which stays perfectly centered on the box's own center (default
+      // transform-origin), so there's no left/top drift at all.
+      gsap.set([bgRef.current, bgSolidRef.current], {
+        width: widthExpr,
+        height: heightExpr,
+        left: leftExpr,
+        top: topExpr,
+        xPercent: 0,
+        yPercent: 0,
+        backgroundSize: "100% 100%",
         backgroundPosition: "center center",
+        backgroundRepeat: "no-repeat",
+      });
+
+      const bgBox = bgRef.current?.getBoundingClientRect();
+      const initialScaleX =
+        bgBox && bgBox.width > 0 ? window.innerWidth / bgBox.width : 1;
+      const initialScaleY =
+        bgBox && bgBox.height > 0 ? window.innerHeight / bgBox.height : 1;
+
+      gsap.set(bgRef.current, {
+        scaleX: initialScaleX,
+        scaleY: initialScaleY,
         opacity: 1,
       });
 
       gsap.set(bgSolidRef.current, {
-        backgroundSize: "120% 120%",
-        backgroundPosition: "center center",
+        scaleX: initialScaleX,
+        scaleY: initialScaleY,
         opacity: 0,
       });
 
@@ -344,7 +377,8 @@ const About = () => {
       tl.to(
         [bgRef.current, bgSolidRef.current],
         {
-          backgroundSize: FINAL_BG_SIZE,
+          scaleX: 1,
+          scaleY: 1,
           ease: "none",
           duration: SHRINK_DURATION,
         },
@@ -423,6 +457,16 @@ const About = () => {
           ease: "power1.inOut",
         },
         "<"
+      );
+
+      tl.to(
+        bgSolidRef.current,
+        {
+          opacity: 0,
+          duration: 0,
+          ease: "power1.inOut",
+        },
+        "0"
       );
 
       const VIDEO_REVEAL_TIME = tl.duration() - 0.9;
@@ -533,7 +577,6 @@ const About = () => {
           </div>
         </div>
       )}
-
       <div className={styles.video} ref={vidRef}>
         <div
           ref={playerHostRef}
