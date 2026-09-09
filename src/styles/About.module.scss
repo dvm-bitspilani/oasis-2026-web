@@ -436,7 +436,7 @@ body::-webkit-scrollbar {
 //   z-index: 999; // above bgFrontSolid (2), below .video (1000)
 //   pointer-events: none;
 // }
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
   .scrollVid {
     left: 40% !important;
     bottom:10%;
@@ -736,3 +736,12 @@ body::-webkit-scrollbar {
 
 
 }
+
+// @media (max-width:850px) {
+//   .leftTop{
+//     top: -50%;
+//     left: -30%;
+//     height: 200vh;
+//     width: 150vw;
+//   }
+// }

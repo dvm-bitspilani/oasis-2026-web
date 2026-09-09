@@ -5,8 +5,8 @@ import bgback from "../assets/about/bgBack.png";
 import cloud from "../assets/about/cloud.png";
 import backBg from "../assets/about/bgBottom.png";
 import leftCloud from "../assets/about/leftClouds.png";
-import leftTop from "../assets/about/pillarTop.png";
-import leftTopMob from "../assets/about/leftTop.png";
+import leftTop from "../assets/about/pillarTop-trimmed.png";
+import leftTopMob from "../assets/about/leftTop-trimmed.png";
 import head from "../assets/about/head.png";
 import lamp from "../assets/about/lamp.png";
 import bgCon from "../assets/about/bgCont.png";
@@ -59,7 +59,7 @@ const YOUTUBE_VIDEO_ID = "5MtkggVC0w0";
 
 const About = () => {
   console.log(window.innerHeight, window.innerWidth)
-  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+  const isMobile = window.matchMedia("(max-width: 1000px)").matches;
   const bgLeft = isMobile ? leftTopMob : leftTop;
   const { navigateWithTransition } = useTransition();
 
