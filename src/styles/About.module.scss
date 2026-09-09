@@ -438,9 +438,10 @@ body::-webkit-scrollbar {
 // }
 @media (max-width: 768px) {
   .scrollVid {
-    left: 30%;
+    left: 40% !important;
     bottom:10%;
-    // width: 30vw;
+    width: 25vw !important;
+    // height: 50vh;
   }
 
   .about {
@@ -546,12 +547,12 @@ body::-webkit-scrollbar {
     z-index: 60;
     pointer-events: none;
     // color: rgba(255, 232, 189, 1);
-    color: #FFE8BD !important;
+    // color: #ff6ec0 !important;
     background: none !important;
     background-image: none !important;
     -webkit-background-clip: initial !important;
     background-clip: initial !important;
-    -webkit-text-fill-color: #d4af37 !important;
+    -webkit-text-fill-color: #FFE8BD !important;
   }
 
   .bgBottom {
