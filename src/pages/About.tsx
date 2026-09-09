@@ -20,7 +20,7 @@ import backBtn from "../assets/about/backBtn.png";
 import { useState, useRef, useEffect, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-
+import scrollVid from "../assets/about/scrollVid.png"
 declare global {
   interface Window {
     YT: any;
@@ -58,6 +58,7 @@ const SvgImg = ({
 const YOUTUBE_VIDEO_ID = "5MtkggVC0w0";
 
 const About = () => {
+  console.log(window.innerHeight, window.innerWidth)
   const isMobile = window.matchMedia("(max-width: 768px)").matches;
   const bgLeft = isMobile ? leftTopMob : leftTop;
   const { navigateWithTransition } = useTransition();
@@ -82,10 +83,11 @@ const About = () => {
   const bgBackRef = useRef<HTMLDivElement | null>(null);
   const bgRef = useRef<HTMLDivElement | null>(null);
   const bgSolidRef = useRef<HTMLDivElement | null>(null);
-
+  const lampLRef = useRef<HTMLDivElement | null>(null);
+  const LampRRef = useRef<HTMLDivElement | null>(null);
   const bottomR = useRef<HTMLDivElement | null>(null);
   const bottomL = useRef<HTMLDivElement | null>(null);
-
+  const scrollVidRef = useRef<HTMLDivElement | null>(null);
   const bottomBack = useRef<HTMLDivElement | null>(null);
   const headRef = useRef<HTMLDivElement | null>(null);
   const cloudRef = useRef<HTMLDivElement | null>(null);
@@ -104,7 +106,7 @@ const About = () => {
         if (typeof player.pauseVideo === "function") {
           player.pauseVideo();
         }
-      } catch {}
+      } catch { }
 
       playerRef.current = null;
     }
@@ -181,7 +183,7 @@ const About = () => {
 
             try {
               e.target.playVideo();
-            } catch {}
+            } catch { }
 
             setTimeout(() => {
               setControlsVisible(true);
@@ -203,7 +205,7 @@ const About = () => {
 
     return () => {
       if (window.onYouTubeIframeAPIReady === createPlayer) {
-        window.onYouTubeIframeAPIReady = () => {};
+        window.onYouTubeIframeAPIReady = () => { };
       }
     };
   }, [showVideo]);
@@ -219,7 +221,7 @@ const About = () => {
       } else {
         player.playVideo();
       }
-    } catch {}
+    } catch { }
   }, [isPlaying]);
 
   const seekBy = useCallback((deltaSeconds: number) => {
@@ -230,7 +232,7 @@ const About = () => {
     try {
       const current = player.getCurrentTime();
       player.seekTo(Math.max(0, current + deltaSeconds), true);
-    } catch {}
+    } catch { }
   }, []);
 
   const rewind = useCallback(() => {
@@ -271,6 +273,18 @@ const About = () => {
         x: "-2.5vw",
         y: "2.5vh",
         opacity: 1,
+      });
+      gsap.set(lampLRef.current, {
+        x: "-2.5vw",
+        y: "2.5vh",
+        opacity: 1,
+        scale:0.7,
+      });
+      gsap.set(LampRRef.current, {
+        x: "2.5vw",
+        y: "2.5vh",
+        opacity: 1,
+        scale:0.7,
       });
 
       gsap.set(bottomR.current, {
@@ -367,6 +381,9 @@ const About = () => {
       gsap.set(bgBackRef.current, {
         opacity: 0.4,
       });
+      gsap.set(scrollVidRef.current, {
+        opacity: 1,
+      });
 
       const tl = gsap.timeline();
 
@@ -421,7 +438,12 @@ const About = () => {
       tl.from(bottomBack.current, { x: 0, y: 0, opacity: 1 }, 0);
       tl.from(cloudRef.current, { x: 0, y: 0, opacity: 1 }, 0);
       tl.from(headRef.current, { x: 0, y: 0, opacity: 1 }, 0);
-
+      tl.from(lampLRef.current, { x: 0, y: 0, opacity: 1 ,  scale:1}, 0);
+      tl.from(LampRRef.current, { x: 0, y: 0, opacity: 1  , scale : 1}, 0);
+      tl.to(scrollVidRef.current, {
+        opacity: 0,
+        y: "10vh"
+      }, 0);
       tl.to(
         vidRef.current,
         {
@@ -433,6 +455,7 @@ const About = () => {
         },
         0.5
       );
+
 
       tl.to(
         vidBgRef.current,
@@ -579,9 +602,8 @@ const About = () => {
       <div className={styles.video} ref={vidRef}>
         <div
           ref={playerHostRef}
-          className={`${styles.videoIframe} ${
-            playerReady ? styles.playerVisible : ""
-          }`}
+          className={`${styles.videoIframe} ${playerReady ? styles.playerVisible : ""
+            }`}
         >
           <div
             ref={playerElRef}
@@ -597,9 +619,8 @@ const About = () => {
       />
 
       <div
-        className={`${styles.videoControls} ${
-          controlsVisible ? styles.controlsVisible : ""
-        }`}
+        className={`${styles.videoControls} ${controlsVisible ? styles.controlsVisible : ""
+          }`}
         ref={controlsRef}
         style={{ backgroundImage: `url(${bgCon})` }}
       >
@@ -661,12 +682,15 @@ const About = () => {
         <SvgImg src={leftTop} />
       </div>
 
-      <div className={styles.lamp}>
+      <div ref={lampLRef} className={styles.lamp}>
         <SvgImg src={lamp} />
       </div>
 
-      <div className={styles.lampR}>
+      <div ref={LampRRef} className={styles.lampR}>
         <SvgImg src={lamp} />
+      </div>
+      <div ref={scrollVidRef} className={styles.scrollVid}>
+        <SvgImg src={scrollVid} />
       </div>
 
       <div
