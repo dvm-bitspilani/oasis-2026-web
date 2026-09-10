@@ -1413,13 +1413,13 @@
   .formContainer {
     position: absolute;
 
-    top: calc(var(--lp-top) + 10%);
+    top: var(--lp-top);
 
     left: var(--lp-left);
 
     width: var(--lp-width);
 
-    height: calc(var(--lp-height) - 15%);
+    height: var(--lp-height);
     margin-top: 0;
     padding: 0;
     box-sizing: border-box;
@@ -1427,10 +1427,6 @@
     flex-direction: column;
 
     gap: 10px;
-
-    border-top: var(--hdr-height) solid transparent;
-
-    border-bottom: var(--ftr-height) solid transparent;
 
     overflow-y: auto;
 
@@ -1462,13 +1458,9 @@
   }
 
   .regTitle {
-    position: fixed;
+    position: sticky;
 
-    top: calc(var(--lp-top) + 5%);
-
-    left: var(--lp-left);
-
-    width: var(--lp-width);
+    top: 0;
 
     height: var(--hdr-height);
 
@@ -1493,9 +1485,6 @@
     background: none;
 
     pointer-events: none;
-
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
   }
 
   .genderOptions {
@@ -1531,15 +1520,15 @@
   }
 
   .formColumn > .nextButton {
-    position: fixed;
+    position: sticky;
 
-    left: calc(var(--lp-left) + 12.5vw);
+    bottom: 0;
 
-    width: calc(var(--lp-width) - 25vw);
+    align-self: center;
+
+    width: 62%;
 
     height: var(--ftr-height);
-
-    bottom: calc(var(--lp-bottom) + 5%);
 
     z-index: 20;
 
@@ -1556,9 +1545,6 @@
     background-size: contain;
 
     font-size: clamp(0.5rem, 3vw, 2rem);
-
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
   }
 
   .lefttop {
