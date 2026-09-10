@@ -160,8 +160,8 @@
     left: 50%;
     transform: translate(-50%, -50%);
     width: var(--modal-w);
-    aspect-ratio: 860 / 1829;
-    height: auto;
+    //aspect-ratio: 860 / 1829;
+    height: 90svh;
     padding: calc(var(--modal-w) * 0.17) calc(var(--modal-w) * 0.115)
       calc(var(--modal-w) * 0.09);
     background-image: var(--modal-bg-mobile);

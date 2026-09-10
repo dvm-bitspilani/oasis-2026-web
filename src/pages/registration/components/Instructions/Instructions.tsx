@@ -133,7 +133,7 @@ const Instructions = ({
             shape="pill"
             size="large"
             text="signin_with"
-            width={isMobile ? 65 : 250}
+            width={isMobile ? 100 : 300}
           />
         </div>
       </div>

@@ -624,6 +624,13 @@
 @media (max-height: 960px) and (max-width: 1500px) {
   .regBtn {
     --carpet-scale: 0.6;
+    .regBtnText {
+      top: 20%;
+
+      text {
+        font-size: 20px;
+      }
+    }
   }
 }
 
