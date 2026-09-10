@@ -7,6 +7,7 @@ const LINKS = [
   { label: "Home", to: "/" },
   { label: "Events", to: "/comingsoon" },
   { label: "About Us", to: "/aboutUs" },
+  { label: "Reg", to: "/Reg" },
   { label: "Contact Us", to: "/comingsoon" },
 ];
 

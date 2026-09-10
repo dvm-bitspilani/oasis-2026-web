@@ -1357,7 +1357,7 @@
 /* MOBILE                                                      */
 /* ========================================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 900px ) {
   .registerContainer {
     --lp-top: 6%;
     --lp-left: 16%;
@@ -1444,6 +1444,222 @@
 
     -ms-overflow-style: none;
   }
+
+  .formContainer::-webkit-scrollbar {
+    display: none;
+
+    width: 0;
+
+    height: 0;
+  }
+
+  .formColumn > * {
+    width: 100%;
+
+    margin-left: auto;
+
+    margin-right: auto;
+
+    flex-shrink: 0;
+  }
+
+  .regTitle {
+    position: fixed;
+
+    top: calc(var(--lp-top) + 5%);
+
+    left: var(--lp-left);
+
+    width: var(--lp-width);
+
+    height: var(--hdr-height);
+
+    z-index: 20;
+
+    margin: 0 !important;
+
+    padding: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: clamp(1.2rem, 12vw, 15rem);
+
+    line-height: 1;
+
+    text-align: center;
+
+    background: none;
+
+    pointer-events: none;
+  }
+
+  .genderOptions {
+    width: 100%;
+
+    gap: 4vw;
+
+    padding: 4px 0;
+  }
+
+  .yearOptions {
+    width: 100%;
+
+    gap: 4vw;
+
+    padding: 4px 0;
+  }
+
+  .dobOptions {
+    width: 100%;
+
+    gap: 2vw;
+
+    padding: 4px 0;
+  }
+
+  .dobSelect {
+    width: 30%;
+
+    height: 32px;
+
+    font-size: 0.7rem;
+  }
+
+  .formColumn > .nextButton {
+    position: fixed;
+
+    left: calc(var(--lp-left) + 12.5vw);
+
+    width: calc(var(--lp-width) - 25vw);
+
+    height: var(--ftr-height);
+
+    bottom: calc(var(--lp-bottom) + 5%);
+
+    z-index: 20;
+
+    min-width: 0;
+
+    min-height: 0;
+
+    margin: 0;
+
+    padding: 0;
+
+    background-color: transparent;
+
+    background-size: contain;
+
+    font-size: clamp(0.5rem, 3vw, 2rem);
+  }
+
+  .lefttop {
+    width: 45%;
+  }
+  .leftmiddle {
+    display: none;
+  }
+
+  .righttop {
+    width: 30%;
+  }
+
+  .leftbottom {
+    width: 25%;
+  }
+
+  .rightbottom {
+    width: 30%;
+  }
+}
+
+@media ((max-width: 900px) and (max-height:800px)) {
+  .registerContainer {
+    --lp-top: 6%;
+    --lp-left: 16%;
+    --lp-width: 66%;
+    --lp-height: 88%;
+
+    --lp-bottom: 6%;
+
+    --hdr-height: 46px;
+    --ftr-height: 56px;
+
+    height: 100svh;
+    min-height: 100svh;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+  }
+
+  .bookContainer {
+    position: absolute;
+
+    top: 52%;
+    left: 13vw;
+
+    transform: translateY(-50%);
+
+    width: 92vw;
+
+    height: 78vh;
+
+    aspect-ratio: auto;
+
+    background-size: 180% 100%;
+
+    background-position: left top;
+
+    background-repeat: no-repeat;
+
+    overflow: hidden;
+  }
+
+  .tajmahal {
+    display: none;
+    width: 34%;
+    display: none;
+    right: 4%;
+
+    bottom: 3%;
+  }
+
+  .formContainer {
+    position: absolute;
+
+    top: calc(var(--lp-top) + 6%);   /* was: + 0% */
+
+    left: var(--lp-left);
+
+    width: var(--lp-width);
+
+    height: calc(var(--lp-height) - 12%);  /* was: + 10% */
+    margin-top: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    border-top: var(--hdr-height) solid transparent;
+
+    border-bottom: var(--ftr-height) solid transparent;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
 
   .formContainer::-webkit-scrollbar {
     display: none;
