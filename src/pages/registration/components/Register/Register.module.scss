@@ -1633,13 +1633,13 @@
   .formContainer {
     position: absolute;
 
-    top: calc(var(--lp-top) + 6%);   /* was: + 0% */
+    top: calc(var(--lp-top) + 0%);
 
     left: var(--lp-left);
 
     width: var(--lp-width);
 
-    height: calc(var(--lp-height) - 12%);  /* was: + 10% */
+    height: calc(var(--lp-height) + 10%);
     margin-top: 0;
     padding: 0;
     box-sizing: border-box;
@@ -1653,13 +1653,17 @@
     border-bottom: var(--ftr-height) solid transparent;
 
     overflow-y: auto;
+
     overflow-x: hidden;
+
     -webkit-overflow-scrolling: touch;
+
     overscroll-behavior: contain;
+
     scrollbar-width: none;
+
     -ms-overflow-style: none;
   }
-
 
   .formContainer::-webkit-scrollbar {
     display: none;
