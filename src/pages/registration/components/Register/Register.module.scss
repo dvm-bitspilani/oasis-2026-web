@@ -1388,7 +1388,7 @@
 
     width: 92vw;
 
-    height: 78vh;
+    height: 78svh;
 
     aspect-ratio: auto;
 
@@ -1435,8 +1435,6 @@
     overflow-y: auto;
 
     overflow-x: hidden;
-
-    -webkit-overflow-scrolling: touch;
 
     overscroll-behavior: contain;
 
@@ -1495,6 +1493,9 @@
     background: none;
 
     pointer-events: none;
+
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
 
   .genderOptions {
@@ -1555,6 +1556,9 @@
     background-size: contain;
 
     font-size: clamp(0.5rem, 3vw, 2rem);
+
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
 
   .lefttop {
@@ -1605,7 +1609,7 @@
 
     width: 115vw;
 
-    height: 85vh;
+    height: 85svh;
 
     background-size: 170% 100%;
   }
