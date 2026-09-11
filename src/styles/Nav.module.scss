@@ -242,74 +242,34 @@
     align-items: center;
     padding: 0.75rem 1.5rem;
     margin-right: 0;
-    background-image: url("../assets/hamBgMob.png");
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
+    background-image: var(--nav-mobile-bg);
 
-  .desktopLinks {
-    display: none;
-  }
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 1.5rem;
+      height: 1.5rem;
+      transform: translateY(-50%);
+      background-image: var(--nav-mobile-nav-decor);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      pointer-events: none;
+    }
 
-  .mobileHomeNav {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 1.5rem;
-  }
+    &::before {
+      left: 1.5rem;
+    }
 
-  .homeLink {
-    display: inline-block;
-    font-size: 0.9rem;
-    white-space: nowrap;
-    position: absolute;
-    z-index: 2;
-    bottom: 2%;
-  }
+    &::after {
+      right: 1.5rem;
+      transform: translateY(-50%) scaleX(-1);
+    }
 
-  .mobileNavDecoration {
-    position: absolute;
-    top: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.5rem;
-    height: 1.5rem;
-    transform: translateY(-50%);
-    flex-shrink: 0;
-    z-index: 2;
-  }
-
-  .mobileNavDecoration:first-child {
-    left: -8%;
-    top: 0%;
-    transform: scaleX(-0.8);
-  }
-
-  .mobileNavDecoration:last-child {
-    right: -8%;
-    transform: translateY(-50%) scaleX(0.8);
-  }
-
-  .mobileNavDecoration img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-  }
-
-  .mobileNavDecoration:first-child:hover,
-  .mobileNavDecoration:first-child:focus-visible {
-    transform: translateY(-50%) scale(1.15);
-    outline: none;
-  }
-
-  .mobileNavDecoration:last-child:hover,
-  .mobileNavDecoration:last-child:focus-visible {
-    transform: translateY(-50%) scaleX(-1.15);
-    outline: none;
+    // a:not(:first-child) {
+    //   display: none;
+    // }
   }
 }

@@ -9,6 +9,7 @@ const LINKS = [
   { label: "Events", to: "/comingsoon" },
   { label: "About Us", to: "/aboutUs" },
   { label: "Contact Us", to: "/comingsoon" },
+   { label: "Reg", to: "/reg" },
 ];
 
 export default function Nav() {
