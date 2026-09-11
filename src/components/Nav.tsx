@@ -1,6 +1,7 @@
-import { NavLink} from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import styles from "../styles/Nav.module.scss";
 import navLine from "../assets/hamLine.svg";
+import navMob from "../assets/navMobNav.png";
 import { useTransition } from "../context/TransitionProvider";
 
 const LINKS = [
@@ -24,21 +25,51 @@ export default function Nav() {
   return (
     <div className={styles.container}>
       <div className={styles.circle}>
-        <img src={navLine} />
-        <img src={navLine} />
-        <img src={navLine} />
+        <img src={navLine} alt="" />
+        <img src={navLine} alt="" />
+        <img src={navLine} alt="" />
       </div>
 
       <div className={styles.rectangle}>
-        {LINKS.map((link) => (
+        <div className={styles.mobileHomeNav}>
           <NavLink
-            key={link.label}
-            to={link.to}
-            onClick={(e) => handleNavClick(e, link.to)}
+            to="/"
+            onClick={(e) => handleNavClick(e, "/")}
+            className={styles.mobileNavDecoration}
+            aria-label="Home"
           >
-            {link.label}
+            <img src={navMob} alt="" />
           </NavLink>
-        ))}
+
+          <NavLink
+            to="/"
+            onClick={(e) => handleNavClick(e, "/")}
+            className={styles.homeLink}
+          >
+            Home
+          </NavLink>
+
+          <NavLink
+            to="/aboutUs"
+            onClick={(e) => handleNavClick(e, "/aboutUs")}
+            className={styles.mobileNavDecoration}
+            aria-label="About Us"
+          >
+            <img src={navMob} alt="" />
+          </NavLink>
+        </div>
+
+        <div className={styles.desktopLinks}>
+          {LINKS.map((link) => (
+            <NavLink
+              key={link.label}
+              to={link.to}
+              onClick={(e) => handleNavClick(e, link.to)}
+            >
+              {link.label}
+            </NavLink>
+          ))}
+        </div>
       </div>
     </div>
   );
