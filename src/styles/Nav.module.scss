@@ -268,8 +268,8 @@
       transform: translateY(-50%) scaleX(-1);
     }
 
-    // a:not(:first-child) {
-    //   display: none;
-    // }
+    a:not(:first-child) {
+      display: none;
+    }
   }
 }
