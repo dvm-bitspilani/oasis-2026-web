@@ -91,7 +91,7 @@ const Instructions = ({
         data-book-start
       />
 
-      <Link to="/" className={styles.backButton} style={leaveStyle}>
+      <Link to="/" className={styles.backButton}>
         <img src="/regBackButton.png" alt="Go to Home Page" />
       </Link>
 

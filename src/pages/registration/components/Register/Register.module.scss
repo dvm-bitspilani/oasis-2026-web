@@ -703,7 +703,7 @@
 
 .registerContainer {
   width: 100vw;
-  min-height: 100vh;
+  min-height: 100dvh;
 
   background-size: cover;
   background-repeat: no-repeat;
@@ -1203,6 +1203,11 @@
   transform: scale(0.96);
 }
 
+.mobileContainer {
+  width: 100%;
+  display: flex;
+}
+
 /* ========================================================= */
 /* REACT SELECT                                                */
 /* ========================================================= */
@@ -1388,7 +1393,7 @@
 
     width: 92vw;
 
-    height: 78svh;
+    height: 85svh;
 
     aspect-ratio: auto;
 
@@ -1458,23 +1463,13 @@
   }
 
   .regTitle {
-    position: sticky;
-
     top: 0;
-
-    height: var(--hdr-height);
 
     z-index: 20;
 
     margin: 0 !important;
 
-    padding: 0;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
+    padding-top: 10px;
 
     font-size: clamp(1.2rem, 12vw, 15rem);
 
@@ -1518,7 +1513,13 @@
 
     font-size: 0.7rem;
   }
-
+.nextButton{
+  align-self: center;
+  margin: 0;
+  min-height: 70px;
+  width: 60%;
+  
+}
   .formColumn > .nextButton {
     position: sticky;
 
@@ -1528,22 +1529,13 @@
 
     width: 62%;
 
-    height: var(--ftr-height);
+    // height: var(--ftr-height);
 
     z-index: 20;
-
-    min-width: 0;
-
-    min-height: 0;
-
     margin: 0;
-
     padding: 0;
-
     background-color: transparent;
-
     background-size: contain;
-
     font-size: clamp(0.5rem, 3vw, 2rem);
   }
 
@@ -1571,14 +1563,12 @@
 /* SMALL MOBILE                                                */
 /* ========================================================= */
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
   .registerContainer {
     --hdr-height: 40px;
-
     --ftr-height: 50px;
   }
   .leftbottom {
-    left: 10%;
     width: 40%;
   }
   .rightbottom {
@@ -1599,11 +1589,26 @@
 
     background-size: 170% 100%;
   }
+  .formColumn {
+    position: relative;
 
+  }
+  .nextButton{
+    align-self: center;
+  }
+  .mobileContainer {
+    overflow-y: scroll;
+    flex-direction: column;
+    // height: 78%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
   .formContainer {
     gap: 8px;
     margin-top: 0;
-    padding: 0;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
   }
 
   .formColumn > .nextButton {
