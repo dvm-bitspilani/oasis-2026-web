@@ -347,7 +347,7 @@ body::-webkit-scrollbar {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5%;
+  gap: 6%;
   pointer-events: none;
 }
 
@@ -363,11 +363,11 @@ body::-webkit-scrollbar {
   border: none;
   cursor: pointer;
   flex: 0 0 auto;
-  width: 2.5vw;
-  height: 2vh;
+  width: 4vw;
+  height: 4vh;
   padding: 0;
   opacity: 0;
-  mix-blend-mode: overlay;
+  // mix-blend-mode: overlay;
   transform: translateY(6px);
   transition: opacity 0.5s ease, transform 0.5s ease;
 
