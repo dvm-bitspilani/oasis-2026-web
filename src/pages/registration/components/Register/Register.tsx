@@ -665,10 +665,6 @@
 // //               </p>
 // //             )}
 
-
-
-
-
 // //               {/* DOB */}
 
 // //             <Reginput
@@ -697,7 +693,6 @@
 // //                 : styles.formRight
 // //             }
 // //           >
-          
 
 // //             {/* COLLEGE */}
 
@@ -914,9 +909,6 @@
 // //     </div>
 // //   );
 // // }
-
-
-
 
 // // import * as yup from "yup";
 // // import { yupResolver } from "@hookform/resolvers/yup";
@@ -2143,8 +2135,6 @@
 // //   );
 // // }
 
-
-
 // import * as yup from "yup";
 // import { yupResolver } from "@hookform/resolvers/yup";
 // import Select from "react-select";
@@ -3207,8 +3197,6 @@
 
 //             {/* CITY */}
 
-            
-
 //             {/* STATE */}
 
 //             <Reginput
@@ -3280,8 +3268,6 @@
 //               </p>
 //             )}
 
-
-
 //             <Reginput
 //               title="City"
 //               showLine
@@ -3352,8 +3338,6 @@
 //   );
 // }
 
-
-
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Select from "react-select";
@@ -3397,50 +3381,29 @@ interface RegProps {
 /* ========================================================= */
 
 const registrationSchema = yup.object({
-  name: yup
-    .string()
-    .required("Name is required"),
+  name: yup.string().required("Name is required"),
 
-  email_id: yup
-    .string()
-    .email("Invalid email"),
+  email_id: yup.string().email("Invalid email"),
 
-  gender: yup
-    .string()
-    .required("Gender is required"),
+  gender: yup.string().required("Gender is required"),
 
   phone: yup
     .string()
-    .matches(
-      /^[1-9]\d{9}$/,
-      "Invalid number"
-    )
+    .matches(/^[1-9]\d{9}$/, "Invalid number")
     .required("Mobile number is required"),
 
-  college_id: yup
-    .string()
-    .required("College is required"),
+  college_id: yup.string().required("College is required"),
 
-  year: yup
-    .string()
-    .required("Field is required"),
+  year: yup.string().required("Field is required"),
 
-  state: yup
-    .string()
-    .required("State is required"),
+  state: yup.string().required("State is required"),
 
-  city: yup
-    .string()
-    .required("City is required"),
+  city: yup.string().required("City is required"),
 
-  dob: yup
-    .string()
-    .required("Date of birth is required"),
+  dob: yup.string().required("Date of birth is required"),
 });
 
-type FormData = yup.InferType<
-  typeof registrationSchema
->;
+type FormData = yup.InferType<typeof registrationSchema>;
 
 /* ========================================================= */
 /* GENDER                                                     */
@@ -3470,21 +3433,17 @@ const genderOptions: GenderOption[] = [
 /* STATE                                                      */
 /* ========================================================= */
 
-const stateOptions = statesData.map(
-  (item) => ({
-    value: item.state,
-    label: item.state,
-  })
-);
+const stateOptions = statesData.map((item) => ({
+  value: item.state,
+  label: item.state,
+}));
 
 /* ========================================================= */
 /* DOB OPTIONS                                                */
 /* ========================================================= */
 
-const days = Array.from(
-  { length: 31 },
-  (_, i) =>
-    String(i + 1).padStart(2, "0")
+const days = Array.from({ length: 31 }, (_, i) =>
+  String(i + 1).padStart(2, "0"),
 );
 
 const months = [
@@ -3502,14 +3461,9 @@ const months = [
   { value: "12", label: "December" },
 ];
 
-const currentYear =
-  new Date().getFullYear();
+const currentYear = new Date().getFullYear();
 
-const years = Array.from(
-  { length: 100 },
-  (_, i) =>
-    String(currentYear - i)
-);
+const years = Array.from({ length: 100 }, (_, i) => String(currentYear - i));
 
 /* ========================================================= */
 /* MOBILE                                                     */
@@ -3527,59 +3481,38 @@ export default function Reg({
   userData,
   setUserData,
 }: RegProps) {
-  const [isMobile, setIsMobile] =
-    useState<boolean>(
-      () =>
-        typeof window !== "undefined" &&
-        window.innerWidth <
-          MOBILE_BREAKPOINT
-    );
+  const [isMobile, setIsMobile] = useState<boolean>(
+    () =>
+      typeof window !== "undefined" && window.innerWidth < MOBILE_BREAKPOINT,
+  );
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(
-        window.innerWidth <
-          MOBILE_BREAKPOINT
-      );
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     };
 
     handleResize();
 
-    window.addEventListener(
-      "resize",
-      handleResize
-    );
+    window.addEventListener("resize", handleResize);
 
-    return () =>
-      window.removeEventListener(
-        "resize",
-        handleResize
-      );
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   /* ======================================================= */
   /* STATE                                                    */
   /* ======================================================= */
 
-  const [selectedState, setSelectedState] =
-    useState("");
+  const [selectedState, setSelectedState] = useState("");
 
-  const [
-    availableCities,
-    setAvailableCities,
-  ] = useState<
+  const [availableCities, setAvailableCities] = useState<
     { value: string; label: string }[]
   >([]);
 
-  const [
-    collegeOptions,
-    setCollegeOptions,
-  ] = useState<
+  const [collegeOptions, setCollegeOptions] = useState<
     { value: string; label: string }[]
   >([]);
 
-  const [inputValue, setInputValue] =
-    useState("");
+  const [inputValue, setInputValue] = useState("");
 
   // Keep DOB selectors independently so selecting one does not
   // reset the others before all three values have been chosen.
@@ -3600,9 +3533,7 @@ export default function Reg({
     reset,
     watch,
   } = useForm<FormData>({
-    resolver: yupResolver(
-      registrationSchema as any
-    ),
+    resolver: yupResolver(registrationSchema as any),
 
     defaultValues: {
       name: "",
@@ -3623,31 +3554,18 @@ export default function Reg({
 
   useEffect(() => {
     axios
-      .get(
-        "https://bits-oasis.org/2026/main/registrations/get_college/"
-      )
+      .get("https://bits-oasis.org/2026/main/registrations/get_college/")
       .then((response) => {
         setCollegeOptions(
-          response.data.map(
-            (college: {
-              id: number;
-              name: string;
-            }) => ({
-              value: String(college.id),
-              label: college.name,
-            })
-          )
+          response.data.map((college: { id: number; name: string }) => ({
+            value: String(college.id),
+            label: college.name,
+          })),
         );
       })
       .catch((error) => {
-        console.error(
-          "COLLEGE API ERROR:",
-          error
-        );
-        console.error(
-          "RESPONSE:",
-          error.response?.data
-        );
+        console.error("COLLEGE API ERROR:", error);
+        console.error("RESPONSE:", error.response?.data);
       });
   }, []);
 
@@ -3666,14 +3584,9 @@ export default function Reg({
   /* CITIES                                                    */
   /* ======================================================= */
 
-  const getAvailableCities = (
-    stateName: string
-  ) => {
+  const getAvailableCities = (stateName: string) => {
     return (
-      statesData.find(
-        (item) =>
-          item.state === stateName
-      )?.cities ?? []
+      statesData.find((item) => item.state === stateName)?.cities ?? []
     ).map((city) => ({
       value: city,
       label: city,
@@ -3681,9 +3594,7 @@ export default function Reg({
   };
 
   useEffect(() => {
-    setAvailableCities(
-      getAvailableCities(selectedState)
-    );
+    setAvailableCities(getAvailableCities(selectedState));
   }, [selectedState]);
 
   /* ======================================================= */
@@ -3703,24 +3614,16 @@ export default function Reg({
     let source = userData;
 
     if (!source) {
-      const savedData =
-        localStorage.getItem(
-          "registrationFormData"
-        );
+      const savedData = localStorage.getItem("registrationFormData");
 
       if (!savedData) return;
 
       try {
         source = JSON.parse(savedData);
       } catch (err) {
-        console.error(
-          "Failed to parse local storage data:",
-          err
-        );
+        console.error("Failed to parse local storage data:", err);
 
-        localStorage.removeItem(
-          "registrationFormData"
-        );
+        localStorage.removeItem("registrationFormData");
 
         return;
       }
@@ -3732,8 +3635,7 @@ export default function Reg({
 
     // `events` is added on the Events screen and is not part of this
     // form's schema, so it is dropped before repopulating.
-    const { events, ...formValues } =
-      source;
+    const { events, ...formValues } = source;
 
     reset({
       ...formValues,
@@ -3741,14 +3643,11 @@ export default function Reg({
     });
 
     if (formValues.state) {
-      setSelectedState(
-        formValues.state
-      );
+      setSelectedState(formValues.state);
     }
 
     if (formValues.dob) {
-      const [year, month, day] =
-        String(formValues.dob).split("-");
+      const [year, month, day] = String(formValues.dob).split("-");
 
       setDobYear(year || "");
       setDobMonth(month || "");
@@ -3757,55 +3656,35 @@ export default function Reg({
   }, [reset, userEmail, userData]);
 
   useEffect(() => {
-    const subscription = watch(
-      (value) => {
-        localStorage.setItem(
-          "registrationFormData",
-          JSON.stringify(value)
-        );
-      }
-    );
+    const subscription = watch((value) => {
+      localStorage.setItem("registrationFormData", JSON.stringify(value));
+    });
 
-    return () =>
-      subscription.unsubscribe();
+    return () => subscription.unsubscribe();
   }, [watch]);
 
   /* ======================================================= */
   /* STATE SEARCH                                              */
   /* ======================================================= */
 
-  const getFilteredOptions = (
-    input: string
-  ) => {
+  const getFilteredOptions = (input: string) => {
     if (!input) {
       return stateOptions;
     }
 
-    const inputLower =
-      input.toLowerCase();
+    const inputLower = input.toLowerCase();
 
-    const startsWith =
-      stateOptions.filter((opt) =>
-        opt.label
-          .toLowerCase()
-          .startsWith(inputLower)
-      );
+    const startsWith = stateOptions.filter((opt) =>
+      opt.label.toLowerCase().startsWith(inputLower),
+    );
 
-    const contains =
-      stateOptions.filter(
-        (opt) =>
-          !opt.label
-            .toLowerCase()
-            .startsWith(inputLower) &&
-          opt.label
-            .toLowerCase()
-            .includes(inputLower)
-      );
+    const contains = stateOptions.filter(
+      (opt) =>
+        !opt.label.toLowerCase().startsWith(inputLower) &&
+        opt.label.toLowerCase().includes(inputLower),
+    );
 
-    return [
-      ...startsWith,
-      ...contains,
-    ];
+    return [...startsWith, ...contains];
   };
 
   /* ======================================================= */
@@ -3829,9 +3708,7 @@ export default function Reg({
       cursor: "pointer",
     }),
 
-    valueContainer: (
-      provided: any
-    ) => ({
+    valueContainer: (provided: any) => ({
       ...provided,
 
       width: "100%",
@@ -3842,9 +3719,7 @@ export default function Reg({
       background: "transparent",
     }),
 
-    input: (
-      provided: any
-    ) => ({
+    input: (provided: any) => ({
       ...provided,
 
       margin: "0",
@@ -3853,17 +3728,13 @@ export default function Reg({
       color: "#38170B",
     }),
 
-    singleValue: (
-      provided: any
-    ) => ({
+    singleValue: (provided: any) => ({
       ...provided,
 
       color: "#6C1700",
     }),
 
-    placeholder: (
-      provided: any
-    ) => ({
+    placeholder: (provided: any) => ({
       ...provided,
 
       color: "#777",
@@ -3873,38 +3744,28 @@ export default function Reg({
       display: "none",
     }),
 
-    dropdownIndicator: (
-      provided: any
-    ) => ({
+    dropdownIndicator: (provided: any) => ({
       ...provided,
 
       color: "#38170B",
     }),
 
-    menuPortal: (
-      provided: any
-    ) => ({
+    menuPortal: (provided: any) => ({
       ...provided,
 
       zIndex: 9999,
     }),
 
-    menu: (
-      provided: any
-    ) => ({
+    menu: (provided: any) => ({
       ...provided,
 
       marginTop: 4,
     }),
 
-    menuList: (
-      provided: any
-    ) => ({
+    menuList: (provided: any) => ({
       ...provided,
 
-      maxHeight: isMobile
-        ? 190
-        : 260,
+      maxHeight: isMobile ? 190 : 260,
 
       padding: 4,
     }),
@@ -3915,28 +3776,20 @@ export default function Reg({
 
     classNamePrefix: "regselect",
 
-    menuPortalTarget:
-      document.body,
+    menuPortalTarget: document.body,
 
-    menuPlacement:
-      "auto" as const,
+    menuPlacement: "auto" as const,
 
-    menuShouldScrollIntoView:
-      !isMobile,
+    menuShouldScrollIntoView: !isMobile,
 
-    blurInputOnSelect:
-      isMobile,
+    blurInputOnSelect: isMobile,
   };
 
   /* ======================================================= */
   /* DOB                                                       */
   /* ======================================================= */
 
-  const updateDob = (
-    day: string,
-    month: string,
-    year: string
-  ) => {
+  const updateDob = (day: string, month: string, year: string) => {
     setDobDay(day);
     setDobMonth(month);
     setDobYear(year);
@@ -3944,23 +3797,15 @@ export default function Reg({
     // React Hook Form receives the final DOB only after
     // Day, Month and Year have all been selected.
     if (day && month && year) {
-      setValue(
-        "dob",
-        `${year}-${month}-${day}`,
-        {
-          shouldValidate: true,
-          shouldDirty: true,
-        }
-      );
+      setValue("dob", `${year}-${month}-${day}`, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
     } else {
-      setValue(
-        "dob",
-        "",
-        {
-          shouldValidate: true,
-          shouldDirty: true,
-        }
-      );
+      setValue("dob", "", {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
     }
   };
 
@@ -3968,9 +3813,7 @@ export default function Reg({
   /* SUBMIT                                                    */
   /* ======================================================= */
 
-  const onSubmit = (
-    data: FormData
-  ) => {
+  const onSubmit = (data: FormData) => {
     const finalData = {
       ...data,
       email_id: userEmail,
@@ -3992,50 +3835,22 @@ export default function Reg({
 
   return (
     <div
-      className={
-        styles.registerContainer
-      }
+      className={styles.registerContainer}
       style={{
         backgroundImage: `url(${RegBg})`,
       }}
     >
       {/* BACKGROUND DECORATIONS */}
 
-      <img
-        src={leftbottom}
-        className={styles.leftbottom}
-        alt=""
-      />
+      <img src={leftbottom} className={styles.leftbottom} alt="" />
 
-      <img
-        src={lefttop}
-        className={styles.lefttop}
-        alt=""
-      />
-       <img
-        src={leftmiddle}
-        className={styles.leftmiddle}
-        alt=""
-      />
-       <img
-        src={rightmid}
-        className={styles.rightmid}
-        alt=""
-      />
+      <img src={lefttop} className={styles.lefttop} alt="" />
+      <img src={leftmiddle} className={styles.leftmiddle} alt="" />
+      <img src={rightmid} className={styles.rightmid} alt="" />
 
-      <img
-        src={rightbottom}
-        className={
-          styles.rightbottom
-        }
-        alt=""
-      />
+      <img src={rightbottom} className={styles.rightbottom} alt="" />
 
-      <img
-        src={righttop}
-        className={styles.righttop}
-        alt=""
-      />
+      <img src={righttop} className={styles.righttop} alt="" />
 
       <Link className={styles.backButton} to="/">
         <img src="/regBackButton.png" alt="Go back to Home Page" />
@@ -4044,560 +3859,289 @@ export default function Reg({
       {/* BOOK */}
 
       <div
-        className={
-          styles.bookContainer
-        }
+        className={styles.bookContainer}
         style={{
           backgroundImage: `url(${book})`,
         }}
       >
-
         {/* TAJ MAHAL */}
 
-        <img
-          src={tajmahal}
-          className={
-            styles.tajmahal
-          }
-          alt=""
-        />
+        <img src={tajmahal} className={styles.tajmahal} alt="" />
 
         <form
-          className={
-            styles.formContainer
-          }
-          onSubmit={handleSubmit(
-            onSubmit
-          )}
+          className={styles.formContainer}
+          onSubmit={handleSubmit(onSubmit)}
           autoComplete="off"
         >
+          {/* HEADING */}
 
-          {/* ================================================= */}
-          {/* LEFT PAGE                                         */}
-          {/* ================================================= */}
+          {isMobile && <h2 className={styles.regTitle}>Registration</h2>}
 
-          <div
-            className={
-              isMobile
-                ? styles.formColumn
-                : styles.formLeft
-            }
-          >
-            {/* HEADING */}
+          <div className={styles.mobileContainer}>
+            {/* ================================================= */}
+            {/* LEFT PAGE                                         */}
+            {/* ================================================= */}
 
-            <h2
-              className={
-                styles.regTitle
-              }
-            >
-              Registration
-            </h2>
+            <div className={isMobile ? styles.formColumn : styles.formLeft}>
+              {/* HEADING */}
 
+              {!isMobile && <h2 className={styles.regTitle}>Registration</h2>}
 
-            <Reginput
-              title="Name"
-              registration={register(
-                "name"
+              {/* NAME */}
+
+              <Reginput title="Name" registration={register("name")} />
+
+              {errors.name && (
+                <p className={styles.error}>{errors.name.message}</p>
               )}
-            />
 
-            {errors.name && (
-              <p
-                className={
-                  styles.error
-                }
-              >
-                {errors.name.message}
-              </p>
-            )}
+              {/* EMAIL */}
 
-            {/* EMAIL */}
+              <Reginput
+                title="Email Id"
+                registration={register("email_id")}
+                disabled
+                placeholder={userEmail}
+              />
 
-            <Reginput
-              title="Email Id"
-              registration={register(
-                "email_id"
+              {errors.email_id && (
+                <p className={styles.error}>{errors.email_id.message}</p>
               )}
-              disabled
-              placeholder={userEmail}
-            />
 
-            {errors.email_id && (
-              <p
-                className={
-                  styles.error
-                }
-              >
-                {
-                  errors.email_id
-                    .message
-                }
-              </p>
-            )}
+              {/* PHONE */}
 
-            {/* PHONE */}
+              <Reginput
+                title="Phone Number"
+                registration={register("phone")}
+                type="tel"
+              />
 
-            <Reginput
-              title="Phone Number"
-              registration={register(
-                "phone"
+              {errors.phone && (
+                <p className={styles.error}>{errors.phone.message}</p>
               )}
-              type="tel"
-            />
 
-            {errors.phone && (
-              <p
-                className={
-                  styles.error
-                }
-              >
-                {errors.phone.message}
-              </p>
-            )}
+              {/* GENDER */}
 
-            {/* GENDER */}
-
-            <Reginput
-              title="Gender"
-              showLine={false}
-            >
-              <div
-                className={
-                  styles.genderOptions
-                }
-              >
-                {genderOptions.map(
-                  (option) => (
-                    <label
-                      key={
-                        option.value
-                      }
-                      className={
-                        styles.genderOption
-                      }
-                    >
+              <Reginput title="Gender" showLine={false}>
+                <div className={styles.genderOptions}>
+                  {genderOptions.map((option) => (
+                    <label key={option.value} className={styles.genderOption}>
                       <input
                         type="radio"
-                        value={
-                          option.value
-                        }
-                        {...register(
-                          "gender"
-                        )}
+                        value={option.value}
+                        {...register("gender")}
                       />
 
-                      <span
-                        className={
-                          styles.genderDiamond
-                        }
-                      />
+                      <span className={styles.genderDiamond} />
 
-                      <span
-                        className={
-                          styles.genderLabel
-                        }
-                      >
-                        {option.label}
-                      </span>
+                      <span className={styles.genderLabel}>{option.label}</span>
                     </label>
-                  )
-                )}
-              </div>
-            </Reginput>
+                  ))}
+                </div>
+              </Reginput>
 
-            {errors.gender && (
-              <p
-                className={
-                  styles.error
-                }
-              >
-                {
-                  errors.gender
-                    .message
-                }
-              </p>
-            )}
+              {errors.gender && (
+                <p className={styles.error}>{errors.gender.message}</p>
+              )}
 
-            {/* DATE OF BIRTH */}
+              {/* DATE OF BIRTH */}
 
-            <Reginput
-              title="Date Of Birth"
-              showLine={false}
-            >
-              <div
-                className={
-                  styles.dobOptions
-                }
-              >
-                <select
-                  value={dobDay}
-                  onChange={(e) =>
-                    updateDob(
-                      e.target.value,
-                      dobMonth,
-                      dobYear
-                    )
-                  }
-                  className={
-                    styles.dobSelect
-                  }
-                >
-                  <option value="">
-                    Day
-                  </option>
+              <Reginput title="Date Of Birth" showLine={false}>
+                <div className={styles.dobOptions}>
+                  <select
+                    value={dobDay}
+                    onChange={(e) =>
+                      updateDob(e.target.value, dobMonth, dobYear)
+                    }
+                    className={styles.dobSelect}
+                  >
+                    <option value="">Day</option>
 
-                  {days.map(
-                    (day) => (
-                      <option
-                        key={day}
-                        value={day}
-                      >
+                    {days.map((day) => (
+                      <option key={day} value={day}>
                         {day}
                       </option>
-                    )
-                  )}
-                </select>
+                    ))}
+                  </select>
 
-                <select
-                  value={dobMonth}
-                  onChange={(e) =>
-                    updateDob(
-                      dobDay,
-                      e.target.value,
-                      dobYear
-                    )
-                  }
-                  className={
-                    styles.dobSelect
-                  }
-                >
-                  <option value="">
-                    Month
-                  </option>
+                  <select
+                    value={dobMonth}
+                    onChange={(e) => updateDob(dobDay, e.target.value, dobYear)}
+                    className={styles.dobSelect}
+                  >
+                    <option value="">Month</option>
 
-                  {months.map(
-                    (month) => (
-                      <option
-                        key={
-                          month.value
-                        }
-                        value={
-                          month.value
-                        }
-                      >
+                    {months.map((month) => (
+                      <option key={month.value} value={month.value}>
                         {month.label}
                       </option>
-                    )
-                  )}
-                </select>
+                    ))}
+                  </select>
 
-                <select
-                  value={dobYear}
-                  onChange={(e) =>
-                    updateDob(
-                      dobDay,
-                      dobMonth,
-                      e.target.value
-                    )
-                  }
-                  className={
-                    styles.dobSelect
-                  }
-                >
-                  <option value="">
-                    Year
-                  </option>
+                  <select
+                    value={dobYear}
+                    onChange={(e) =>
+                      updateDob(dobDay, dobMonth, e.target.value)
+                    }
+                    className={styles.dobSelect}
+                  >
+                    <option value="">Year</option>
 
-                  {years.map(
-                    (year) => (
-                      <option
-                        key={year}
-                        value={year}
-                      >
+                    {years.map((year) => (
+                      <option key={year} value={year}>
                         {year}
                       </option>
-                    )
+                    ))}
+                  </select>
+                </div>
+              </Reginput>
+
+              {errors.dob && (
+                <p className={styles.error}>{errors.dob.message}</p>
+              )}
+
+              {/* COLLEGE */}
+
+              <Reginput title="College" showLine>
+                <Controller
+                  name="college_id"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      {...selectProps}
+                      options={collegeOptions}
+                      placeholder="Select College"
+                      menuPlacement="top"
+                      value={
+                        collegeOptions.find(
+                          (college) => college.value === field.value,
+                        ) || null
+                      }
+                      onChange={(option) => field.onChange(option?.value || "")}
+                    />
                   )}
-                </select>
-              </div>
-            </Reginput>
+                />
+              </Reginput>
 
-            {errors.dob && (
-              <p
-                className={
-                  styles.error
-                }
+              {errors.college_id && (
+                <p className={styles.error}>{errors.college_id.message}</p>
+              )}
+            </div>
+
+            {/* ================================================= */}
+            {/* RIGHT PAGE                                        */}
+            {/* ================================================= */}
+
+            <div className={isMobile ? styles.formColumn : styles.formRight}>
+              {/* YEAR */}
+
+              <Reginput title="Year Of Study" showLine={false}>
+                <div className={styles.yearOptions}>
+                  {["1", "2", "3", "4"].map((year) => (
+                    <label key={year} className={styles.yearOption}>
+                      <input type="radio" value={year} {...register("year")} />
+
+                      <span className={styles.yearDiamond} />
+
+                      <span className={styles.yearLabel}>{year}</span>
+                    </label>
+                  ))}
+                </div>
+              </Reginput>
+
+              {errors.year && (
+                <p className={styles.error}>{errors.year.message}</p>
+              )}
+
+              {/* CITY */}
+
+              {/* STATE */}
+
+              <Reginput title="State" showLine>
+                <Controller
+                  name="state"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      {...selectProps}
+                      options={getFilteredOptions(inputValue)}
+                      placeholder="Select State"
+                      value={
+                        stateOptions.find(
+                          (state) => state.value === field.value,
+                        ) || null
+                      }
+                      onInputChange={(value) => setInputValue(value)}
+                      filterOption={() => true}
+                      onChange={(option) => {
+                        const value = option?.value || "";
+
+                        field.onChange(value);
+
+                        setSelectedState(value);
+
+                        setValue("city", "");
+                      }}
+                    />
+                  )}
+                />
+              </Reginput>
+
+              {errors.state && (
+                <p className={styles.error}>{errors.state.message}</p>
+              )}
+
+              <Reginput title="City" showLine>
+                <Controller
+                  name="city"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      {...selectProps}
+                      options={availableCities}
+                      placeholder="Select City"
+                      isDisabled={!selectedState}
+                      value={
+                        availableCities.find(
+                          (city) => city.value === field.value,
+                        ) || null
+                      }
+                      onChange={(option) => field.onChange(option?.value || "")}
+                    />
+                  )}
+                />
+              </Reginput>
+
+              {errors.city && (
+                <p className={styles.error}>{errors.city.message}</p>
+              )}
+
+              {/* NEXT */}
+
+              {!isMobile && <button
+                type="submit"
+                style={{
+                  backgroundImage: `url(${buttonBg})`,
+                }}
+                className={styles.nextButton}
               >
-                {errors.dob.message}
-              </p>
-            )}
-
-            {/* COLLEGE */}
-
-            <Reginput
-              title="College"
-              showLine
-            >
-              <Controller
-                name="college_id"
-                control={control}
-                render={({
-                  field,
-                }) => (
-                  <Select
-                    {...field}
-                    {...selectProps}
-                    options={
-                      collegeOptions
-                    }
-                    placeholder="Select College"
-                    menuPlacement="top"
-                    value={
-                      collegeOptions.find(
-                        (college) =>
-                          college.value ===
-                          field.value
-                      ) || null
-                    }
-                    onChange={(
-                      option
-                    ) =>
-                      field.onChange(
-                        option?.value ||
-                          ""
-                      )
-                    }
-                  />
-                )}
-              />
-            </Reginput>
-
-            {errors.college_id && (
-              <p
-                className={
-                  styles.error
-                }
-              >
-                {
-                  errors.college_id
-                    .message
-                }
-              </p>
-            )}
+                NEXT
+              </button>}
+            </div>
           </div>
 
-          {/* ================================================= */}
-          {/* RIGHT PAGE                                        */}
-          {/* ================================================= */}
-
-          <div
-            className={
-              isMobile
-                ? styles.formColumn
-                : styles.formRight
-            }
+          {isMobile && <button
+            type="submit"
+            style={{
+              backgroundImage: `url(${buttonBg})`,
+            }}
+            className={styles.nextButton}
           >
-
-            {/* YEAR */}
-
-            <Reginput
-              title="Year Of Study"
-              showLine={false}
-            >
-              <div
-                className={
-                  styles.yearOptions
-                }
-              >
-                {[
-                  "1",
-                  "2",
-                  "3",
-                  "4",
-                ].map((year) => (
-                  <label
-                    key={year}
-                    className={
-                      styles.yearOption
-                    }
-                  >
-                    <input
-                      type="radio"
-                      value={year}
-                      {...register(
-                        "year"
-                      )}
-                    />
-
-                    <span
-                      className={
-                        styles.yearDiamond
-                      }
-                    />
-
-                    <span
-                      className={
-                        styles.yearLabel
-                      }
-                    >
-                      {year}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </Reginput>
-
-            {errors.year && (
-              <p
-                className={
-                  styles.error
-                }
-              >
-                {errors.year.message}
-              </p>
-            )}
-
-            {/* CITY */}
-
-            
-
-            {/* STATE */}
-
-            <Reginput
-              title="State"
-              showLine
-            >
-              <Controller
-                name="state"
-                control={control}
-                render={({
-                  field,
-                }) => (
-                  <Select
-                    {...field}
-                    {...selectProps}
-                    options={getFilteredOptions(
-                      inputValue
-                    )}
-                    placeholder="Select State"
-                    value={
-                      stateOptions.find(
-                        (state) =>
-                          state.value ===
-                          field.value
-                      ) || null
-                    }
-                    onInputChange={(
-                      value
-                    ) =>
-                      setInputValue(
-                        value
-                      )
-                    }
-                    filterOption={() =>
-                      true
-                    }
-                    onChange={(
-                      option
-                    ) => {
-                      const value =
-                        option?.value ||
-                        "";
-
-                      field.onChange(
-                        value
-                      );
-
-                      setSelectedState(
-                        value
-                      );
-
-                      setValue(
-                        "city",
-                        ""
-                      );
-                    }}
-                  />
-                )}
-              />
-            </Reginput>
-
-            {errors.state && (
-              <p
-                className={
-                  styles.error
-                }
-              >
-                {errors.state.message}
-              </p>
-            )}
-
-
-
-            <Reginput
-              title="City"
-              showLine
-            >
-              <Controller
-                name="city"
-                control={control}
-                render={({
-                  field,
-                }) => (
-                  <Select
-                    {...field}
-                    {...selectProps}
-                    options={
-                      availableCities
-                    }
-                    placeholder="Select City"
-                    isDisabled={
-                      !selectedState
-                    }
-                    value={
-                      availableCities.find(
-                        (city) =>
-                          city.value ===
-                          field.value
-                      ) || null
-                    }
-                    onChange={(
-                      option
-                    ) =>
-                      field.onChange(
-                        option?.value ||
-                          ""
-                      )
-                    }
-                  />
-                )}
-              />
-            </Reginput>
-
-            {errors.city && (
-              <p
-                className={
-                  styles.error
-                }
-              >
-                {errors.city.message}
-              </p>
-            )}
-
-            {/* NEXT */}
-
-            <button
-              type="submit"
-              style={{
-                backgroundImage: `url(${buttonBg})`,
-              }}
-              className={
-                styles.nextButton
-              }
-            >
-              NEXT
-            </button>
-          </div>
+            NEXT
+          </button>}
         </form>
       </div>
     </div>

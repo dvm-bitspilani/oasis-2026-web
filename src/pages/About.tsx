@@ -75,7 +75,7 @@ const SvgImg = ({
   </svg>
 );
 
-const YOUTUBE_VIDEO_ID = "5MtkggVC0w0";
+const YOUTUBE_VIDEO_IDS = ["V9LHjddKR_M" , "5MtkggVC0w0", "ZCrClSBM1ns"];
 
 const About = () => {
   const isMobile = window.matchMedia("(max-width: 1000px)").matches;
@@ -87,6 +87,7 @@ const About = () => {
   const [playerReady, setPlayerReady] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(false);
   const [aboutPreloaderDone, setAboutPreloaderDone] = useState(false);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
 
   const playerHostRef = useRef<HTMLDivElement | null>(null);
   const playerElRef = useRef<HTMLDivElement | null>(null);
@@ -190,7 +191,7 @@ const About = () => {
       if (!playerElRef.current || playerRef.current) return;
 
       playerRef.current = new window.YT.Player(playerElRef.current, {
-        videoId: YOUTUBE_VIDEO_ID,
+        videoId: YOUTUBE_VIDEO_IDS[currentVideoIndex],
         width: "100%",
         height: "100%",
         playerVars: {
@@ -233,7 +234,7 @@ const About = () => {
         window.onYouTubeIframeAPIReady = () => { };
       }
     };
-  }, [showVideo]);
+  }, [showVideo, currentVideoIndex]);
 
   useEffect(() => {
     const tween = gsap.to(scrollVidRef.current, {
@@ -263,24 +264,31 @@ const About = () => {
     } catch { }
   }, [isPlaying]);
 
-  const seekBy = useCallback((deltaSeconds: number) => {
-    const player = playerRef.current;
+  const goToVideo = useCallback(
+    (index: number) => {
+      const total = YOUTUBE_VIDEO_IDS.length;
+      const nextIndex = (index + total) % total;
+      const player = playerRef.current;
 
-    if (!player || typeof player.getCurrentTime !== "function") return;
+      setCurrentVideoIndex(nextIndex);
 
-    try {
-      const current = player.getCurrentTime();
-      player.seekTo(Math.max(0, current + deltaSeconds), true);
-    } catch { }
-  }, []);
+      if (!player || typeof player.loadVideoById !== "function") return;
 
-  const rewind = useCallback(() => {
-    seekBy(-10);
-  }, [seekBy]);
+      try {
+        player.loadVideoById(YOUTUBE_VIDEO_IDS[nextIndex]);
+        setIsPlaying(true);
+      } catch { }
+    },
+    []
+  );
 
-  const fastForward = useCallback(() => {
-    seekBy(10);
-  }, [seekBy]);
+  const goToPrevVideo = useCallback(() => {
+    goToVideo(currentVideoIndex - 1);
+  }, [goToVideo, currentVideoIndex]);
+
+  const goToNextVideo = useCallback(() => {
+    goToVideo(currentVideoIndex + 1);
+  }, [goToVideo, currentVideoIndex]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -352,7 +360,7 @@ const About = () => {
       const leftExpr = `calc(50% - (${widthExpr}) / 2)`;
       const topExpr = `calc(50% - (${heightExpr}) / 2)`;
 
-      const CONTROLS_HEIGHT_PCT = isMobile ? 9 : 7;
+      const CONTROLS_HEIGHT_PCT = isMobile ? 12 : 11;
       const CONTROLS_GAP_PCT = 0.5;
 
       gsap.set(vidRef.current, {
@@ -657,8 +665,8 @@ const About = () => {
         <button
           type="button"
           className={`${styles.controlBtn} ${styles.rewindBtn}`}
-          onClick={rewind}
-          aria-label="Rewind 10 seconds"
+          onClick={goToPrevVideo}
+          aria-label="Previous video"
         >
           <img src={ff} alt="" />
         </button>
@@ -675,8 +683,8 @@ const About = () => {
         <button
           type="button"
           className={`${styles.controlBtn} ${styles.ffBtn}`}
-          onClick={fastForward}
-          aria-label="Fast forward 10 seconds"
+          onClick={goToNextVideo}
+          aria-label="Next video"
         >
           <img src={ff} alt="" />
         </button>

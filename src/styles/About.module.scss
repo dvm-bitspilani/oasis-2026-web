@@ -347,7 +347,7 @@ body::-webkit-scrollbar {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8%;
+  gap: 5%;
   pointer-events: none;
 }
 
@@ -367,6 +367,7 @@ body::-webkit-scrollbar {
   height: 2vh;
   padding: 0;
   opacity: 0;
+  mix-blend-mode: overlay;
   transform: translateY(6px);
   transition: opacity 0.5s ease, transform 0.5s ease;
 
@@ -401,12 +402,12 @@ body::-webkit-scrollbar {
 
 @media screen and (max-width: 768px) {
   .videoControls {
-    gap: 10%;
+    gap: 15%;
   }
 
   .controlBtn {
-    width: 8vw;
-    height: 8vw;
+    width: 5vw;
+    height: 5vw;
   }
 }
 
