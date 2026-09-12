@@ -4093,7 +4093,6 @@ export default function Reg({
               Registration
             </h2>
 
-            {/* NAME */}
 
             <Reginput
               title="Name"
