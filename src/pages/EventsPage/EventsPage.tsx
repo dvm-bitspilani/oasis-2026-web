@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import Nav from "../../components/Nav";
 
 import styles from "./EventsPage.module.scss";
@@ -297,6 +297,536 @@ const eventsData: Record<Category, EventData[]> = {
 
 
 /* =========================================================
+   SMOKE TRANSITION
+========================================================= */
+
+interface SmokeCanvasProps {
+    originX: number;
+    originY: number;
+}
+
+function SmokeCanvas({ originX, originY }: SmokeCanvasProps) {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        let animationFrame = 0;
+        const startTime = performance.now();
+
+        const resize = () => {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+
+            canvas.style.width = `${window.innerWidth}px`;
+            canvas.style.height = `${window.innerHeight}px`;
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        };
+
+        resize();
+        window.addEventListener("resize", resize);
+
+        const isMobile = window.innerWidth <= 700;
+
+        const centerX = window.innerWidth * 0.5;
+        const centerY = window.innerHeight * 0.5;
+
+        /*
+         * Smoke is intentionally wider near the centre,
+         * but never forms a perfect circle.
+         */
+        const smokeWidth = isMobile ? 210 : 400;
+        const smokeHeight = isMobile ? 145 : 300;
+
+        /*
+         * Individual smoke wisps.
+         */
+        const particles = Array.from(
+            { length: isMobile ? 240 : 380 },
+            () => {
+                const side = Math.random() > 0.5 ? 1 : -1;
+
+                return {
+                    startX:
+                        originX +
+                        (Math.random() - 0.5) * 24,
+
+                    startY:
+                        originY +
+                        Math.random() * 18,
+
+                    /*
+                     * Different parts of the smoke finish
+                     * at different places instead of all ending
+                     * on the same ellipse.
+                     */
+                    targetX:
+                        centerX +
+                        (Math.random() - 0.5) *
+                            smokeWidth *
+                            (0.55 + Math.random() * 0.8),
+
+                    targetY:
+                        centerY +
+                        (Math.random() - 0.5) *
+                            smokeHeight *
+                            (0.55 + Math.random() * 0.9),
+
+                    size:
+                        9 +
+                        Math.random() * 30,
+
+                    drift:
+                        side *
+                        (20 + Math.random() * 75),
+
+                    phase:
+                        Math.random() * Math.PI * 2,
+
+                    speed:
+                        0.35 +
+                        Math.random() * 0.45,
+
+                    delay:
+                        Math.random() * 0.45,
+
+                    opacity:
+                        0.35 +
+                        Math.random() * 1.5,
+                };
+            }
+        );
+
+        /*
+         * A small number of larger smoke pockets.
+         * These make the smoke feel like a cloud rather
+         * than hundreds of individual dots.
+         */
+        const smokePuffs = Array.from(
+            { length: isMobile ? 18 : 26 },
+            () => ({
+                offsetX:
+                    (Math.random() - 0.5) *
+                    smokeWidth *
+                    1.2,
+
+                offsetY:
+                    (Math.random() - 0.5) *
+                    smokeHeight *
+                    1.15,
+
+                radius:
+                    10 +
+                    Math.random() * 30,
+
+                delay:
+                    Math.random() * 0.5,
+
+                phase:
+                    Math.random() * Math.PI * 2,
+
+                drift:
+                    15 +
+                    Math.random() * 35,
+
+                opacity:
+                    0.025 +
+                    Math.random() * 0.045,
+            })
+        );
+
+        /*
+         * Slow, soft easing.
+         */
+        const easeOut = (t: number) =>
+            1 - Math.pow(1 - t, 1.3);
+
+        const draw = (now: number) => {
+            const elapsed =
+                (now - startTime) / 1000;
+
+            ctx.clearRect(
+                0,
+                0,
+                window.innerWidth,
+                window.innerHeight
+            );
+
+            /*
+             * =================================================
+             * PARTICLE SMOKE
+             * =================================================
+             */
+
+            particles.forEach((particle) => {
+                const rawProgress = Math.max(
+                    0,
+                    Math.min(
+                        1,
+                        (elapsed - particle.delay) /
+                            2.35
+                    )
+                );
+
+                const progress =
+                    easeOut(rawProgress);
+
+                /*
+                 * Smoke rises substantially before
+                 * beginning to spread sideways.
+                 */
+                const riseAmount =
+                    Math.min(
+                        window.innerHeight * 0.42,
+                        390
+                    );
+
+                const rise =
+                    Math.sin(
+                        progress *
+                            Math.PI *
+                            0.72
+                    ) * riseAmount;
+
+                /*
+                 * The further the smoke rises,
+                 * the more it starts drifting sideways.
+                 */
+                const spread =
+                    Math.pow(progress, 1.35);
+
+                const wave =
+                    Math.sin(
+                        elapsed *
+                            particle.speed *
+                            2.2 +
+                            particle.phase
+                    );
+
+                const x =
+                    particle.startX +
+                    (particle.targetX -
+                        particle.startX) *
+                        spread +
+                    wave *
+                        particle.drift *
+                        spread;
+
+                /*
+                 * Rise vertically first.
+                 */
+                const risingY =
+                    particle.startY - rise;
+
+                /*
+                 * Only gradually bend toward
+                 * the final cloud position.
+                 */
+                const y =
+                    risingY +
+                    (particle.targetY -
+                        risingY) *
+                        Math.pow(
+                            progress,
+                            1.8
+                        );
+
+                /*
+                 * Smoke expands as it rises.
+                 */
+                const size =
+                    particle.size *
+                    (0.65 +
+                        progress * 1.15);
+
+                const alpha =
+                    particle.opacity *
+                    (0.12 +
+                        progress * 0.48) *
+                    (1 -
+                        Math.max(
+                            0,
+                            progress - 0.92
+                        ) *
+                            1.8);
+
+                /*
+                 * Soft irregular smoke particle.
+                 */
+                const gradient =
+                    ctx.createRadialGradient(
+                        x,
+                        y,
+                        0,
+                        x,
+                        y,
+                        size
+                    );
+
+                gradient.addColorStop(
+                    0,
+                    `rgba(232, 227, 218, ${alpha})`
+                );
+
+                gradient.addColorStop(
+                    0.3,
+                    `rgba(215, 209, 201, ${
+                        alpha * 0.65
+                    })`
+                );
+
+                gradient.addColorStop(
+                    0.65,
+                    `rgba(180, 176, 170, ${
+                        alpha * 0.25
+                    })`
+                );
+
+                gradient.addColorStop(
+                    1,
+                    "rgba(150, 145, 140, 0)"
+                );
+
+                ctx.fillStyle = gradient;
+
+                ctx.beginPath();
+
+                /*
+                 * Slightly deform the circle.
+                 * This prevents the particles from
+                 * looking like perfect round dots.
+                 */
+                ctx.ellipse(
+                    x,
+                    y,
+                    size,
+                    size *
+                        (0.65 +
+                            Math.sin(
+                                particle.phase
+                            ) *
+                                0.2),
+                    particle.phase,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fill();
+            });
+
+            /*
+             * =================================================
+             * LARGE IRREGULAR SMOKE POCKETS
+             * =================================================
+             */
+
+            if (elapsed > 0.35) {
+                smokePuffs.forEach((puff) => {
+                    const progress = Math.min(
+                        1,
+                        Math.max(
+                            0,
+                            (elapsed -
+                                puff.delay -
+                                0.25) /
+                                1.65
+                        )
+                    );
+
+                    const puffX =
+                        centerX +
+                        puff.offsetX *
+                            progress +
+                        Math.sin(
+                            elapsed * 0.65 +
+                                puff.phase
+                        ) *
+                            puff.drift;
+
+                    const puffY =
+                        centerY +
+                        puff.offsetY *
+                            progress -
+                        Math.sin(
+                            progress *
+                                Math.PI
+                        ) *
+                            45;
+
+                    const radius =
+                        puff.radius *
+                        (0.35 +
+                            progress * 0.8);
+
+                    const gradient =
+                        ctx.createRadialGradient(
+                            puffX,
+                            puffY,
+                            0,
+                            puffX,
+                            puffY,
+                            radius
+                        );
+
+                    gradient.addColorStop(
+                        0,
+                        `rgba(225, 220, 211, ${
+                            puff.opacity *
+                            progress
+                        })`
+                    );
+
+                    gradient.addColorStop(
+                        0.45,
+                        `rgba(195, 190, 182, ${
+                            puff.opacity *
+                            progress *
+                            0.55
+                        })`
+                    );
+
+                    gradient.addColorStop(
+                        1,
+                        "rgba(160, 155, 150, 0)"
+                    );
+
+                    ctx.fillStyle =
+                        gradient;
+
+                    ctx.beginPath();
+
+                    /*
+                     * Irregular overlapping puff.
+                     */
+                    ctx.ellipse(
+                        puffX,
+                        puffY,
+                        radius *
+                            (0.7 +
+                                Math.sin(
+                                    puff.phase
+                                ) *
+                                    0.18),
+                        radius *
+                            (0.45 +
+                                Math.cos(
+                                    puff.phase
+                                ) *
+                                    0.2),
+                        puff.phase,
+                        0,
+                        Math.PI * 2
+                    );
+
+                    ctx.fill();
+                });
+            }
+
+            /*
+             * =================================================
+             * SMALL DENSE BASE
+             * =================================================
+             *
+             * This keeps the smoke visibly connected
+             * to the vase instead of looking detached.
+             */
+
+            const baseProgress = Math.min(
+                1,
+                elapsed / 0.8
+            );
+
+            if (baseProgress > 0) {
+                const baseGradient =
+                    ctx.createRadialGradient(
+                        originX,
+                        originY,
+                        0,
+                        originX,
+                        originY,
+                        45
+                    );
+
+                baseGradient.addColorStop(
+                    0,
+                    `rgba(225, 220, 212, ${
+                        0.28 *
+                        baseProgress
+                    })`
+                );
+
+                baseGradient.addColorStop(
+                    0.45,
+                    `rgba(190, 185, 178, ${
+                        0.12 *
+                        baseProgress
+                    })`
+                );
+
+                baseGradient.addColorStop(
+                    1,
+                    "rgba(150, 145, 140, 0)"
+                );
+
+                ctx.fillStyle =
+                    baseGradient;
+
+                ctx.beginPath();
+
+                ctx.ellipse(
+                    originX,
+                    originY,
+                    28,
+                    42,
+                    0,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fill();
+            }
+
+            /*
+             * Keep the smoke alive slightly longer
+             * so it doesn't suddenly freeze.
+             */
+            if (elapsed < 2.7) {
+                animationFrame =
+                    requestAnimationFrame(draw);
+            }
+        };
+
+        animationFrame =
+            requestAnimationFrame(draw);
+
+        return () => {
+            cancelAnimationFrame(
+                animationFrame
+            );
+
+            window.removeEventListener(
+                "resize",
+                resize
+            );
+        };
+    }, [originX, originY]);
+
+    return (
+        <canvas
+            ref={canvasRef}
+            className={styles.smokeCanvas}
+            aria-hidden="true"
+        />
+    );
+}
+/* =========================================================
    EVENTS PAGE
 ========================================================= */
 
@@ -304,8 +834,13 @@ export default function EventsPage() {
 
     const overlayRef = useRef<HTMLDivElement>(null);
 
+    const smokeTimerRef = useRef<number | null>(null);
+
     const [selectedCategory, setSelectedCategory] =
         useState<Category | null>(null);
+
+    const [smokeOrigin, setSmokeOrigin] =
+        useState<{ x: number; y: number } | null>(null);
 
     const [currentIndex, setCurrentIndex] =
         useState(0);
@@ -317,7 +852,7 @@ export default function EventsPage() {
 
     useEffect(() => {
 
-        const handleMouseMove = (e: MouseEvent) => {
+        const handleMouseMove = (e: globalThis.MouseEvent) => {
 
             const overlay = overlayRef.current;
 
@@ -361,12 +896,47 @@ export default function EventsPage() {
        OPEN CATEGORY
     ===================================================== */
 
-    const openCategory = (category: Category) => {
+    const openCategory = (
+        category: Category,
+        e: ReactMouseEvent<HTMLElement>
+    ) => {
+        if (smokeTimerRef.current !== null) {
+            window.clearTimeout(smokeTimerRef.current);
+        }
 
-        setSelectedCategory(category);
+        const vase =
+            e.currentTarget.querySelector("img");
 
-        setCurrentIndex(0);
+        if (!vase) {
+            setSelectedCategory(category);
+            setCurrentIndex(0);
+            return;
+        }
 
+        const rect =
+            vase.getBoundingClientRect();
+
+        // Smoke always starts from the mouth/top of the vase,
+        // never from the point where the user clicked.
+        const originX =
+            rect.left + rect.width / 1.5;
+
+        const originY =
+            rect.top + rect.height * 0.05;
+
+        setSmokeOrigin({
+            x: originX,
+            y: originY,
+        });
+
+        // Reveal the modal after a short fixed delay.
+        // The timer is intentionally independent of the smoke position,
+        // so the modal still appears even if the smoke has not fully
+        // reached the centre yet.
+        smokeTimerRef.current = window.setTimeout(() => {
+            setSelectedCategory(category);
+            setCurrentIndex(0);
+        }, 1100);
     };
 
 
@@ -375,11 +945,14 @@ export default function EventsPage() {
     ===================================================== */
 
     const closeModal = () => {
+        if (smokeTimerRef.current !== null) {
+            window.clearTimeout(smokeTimerRef.current);
+            smokeTimerRef.current = null;
+        }
 
         setSelectedCategory(null);
-
         setCurrentIndex(0);
-
+        setSmokeOrigin(null);
     };
 
 
@@ -526,8 +1099,8 @@ export default function EventsPage() {
 
             <section
                 className={styles.dramaContainer}
-                onClick={() =>
-                    openCategory("drama")
+                onClick={(e) =>
+                    openCategory("drama", e)
                 }
             >
 
@@ -547,8 +1120,8 @@ export default function EventsPage() {
                 className={
                     styles.photographyContainer
                 }
-                onClick={() =>
-                    openCategory("photography")
+                onClick={(e) =>
+                    openCategory("photography", e)
                 }
             >
 
@@ -566,8 +1139,8 @@ export default function EventsPage() {
 
             <section
                 className={styles.danceContainer}
-                onClick={() =>
-                    openCategory("dance")
+                onClick={(e) =>
+                    openCategory("dance", e)
                 }
             >
 
@@ -585,8 +1158,8 @@ export default function EventsPage() {
 
             <section
                 className={styles.otherContainer}
-                onClick={() =>
-                    openCategory("misc")
+                onClick={(e) =>
+                    openCategory("misc", e)
                 }
             >
 
@@ -604,8 +1177,8 @@ export default function EventsPage() {
 
             <section
                 className={styles.musicContainer}
-                onClick={() =>
-                    openCategory("music")
+                onClick={(e) =>
+                    openCategory("music", e)
                 }
             >
 
@@ -616,6 +1189,17 @@ export default function EventsPage() {
 
             </section>
 
+
+            {/* =================================================
+                SMOKE
+            ================================================= */}
+
+            {smokeOrigin && (
+                <SmokeCanvas
+                    originX={smokeOrigin.x}
+                    originY={smokeOrigin.y}
+                />
+            )}
 
             {/* =================================================
                 SPOTLIGHT

@@ -223,10 +223,7 @@
 
     padding: 30px;
 
-    background:
-        rgba(5, 5, 20, 0.72);
 
-    backdrop-filter: blur(5px);
 
     animation:
         eventsOverlayIn
@@ -253,21 +250,8 @@
         55px
         30px;
 
-    background:
-        rgba(75, 67, 120, 0.88);
+  
 
-    border:
-        1px solid
-        rgba(210, 190, 255, 0.25);
-
-    box-shadow:
-        0 20px 80px
-        rgba(0, 0, 0, 0.55),
-
-        inset 0 0 80px
-        rgba(170, 150, 230, 0.08);
-
-    backdrop-filter: blur(10px);
 
     color: #f5eee3;
 
@@ -301,7 +285,7 @@
 
     background: transparent;
 
-    color: #e5ad2f;
+    color: white;
 
     font-size: 36px;
 
@@ -366,7 +350,7 @@
         0 0 25px;
 
     color:
-        #e5ad2f;
+        white;
 
     /*
        Replace this with your actual
@@ -441,7 +425,7 @@
     width: 24px;
 
     color:
-        #e5ad2f;
+        white;
 
     font-size:
         18px;
@@ -501,19 +485,8 @@
 
     padding: 30px;
 
-    background:
-        linear-gradient(
-            135deg,
-            rgba(40, 35, 75, 0.8),
-            rgba(90, 70, 120, 0.7)
-        );
-
-    border:
-        1px solid
-        rgba(230, 190, 100, 0.2);
-
     color:
-        #e5ad2f;
+        white;
 
     text-align:
         center;
@@ -665,7 +638,7 @@
         0 0 18px;
 
     color:
-        #e5ad2f;
+        white;
 
     font-family:
         "Your Arabic Font",
@@ -836,4 +809,18 @@
             34px;
     }
 
+}
+
+/* =========================================================
+   SMOKE TRANSITION
+   Sits above the page and below the modal.
+========================================================= */
+
+.smokeCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 4990;
+    pointer-events: none;
 }
