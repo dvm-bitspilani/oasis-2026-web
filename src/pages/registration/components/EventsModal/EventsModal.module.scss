@@ -1,9 +1,9 @@
+
 // @use "/src/assets/global.scss" as *;
 
 .backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100svh;
   z-index: 1000;
@@ -11,72 +11,57 @@
 }
 
 /* ================================================= */
-/* SAME BOOK-PAGE FRAME AS THE CONFIRM MODAL          */
-/* (this modal only ever renders on mobile, so it     */
-/* uses the mobile frame directly instead of the      */
-/* desktop/mobile CSS-var switch ConfirmModal needs)  */
+/* EVENT MODAL                                       */
+/* Same visual frame/style as Instruction Modal      */
 /* ================================================= */
-@media (max-width: 768px) and (max-height:600px) {
-  .selectedEvents {
-    height:500px;
-  }
-}
-@media (max-width: 768px) and (max-height:700px) {
-  .selectedEvents {
-    height:600px;
-  }
-}
-@media (max-width: 768px) and (max-height:800px) {
-  .selectedEvents {
-    height:700px;
-  }
-}
+
 .selectedEvents {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
- 
+
+  z-index: 1001;
+
   --modal-w: min(90vw, 95svh * 0.4702);
 
   width: var(--modal-w);
   aspect-ratio: 860 / 1829;
-  max-height: 80vh;
-  // height: auto;
+
+  padding: calc(var(--modal-w) * 0.21)
+    calc(var(--modal-w) * 0.14)
+    calc(var(--modal-w) * 0.1);
 
   border-radius: 8px;
-  z-index: 1001;
-
-  /* extra top padding so the heading clears the ornate flourish  */
-  /* built into the frame artwork instead of colliding with it,   */
-  /* and a bit more on the sides/bottom so nothing hugs the border */
-  padding: calc(var(--modal-w) * 0.21) calc(var(--modal-w) * 0.14)
-    calc(var(--modal-w) * 0.1);
 
   display: flex;
   flex-direction: column;
 
-  box-shadow: 0px 0px 15.3px 0px #e5c3845e;
+  box-sizing: border-box;
 
   background-image: var(--modal-bg-mobile);
   background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
 
+  box-shadow: 0px 0px 15.3px 0px #e5c3845e;
+
   overflow: hidden;
 
   /* ============================================ */
-  /* CLOSE BUTTON — round dark chip behind a gold  */
-  /* icon so it reads against ANY part of the      */
-  /* busy border artwork, not just the plain paper */
+  /* CLOSE BUTTON                                 */
+  /* Same as Instruction Modal                   */
   /* ============================================ */
+
   .close {
     position: absolute;
+
     top: calc(var(--modal-w) * 0.055);
     right: calc(var(--modal-w) * 0.06);
 
     width: calc(var(--modal-w) * 0.095);
     height: calc(var(--modal-w) * 0.095);
+
     min-width: 32px;
     min-height: 32px;
 
@@ -89,6 +74,7 @@
     justify-content: center;
 
     background: rgba(20, 10, 5, 0.45);
+
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.35);
 
     cursor: pointer;
@@ -113,195 +99,504 @@
     }
   }
 
+  /* ============================================ */
+  /* HEADING                                      */
+  /* Same typography as Instruction Modal         */
+  /* ============================================ */
+
   .heading {
     flex-shrink: 0;
 
     margin: 0 0 calc(var(--modal-w) * 0.03);
 
     color: #3a2411;
+
     font: 400 calc(var(--modal-w) * 0.075) "Syamsiah";
+
     text-align: center;
 
     text-shadow: 0 1px 1px rgba(255, 255, 255, 0.25);
   }
 
-  .description {
+  /* ============================================ */
+  /* EVENT CONTENT                                */
+  /* ============================================ */
+
+  .content {
     flex: 1 1 auto;
-    min-height: 0; // let the paragraph shrink to the space that's actually left, instead of forcing the box taller than the frame
+    min-height: 0;
 
-    margin: 0 0 calc(var(--modal-w) * 0.04);
+    display: flex;
+    justify-content: space-between;
 
-    color: #432611;
-    font: 400 calc(var(--modal-w) * 0.05) "EB";
-    line-height: 1.65;
-    letter-spacing: 0.5px;
-    text-align: center;
+    margin-top: calc(var(--modal-w) * 0.01);
 
-    overflow-y: auto;
-    scrollbar-width: none;
-    &::-webkit-scrollbar {
-      display: none;
+    ul {
+      flex: 1 1 auto;
+      min-height: 0;
+
+      margin: 0 0 0 calc(var(--modal-w) * 0.04);
+
+      padding: calc(var(--modal-w) * 0.02) 0;
+
+      display: flex;
+      flex-direction: column;
+
+      gap: calc(var(--modal-w) * 0.045);
+
+      overflow-y: auto;
+
+      list-style: none;
+
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Bottom fade, matching Instruction Modal */
+      mask-image: linear-gradient(
+        to bottom,
+        #000 92%,
+        transparent 100%
+      );
+
+      -webkit-mask-image: linear-gradient(
+        to bottom,
+        #000 92%,
+        transparent 100%
+      );
+
+      li {
+        position: relative;
+
+        margin: 0;
+
+        padding: 0;
+
+        color: #432611;
+
+        text-align: left;
+
+        font: 400 calc(var(--modal-w) * 0.05) "EB";
+
+        line-height: 1.65;
+
+        letter-spacing: 0.5px;
+
+        /* ====================================== */
+        /* MAGIC LAMP                             */
+        /* ====================================== */
+
+        &::before {
+          content: "";
+
+          position: absolute;
+
+          top: 0;
+          left: 0;
+
+          width: calc(var(--modal-w) * 0.075);
+          height: calc(var(--modal-w) * 0.075);
+
+          transform: translate(-125%, 20%);
+
+          background: center / contain no-repeat
+            url("/game-icons_magic-lamp.svg");
+        }
+      }
     }
 
-    /* fade only the bottom edge as a scroll hint — a top fade   */
-    /* doesn't make sense here since there's nothing hidden      */
-    /* above the very first line, and it was washing that line   */
-    /* out for short descriptions that never even scroll         */
-    mask-image: linear-gradient(to bottom, #000 92%, transparent 100%);
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      #000 92%,
-      transparent 100%
-    );
+    /* ============================================ */
+    /* CUSTOM SCROLL BAR                            */
+    /* ============================================ */
+
+    .scrollBarContainer {
+      flex-shrink: 0;
+
+      height: 100%;
+
+      width: calc(var(--modal-w) * 0.12);
+
+      display: flex;
+      justify-content: center;
+
+      position: relative;
+
+      cursor: grab;
+
+      z-index: 4;
+
+      .scrollBarThumb {
+        position: absolute;
+
+        top: 13.5%;
+
+        transform: translateY(-50%);
+
+        height: calc(var(--modal-w) * 0.11);
+      }
+
+      .scrollBar {
+        object-fit: contain;
+
+        height: 100%;
+
+        border-radius: 5px;
+      }
+    }
   }
 
   /* ============================================ */
-  /* SAME BANNER AS THE EVENT-LIST / CONFIRM MODAL */
-  /* BUTTONS — inputBg.png outline + inputBgFilled */
-  /* .png mask that reveals a red gradient fill    */
+  /* BUTTON CONTAINER                             */
   /* ============================================ */
-  .confirmButton,
-  .removeButton {
+
+  .buttonsContainer {
     flex-shrink: 0;
 
-    position: relative;
-
-    width: 100%;
-    height: calc(var(--modal-w) * 0.14);
-    min-height: 42px;
-
-    margin: calc(var(--modal-w) * 0.03) 0 0;
-    padding: 0 4%;
-
-    border: none;
-
-    background-color: transparent;
-    background-position: center;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-
-    color: #38170b;
-
-    font-family: "Cinzel", serif;
-    font-size: calc(var(--modal-w) * 0.05);
-    font-weight: 700;
-
-    cursor: pointer;
-
-    box-sizing: border-box;
-    overflow: hidden;
-
     display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    flex-direction: column;
 
-    appearance: none;
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
+    margin-top: calc(var(--modal-w) * 0.03);
 
-    transition:
-      transform 0.3s ease,
-      filter 0.3s ease;
+    gap: calc(var(--modal-w) * 0.03);
 
-    /* red gradient fill, masked to the banner's silhouette */
-    &::before {
-      content: "";
+    /* ========================================== */
+    /* BOTH BUTTONS                               */
+    /* Same banner style as Instruction Modal     */
+    /* ========================================== */
 
-      position: absolute;
-      inset: 0;
-
-      background: radial-gradient(
-        circle at center,
-        #671c07 0%,
-        #400e00 100%
-      );
-
-      -webkit-mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
-      mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
-      -webkit-mask-size: 100% 100%;
-      mask-size: 100% 100%;
-      -webkit-mask-position: center;
-      mask-position: center;
-      -webkit-mask-repeat: no-repeat;
-      mask-repeat: no-repeat;
-
-      -webkit-clip-path: inset(0 100% 0 0);
-      clip-path: inset(0 100% 0 0);
-
-      z-index: 0;
-      pointer-events: none;
-
-      transition:
-        -webkit-clip-path 0.45s ease,
-        clip-path 0.45s ease;
-    }
-
-    span {
+    .cancelButton,
+    .confirmButton {
       position: relative;
 
-      z-index: 2;
-
-      display: block;
-
       width: 100%;
+      height: calc(var(--modal-w) * 0.14);
+
+      min-height: 42px;
 
       margin: 0;
-      padding: 0;
+      padding: 0 4%;
+
+      border: none;
+
+      background-color: transparent;
+
+      background-position: center;
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+
+      color: #38170b;
+
+      font-family: "Cinzel", serif;
+      font-size: calc(var(--modal-w) * 0.05);
+      font-weight: 700;
+
+      cursor: pointer;
+
+      box-sizing: border-box;
+
+      overflow: hidden;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       text-align: center;
 
-      line-height: 1;
+      appearance: none;
+      -webkit-appearance: none;
 
-      color: inherit;
+      -webkit-tap-highlight-color: transparent;
 
       transition:
         transform 0.3s ease,
-        letter-spacing 0.3s ease,
-        text-shadow 0.3s ease,
-        color 0.3s ease;
+        filter 0.3s ease;
+
+      /* ======================================== */
+      /* BUTTON FILLED BACKGROUND                 */
+      /* ======================================== */
+
+      &::before {
+        content: "";
+
+        position: absolute;
+        inset: 0;
+
+        background: radial-gradient(
+          circle at center,
+          #671c07 0%,
+          #400e00 100%
+        );
+
+        -webkit-mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
+        mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
+
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+
+        -webkit-mask-position: center;
+        mask-position: center;
+
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+
+        -webkit-clip-path: inset(0 100% 0 0);
+        clip-path: inset(0 100% 0 0);
+
+        z-index: 0;
+
+        pointer-events: none;
+
+        transition:
+          -webkit-clip-path 0.45s ease,
+          clip-path 0.45s ease;
+      }
+
+      span {
+        position: relative;
+
+        z-index: 2;
+
+        display: block;
+
+        width: 100%;
+
+        margin: 0;
+        padding: 0;
+
+        text-align: center;
+
+        line-height: 1;
+
+        color: inherit;
+
+        transition:
+          transform 0.3s ease,
+          letter-spacing 0.3s ease,
+          text-shadow 0.3s ease,
+          color 0.3s ease;
+      }
+
+      &:active {
+        transform: scale(0.97);
+      }
     }
 
-    /* no :hover states — this modal is mobile-only, so the tap */
-    /* (:active) feedback below is what actually gets used      */
-    &:active {
-      transform: scale(0.97);
+    /* ============================================ */
+    /* CANCEL                                      */
+    /* Plain / unselected banner                   */
+    /* ============================================ */
+
+    .cancelButton {
+      color: #671c07;
+
+      filter:
+        drop-shadow(0 0 1.5px #241006);
+    }
+
+    /* ============================================ */
+    /* CONFIRM                                     */
+    /* Selected / filled banner                    */
+    /* ============================================ */
+
+    .confirmButton {
+      transform: scale(1.02);
+
+      filter:
+        brightness(1.1)
+        drop-shadow(
+          0 0 8px rgba(229, 195, 132, 0.5)
+        );
+
+      &::before {
+        -webkit-clip-path: inset(0 0 0 0);
+        clip-path: inset(0 0 0 0);
+      }
+
+      span {
+        letter-spacing: 0.04em;
+
+        color: #fed59b;
+
+        text-shadow:
+          0 0 7px rgba(254, 213, 155, 0.8);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
     }
   }
+}
 
-  /* ADD — plain banner outline, same as an unselected event item */
-  .confirmButton {
-    color: #671c07;
+/* ================================================= */
+/* SHORT MOBILE SCREENS                              */
+/* ================================================= */
 
-
-  filter:
-    drop-shadow(0 0 1.5px #241006)
-   ;
+@media (max-width: 768px) and (max-height: 600px) {
+  .selectedEvents {
+    --modal-w: min(90vw, 95svh * 0.4702);
   }
+}
 
-  /* REMOVE — permanently in the "selected" state, i.e. already   */
-  /* filled + gold, same as the currently-active/selected event   */
-  /* item, since the event behind this button is already added   */
-  .removeButton {
-    transform: scale(1.02);
+/* ================================================= */
+/* RESPONSIVE MOBILE                                 */
+/* ================================================= */
 
-    filter: brightness(1.1) drop-shadow(0 0 8px rgba(229, 195, 132, 0.5));
+@media screen and (max-width: 1200px) and (max-aspect-ratio: 1.45) {
+  .selectedEvents {
+    --modal-w: min(90vw, 95svh * 0.4702);
 
-    &::before {
-      -webkit-clip-path: inset(0 0 0 0);
-      clip-path: inset(0 0 0 0);
+    width: var(--modal-w);
+
+    aspect-ratio: 860 / 1829;
+
+    padding:
+      calc(var(--modal-w) * 0.17)
+      calc(var(--modal-w) * 0.115)
+      calc(var(--modal-w) * 0.09);
+
+    background-image: var(--modal-bg-mobile);
+
+    overflow: hidden;
+
+    .close {
+      top: calc(var(--modal-w) * 0.075);
+      right: calc(var(--modal-w) * 0.085);
+
+      width: calc(var(--modal-w) * 0.06);
+      height: calc(var(--modal-w) * 0.06);
     }
 
-    span {
-      letter-spacing: 0.04em;
+    .heading {
+      flex-shrink: 0;
 
-      color: #fed59b;
+      margin-bottom: calc(var(--modal-w) * 0.03);
 
-      text-shadow: 0 0 7px rgba(254, 213, 155, 0.8);
+      font:
+        400 calc(var(--modal-w) * 0.068)
+        "Syamsiah";
     }
 
-    &:active {
-      transform: scale(0.95);
+    .content {
+      flex: 1 1 auto;
+      min-height: 0;
+
+      ul {
+        margin:
+          calc(var(--modal-w) * 0.035)
+          0
+          0
+          calc(var(--modal-w) * 0.02);
+
+        height: 90%;
+
+        padding:
+          calc(var(--modal-w) * 0.02)
+          0;
+
+        gap: calc(var(--modal-w) * 0.045);
+
+        li {
+          margin-left: 0;
+
+          padding-left: 0;
+
+          font:
+            400 calc(var(--modal-w) * 0.05)
+            "EB";
+
+          line-height: 1.65;
+
+          &::before {
+            top: 0;
+            left: 0;
+
+            transform:
+              translate(-100%, 20%);
+
+            width: calc(var(--modal-w) * 0.075);
+            height: calc(var(--modal-w) * 0.075);
+          }
+        }
+      }
+
+      .scrollBarContainer {
+        height: 100%;
+
+        width: calc(var(--modal-w) * 0.12);
+
+        .scrollBarThumb {
+          height: calc(var(--modal-w) * 0.11);
+        }
+      }
+    }
+
+    .buttonsContainer {
+      flex-shrink: 0;
+
+      margin-top: calc(var(--modal-w) * 0.03);
+
+      gap: calc(var(--modal-w) * 0.03);
+
+      .cancelButton,
+      .confirmButton {
+        height: calc(var(--modal-w) * 0.14);
+
+        font:
+          400 calc(var(--modal-w) * 0.045)
+          "DM Serif Text";
+      }
+    }
+  }
+}
+
+/* ================================================= */
+/* VERY NARROW / TALL PHONES                         */
+/* ================================================= */
+
+@media screen and (max-width: 1200px) and (max-aspect-ratio: 0.75) {
+  .selectedEvents {
+    .heading {
+      font:
+        400 calc(var(--modal-w) * 0.095)
+        "Syamsiah";
+
+      align-self: center;
+    }
+
+    .content {
+      ul {
+        li {
+          font:
+            400 calc(var(--modal-w) * 0.058)
+            "EB";
+
+          &::before {
+            width: calc(var(--modal-w) * 0.085);
+            height: calc(var(--modal-w) * 0.085);
+          }
+        }
+      }
+    }
+
+    .buttonsContainer {
+      .cancelButton,
+      .confirmButton {
+        font:
+          400 calc(var(--modal-w) * 0.05)
+          "DM Serif Text";
+      }
+    }
+
+    .close {
+      right: 5%;
+      top: 3.5%;
+
+      path {
+        fill: #c6a570;
+      }
     }
   }
 }

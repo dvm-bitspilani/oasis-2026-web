@@ -1,260 +1,260 @@
-// @use "/src/assets/global.scss" as *;
+  // @use "/src/assets/global.scss" as *;
 
-.backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100svh;
-  z-index: 1000;
-  background: rgba(0, 0, 0, 0.6);
-}
-
-.selectedEvents {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 8px;
-  z-index: 1001;
-  padding: 5vw 6vw 4vw;
-  width: 50vw;
-  aspect-ratio: 1536 / 1024;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0px 0px 15.3px 0px #e5c3845e;
-  background-image: var(--modal-bg-desktop);
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  background-position: center;
-
-  .close {
-    cursor: pointer;
-    width: 1.6vw;
-    height: 1.6vw;
-    position: absolute;
-    top: 5vw;
-    right: 7vw;
-
-    path {
-      fill: #4a3115;
-    }
+  .backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100svh;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.6);
   }
 
-  .heading {
-    color: #3a2411;
-    font: 400 2.5vw "Syamsiah";
-  }
-  .content {
-    display: flex;
-    justify-content: space-between;
-    ul {
-      margin: 1vw 0 2vw 1vw;
-      height: 21vw;
-      overflow-y: auto;
-      list-style: none;
-      padding: 1vw 0;
-      display: flex;
-      flex-direction: column;
-      gap: 1.3vw;
-      padding: 1vw 0;
-      // mask-image: linear-gradient(
-      //   to bottom,
-      //   transparent 0%,
-      //   #000 7%,
-      //   #000 93%,
-      //   transparent 100%
-      // );
-      --webkit-mask-image: linear-gradient(
-        to bottom,
-        transparent 0%,
-        #000 7%,
-        #000 93%,
-        transparent 100%
-      );
-      scrollbar-width: none;
-      &::-webkit-scrollbar {
-        display: none;
-      }
-
-      li {
-        position: relative;
-        color: #432611;
-        text-align: left;
-        font: 400 1.3vw "EB";
-        line-height: 1.6;
-        letter-spacing: 1px;
-        margin-left: 3vw;
-
-        &::before {
-          content: "";
-          position: absolute;
-          display: block;
-          top: 6%;
-          left: -2.5vw;
-          width: 1.5vw;
-          height: 1.45vw;
-          background: center / contain no-repeat
-            url("/game-icons_magic-lamp.svg");
-        }
-      }
-    }
-    .scrollBarContainer {
-      height: 21vw;
-      width: 10vw;
-      display: flex;
-      justify-content: center;
-      position: relative;
-      cursor: -webkit-grab;
-      z-index: 4;
-
-      .scrollBarThumb {
-        position: absolute;
-        top: 13.5%;
-        transform: translateY(-50%);
-        height: 2vw;
-      }
-
-      .scrollBar {
-        object-fit: contain;
-        height: 100%;
-        border-radius: 5px;
-      }
-    }
-  }
-  .buttonsContainer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: auto;
-
-    .cancelButton {
-      border: 1.5px solid #4a3115;
-      border-radius: 8px;
-      background: transparent;
-      color: #3a2411;
-      font: 400 1.5vw "EB";
-      padding: 0.5vw 4vw;
-      cursor: pointer;
-    }
-    .confirmButton {
-      background-color: #4a3115;
-      border: none;
-      border-radius: 8px;
-      color: #fff6dd;
-      font: 400 1.5vw "EB";
-      padding: 0.5vw 4vw;
-      cursor: pointer;
-    }
-  }
-}
-
-@media screen and (max-width: 1200px) and (max-aspect-ratio: 1.45) {
   .selectedEvents {
-    // 0.4702 = 860 / 1829, the actual width:height ratio of modalFrameMobile.png.
-    // min() picks whichever of "88% of viewport width" or "the width that
-    // makes the frame exactly 82svh tall" is smaller, so the frame always
-    // fits inside the screen on both axes instead of overflowing it.
-    --modal-w: min(90vw, 95svh * 0.4702);
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: var(--modal-w);
-    aspect-ratio: 860 / 1829;
-    height: auto;
-    padding: calc(var(--modal-w) * 0.17) calc(var(--modal-w) * 0.115)
-      calc(var(--modal-w) * 0.09);
-    background-image: var(--modal-bg-mobile);
-    overflow: hidden;
+    border-radius: 8px;
+    z-index: 1001;
+    padding: 5vw 6vw 4vw;
+    width: 50vw;
+    aspect-ratio: 1536 / 1024;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0px 0px 15.3px 0px #e5c3845e;
+    background-image: var(--modal-bg-desktop);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
 
     .close {
-      top: calc(var(--modal-w) * 0.075);
-      right: calc(var(--modal-w) * 0.085);
-      width: calc(var(--modal-w) * 0.06);
-      height: calc(var(--modal-w) * 0.06);
+      cursor: pointer;
+      width: 1.6vw;
+      height: 1.6vw;
+      position: absolute;
+      top: 5vw;
+      right: 7vw;
+
+      path {
+        fill: #4a3115;
+      }
     }
 
     .heading {
-      flex-shrink: 0;
-      font: 400 calc(var(--modal-w) * 0.068) "Syamsiah";
+      color: #3a2411;
+      font: 400 2.5vw "Syamsiah";
     }
     .content {
-      flex: 1 1 auto;
-      min-height: 0; // let the flex item shrink to the space that's actually left, instead of forcing the box taller than the frame
+      display: flex;
+      justify-content: space-between;
       ul {
-        margin: calc(var(--modal-w) * 0.035) 0 0 calc(var(--modal-w) * 0.02);
-        height: 90%;
-        padding: calc(var(--modal-w) * 0.02) 0;
-        gap: calc(var(--modal-w) * 0.045);
+        margin: 1vw 0 2vw 1vw;
+        height: 21vw;
+        overflow-y: auto;
+        list-style: none;
+        padding: 1vw 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1.3vw;
+        padding: 1vw 0;
+        // mask-image: linear-gradient(
+        //   to bottom,
+        //   transparent 0%,
+        //   #000 7%,
+        //   #000 93%,
+        //   transparent 100%
+        // );
+        --webkit-mask-image: linear-gradient(
+          to bottom,
+          transparent 0%,
+          #000 7%,
+          #000 93%,
+          transparent 100%
+        );
+        scrollbar-width: none;
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
         li {
-          margin-left: 0;
-          padding-left: 0;
-          font: 400 calc(var(--modal-w) * 0.05) "EB";
+          position: relative;
+          color: #432611;
+          text-align: left;
+          font: 400 1.3vw "EB";
+          line-height: 1.6;
+          letter-spacing: 1px;
+          margin-left: 3vw;
+
           &::before {
-            top: 0;
-            left: 0;
-            transform: translate(-100%, 20%);
-            width: calc(var(--modal-w) * 0.075);
-            height: calc(var(--modal-w) * 0.075);
+            content: "";
+            position: absolute;
+            display: block;
+            top: 6%;
+            left: -2.5vw;
+            width: 1.5vw;
+            height: 1.45vw;
+            background: center / contain no-repeat
+              url("/game-icons_magic-lamp.svg");
           }
         }
       }
       .scrollBarContainer {
-        height: 100%;
-        width: calc(var(--modal-w) * 0.12);
+        height: 21vw;
+        width: 10vw;
+        display: flex;
+        justify-content: center;
+        position: relative;
+        cursor: -webkit-grab;
+        z-index: 4;
+
         .scrollBarThumb {
-          height: calc(var(--modal-w) * 0.11);
+          position: absolute;
+          top: 13.5%;
+          transform: translateY(-50%);
+          height: 2vw;
+        }
+
+        .scrollBar {
+          object-fit: contain;
+          height: 100%;
+          border-radius: 5px;
         }
       }
     }
     .buttonsContainer {
-      flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      margin-top: auto;
+
       .cancelButton {
-        font: 400 calc(var(--modal-w) * 0.045) "DM Serif Text";
+        border: 1.5px solid #4a3115;
+        border-radius: 8px;
+        background: transparent;
+        color: #3a2411;
+        font: 400 1.5vw "EB";
         padding: 0.5vw 4vw;
+        cursor: pointer;
       }
       .confirmButton {
-        font: 400 calc(var(--modal-w) * 0.045) "DM Serif Text";
+        background-color: #4a3115;
+        border: none;
+        border-radius: 8px;
+        color: #fff6dd;
+        font: 400 1.5vw "EB";
         padding: 0.5vw 4vw;
         cursor: pointer;
       }
     }
   }
-}
-@media screen and (max-width: 1200px) and (max-aspect-ratio: 0.75) {
-  .selectedEvents {
-    // Sizing (--modal-w, width, aspect-ratio, padding) is inherited from the
-    // breakpoint above — only the type scale needs to grow a bit further for
-    // very narrow/tall phones, so we don't re-declare box dimensions here.
-    .heading {
-      font: 400 calc(var(--modal-w) * 0.095) "Syamsiah";
-      align-self: center;
-    }
-    .content {
-      ul {
-        li {
-          font: 400 calc(var(--modal-w) * 0.058) "EB";
-          &::before {
-            width: calc(var(--modal-w) * 0.085);
-            height: calc(var(--modal-w) * 0.085);
+
+  @media screen and (max-width: 1200px) and (max-aspect-ratio: 1.45) {
+    .selectedEvents {
+      // 0.4702 = 860 / 1829, the actual width:height ratio of modalFrameMobile.png.
+      // min() picks whichever of "88% of viewport width" or "the width that
+      // makes the frame exactly 82svh tall" is smaller, so the frame always
+      // fits inside the screen on both axes instead of overflowing it.
+      --modal-w: min(90vw, 95svh * 0.4702);
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: var(--modal-w);
+      aspect-ratio: 860 / 1829;
+      height: auto;
+      padding: calc(var(--modal-w) * 0.17) calc(var(--modal-w) * 0.115)
+        calc(var(--modal-w) * 0.09);
+      background-image: var(--modal-bg-mobile);
+      overflow: hidden;
+
+      .close {
+        top: calc(var(--modal-w) * 0.075);
+        right: calc(var(--modal-w) * 0.085);
+        width: calc(var(--modal-w) * 0.06);
+        height: calc(var(--modal-w) * 0.06);
+      }
+
+      .heading {
+        flex-shrink: 0;
+        font: 400 calc(var(--modal-w) * 0.068) "Syamsiah";
+      }
+      .content {
+        flex: 1 1 auto;
+        min-height: 0; // let the flex item shrink to the space that's actually left, instead of forcing the box taller than the frame
+        ul {
+          margin: calc(var(--modal-w) * 0.035) 0 0 calc(var(--modal-w) * 0.02);
+          height: 90%;
+          padding: calc(var(--modal-w) * 0.02) 0;
+          gap: calc(var(--modal-w) * 0.045);
+          li {
+            margin-left: 0;
+            padding-left: 0;
+            font: 400 calc(var(--modal-w) * 0.05) "EB";
+            &::before {
+              top: 0;
+              left: 0;
+              transform: translate(-100%, 20%);
+              width: calc(var(--modal-w) * 0.075);
+              height: calc(var(--modal-w) * 0.075);
+            }
+          }
+        }
+        .scrollBarContainer {
+          height: 100%;
+          width: calc(var(--modal-w) * 0.12);
+          .scrollBarThumb {
+            height: calc(var(--modal-w) * 0.11);
           }
         }
       }
-    }
-    .buttonsContainer {
-      .cancelButton {
-        font: 400 calc(var(--modal-w) * 0.05) "DM Serif Text";
-      }
-      .confirmButton {
-        font: 400 calc(var(--modal-w) * 0.05) "DM Serif Text";
-      }
-    }
-    .close {
-      right: 5%;
-      top: 3.5%;
-      path {
-        fill: #C6A570;
+      .buttonsContainer {
+        flex-shrink: 0;
+        .cancelButton {
+          font: 400 calc(var(--modal-w) * 0.045) "DM Serif Text";
+          padding: 0.5vw 4vw;
+        }
+        .confirmButton {
+          font: 400 calc(var(--modal-w) * 0.045) "DM Serif Text";
+          padding: 0.5vw 4vw;
+          cursor: pointer;
+        }
       }
     }
   }
-}
+  @media screen and (max-width: 1200px) and (max-aspect-ratio: 0.75) {
+    .selectedEvents {
+      // Sizing (--modal-w, width, aspect-ratio, padding) is inherited from the
+      // breakpoint above — only the type scale needs to grow a bit further for
+      // very narrow/tall phones, so we don't re-declare box dimensions here.
+      .heading {
+        font: 400 calc(var(--modal-w) * 0.095) "Syamsiah";
+        align-self: center;
+      }
+      .content {
+        ul {
+          li {
+            font: 400 calc(var(--modal-w) * 0.058) "EB";
+            &::before {
+              width: calc(var(--modal-w) * 0.085);
+              height: calc(var(--modal-w) * 0.085);
+            }
+          }
+        }
+      }
+      .buttonsContainer {
+        .cancelButton {
+          font: 400 calc(var(--modal-w) * 0.05) "DM Serif Text";
+        }
+        .confirmButton {
+          font: 400 calc(var(--modal-w) * 0.05) "DM Serif Text";
+        }
+      }
+      .close {
+        right: 5%;
+        top: 3.5%;
+        path {
+          fill: #C6A570;
+        }
+      }
+    }
+  }

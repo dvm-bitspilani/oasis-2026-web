@@ -1,3 +1,31 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import styles from "./EventsModal.module.scss";
 
 import ReactDOM from "react-dom";
