@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import Nav from "../../components/Nav";
 
@@ -25,7 +26,6 @@ interface EventData {
     image_url: string | null;
 }
 
-
 type Category =
     | "drama"
     | "photography"
@@ -40,10 +40,6 @@ type Category =
 
 const eventsData: Record<Category, EventData[]> = {
 
-    /* =========================
-       DRAMA & THEATRE
-    ========================= */
-
     drama: [
         {
             id: "sukhmanch",
@@ -55,7 +51,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "Celebrated for its deeply emotional and socially impactful plays that resonate with audiences long after the curtain falls. Their repertoire includes thought-provoking dramas such as Court Martial, and Seven Steps Around the Fire, among others. Experience storytelling that's as enlightening as it is entertaining. Join us for an unforgettable theatrical experience.",
             image_url: null,
         },
-
         {
             id: "street-play",
             name: "Street Play",
@@ -66,7 +61,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "Right from the streets, a loud and larger-than-life exchange of ideologies, with drama full of humor and zeal. Street Plays aka Nukkad Natak, are carried out to propagate social and political messages among the masses, amidst the direct, intimate and effective means of theater by means of shouts, chants, drums and catchy songs.",
             image_url: null,
         },
-
         {
             id: "stage-play",
             name: "Stage Play",
@@ -77,7 +71,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "The stage, a neutral territory outside the jurisdiction of fate where stars may be crossed with impunity. A truer and more real place does not exist in the universe. The Stage Play event brings you a wholesome feat of drama to awaken and thrill your senses. It gives you a chance to captivate your audience with your actions and expressions and to watch and perform captivating plays.",
             image_url: null,
         },
-
         {
             id: "metamorphosis",
             name: "Metamorphosis",
@@ -88,7 +81,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "Metamorphosis, our flagship short film competition, returns at Oasis. Create a captivating narrative around a theme, push your artistic boundaries, and compete for an exciting prize pool. Your masterpiece premieres at Oasis before a discerning audience and expert judges. Embrace the challenge!",
             image_url: null,
         },
-
         {
             id: "hypercut",
             name: "Hypercut",
@@ -101,18 +93,7 @@ const eventsData: Record<Category, EventData[]> = {
         },
     ],
 
-
-    /* =========================
-       PHOTOGRAPHY
-       EMPTY INTENTIONALLY
-    ========================= */
-
     photography: [],
-
-
-    /* =========================
-       DANCE
-    ========================= */
 
     dance: [
         {
@@ -125,7 +106,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "This event is conducted in the central auditorium. After the initial elimination round, about six to eight teams are shortlisted for the final round. The final round features contemporary dance performances that are usually based on a certain theme.",
             image_url: null,
         },
-
         {
             id: "street-dance",
             name: "Street Dance",
@@ -136,7 +116,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "Street Dance is considered a crowd favorite and is held in the Rotunda, the open-air amphitheater of BITS. The first stage consists of 2 rounds; a performance and a battle round. From this, 4 teams are selected for the second stage. The second stage is a face-off challenge between pairs of teams. These pairs are allotted randomly.",
             image_url: null,
         },
-
         {
             id: "desert-duel",
             name: "Desert Duel",
@@ -147,7 +126,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "It is a solo dance event in which dancers from every college participate and showcase their talent. Depending on the dancer, styles can vary from western to classical to hip-hop and even to the typical Bollywood style.",
             image_url: null,
         },
-
         {
             id: "razzmatazz",
             name: "Razzmatazz",
@@ -158,7 +136,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "A group dance competition that tests finesse and artistry in showcasing coordinated group choreographies. With equal weightage in judgement given to execution, presentation and creativity, it is fashioned to test the esprit de corps of the participating teams. All forms of dance including fusions are allowed. So trip the light fantastic toe and let there be a dazzle-daze of sheer splendor.",
             image_url: null,
         },
-
         {
             id: "tandav",
             name: "Tandav",
@@ -170,11 +147,6 @@ const eventsData: Record<Category, EventData[]> = {
             image_url: null,
         },
     ],
-
-
-    /* =========================
-       MISC / FASHION
-    ========================= */
 
     misc: [
         {
@@ -188,11 +160,6 @@ const eventsData: Record<Category, EventData[]> = {
         },
     ],
 
-
-    /* =========================
-       MUSIC
-    ========================= */
-
     music: [
         {
             id: "pitch-perfect",
@@ -204,7 +171,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "With participants from over 10 institutions, Pitch Perfect is the platform for a growing crowd of Cappella enthusiasts to face off against each other. A battle of the bands with no instruments, this symphony of voices at the NAB Auditorium is establishing a new dimensionality of music vastly unexplored till date.",
             image_url: null,
         },
-
         {
             id: "swaranjali",
             name: "Swaranjali",
@@ -215,7 +181,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "Swaranjali is a classical music competition that invites participants trained in both the Carnatic and Hindustani styles, covering a range of vocal and instrumental forms. The instruments include violin, sitar, veena, flute, Hawaiian guitar, tabla, mridangam etc. The competition features four categories: Solo Vocals, Solo Wind and String, Solo Percussion, and Group.",
             image_url: null,
         },
-
         {
             id: "tarang",
             name: "Tarang",
@@ -226,7 +191,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "Tarang - a musical fusion extravaganza from the Indian heartland and its innumerably diverse facets. Cover an existing piece, or create your own. Come participate in our Indian fusion battle of bands to claim the title of the best band.",
             image_url: null,
         },
-
         {
             id: "andholika",
             name: "Andholika",
@@ -237,7 +201,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "Andholika is a talent hunt for the most versatile singer among the participants. The event is split into two categories, Eastern and Western. The event consists of an audition round and a final round. 4 finalists will be selected from each category. A winner and runner up will be awarded from each category.",
             image_url: null,
         },
-
         {
             id: "rap-wars",
             name: "Rap-wars",
@@ -248,7 +211,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "RapWars is a rap-battle event with a legacy of 13 years which includes names like Seedhe Maut, Divine, Brodha V, Wolf Cryman and many more. Shortlisted through preliminary rounds in 4 cities, the 8 finalists will do whatever it takes to spit bars par excellence and take the crown home.",
             image_url: null,
         },
-
         {
             id: "scontro",
             name: "Scontro",
@@ -259,7 +221,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "A high-energy DJ Battle where talented DJs showcase their skills in live mixing, beat-matching, and creative transitions. DJs compete against each other, bringing their unique styles, from hard hitting bass drops to smooth grooves. The battle emphasizes technical proficiency, creativity, and the ability to engage the crowd through music.",
             image_url: null,
         },
-
         {
             id: "axetacy",
             name: "Axetacy",
@@ -270,7 +231,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "Solo Guitar Competition. A thrilling guitar showdown for both acoustic and electric players. Open to all individual participants who can play the guitar. The event features two rounds: Qualifier and Final, with judging criteria determined by the panel.",
             image_url: null,
         },
-
         {
             id: "drum-duels",
             name: "Drum Duels",
@@ -281,7 +241,6 @@ const eventsData: Record<Category, EventData[]> = {
                 "A Solo Drumming Competition. A dynamic event for drummers showcasing their creativity and control. Participants are tested in two rounds: replicating a drum track and creating beats for a bass line. Shortlisted drummers then face off in duels.",
             image_url: null,
         },
-
         {
             id: "beat-brawl",
             name: "Beat-Brawl",
@@ -305,152 +264,341 @@ interface SmokeCanvasProps {
     originY: number;
 }
 
-function SmokeCanvas({ originX, originY }: SmokeCanvasProps) {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+function SmokeCanvas({
+    originX,
+    originY,
+}: SmokeCanvasProps) {
+
+    const canvasRef =
+        useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-        const canvas = canvasRef.current;
+
+        const canvas =
+            canvasRef.current;
+
         if (!canvas) return;
 
-        const ctx = canvas.getContext("2d");
+        const ctx =
+            canvas.getContext("2d");
+
         if (!ctx) return;
 
         let animationFrame = 0;
-        const startTime = performance.now();
+
+        const startTime =
+            performance.now();
+
+
+        /* =====================================================
+           CANVAS RESIZE
+        ===================================================== */
 
         const resize = () => {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-            canvas.width = window.innerWidth * dpr;
-            canvas.height = window.innerHeight * dpr;
+            const dpr =
+                Math.min(
+                    window.devicePixelRatio || 1,
+                    2
+                );
 
-            canvas.style.width = `${window.innerWidth}px`;
-            canvas.style.height = `${window.innerHeight}px`;
+            canvas.width =
+                window.innerWidth * dpr;
 
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            canvas.height =
+                window.innerHeight * dpr;
+
+            canvas.style.width =
+                `${window.innerWidth}px`;
+
+            canvas.style.height =
+                `${window.innerHeight}px`;
+
+            ctx.setTransform(
+                dpr,
+                0,
+                0,
+                dpr,
+                0,
+                0
+            );
         };
 
+
         resize();
-        window.addEventListener("resize", resize);
 
-        const isMobile = window.innerWidth <= 700;
-
-        const centerX = window.innerWidth * 0.5;
-        const centerY = window.innerHeight * 0.5;
-
-        /*
-         * Smoke is intentionally wider near the centre,
-         * but never forms a perfect circle.
-         */
-        const smokeWidth = isMobile ? 210 : 400;
-        const smokeHeight = isMobile ? 145 : 300;
-
-        /*
-         * Individual smoke wisps.
-         */
-        const particles = Array.from(
-            { length: isMobile ? 240 : 380 },
-            () => {
-                const side = Math.random() > 0.5 ? 1 : -1;
-
-                return {
-                    startX:
-                        originX +
-                        (Math.random() - 0.5) * 24,
-
-                    startY:
-                        originY +
-                        Math.random() * 18,
-
-                    /*
-                     * Different parts of the smoke finish
-                     * at different places instead of all ending
-                     * on the same ellipse.
-                     */
-                    targetX:
-                        centerX +
-                        (Math.random() - 0.5) *
-                            smokeWidth *
-                            (0.55 + Math.random() * 0.8),
-
-                    targetY:
-                        centerY +
-                        (Math.random() - 0.5) *
-                            smokeHeight *
-                            (0.55 + Math.random() * 0.9),
-
-                    size:
-                        9 +
-                        Math.random() * 30,
-
-                    drift:
-                        side *
-                        (20 + Math.random() * 75),
-
-                    phase:
-                        Math.random() * Math.PI * 2,
-
-                    speed:
-                        0.35 +
-                        Math.random() * 0.45,
-
-                    delay:
-                        Math.random() * 0.45,
-
-                    opacity:
-                        0.35 +
-                        Math.random() * 1.5,
-                };
-            }
+        window.addEventListener(
+            "resize",
+            resize
         );
 
-        /*
-         * A small number of larger smoke pockets.
-         * These make the smoke feel like a cloud rather
-         * than hundreds of individual dots.
-         */
-        const smokePuffs = Array.from(
-            { length: isMobile ? 18 : 26 },
-            () => ({
-                offsetX:
-                    (Math.random() - 0.5) *
-                    smokeWidth *
-                    1.2,
 
-                offsetY:
-                    (Math.random() - 0.5) *
-                    smokeHeight *
-                    1.15,
+        /* =====================================================
+           BASIC SETTINGS
+        ===================================================== */
 
-                radius:
-                    10 +
-                    Math.random() * 30,
+        const isMobile =
+            window.innerWidth <= 700;
 
-                delay:
-                    Math.random() * 0.5,
-
-                phase:
-                    Math.random() * Math.PI * 2,
-
-                drift:
-                    15 +
-                    Math.random() * 35,
-
-                opacity:
-                    0.025 +
-                    Math.random() * 0.045,
-            })
-        );
+        const centerX =
+            window.innerWidth * 0.5;
 
         /*
-         * Slow, soft easing.
+         * Slightly above the exact centre.
+         * This gives the smoke a more natural rising shape.
          */
+        const centerY =
+            window.innerHeight * 0.5 - 30;
+
+
+        /*
+         * The central cloud is deliberately wider
+         * than it is tall, but its silhouette is created
+         * by individual overlapping puffs rather than
+         * one ellipse.
+         */
+        const cloudWidth =
+            isMobile ? 210 : 360;
+
+        const cloudHeight =
+            isMobile ? 145 : 230;
+
+
+        /* =====================================================
+           PARTICLE WISPS
+        ===================================================== */
+
+        const particles =
+            Array.from(
+                {
+                    length:
+                        isMobile
+                            ? 230
+                            : 360,
+                },
+                () => {
+
+                    const side =
+                        Math.random() > 0.5
+                            ? 1
+                            : -1;
+
+                    return {
+
+                        startX:
+                            originX +
+                            (Math.random() - 0.5) *
+                                22,
+
+                        startY:
+                            originY +
+                            Math.random() *
+                                20,
+
+                        /*
+                         * Particles don't all end
+                         * at the same position.
+                         */
+                        targetX:
+                            centerX +
+                            (Math.random() - 0.5) *
+                                cloudWidth *
+                                (0.5 +
+                                    Math.random() *
+                                        0.75),
+
+                        targetY:
+                            centerY +
+                            (Math.random() - 0.5) *
+                                cloudHeight *
+                                (0.45 +
+                                    Math.random() *
+                                        0.85),
+
+                        size:
+                            8 +
+                            Math.random() *
+                                22,
+
+                        drift:
+                            side *
+                            (18 +
+                                Math.random() *
+                                    70),
+
+                        phase:
+                            Math.random() *
+                            Math.PI *
+                            2,
+
+                        speed:
+                            0.3 +
+                            Math.random() *
+                                0.45,
+
+                        delay:
+                            Math.random() *
+                            0.35,
+
+                        opacity:
+                            0.28 +
+                            Math.random() *
+                                0.5,
+                    };
+                }
+            );
+
+
+        /* =====================================================
+           CENTRAL CLOUD PUFFS
+           
+           These fixed positions create an organic silhouette.
+           They are intentionally NOT arranged as a circle.
+        ===================================================== */
+
+        const cloudPuffs = [
+
+            // upper edge
+            {
+                x: -0.48,
+                y: -0.34,
+                s: 0.75,
+            },
+
+            {
+                x: -0.25,
+                y: -0.48,
+                s: 0.88,
+            },
+
+            {
+                x: 0.02,
+                y: -0.40,
+                s: 0.95,
+            },
+
+            {
+                x: 0.28,
+                y: -0.30,
+                s: 0.86,
+            },
+
+            {
+                x: 0.50,
+                y: -0.18,
+                s: 0.62,
+            },
+
+
+            // middle
+            {
+                x: -0.58,
+                y: -0.05,
+                s: 0.68,
+            },
+
+            {
+                x: -0.35,
+                y: -0.12,
+                s: 0.98,
+            },
+
+            {
+                x: -0.08,
+                y: -0.06,
+                s: 1.16,
+            },
+
+            {
+                x: 0.18,
+                y: -0.08,
+                s: 1.08,
+            },
+
+            {
+                x: 0.42,
+                y: 0.02,
+                s: 0.88,
+            },
+
+            {
+                x: 0.58,
+                y: 0.12,
+                s: 0.60,
+            },
+
+
+            // lower body
+            {
+                x: -0.42,
+                y: 0.25,
+                s: 0.75,
+            },
+
+            {
+                x: -0.18,
+                y: 0.28,
+                s: 1.02,
+            },
+
+            {
+                x: 0.08,
+                y: 0.25,
+                s: 1.08,
+            },
+
+            {
+                x: 0.32,
+                y: 0.22,
+                s: 0.78,
+            },
+
+
+            // small bottom wisps
+            {
+                x: -0.25,
+                y: 0.48,
+                s: 0.52,
+            },
+
+            {
+                x: 0.02,
+                y: 0.45,
+                s: 0.65,
+            },
+
+            {
+                x: 0.23,
+                y: 0.40,
+                s: 0.48,
+            },
+        ];
+
+
+        /* =====================================================
+           SOFT EASING
+        ===================================================== */
+
         const easeOut = (t: number) =>
-            1 - Math.pow(1 - t, 1.3);
+            1 -
+            Math.pow(
+                1 - t,
+                2.25
+            );
 
-        const draw = (now: number) => {
+
+        /* =====================================================
+           DRAW
+        ===================================================== */
+
+        const draw = (
+            now: number
+        ) => {
+
             const elapsed =
-                (now - startTime) / 1000;
+                (now - startTime) /
+                1000;
+
 
             ctx.clearRect(
                 0,
@@ -459,291 +607,490 @@ function SmokeCanvas({ originX, originY }: SmokeCanvasProps) {
                 window.innerHeight
             );
 
-            /*
-             * =================================================
-             * PARTICLE SMOKE
-             * =================================================
-             */
 
-            particles.forEach((particle) => {
-                const rawProgress = Math.max(
-                    0,
-                    Math.min(
-                        1,
-                        (elapsed - particle.delay) /
-                            2.35
-                    )
-                );
+            /* =================================================
+               RISING PARTICLES
+            ================================================= */
 
-                const progress =
-                    easeOut(rawProgress);
+            particles.forEach(
+                (particle) => {
 
-                /*
-                 * Smoke rises substantially before
-                 * beginning to spread sideways.
-                 */
-                const riseAmount =
-                    Math.min(
-                        window.innerHeight * 0.42,
-                        390
-                    );
+                    const rawProgress =
+                        Math.max(
+                            0,
+                            Math.min(
+                                1,
+                                (elapsed -
+                                    particle.delay) /
+                                    2.35
+                            )
+                        );
 
-                const rise =
-                    Math.sin(
-                        progress *
-                            Math.PI *
-                            0.72
-                    ) * riseAmount;
 
-                /*
-                 * The further the smoke rises,
-                 * the more it starts drifting sideways.
-                 */
-                const spread =
-                    Math.pow(progress, 1.35);
+                    const progress =
+                        easeOut(
+                            rawProgress
+                        );
 
-                const wave =
-                    Math.sin(
-                        elapsed *
-                            particle.speed *
-                            2.2 +
-                            particle.phase
-                    );
 
-                const x =
-                    particle.startX +
-                    (particle.targetX -
-                        particle.startX) *
-                        spread +
-                    wave *
-                        particle.drift *
-                        spread;
+                    /*
+                     * Smoke rises first.
+                     */
+                    const riseAmount =
+                        Math.min(
+                            window.innerHeight *
+                                0.42,
+                            390
+                        );
 
-                /*
-                 * Rise vertically first.
-                 */
-                const risingY =
-                    particle.startY - rise;
 
-                /*
-                 * Only gradually bend toward
-                 * the final cloud position.
-                 */
-                const y =
-                    risingY +
-                    (particle.targetY -
-                        risingY) *
+                    const rise =
+                        Math.sin(
+                            progress *
+                                Math.PI *
+                                0.72
+                        ) *
+                        riseAmount;
+
+
+                    /*
+                     * Horizontal movement starts
+                     * slowly and becomes stronger
+                     * near the centre.
+                     */
+                    const spread =
                         Math.pow(
                             progress,
-                            1.8
+                            1.35
                         );
 
-                /*
-                 * Smoke expands as it rises.
-                 */
-                const size =
-                    particle.size *
-                    (0.65 +
-                        progress * 1.15);
 
-                const alpha =
-                    particle.opacity *
-                    (0.12 +
-                        progress * 0.48) *
-                    (1 -
-                        Math.max(
-                            0,
-                            progress - 0.92
-                        ) *
-                            1.8);
-
-                /*
-                 * Soft irregular smoke particle.
-                 */
-                const gradient =
-                    ctx.createRadialGradient(
-                        x,
-                        y,
-                        0,
-                        x,
-                        y,
-                        size
-                    );
-
-                gradient.addColorStop(
-                    0,
-                    `rgba(232, 227, 218, ${alpha})`
-                );
-
-                gradient.addColorStop(
-                    0.3,
-                    `rgba(215, 209, 201, ${
-                        alpha * 0.65
-                    })`
-                );
-
-                gradient.addColorStop(
-                    0.65,
-                    `rgba(180, 176, 170, ${
-                        alpha * 0.25
-                    })`
-                );
-
-                gradient.addColorStop(
-                    1,
-                    "rgba(150, 145, 140, 0)"
-                );
-
-                ctx.fillStyle = gradient;
-
-                ctx.beginPath();
-
-                /*
-                 * Slightly deform the circle.
-                 * This prevents the particles from
-                 * looking like perfect round dots.
-                 */
-                ctx.ellipse(
-                    x,
-                    y,
-                    size,
-                    size *
-                        (0.65 +
-                            Math.sin(
+                    const wave =
+                        Math.sin(
+                            elapsed *
+                                particle.speed *
+                                2.2 +
                                 particle.phase
-                            ) *
-                                0.2),
-                    particle.phase,
-                    0,
-                    Math.PI * 2
-                );
+                        );
 
-                ctx.fill();
-            });
 
-            /*
-             * =================================================
-             * LARGE IRREGULAR SMOKE POCKETS
-             * =================================================
-             */
+                    const x =
+                        particle.startX +
+                        (particle.targetX -
+                            particle.startX) *
+                            spread +
+                        wave *
+                            particle.drift *
+                            spread;
 
-            if (elapsed > 0.35) {
-                smokePuffs.forEach((puff) => {
-                    const progress = Math.min(
-                        1,
-                        Math.max(
-                            0,
-                            (elapsed -
-                                puff.delay -
-                                0.25) /
-                                1.65
-                        )
-                    );
 
-                    const puffX =
-                        centerX +
-                        puff.offsetX *
-                            progress +
-                        Math.sin(
-                            elapsed * 0.65 +
-                                puff.phase
-                        ) *
-                            puff.drift;
+                    const risingY =
+                        particle.startY -
+                        rise;
 
-                    const puffY =
-                        centerY +
-                        puff.offsetY *
-                            progress -
-                        Math.sin(
+
+                    /*
+                     * Slowly bend toward the
+                     * central cloud.
+                     */
+                    const y =
+                        risingY +
+                        (particle.targetY -
+                            risingY) *
+                            Math.pow(
+                                progress,
+                                1.8
+                            );
+
+
+                    const size =
+                        particle.size *
+                        (0.62 +
                             progress *
-                                Math.PI
-                        ) *
-                            45;
+                                1.15);
 
-                    const radius =
-                        puff.radius *
-                        (0.35 +
-                            progress * 0.8);
 
+                    const alpha =
+                        particle.opacity *
+                        (0.10 +
+                            progress *
+                                0.46);
+
+
+                    /*
+                     * Soft particle.
+                     */
                     const gradient =
                         ctx.createRadialGradient(
-                            puffX,
-                            puffY,
+                            x,
+                            y,
                             0,
-                            puffX,
-                            puffY,
-                            radius
+                            x,
+                            y,
+                            size
                         );
+
 
                     gradient.addColorStop(
                         0,
-                        `rgba(225, 220, 211, ${
-                            puff.opacity *
-                            progress
+                        `rgba(232, 227, 218, ${alpha})`
+                    );
+
+                    gradient.addColorStop(
+                        0.32,
+                        `rgba(215, 209, 201, ${
+                            alpha *
+                            0.62
                         })`
                     );
 
                     gradient.addColorStop(
-                        0.45,
-                        `rgba(195, 190, 182, ${
-                            puff.opacity *
-                            progress *
-                            0.55
+                        0.68,
+                        `rgba(180, 176, 170, ${
+                            alpha *
+                            0.22
                         })`
                     );
 
                     gradient.addColorStop(
                         1,
-                        "rgba(160, 155, 150, 0)"
+                        "rgba(150, 145, 140, 0)"
                     );
+
 
                     ctx.fillStyle =
                         gradient;
 
+
                     ctx.beginPath();
 
-                    /*
-                     * Irregular overlapping puff.
-                     */
+
                     ctx.ellipse(
-                        puffX,
-                        puffY,
-                        radius *
-                            (0.7 +
+                        x,
+                        y,
+                        size,
+                        size *
+                            (0.62 +
                                 Math.sin(
-                                    puff.phase
+                                    particle.phase
                                 ) *
                                     0.18),
-                        radius *
-                            (0.45 +
-                                Math.cos(
-                                    puff.phase
-                                ) *
-                                    0.2),
-                        puff.phase,
+                        particle.phase,
                         0,
                         Math.PI * 2
                     );
 
+
                     ctx.fill();
-                });
-            }
-
-            /*
-             * =================================================
-             * SMALL DENSE BASE
-             * =================================================
-             *
-             * This keeps the smoke visibly connected
-             * to the vase instead of looking detached.
-             */
-
-            const baseProgress = Math.min(
-                1,
-                elapsed / 0.8
+                }
             );
 
-            if (baseProgress > 0) {
+
+            /* =================================================
+               CENTRAL ORGANIC CLOUD
+            ================================================= */
+
+            if (elapsed > 0.42) {
+
+                const cloudProgress =
+                    Math.min(
+                        1,
+                        Math.max(
+                            0,
+                            (elapsed -
+                                0.42) /
+                                0.95
+                        )
+                    );
+
+
+                cloudPuffs.forEach(
+                    (
+                        puff,
+                        index
+                    ) => {
+
+                        /*
+                         * Slight delay between puffs.
+                         * This makes the cloud grow naturally.
+                         */
+                        const puffDelay =
+                            index *
+                            0.025;
+
+
+                        const puffProgress =
+                            Math.min(
+                                1,
+                                Math.max(
+                                    0,
+                                    (cloudProgress -
+                                        puffDelay) /
+                                        0.72
+                                )
+                            );
+
+
+                        const eased =
+                            easeOut(
+                                puffProgress
+                            );
+
+
+                        /*
+                         * Very subtle movement.
+                         * Enough to keep the smoke alive,
+                         * but not enough to make it look
+                         * like floating circles.
+                         */
+                        const wobbleX =
+                            Math.sin(
+                                elapsed *
+                                    0.55 +
+                                    index *
+                                        1.73
+                            ) *
+                            7;
+
+                        const wobbleY =
+                            Math.cos(
+                                elapsed *
+                                    0.48 +
+                                    index *
+                                        1.41
+                            ) *
+                            5;
+
+
+                        const x =
+                            centerX +
+                            puff.x *
+                                cloudWidth *
+                                eased +
+                            wobbleX;
+
+
+                        const y =
+                            centerY +
+                            puff.y *
+                                cloudHeight *
+                                eased +
+                            wobbleY;
+
+
+                        const radius =
+                            (isMobile
+                                ? 72
+                                : 105) *
+                            puff.s *
+                            (0.18 +
+                                eased *
+                                    0.82);
+
+
+                        const alpha =
+                            0.105 *
+                            eased;
+
+
+                        /*
+                         * Soft layered gradient.
+                         */
+                        const gradient =
+                            ctx.createRadialGradient(
+                                x,
+                                y,
+                                0,
+                                x,
+                                y,
+                                radius
+                            );
+
+
+                        gradient.addColorStop(
+                            0,
+                            `rgba(232, 227, 218, ${alpha})`
+                        );
+
+                        gradient.addColorStop(
+                            0.28,
+                            `rgba(222, 216, 207, ${
+                                alpha *
+                                0.82
+                            })`
+                        );
+
+                        gradient.addColorStop(
+                            0.58,
+                            `rgba(195, 189, 181, ${
+                                alpha *
+                                0.42
+                            })`
+                        );
+
+                        gradient.addColorStop(
+                            0.82,
+                            `rgba(165, 160, 154, ${
+                                alpha *
+                                0.14
+                            })`
+                        );
+
+                        gradient.addColorStop(
+                            1,
+                            "rgba(150, 145, 140, 0)"
+                        );
+
+
+                        ctx.fillStyle =
+                            gradient;
+
+
+                        ctx.beginPath();
+
+
+                        /*
+                         * Deformed ellipse.
+                         * Each puff has a different rotation
+                         * and aspect ratio.
+                         */
+                        ctx.ellipse(
+                            x,
+                            y,
+                            radius *
+                                (0.78 +
+                                    Math.sin(
+                                        index *
+                                            2.17
+                                    ) *
+                                        0.15),
+                            radius *
+                                (0.56 +
+                                    Math.cos(
+                                        index *
+                                            1.61
+                                    ) *
+                                        0.17),
+                            index *
+                                0.43,
+                            0,
+                            Math.PI * 2
+                        );
+
+
+                        ctx.fill();
+                    }
+                );
+            }
+
+
+            /* =================================================
+               DENSE CORE
+               
+               A very soft centre prevents gaps between
+               individual puffs without creating a circle.
+            ================================================= */
+
+            if (elapsed > 0.65) {
+
+                const coreProgress =
+                    Math.min(
+                        1,
+                        (elapsed -
+                            0.65) /
+                            0.7
+                    );
+
+
+                const coreGradient =
+                    ctx.createRadialGradient(
+                        centerX,
+                        centerY,
+                        0,
+                        centerX,
+                        centerY,
+                        isMobile
+                            ? 110
+                            : 155
+                    );
+
+
+                coreGradient.addColorStop(
+                    0,
+                    `rgba(230, 225, 216, ${
+                        0.075 *
+                        coreProgress
+                    })`
+                );
+
+                coreGradient.addColorStop(
+                    0.38,
+                    `rgba(210, 204, 196, ${
+                        0.052 *
+                        coreProgress
+                    })`
+                );
+
+                coreGradient.addColorStop(
+                    0.72,
+                    `rgba(180, 175, 169, ${
+                        0.018 *
+                        coreProgress
+                    })`
+                );
+
+                coreGradient.addColorStop(
+                    1,
+                    "rgba(150, 145, 140, 0)"
+                );
+
+
+                ctx.fillStyle =
+                    coreGradient;
+
+
+                /*
+                 * Notice this is NOT an ellipse.
+                 * The core is simply a very soft haze.
+                 */
+                ctx.fillRect(
+                    centerX -
+                        (isMobile
+                            ? 110
+                            : 155),
+
+                    centerY -
+                        (isMobile
+                            ? 100
+                            : 140),
+
+                    (isMobile
+                        ? 220
+                        : 310),
+
+                    (isMobile
+                        ? 200
+                        : 280)
+                );
+            }
+
+
+            /* =================================================
+               SMOKE BASE AT VASE
+            ================================================= */
+
+            const baseProgress =
+                Math.min(
+                    1,
+                    elapsed / 0.75
+                );
+
+
+            if (
+                baseProgress >
+                0
+            ) {
+
                 const baseGradient =
                     ctx.createRadialGradient(
                         originX,
@@ -751,21 +1098,30 @@ function SmokeCanvas({ originX, originY }: SmokeCanvasProps) {
                         0,
                         originX,
                         originY,
-                        45
+                        48
                     );
+
 
                 baseGradient.addColorStop(
                     0,
                     `rgba(225, 220, 212, ${
-                        0.28 *
+                        0.30 *
                         baseProgress
                     })`
                 );
 
                 baseGradient.addColorStop(
-                    0.45,
-                    `rgba(190, 185, 178, ${
-                        0.12 *
+                    0.38,
+                    `rgba(205, 199, 191, ${
+                        0.18 *
+                        baseProgress
+                    })`
+                );
+
+                baseGradient.addColorStop(
+                    0.7,
+                    `rgba(175, 170, 164, ${
+                        0.06 *
                         baseProgress
                     })`
                 );
@@ -775,38 +1131,54 @@ function SmokeCanvas({ originX, originY }: SmokeCanvasProps) {
                     "rgba(150, 145, 140, 0)"
                 );
 
+
                 ctx.fillStyle =
                     baseGradient;
 
+
                 ctx.beginPath();
+
 
                 ctx.ellipse(
                     originX,
                     originY,
-                    28,
-                    42,
+                    24,
+                    40,
                     0,
                     0,
                     Math.PI * 2
                 );
 
+
                 ctx.fill();
             }
 
-            /*
-             * Keep the smoke alive slightly longer
-             * so it doesn't suddenly freeze.
-             */
-            if (elapsed < 2.7) {
+
+            /* =================================================
+               CONTINUE ANIMATION
+            ================================================= */
+
+            if (
+                elapsed <
+                2.9
+            ) {
+
                 animationFrame =
-                    requestAnimationFrame(draw);
+                    requestAnimationFrame(
+                        draw
+                    );
             }
         };
 
+
         animationFrame =
-            requestAnimationFrame(draw);
+            requestAnimationFrame(
+                draw
+            );
+
 
         return () => {
+
             cancelAnimationFrame(
                 animationFrame
             );
@@ -816,34 +1188,62 @@ function SmokeCanvas({ originX, originY }: SmokeCanvasProps) {
                 resize
             );
         };
-    }, [originX, originY]);
+
+    }, [
+        originX,
+        originY,
+    ]);
+
 
     return (
         <canvas
             ref={canvasRef}
-            className={styles.smokeCanvas}
+            className={
+                styles.smokeCanvas
+            }
             aria-hidden="true"
         />
     );
 }
+
+
 /* =========================================================
    EVENTS PAGE
 ========================================================= */
 
 export default function EventsPage() {
 
-    const overlayRef = useRef<HTMLDivElement>(null);
+    const overlayRef =
+        useRef<HTMLDivElement>(
+            null
+        );
 
-    const smokeTimerRef = useRef<number | null>(null);
+    const smokeTimerRef =
+        useRef<number | null>(
+            null
+        );
 
-    const [selectedCategory, setSelectedCategory] =
-        useState<Category | null>(null);
+    const [
+        selectedCategory,
+        setSelectedCategory,
+    ] =
+        useState<Category | null>(
+            null
+        );
 
-    const [smokeOrigin, setSmokeOrigin] =
-        useState<{ x: number; y: number } | null>(null);
+    const [
+        smokeOrigin,
+        setSmokeOrigin,
+    ] =
+        useState<{
+            x: number;
+            y: number;
+        } | null>(null);
 
-    const [currentIndex, setCurrentIndex] =
-        useState(0);
+    const [
+        currentIndex,
+        setCurrentIndex,
+    ] = useState(0);
 
 
     /* =====================================================
@@ -852,17 +1252,25 @@ export default function EventsPage() {
 
     useEffect(() => {
 
-        const handleMouseMove = (e: globalThis.MouseEvent) => {
+        const handleMouseMove = (
+            e: globalThis.MouseEvent
+        ) => {
 
-            const overlay = overlayRef.current;
+            const overlay =
+                overlayRef.current;
 
             if (!overlay) return;
 
             const rect =
                 overlay.getBoundingClientRect();
 
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            const x =
+                e.clientX -
+                rect.left;
+
+            const y =
+                e.clientY -
+                rect.top;
 
             overlay.style.setProperty(
                 "--mouse-x",
@@ -883,6 +1291,7 @@ export default function EventsPage() {
 
 
         return () => {
+
             window.removeEventListener(
                 "mousemove",
                 handleMouseMove
@@ -900,43 +1309,78 @@ export default function EventsPage() {
         category: Category,
         e: ReactMouseEvent<HTMLElement>
     ) => {
-        if (smokeTimerRef.current !== null) {
-            window.clearTimeout(smokeTimerRef.current);
+
+        if (
+            smokeTimerRef.current !==
+            null
+        ) {
+
+            window.clearTimeout(
+                smokeTimerRef.current
+            );
         }
+
 
         const vase =
-            e.currentTarget.querySelector("img");
+            e.currentTarget.querySelector(
+                "img"
+            );
+
 
         if (!vase) {
-            setSelectedCategory(category);
+
+            setSelectedCategory(
+                category
+            );
+
             setCurrentIndex(0);
+
             return;
         }
+
 
         const rect =
             vase.getBoundingClientRect();
 
-        // Smoke always starts from the mouth/top of the vase,
-        // never from the point where the user clicked.
+
+        /*
+         * Smoke always starts from the
+         * mouth/top of the vase.
+         */
         const originX =
-            rect.left + rect.width / 1.5;
+            rect.left +
+            rect.width /
+                1.5;
 
         const originY =
-            rect.top + rect.height * 0.05;
+            rect.top +
+            rect.height *
+                0.05;
+
 
         setSmokeOrigin({
             x: originX,
             y: originY,
         });
 
-        // Reveal the modal after a short fixed delay.
-        // The timer is intentionally independent of the smoke position,
-        // so the modal still appears even if the smoke has not fully
-        // reached the centre yet.
-        smokeTimerRef.current = window.setTimeout(() => {
-            setSelectedCategory(category);
-            setCurrentIndex(0);
-        }, 1100);
+
+        /*
+         * Modal timing remains independent
+         * from the smoke position.
+         */
+        smokeTimerRef.current =
+            window.setTimeout(
+                () => {
+
+                    setSelectedCategory(
+                        category
+                    );
+
+                    setCurrentIndex(0);
+
+                },
+                1100
+            );
     };
 
 
@@ -945,14 +1389,30 @@ export default function EventsPage() {
     ===================================================== */
 
     const closeModal = () => {
-        if (smokeTimerRef.current !== null) {
-            window.clearTimeout(smokeTimerRef.current);
-            smokeTimerRef.current = null;
+
+        if (
+            smokeTimerRef.current !==
+            null
+        ) {
+
+            window.clearTimeout(
+                smokeTimerRef.current
+            );
+
+            smokeTimerRef.current =
+                null;
         }
 
-        setSelectedCategory(null);
+
+        setSelectedCategory(
+            null
+        );
+
         setCurrentIndex(0);
-        setSmokeOrigin(null);
+
+        setSmokeOrigin(
+            null
+        );
     };
 
 
@@ -960,9 +1420,12 @@ export default function EventsPage() {
        CURRENT EVENTS
     ===================================================== */
 
-    const currentEvents: EventData[] =
+    const currentEvents:
+        EventData[] =
         selectedCategory
-            ? eventsData[selectedCategory]
+            ? eventsData[
+                  selectedCategory
+              ]
             : [];
 
 
@@ -972,21 +1435,28 @@ export default function EventsPage() {
 
     const handleNext = () => {
 
-        if (currentEvents.length <= 1) return;
+        if (
+            currentEvents.length <=
+            1
+        )
+            return;
 
-        setCurrentIndex((prev) => {
 
-            if (
-                prev >=
-                currentEvents.length - 1
-            ) {
-                return 0;
+        setCurrentIndex(
+            (prev) => {
+
+                if (
+                    prev >=
+                    currentEvents.length -
+                        1
+                ) {
+
+                    return 0;
+                }
+
+                return prev + 1;
             }
-
-            return prev + 1;
-
-        });
-
+        );
     };
 
 
@@ -996,18 +1466,29 @@ export default function EventsPage() {
 
     const handlePrev = () => {
 
-        if (currentEvents.length <= 1) return;
+        if (
+            currentEvents.length <=
+            1
+        )
+            return;
 
-        setCurrentIndex((prev) => {
 
-            if (prev <= 0) {
-                return currentEvents.length - 1;
+        setCurrentIndex(
+            (prev) => {
+
+                if (
+                    prev <= 0
+                ) {
+
+                    return (
+                        currentEvents.length -
+                        1
+                    );
+                }
+
+                return prev - 1;
             }
-
-            return prev - 1;
-
-        });
-
+        );
     };
 
 
@@ -1017,23 +1498,39 @@ export default function EventsPage() {
 
     useEffect(() => {
 
-        if (!selectedCategory) return;
+        if (!selectedCategory)
+            return;
 
 
-        const handleKeyDown = (e: KeyboardEvent) => {
+        const handleKeyDown = (
+            e: KeyboardEvent
+        ) => {
 
-            if (e.key === "Escape") {
+            if (
+                e.key ===
+                "Escape"
+            ) {
+
                 closeModal();
             }
 
-            if (e.key === "ArrowRight") {
+
+            if (
+                e.key ===
+                "ArrowRight"
+            ) {
+
                 handleNext();
             }
 
-            if (e.key === "ArrowLeft") {
+
+            if (
+                e.key ===
+                "ArrowLeft"
+            ) {
+
                 handlePrev();
             }
-
         };
 
 
@@ -1049,7 +1546,6 @@ export default function EventsPage() {
                 "keydown",
                 handleKeyDown
             );
-
         };
 
     }, [
@@ -1063,12 +1559,17 @@ export default function EventsPage() {
     ===================================================== */
 
     const currentEvent =
-        currentEvents[currentIndex];
+        currentEvents[
+            currentIndex
+        ];
 
 
     return (
-        <div className={styles.fullPageContainer}>
-
+        <div
+            className={
+                styles.fullPageContainer
+            }
+        >
 
             {/* =================================================
                 NAV
@@ -1083,10 +1584,16 @@ export default function EventsPage() {
                 TITLE
             ================================================= */}
 
-            <section className={styles.title}>
+            <section
+                className={
+                    styles.title
+                }
+            >
 
                 <img
-                    src={eventsTitle}
+                    src={
+                        eventsTitle
+                    }
                     alt="Events"
                 />
 
@@ -1098,14 +1605,21 @@ export default function EventsPage() {
             ================================================= */}
 
             <section
-                className={styles.dramaContainer}
+                className={
+                    styles.dramaContainer
+                }
                 onClick={(e) =>
-                    openCategory("drama", e)
+                    openCategory(
+                        "drama",
+                        e
+                    )
                 }
             >
 
                 <img
-                    src={dramaVase}
+                    src={
+                        dramaVase
+                    }
                     alt="Drama and Theatre"
                 />
 
@@ -1121,12 +1635,17 @@ export default function EventsPage() {
                     styles.photographyContainer
                 }
                 onClick={(e) =>
-                    openCategory("photography", e)
+                    openCategory(
+                        "photography",
+                        e
+                    )
                 }
             >
 
                 <img
-                    src={photographyVase}
+                    src={
+                        photographyVase
+                    }
                     alt="Photography"
                 />
 
@@ -1138,14 +1657,21 @@ export default function EventsPage() {
             ================================================= */}
 
             <section
-                className={styles.danceContainer}
+                className={
+                    styles.danceContainer
+                }
                 onClick={(e) =>
-                    openCategory("dance", e)
+                    openCategory(
+                        "dance",
+                        e
+                    )
                 }
             >
 
                 <img
-                    src={danceVase}
+                    src={
+                        danceVase
+                    }
                     alt="Dance"
                 />
 
@@ -1157,14 +1683,21 @@ export default function EventsPage() {
             ================================================= */}
 
             <section
-                className={styles.otherContainer}
+                className={
+                    styles.otherContainer
+                }
                 onClick={(e) =>
-                    openCategory("misc", e)
+                    openCategory(
+                        "misc",
+                        e
+                    )
                 }
             >
 
                 <img
-                    src={otherVase}
+                    src={
+                        otherVase
+                    }
                     alt="Miscellaneous"
                 />
 
@@ -1176,14 +1709,21 @@ export default function EventsPage() {
             ================================================= */}
 
             <section
-                className={styles.musicContainer}
+                className={
+                    styles.musicContainer
+                }
                 onClick={(e) =>
-                    openCategory("music", e)
+                    openCategory(
+                        "music",
+                        e
+                    )
                 }
             >
 
                 <img
-                    src={musicVase}
+                    src={
+                        musicVase
+                    }
                     alt="Music"
                 />
 
@@ -1196,18 +1736,27 @@ export default function EventsPage() {
 
             {smokeOrigin && (
                 <SmokeCanvas
-                    originX={smokeOrigin.x}
-                    originY={smokeOrigin.y}
+                    originX={
+                        smokeOrigin.x
+                    }
+                    originY={
+                        smokeOrigin.y
+                    }
                 />
             )}
+
 
             {/* =================================================
                 SPOTLIGHT
             ================================================= */}
 
             <div
-                ref={overlayRef}
-                className={styles.spotlightOverlay}
+                ref={
+                    overlayRef
+                }
+                className={
+                    styles.spotlightOverlay
+                }
             />
 
 
@@ -1215,16 +1764,22 @@ export default function EventsPage() {
                 MODAL
             ================================================= */}
 
-            {selectedCategory !== null && (
+            {selectedCategory !==
+                null && (
 
                 <div
-                    className={styles.modalOverlay}
-                    onClick={closeModal}
+                    className={
+                        styles.modalOverlay
+                    }
+                    onClick={
+                        closeModal
+                    }
                 >
 
                     <div
                         className={
-                            currentEvents.length === 0
+                            currentEvents.length ===
+                            0
                                 ? styles.noEventsModal
                                 : styles.modal
                         }
@@ -1232,7 +1787,6 @@ export default function EventsPage() {
                             e.stopPropagation()
                         }
                     >
-
 
                         {/* =====================================
                             CLOSE
@@ -1242,7 +1796,9 @@ export default function EventsPage() {
                             className={
                                 styles.closeButton
                             }
-                            onClick={closeModal}
+                            onClick={
+                                closeModal
+                            }
                             aria-label="Close"
                         >
                             ×
@@ -1253,7 +1809,9 @@ export default function EventsPage() {
                             NO EVENTS
                         ===================================== */}
 
-                        {currentEvents.length === 0 ? (
+                        {
+                            currentEvents.length ===
+                            0 ? (
 
                             <div
                                 className={
@@ -1267,10 +1825,12 @@ export default function EventsPage() {
 
                                 <p>
                                     Alas! There are no{" "}
-                                    {selectedCategory ===
-                                    "photography"
-                                        ? "photography"
-                                        : selectedCategory}{" "}
+                                    {
+                                        selectedCategory ===
+                                        "photography"
+                                            ? "photography"
+                                            : selectedCategory
+                                    }{" "}
                                     events to discover
                                     at the moment.
                                 </p>
@@ -1291,7 +1851,6 @@ export default function EventsPage() {
                                     }
                                 >
 
-
                                     {/* =========================
                                         LEFT
                                     ========================= */}
@@ -1310,16 +1869,15 @@ export default function EventsPage() {
 
 
                                         {
-                                            currentEvent
-                                                .description && (
+                                            currentEvent.description &&
+                                            (
                                                 <p
                                                     className={
                                                         styles.description
                                                     }
                                                 >
                                                     {
-                                                        currentEvent
-                                                            .description
+                                                        currentEvent.description
                                                     }
                                                 </p>
                                             )
@@ -1333,7 +1891,6 @@ export default function EventsPage() {
                                                 styles.eventDetails
                                             }
                                         >
-
 
                                             {/* CATEGORY */}
 
@@ -1353,8 +1910,7 @@ export default function EventsPage() {
 
                                                 <span>
                                                     {
-                                                        currentEvent
-                                                            .category
+                                                        currentEvent.category
                                                     }
                                                 </span>
 
@@ -1364,8 +1920,8 @@ export default function EventsPage() {
                                             {/* CLUB */}
 
                                             {
-                                                currentEvent
-                                                    .club_name && (
+                                                currentEvent.club_name &&
+                                                (
                                                     <div
                                                         className={
                                                             styles.detail
@@ -1382,8 +1938,7 @@ export default function EventsPage() {
 
                                                         <span>
                                                             {
-                                                                currentEvent
-                                                                    .club_name
+                                                                currentEvent.club_name
                                                             }
                                                         </span>
 
@@ -1395,8 +1950,8 @@ export default function EventsPage() {
                                             {/* VENUE */}
 
                                             {
-                                                currentEvent
-                                                    .venue && (
+                                                currentEvent.venue &&
+                                                (
                                                     <div
                                                         className={
                                                             styles.detail
@@ -1413,8 +1968,7 @@ export default function EventsPage() {
 
                                                         <span>
                                                             {
-                                                                currentEvent
-                                                                    .venue
+                                                                currentEvent.venue
                                                             }
                                                         </span>
 
@@ -1438,17 +1992,14 @@ export default function EventsPage() {
                                     >
 
                                         {
-                                            currentEvent
-                                                .image_url ? (
+                                            currentEvent.image_url ? (
 
                                                 <img
                                                     src={
-                                                        currentEvent
-                                                            .image_url
+                                                        currentEvent.image_url
                                                     }
                                                     alt={
-                                                        currentEvent
-                                                            .name
+                                                        currentEvent.name
                                                     }
                                                 />
 
@@ -1462,8 +2013,7 @@ export default function EventsPage() {
 
                                                     <span>
                                                         {
-                                                            currentEvent
-                                                                .name
+                                                            currentEvent.name
                                                         }
                                                     </span>
 
@@ -1482,7 +2032,8 @@ export default function EventsPage() {
                                 ================================= */}
 
                                 {
-                                    currentEvents.length > 1 && (
+                                    currentEvents.length >
+                                    1 && (
 
                                         <div
                                             className={
@@ -1508,11 +2059,13 @@ export default function EventsPage() {
                                                     styles.counter
                                                 }
                                             >
-                                                {currentIndex + 1}
+                                                {
+                                                    currentIndex +
+                                                    1
+                                                }
                                                 {" / "}
                                                 {
-                                                    currentEvents
-                                                        .length
+                                                    currentEvents.length
                                                 }
                                             </span>
 
@@ -1530,7 +2083,6 @@ export default function EventsPage() {
                                             </button>
 
                                         </div>
-
                                     )
                                 }
 
@@ -1541,7 +2093,6 @@ export default function EventsPage() {
                     </div>
 
                 </div>
-
             )}
 
         </div>
