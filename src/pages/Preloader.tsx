@@ -41,16 +41,48 @@ type LogoDot = {
   size: number;
   order: number;
   phase: number;
+  isGap: boolean;
+  clusterId: number;
+  rankInCluster: number; // position within its cluster's stroke sequence
+  growthJitter: number; // 0-1 random offset for organic, non-uniform growth
+};
+type GapCluster = {
+  id: number;
+  indices: number[];
+  cx: number;
+  cy: number;
+  originRank: number; // rank (within this cluster) of the point closest to contact
+  originX: number; // exact point-of-contact coordinates
+  originY: number;
+  threshold: number; // asset-load progress (0-1) required before this gap can launch
+  launched: boolean;
+  filled: boolean;
+  fillTime: number | null;
+  impactX: number | null; // exact screen position where the filler star actually hit
+  impactY: number | null;
+};
+type FillerStar = {
+  clusterId: number;
+  x: number;
+  y: number;
+  angle: number;
+  speed: number;
+  length: number;
+  size: number;
+  opacity: number;
+  consumed: boolean;
 };
 
 const SVG_VIEWBOX_WIDTH = 1578;
 const SVG_VIEWBOX_HEIGHT = 744;
 
 const PATH_STAR_COUNT = 700;
-const MOBILE_PATH_STAR_COUNT = 625;
-
-const MIN_LOGO_TIME = 2000;
-const LOGO_HOLD = 1000;
+// Non-gap dots snap in almost immediately (fast ripple, not a slow build).
+const AMBIENT_REVEAL_TIME = 450;
+const AMBIENT_ORDER_STAGGER = 0.15; // max extra delay fraction across the path
+const AMBIENT_REVEAL_WINDOW = 0.35;
+const MIN_LOGO_TIME = 500; // floor only; real gating is logoCompleteRef + asset progress
+const LOGO_HOLD = 2000;
 const EXIT_DURATION = 1200;
 
 const BG_COLOR = "rgb(8, 10, 24)";
@@ -65,6 +97,32 @@ const SHOOTING_STARS = 10;
 
 const MAX_FRAME_DT = 1000 / 30;
 const RESIZE_DEBOUNCE = 150;
+
+// The logo's 700 sample points are divided into clusters. Only a small,
+// scattered fraction of clusters are visible immediately (so the shape is
+// NOT recognizable at first) — the rest are "gaps" that shooting stars fill
+// in progressively as real asset-load progress advances from 0 to 1.
+const TOTAL_CLUSTER_COUNT = 10;
+const AMBIENT_CLUSTER_FRACTION = 0.14; // ~14% of the shape visible up front
+const AMBIENT_CLUSTER_COUNT = Math.round(TOTAL_CLUSTER_COUNT * AMBIENT_CLUSTER_FRACTION);
+const GAP_CLUSTER_COUNT = TOTAL_CLUSTER_COUNT - AMBIENT_CLUSTER_COUNT;
+// Thresholds spread across load progress so gaps close in step with real loading;
+// the last one only launches once assets finish (threshold 1.0).
+const GAP_THRESHOLD_START = 0.05;
+const GAP_THRESHOLD_END = 1.0;
+const FILLER_MIN_LAUNCH_GAP = 260; // ms, keeps simultaneous progress jumps staggered visually
+const FILLER_TRAVEL_TIME = 700; // ms
+const FILLER_ARRIVAL_RADIUS = 16;
+// No glow/flash on impact — the fill itself IS the visible effect: it grows
+// outward from the exact point of contact along the stroke, in both
+// directions, like a branch/vein extending rather than a radial bloom.
+const GROWTH_STEP_MS = 50; // base ms of delay per point stepped away from contact
+const GROWTH_SPEED_JITTER = 0.5; // +/- variation in how fast growth travels per point (organic feel)
+const GROWTH_DOT_FADE_MS = 260; // how gently each point fades in once growth reaches it
+const STRIKE_FLASH_DURATION = 260; // subtle, quick — just enough to register as a cause
+const STRIKE_FLASH_MAX_SIZE = 16; // small on purpose, not a bloom
+const SHOCKWAVE_DURATION = 420; // slightly outlives the flash, visually linking strike -> spread
+const SHOCKWAVE_MAX_RADIUS = 30; // stays small; it's a hint, not a bloom
 
 const PATH_D = `
   M 264 237 L 258 242 L 258 243 L 253 248 L 253 249 L 243 261 L 237 272 L 235 274 L 229 286 L 229 288 L 225 298 L 224 307 L 223 308 L 223 329 L 224 330 L 224 335 L 225 336 L 225 339 L 226 340 L 228 348 L 234 360 L 250 382 L 267 398 L 268 398 L 283 411 L 296 420 L 300 422 L 303 422 L 303 419 L 302 418 L 301 413 L 295 401 L 295 399 L 293 396 L 293 394 L 289 384 L 289 381 L 287 376 L 287 372 L 286 371 L 286 366 L 285 365 L 285 357 L 284 356 L 284 342 L 285 341 L 285 332 L 286 331 L 286 326 L 287 325 L 288 315 L 289 314 L 289 311 L 290 310 L 290 307 L 291 306 L 291 303 L 292 302 L 294 294 L 300 284 L 297 284 L 289 288 L 283 292 L 274 301 L 269 308 L 265 316 L 264 322 L 263 323 L 263 332 L 261 335 L 259 334 L 256 328 L 256 326 L 251 315 L 251 313 L 247 303 L 246 296 L 245 295 L 245 283 L 246 282 L 246 276 L 247 275 L 248 268 L 249 267 L 251 259 L 256 249 Z
@@ -192,13 +250,13 @@ export default function Preloader({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const starRefs = useRef<(HTMLDivElement | null)[]>([]);
-
+  const fillerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const startRef = useRef(performance.now());
   const enteredRef = useRef(false);
   const exitRef = useRef(false);
 
   const progressRef = useRef(assets.length === 0 ? 1 : 0);
-
+  const logoCompleteRef = useRef(false);
   const [assetProgress, setAssetProgress] = useState(
     assets.length === 0 ? 1 : 0,
   );
@@ -284,7 +342,9 @@ export default function Preloader({
     let logoDots: LogoDot[] = [];
     let backgroundStars: BackgroundStar[] = [];
     let shootingStars: ShootingStar[] = [];
-
+    let gapClusters: GapCluster[] = [];
+    let fillerStars: FillerStar[] = [];
+    let lastLaunchElapsed = -Infinity;
     const glowSprite = makeGlowSprite(64);
 
     let lastFrameTime = performance.now();
@@ -301,33 +361,14 @@ export default function Preloader({
      * SAMPLE LOGO PATH
      */
     const sample = () => {
-      const len = path.getTotalLength();
-
-      const out: Point[] = [];
-
-      const isMobile = window.innerWidth <= 650;
-
-      const starCount = isMobile
-        ? MOBILE_PATH_STAR_COUNT
-        : PATH_STAR_COUNT;
-
-      for (let i = 0; i < starCount; i++) {
-        const p = path.getPointAtLength(
-          (len * i) / (starCount - 1),
-        );
-
-        out.push({
-          x: p.x,
-          y: p.y,
-        });
+      const len = path.getTotalLength(),
+        out: Point[] = [];
+      for (let i = 0; i < PATH_STAR_COUNT; i++) {
+        const p = path.getPointAtLength((len * i) / (PATH_STAR_COUNT - 1));
+        out.push({ x: p.x, y: p.y });
       }
-
       return out;
     };
-
-    /*
-     * SCALE SVG COORDINATES TO SCREEN
-     */
     const screen = (p: Point): Point => {
       const scale = Math.min(
         (width * 0.96) / SVG_VIEWBOX_WIDTH,
@@ -571,26 +612,134 @@ export default function Preloader({
      */
     const makeLogo = () => {
       const points = sample();
-
-      const starCount = points.length;
-
       logoDots = points.map((p, i) => {
         const q = screen(p);
 
         return {
           x: q.x,
           y: q.y,
+          size: 1.25 + Math.random() * 1.35,
+          order: i / (PATH_STAR_COUNT - 1),
+          phase: Math.random() * Math.PI * 2,
+          isGap: false,
+          clusterId: -1,
+          rankInCluster: 0,
+          growthJitter: Math.random(),
+        };
+      });
 
-          size:
-            1.25 +
-            Math.random() * 1.35,
+      // Partition the whole path into contiguous clusters, then randomly pick
+      // a small subset to stay ambient (visible immediately) — the rest are
+      // gaps that fill in as assets load, so the shape starts unrecognizable.
+      const clusterOrder = Array.from({ length: TOTAL_CLUSTER_COUNT }, (_, i) => i);
+      for (let i = clusterOrder.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [clusterOrder[i], clusterOrder[j]] = [clusterOrder[j], clusterOrder[i]];
+      }
+      const ambientClusterIds = new Set(clusterOrder.slice(0, AMBIENT_CLUSTER_COUNT));
 
-          order:
-            i /
-            Math.max(1, starCount - 1),
+      const baseSize = Math.floor(PATH_STAR_COUNT / TOTAL_CLUSTER_COUNT);
+      gapClusters = [];
+      let gapCursor = 0;
+      for (let c = 0; c < TOTAL_CLUSTER_COUNT; c++) {
+        const start = c * baseSize;
+        const end = c === TOTAL_CLUSTER_COUNT - 1 ? PATH_STAR_COUNT : start + baseSize;
+        if (ambientClusterIds.has(c)) continue; // stays ambient, not a gap
 
-          phase:
-            Math.random() * Math.PI * 2,
+        const indices: number[] = [];
+        let sx = 0,
+          sy = 0;
+        for (let k = start; k < end; k++) {
+          indices.push(k);
+          sx += logoDots[k].x;
+          sy += logoDots[k].y;
+          logoDots[k].isGap = true;
+          logoDots[k].clusterId = gapCursor;
+          logoDots[k].rankInCluster = k - start;
+        }
+        const avgX = sx / indices.length;
+        const avgY = sy / indices.length;
+        // Find the real point in this cluster nearest to the raw average —
+        // that's where growth will radiate from. Note the raw average itself
+        // is NOT used as the star's target: a cluster's index range can
+        // straddle two disconnected subpaths (the logo is many separate
+        // M...Z shapes), so averaging their coordinates can land in empty
+        // space between them. Targeting that empty point makes the star
+        // arrive and visibly do nothing, while the growth (anchored at the
+        // real nearest point below) appears somewhere else entirely.
+        let originRank = 0;
+        let originIndex = start;
+        let bestDist = Infinity;
+        for (const k of indices) {
+          const d = Math.hypot(logoDots[k].x - avgX, logoDots[k].y - avgY);
+          if (d < bestDist) {
+            bestDist = d;
+            originRank = k - start;
+            originIndex = k;
+          }
+        }
+        // Target the star at this exact real point so arrival and growth
+        // origin are always the same coordinates.
+        const cx = logoDots[originIndex].x;
+        const cy = logoDots[originIndex].y;
+        gapClusters.push({
+          id: gapCursor,
+          indices,
+          cx,
+          cy,
+          originRank,
+          originX: cx,
+          originY: cy,
+          threshold: 0,
+          launched: false,
+          filled: false,
+          fillTime: null,
+          impactX: null,
+          impactY: null,
+        });
+        gapCursor++;
+      }
+
+      // Spread thresholds across load progress, in a shuffled fill order so
+      // gaps close unevenly across the shape rather than sweeping in path order.
+      const fillOrder = gapClusters.map((c) => c.id);
+      for (let i = fillOrder.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [fillOrder[i], fillOrder[j]] = [fillOrder[j], fillOrder[i]];
+      }
+      const count = gapClusters.length;
+      fillOrder.forEach((clusterId, rank) => {
+        const cluster = gapClusters[clusterId];
+        cluster.threshold =
+          count <= 1
+            ? GAP_THRESHOLD_END
+            : GAP_THRESHOLD_START +
+              (rank * (GAP_THRESHOLD_END - GAP_THRESHOLD_START)) / (count - 1);
+      });
+
+      logoCompleteRef.current = gapClusters.length === 0;
+      lastLaunchElapsed = -Infinity;
+
+      // One streaking star per gap, launched from off-screen left once its
+      // threshold is crossed by real asset-load progress (see animate()).
+      fillerStars = gapClusters.map((cluster) => {
+        const startX = -200 - Math.random() * 160;
+        const startY = -100 - Math.random() * (height * 0.3);
+        const dx = cluster.cx - startX;
+        const dy = cluster.cy - startY;
+        const dist = Math.max(1, Math.hypot(dx, dy));
+        const angle = Math.atan2(dy, dx);
+        const speed = dist / (FILLER_TRAVEL_TIME / 1000);
+        return {
+          clusterId: cluster.id,
+          x: startX,
+          y: startY,
+          angle,
+          speed,
+          length: 90 + Math.random() * 55,
+          size: 1.3 + Math.random() * 0.75,
+          opacity: 0.85 + Math.random() * 0.15,
+          consumed: false,
         };
       });
     };
@@ -661,18 +810,22 @@ export default function Preloader({
 
       const elapsed = virtualElapsed;
 
-      const assetP =
-        progressRef.current;
+      const assetP = progressRef.current;
+      const ambientTimeP = Math.min(1, elapsed / AMBIENT_REVEAL_TIME);
 
-      const timeP = Math.min(
-        1,
-        elapsed / MIN_LOGO_TIME,
-      );
-
-      const logoP = Math.min(
-        assetP,
-        timeP,
-      );
+      // Launch a gap's filler star once real load progress crosses its
+      // threshold, staggered slightly so simultaneous jumps still read as
+      // a sequence rather than everything popping at once.
+      gapClusters.forEach((cluster) => {
+        if (cluster.launched || cluster.filled) return;
+        if (
+          assetP >= cluster.threshold &&
+          elapsed - lastLaunchElapsed >= FILLER_MIN_LAUNCH_GAP
+        ) {
+          cluster.launched = true;
+          lastLaunchElapsed = elapsed;
+        }
+      });
 
       const isMobile =
         width <= 650;
@@ -764,15 +917,10 @@ export default function Preloader({
         },
       );
 
-      /*
-       * SHOOTING STARS
-       */
-      shootingStars.forEach(
-        (star, i) => {
-          const el =
-            starRefs.current[i];
-
-          if (!el) return;
+      // Ambient background shooting stars.
+      shootingStars.forEach((star, i) => {
+        const el = starRefs.current[i];
+        if (!el) return;
 
           if (time < star.nextSpawn) {
             el.style.opacity = "0";
@@ -853,56 +1001,139 @@ export default function Preloader({
             String(star.opacity),
           );
 
-          el.style.zIndex = String(
-            20 + star.depth * 10,
+        el.style.zIndex = String(20 + star.depth * 10);
+        el.style.opacity = String(star.opacity);
+        el.style.transform =
+          `translate3d(${x}px, ${y}px, 0) ` +
+          `translate(-100%, -50%) ` +
+          `rotate(${angleDeg}deg) ` +
+          `scaleX(${lengthScale})`;
+      });
+
+      // Filler stars: fly in from the left and light up a broken gap on arrival.
+      fillerStars.forEach((star, i) => {
+        const el = fillerRefs.current[i];
+        const cluster = gapClusters[star.clusterId];
+        if (!el || !cluster) return;
+
+        if (star.consumed || !cluster.launched) {
+          el.style.opacity = "0";
+          return;
+        }
+
+        star.x += Math.cos(star.angle) * star.speed * (dt / 1000);
+        star.y += Math.sin(star.angle) * star.speed * (dt / 1000);
+
+        const distToTarget = Math.hypot(cluster.cx - star.x, cluster.cy - star.y);
+        if (distToTarget <= FILLER_ARRIVAL_RADIUS || star.x >= cluster.cx) {
+          star.consumed = true;
+          cluster.filled = true;
+          cluster.fillTime = elapsed;
+          // Remember exactly where the star was when it landed — the strike
+          // flash and shockwave below anchor to this real point of contact,
+          // not the cluster's abstract centroid, so cause and effect line up.
+          cluster.impactX = star.x;
+          cluster.impactY = star.y;
+          if (gapClusters.every((c) => c.filled)) {
+            logoCompleteRef.current = true;
+          }
+          el.style.opacity = "0";
+          return;
+        }
+
+        const angleDeg = (star.angle * 180) / Math.PI;
+        const trailHeight = Math.max(2, star.size * 2.6);
+        const headSize = Math.max(9, star.size * 12);
+
+        el.style.setProperty("--star-length", `${star.length}px`);
+        el.style.setProperty("--star-height", `${trailHeight}px`);
+        el.style.setProperty("--head-size", `${headSize}px`);
+        el.style.setProperty("--star-glow", `${5 + star.size * 4}px`);
+        el.style.setProperty("--star-opacity", String(star.opacity));
+        el.style.zIndex = "45";
+        el.style.opacity = String(star.opacity);
+        el.style.transform =
+          `translate3d(${star.x}px, ${star.y}px, 0) ` +
+          `translate(-100%, -50%) ` +
+          `rotate(${angleDeg}deg) ` +
+          `scaleX(1)`;
+      });
+
+      // Right at the point of contact: a small, brief flash — subtle, just
+      // enough to register "a star did this" — plus a faint ring that
+      // expands outward from that exact spot. The ring visibly echoes the
+      // direction the dot-growth is about to spread in, so the star's
+      // arrival reads as the clear cause of the reveal, not a coincidence.
+      gapClusters.forEach((cluster) => {
+        if (!cluster.filled || cluster.fillTime === null) return;
+        const ix = cluster.impactX ?? cluster.originX;
+        const iy = cluster.impactY ?? cluster.originY;
+        const age = elapsed - cluster.fillTime;
+
+        if (age < STRIKE_FLASH_DURATION) {
+          const t = age / STRIKE_FLASH_DURATION;
+          const eased = ease(t);
+          const fade = 1 - eased;
+          const size = 5 + eased * STRIKE_FLASH_MAX_SIZE;
+          ctx.globalAlpha = fade * 0.75;
+          ctx.drawImage(
+            glowSprite,
+            ix - size / 2,
+            iy - size / 2,
+            size,
+            size,
           );
+          ctx.globalAlpha = 1;
+        }
 
-          el.style.opacity =
-            String(star.opacity);
+        if (age < SHOCKWAVE_DURATION) {
+          const t = age / SHOCKWAVE_DURATION;
+          const eased = ease(t);
+          const radius = 2 + eased * SHOCKWAVE_MAX_RADIUS;
+          ctx.globalAlpha = (1 - eased) * 0.35;
+          ctx.strokeStyle = `rgba(${LOGO_COLOR},1)`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(ix, iy, radius, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+      });
 
-          el.style.transform =
-            `translate3d(${x}px, ${y}px, 0) ` +
-            `translate(-100%, -50%) ` +
-            `rotate(${angleDeg}deg) ` +
-            `scaleX(${lengthScale})`;
-        },
-      );
-
-      /*
-       * LOGO STARS
-       */
       logoDots.forEach((dot) => {
-        const local = ease(
-          Math.min(
-            1,
-            Math.max(
-              0,
-              (logoP - dot.order) /
-                0.1,
+        let local: number;
+        if (dot.isGap) {
+          const cluster = gapClusters[dot.clusterId];
+          if (!cluster || !cluster.filled || cluster.fillTime === null) return;
+          const rankDist = Math.abs(dot.rankInCluster - cluster.originRank);
+          // Speed varies per dot (organic, uneven branching) but delay is
+          // always exactly 0 at rankDist === 0 — the point of contact itself
+          // lights up the instant the star hits, with zero wait.
+          const speedFactor = 1 - GROWTH_SPEED_JITTER / 2 + dot.growthJitter * GROWTH_SPEED_JITTER;
+          const arrivalTime = rankDist * GROWTH_STEP_MS * speedFactor;
+          local = ease(
+            Math.min(
+              1,
+              Math.max(0, (elapsed - cluster.fillTime - arrivalTime) / GROWTH_DOT_FADE_MS),
             ),
-          ),
-        );
+          );
+        } else {
+          local = ease(
+            Math.min(
+              1,
+              Math.max(
+                0,
+                (ambientTimeP - dot.order * AMBIENT_ORDER_STAGGER) /
+                  AMBIENT_REVEAL_WINDOW,
+              ),
+            ),
+          );
+        }
+        if (local <= 0.001) return;
 
-        const pulse =
-          0.9 +
-          0.1 *
-            ((Math.sin(
-              elapsed *
-                0.002 +
-                dot.phase,
-            ) +
-              1) /
-              2);
-
-        const op =
-          0.035 +
-          local *
-            0.965 *
-            pulse;
-
-        const r =
-          dot.size *
-          (0.7 + local * 0.55);
+        const pulse = 0.9 + 0.1 * ((Math.sin(elapsed * 0.002 + dot.phase) + 1) / 2),
+          op = 0.035 + local * 0.965 * pulse,
+          r = dot.size * (0.7 + local * 0.55);
 
         /*
          * MOBILE:
@@ -994,37 +1225,28 @@ export default function Preloader({
    * EXIT HANDLING
    */
   useEffect(() => {
-    const timer =
-      window.setInterval(() => {
-        if (
-          !exitRef.current &&
-          progressRef.current >= 1 &&
-          performance.now() -
-            startRef.current >=
-            MIN_LOGO_TIME
-        ) {
-          exitRef.current = true;
-
-          window.clearInterval(timer);
-
+    const timer = window.setInterval(() => {
+      if (
+        !exitRef.current &&
+        progressRef.current >= 1 &&
+        logoCompleteRef.current &&
+        performance.now() - startRef.current >= MIN_LOGO_TIME
+      ) {
+        exitRef.current = true;
+        window.clearInterval(timer);
+        window.setTimeout(() => {
+          setExiting(true);
+          onExitStart?.();
           window.setTimeout(() => {
-            setExiting(true);
-
-            onExitStart?.();
-
-            window.setTimeout(() => {
-              if (!enteredRef.current) {
-                enteredRef.current = true;
-
-                onEnter();
-              }
-            }, EXIT_DURATION);
-          }, LOGO_HOLD);
-        }
-      }, 50);
-
-    return () =>
-      window.clearInterval(timer);
+            if (!enteredRef.current) {
+              enteredRef.current = true;
+              onEnter();
+            }
+          }, EXIT_DURATION);
+        }, LOGO_HOLD);
+      }
+    }, 50);
+    return () => window.clearInterval(timer);
   }, [onEnter, onExitStart]);
 
   /*
@@ -1032,58 +1254,67 @@ export default function Preloader({
    */
   return (
     <div
-      className={[
-        styles.preloader,
-        exiting ? styles.exiting : "",
-      ].join(" ")}
-      style={
-        {
-          "--exit-duration": `${EXIT_DURATION}ms`,
-        } as React.CSSProperties
-      }
+      className={[styles.preloader, exiting ? styles.exiting : ""].join(" ")}
+      style={{ "--exit-duration": `${EXIT_DURATION}ms` } as React.CSSProperties}
     >
-      <canvas
-        ref={canvasRef}
-        className={styles.canvas}
-      />
-
-      <svg
-        className={styles.sourceSvg}
-        viewBox={`0 0 ${SVG_VIEWBOX_WIDTH} ${SVG_VIEWBOX_HEIGHT}`}
-        preserveAspectRatio="xMidYMid meet"
-        aria-hidden="true"
-      >
-        <path
-          ref={pathRef}
-          d={PATH_D}
-        />
-      </svg>
-
       <div
-        className={
-          styles.shootingStars
-        }
+        style={{
+          position: "absolute",
+          inset: 0,
+          transformOrigin: "50% 42%",
+          transform: exiting
+            ? "perspective(1100px) rotateX(-62deg) translateY(38px) scale(0.92)"
+            : "perspective(1100px) rotateX(0deg) translateY(0px) scale(1)",
+          opacity: exiting ? 0 : 1,
+          transition: `transform ${EXIT_DURATION}ms cubic-bezier(0.55, 0, 0.15, 1), opacity ${EXIT_DURATION}ms ease`,
+          willChange: "transform, opacity",
+        }}
       >
-        {Array.from({
-          length: SHOOTING_STARS,
-        }).map((_, i) => (
-          <div
-            key={i}
-            ref={(el) => {
-              starRefs.current[i] =
-                el;
-            }}
-            className={styles.star}
-            style={{
-              opacity: 0,
-              zIndex: 20,
-              willChange:
-                "transform, opacity",
-              left: 0,
-              top: 0,
-            }}
-          />
-        ))}
+        <canvas ref={canvasRef} className={styles.canvas} />
+        <svg
+          className={styles.sourceSvg}
+          viewBox={`0 0 ${SVG_VIEWBOX_WIDTH} ${SVG_VIEWBOX_HEIGHT}`}
+          preserveAspectRatio="xMidYMid meet"
+          aria-hidden="true"
+        >
+          <path ref={pathRef} d={PATH_D} />
+        </svg>
+        <div className={styles.shootingStars}>
+          {Array.from({ length: SHOOTING_STARS }).map((_, i) => (
+            <div
+              key={`ambient-${i}`}
+              ref={(el) => {
+                starRefs.current[i] = el;
+              }}
+              className={styles.star}
+              style={{
+                opacity: 0,
+                zIndex: 20,
+                willChange: "transform, opacity",
+                left: 0,
+                top: 0,
+              }}
+            />
+          ))}
+          {Array.from({ length: GAP_CLUSTER_COUNT }).map((_, i) => (
+            <div
+              key={`filler-${i}`}
+              ref={(el) => {
+                fillerRefs.current[i] = el;
+              }}
+              className={styles.star}
+              style={{
+                opacity: 0,
+                zIndex: 45,
+                willChange: "transform, opacity",
+                left: 0,
+                top: 0,
+                filter: "brightness(1.35)",
+                transition: "opacity 140ms ease-out",
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       <div
