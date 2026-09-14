@@ -11,6 +11,7 @@
     width: 100%;
     height: 100svh;
     position: relative;
+    isolation: isolate;
 }
 
 .spotlightOverlay {
@@ -213,7 +214,7 @@
 
     inset: 0;
 
-    z-index: 5000;
+    z-index: 20;
 
     display: flex;
 
@@ -821,6 +822,6 @@
     inset: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 4990;
+    z-index: 10;
     pointer-events: none;
 }

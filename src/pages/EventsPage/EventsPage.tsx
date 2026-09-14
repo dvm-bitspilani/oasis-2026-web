@@ -1,5 +1,11 @@
 
-import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
+import {
+    useEffect,
+    useRef,
+    useState,
+    type MouseEvent as ReactMouseEvent,
+} from "react";
+
 import Nav from "../../components/Nav";
 
 import styles from "./EventsPage.module.scss";
@@ -39,7 +45,6 @@ type Category =
 ========================================================= */
 
 const eventsData: Record<Category, EventData[]> = {
-
     drama: [
         {
             id: "sukhmanch",
@@ -268,51 +273,36 @@ function SmokeCanvas({
     originX,
     originY,
 }: SmokeCanvasProps) {
-
-    const canvasRef =
-        useRef<HTMLCanvasElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-
-        const canvas =
-            canvasRef.current;
+        const canvas = canvasRef.current;
 
         if (!canvas) return;
 
-        const ctx =
-            canvas.getContext("2d");
+        const ctx = canvas.getContext("2d");
 
         if (!ctx) return;
 
         let animationFrame = 0;
 
-        const startTime =
-            performance.now();
-
+        const startTime = performance.now();
 
         /* =====================================================
            CANVAS RESIZE
         ===================================================== */
 
         const resize = () => {
+            const dpr = Math.min(
+                window.devicePixelRatio || 1,
+                2
+            );
 
-            const dpr =
-                Math.min(
-                    window.devicePixelRatio || 1,
-                    2
-                );
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
 
-            canvas.width =
-                window.innerWidth * dpr;
-
-            canvas.height =
-                window.innerHeight * dpr;
-
-            canvas.style.width =
-                `${window.innerWidth}px`;
-
-            canvas.style.height =
-                `${window.innerHeight}px`;
+            canvas.style.width = `${window.innerWidth}px`;
+            canvas.style.height = `${window.innerHeight}px`;
 
             ctx.setTransform(
                 dpr,
@@ -324,281 +314,131 @@ function SmokeCanvas({
             );
         };
 
-
         resize();
 
-        window.addEventListener(
-            "resize",
-            resize
-        );
-
+        window.addEventListener("resize", resize);
 
         /* =====================================================
            BASIC SETTINGS
         ===================================================== */
 
-        const isMobile =
-            window.innerWidth <= 700;
+        const isMobile = window.innerWidth <= 700;
 
-        const centerX =
-            window.innerWidth * 0.5;
+        const centerX = window.innerWidth * 0.5;
+        const centerY = window.innerHeight * 0.5 - 30;
 
-        /*
-         * Slightly above the exact centre.
-         * This gives the smoke a more natural rising shape.
-         */
-        const centerY =
-            window.innerHeight * 0.5 - 30;
-
-
-        /*
-         * The central cloud is deliberately wider
-         * than it is tall, but its silhouette is created
-         * by individual overlapping puffs rather than
-         * one ellipse.
-         */
-        const cloudWidth =
-            isMobile ? 210 : 360;
-
-        const cloudHeight =
-            isMobile ? 145 : 230;
-
+        const cloudWidth = isMobile ? 210 : 360;
+        const cloudHeight = isMobile ? 190 : 310;
 
         /* =====================================================
            PARTICLE WISPS
         ===================================================== */
 
-        const particles =
-            Array.from(
-                {
-                    length:
-                        isMobile
-                            ? 230
-                            : 360,
-                },
-                () => {
+        const particles = Array.from(
+            {
+                length: isMobile ? 230 : 360,
+            },
+            () => {
+                const side = Math.random() > 0.5 ? 1 : -1;
 
-                    const side =
-                        Math.random() > 0.5
-                            ? 1
-                            : -1;
+                return {
+                    startX:
+                        originX +
+                        (Math.random() - 0.5) * 22,
 
-                    return {
+                    startY:
+                        originY +
+                        Math.random() * 20,
 
-                        startX:
-                            originX +
-                            (Math.random() - 0.5) *
-                                22,
+                    targetX:
+                        centerX +
+                        (Math.random() - 0.5) *
+                            cloudWidth *
+                            (0.5 + Math.random() * 0.75),
 
-                        startY:
-                            originY +
-                            Math.random() *
-                                20,
+                    targetY:
+                        centerY +
+                        (Math.random() - 0.5) *
+                            cloudHeight *
+                            (0.45 + Math.random() * 0.85),
 
-                        /*
-                         * Particles don't all end
-                         * at the same position.
-                         */
-                        targetX:
-                            centerX +
-                            (Math.random() - 0.5) *
-                                cloudWidth *
-                                (0.5 +
-                                    Math.random() *
-                                        0.75),
+                    size:
+                        8 +
+                        Math.random() * 22,
 
-                        targetY:
-                            centerY +
-                            (Math.random() - 0.5) *
-                                cloudHeight *
-                                (0.45 +
-                                    Math.random() *
-                                        0.85),
+                    drift:
+                        side *
+                        (18 + Math.random() * 70),
 
-                        size:
-                            8 +
-                            Math.random() *
-                                22,
+                    phase:
+                        Math.random() *
+                        Math.PI *
+                        2,
 
-                        drift:
-                            side *
-                            (18 +
-                                Math.random() *
-                                    70),
+                    speed:
+                        0.3 +
+                        Math.random() * 0.45,
 
-                        phase:
-                            Math.random() *
-                            Math.PI *
-                            2,
+                    delay:
+                        Math.random() * 0.35,
 
-                        speed:
-                            0.3 +
-                            Math.random() *
-                                0.45,
-
-                        delay:
-                            Math.random() *
-                            0.35,
-
-                        opacity:
-                            0.28 +
-                            Math.random() *
-                                0.5,
-                    };
-                }
-            );
-
+                    opacity:
+                        0.28 +
+                        Math.random() * 0.5,
+                };
+            }
+        );
 
         /* =====================================================
            CENTRAL CLOUD PUFFS
-           
-           These fixed positions create an organic silhouette.
-           They are intentionally NOT arranged as a circle.
         ===================================================== */
 
         const cloudPuffs = [
+            { x: -0.52, y: 0.42, s: 0.70 },
+            { x: -0.30, y: 0.46, s: 0.92 },
+            { x: -0.06, y: 0.44, s: 1.05 },
+            { x: 0.20, y: 0.40, s: 0.88 },
+            { x: 0.44, y: 0.34, s: 0.66 },
+            { x: 0.60, y: 0.24, s: 0.48 },
 
-            // upper edge
-            {
-                x: -0.48,
-                y: -0.34,
-                s: 0.75,
-            },
+            { x: -0.60, y: 0.10, s: 0.62 },
+            { x: -0.38, y: 0.08, s: 0.95 },
+            { x: -0.14, y: 0.06, s: 1.18 },
+            { x: 0.10, y: 0.10, s: 1.10 },
+            { x: 0.34, y: 0.06, s: 0.84 },
+            { x: 0.52, y: -0.02, s: 0.58 },
 
-            {
-                x: -0.25,
-                y: -0.48,
-                s: 0.88,
-            },
+            { x: -0.44, y: -0.16, s: 0.60 },
+            { x: -0.22, y: -0.20, s: 0.86 },
+            { x: -0.02, y: -0.22, s: 0.95 },
+            { x: 0.20, y: -0.18, s: 0.70 },
+            { x: 0.38, y: -0.10, s: 0.46 },
 
-            {
-                x: 0.02,
-                y: -0.40,
-                s: 0.95,
-            },
+            { x: -0.34, y: -0.38, s: 0.48 },
+            { x: -0.14, y: -0.42, s: 0.66 },
+            { x: 0.06, y: -0.40, s: 0.58 },
+            { x: 0.24, y: -0.32, s: 0.36 },
 
-            {
-                x: 0.28,
-                y: -0.30,
-                s: 0.86,
-            },
-
-            {
-                x: 0.50,
-                y: -0.18,
-                s: 0.62,
-            },
-
-
-            // middle
-            {
-                x: -0.58,
-                y: -0.05,
-                s: 0.68,
-            },
-
-            {
-                x: -0.35,
-                y: -0.12,
-                s: 0.98,
-            },
-
-            {
-                x: -0.08,
-                y: -0.06,
-                s: 1.16,
-            },
-
-            {
-                x: 0.18,
-                y: -0.08,
-                s: 1.08,
-            },
-
-            {
-                x: 0.42,
-                y: 0.02,
-                s: 0.88,
-            },
-
-            {
-                x: 0.58,
-                y: 0.12,
-                s: 0.60,
-            },
-
-
-            // lower body
-            {
-                x: -0.42,
-                y: 0.25,
-                s: 0.75,
-            },
-
-            {
-                x: -0.18,
-                y: 0.28,
-                s: 1.02,
-            },
-
-            {
-                x: 0.08,
-                y: 0.25,
-                s: 1.08,
-            },
-
-            {
-                x: 0.32,
-                y: 0.22,
-                s: 0.78,
-            },
-
-
-            // small bottom wisps
-            {
-                x: -0.25,
-                y: 0.48,
-                s: 0.52,
-            },
-
-            {
-                x: 0.02,
-                y: 0.45,
-                s: 0.65,
-            },
-
-            {
-                x: 0.23,
-                y: 0.40,
-                s: 0.48,
-            },
+            { x: -0.46, y: -0.58, s: 0.26 },
+            { x: -0.10, y: -0.64, s: 0.30 },
+            { x: 0.16, y: -0.56, s: 0.22 },
+            { x: 0.42, y: -0.44, s: 0.18 },
         ];
-
 
         /* =====================================================
            SOFT EASING
         ===================================================== */
 
         const easeOut = (t: number) =>
-            1 -
-            Math.pow(
-                1 - t,
-                2.25
-            );
-
+            1 - Math.pow(1 - t, 2.25);
 
         /* =====================================================
            DRAW
         ===================================================== */
 
-        const draw = (
-            now: number
-        ) => {
-
+        const draw = (now: number) => {
             const elapsed =
-                (now - startTime) /
-                1000;
-
+                (now - startTime) / 1000;
 
             ctx.clearRect(
                 0,
@@ -607,217 +447,155 @@ function SmokeCanvas({
                 window.innerHeight
             );
 
-
             /* =================================================
                RISING PARTICLES
             ================================================= */
 
-            particles.forEach(
-                (particle) => {
+            particles.forEach((particle) => {
+                const rawProgress = Math.max(
+                    0,
+                    Math.min(
+                        1,
+                        (elapsed - particle.delay) /
+                            2.35
+                    )
+                );
 
-                    const rawProgress =
-                        Math.max(
-                            0,
-                            Math.min(
-                                1,
-                                (elapsed -
-                                    particle.delay) /
-                                    2.35
-                            )
-                        );
+                const progress =
+                    easeOut(rawProgress);
 
+                const riseAmount = Math.min(
+                    window.innerHeight * 0.42,
+                    390
+                );
 
-                    const progress =
-                        easeOut(
-                            rawProgress
-                        );
+                const rise =
+                    Math.sin(
+                        progress *
+                            Math.PI *
+                            0.72
+                    ) * riseAmount;
 
+                const spread =
+                    Math.pow(
+                        progress,
+                        1.35
+                    );
 
-                    /*
-                     * Smoke rises first.
-                     */
-                    const riseAmount =
-                        Math.min(
-                            window.innerHeight *
-                                0.42,
-                            390
-                        );
+                const wave =
+                    Math.sin(
+                        elapsed *
+                            particle.speed *
+                            2.2 +
+                            particle.phase
+                    );
 
+                const x =
+                    particle.startX +
+                    (particle.targetX -
+                        particle.startX) *
+                        spread +
+                    wave *
+                        particle.drift *
+                        spread;
 
-                    const rise =
-                        Math.sin(
-                            progress *
-                                Math.PI *
-                                0.72
-                        ) *
-                        riseAmount;
+                const risingY =
+                    particle.startY - rise;
 
-
-                    /*
-                     * Horizontal movement starts
-                     * slowly and becomes stronger
-                     * near the centre.
-                     */
-                    const spread =
+                const y =
+                    risingY +
+                    (particle.targetY -
+                        risingY) *
                         Math.pow(
                             progress,
-                            1.35
+                            1.8
                         );
 
+                const size =
+                    particle.size *
+                    (0.62 +
+                        progress * 1.15);
 
-                    const wave =
-                        Math.sin(
-                            elapsed *
-                                particle.speed *
-                                2.2 +
-                                particle.phase
-                        );
+                const alpha =
+                    particle.opacity *
+                    (0.10 +
+                        progress * 0.46);
 
-
-                    const x =
-                        particle.startX +
-                        (particle.targetX -
-                            particle.startX) *
-                            spread +
-                        wave *
-                            particle.drift *
-                            spread;
-
-
-                    const risingY =
-                        particle.startY -
-                        rise;
-
-
-                    /*
-                     * Slowly bend toward the
-                     * central cloud.
-                     */
-                    const y =
-                        risingY +
-                        (particle.targetY -
-                            risingY) *
-                            Math.pow(
-                                progress,
-                                1.8
-                            );
-
-
-                    const size =
-                        particle.size *
-                        (0.62 +
-                            progress *
-                                1.15);
-
-
-                    const alpha =
-                        particle.opacity *
-                        (0.10 +
-                            progress *
-                                0.46);
-
-
-                    /*
-                     * Soft particle.
-                     */
-                    const gradient =
-                        ctx.createRadialGradient(
-                            x,
-                            y,
-                            0,
-                            x,
-                            y,
-                            size
-                        );
-
-
-                    gradient.addColorStop(
-                        0,
-                        `rgba(232, 227, 218, ${alpha})`
-                    );
-
-                    gradient.addColorStop(
-                        0.32,
-                        `rgba(215, 209, 201, ${
-                            alpha *
-                            0.62
-                        })`
-                    );
-
-                    gradient.addColorStop(
-                        0.68,
-                        `rgba(180, 176, 170, ${
-                            alpha *
-                            0.22
-                        })`
-                    );
-
-                    gradient.addColorStop(
-                        1,
-                        "rgba(150, 145, 140, 0)"
-                    );
-
-
-                    ctx.fillStyle =
-                        gradient;
-
-
-                    ctx.beginPath();
-
-
-                    ctx.ellipse(
+                const gradient =
+                    ctx.createRadialGradient(
                         x,
                         y,
-                        size,
-                        size *
-                            (0.62 +
-                                Math.sin(
-                                    particle.phase
-                                ) *
-                                    0.18),
-                        particle.phase,
                         0,
-                        Math.PI * 2
+                        x,
+                        y,
+                        size
                     );
 
+                gradient.addColorStop(
+                    0,
+                    `rgba(232, 227, 218, ${alpha})`
+                );
 
-                    ctx.fill();
-                }
-            );
+                gradient.addColorStop(
+                    0.32,
+                    `rgba(215, 209, 201, ${
+                        alpha * 0.62
+                    })`
+                );
 
+                gradient.addColorStop(
+                    0.68,
+                    `rgba(180, 176, 170, ${
+                        alpha * 0.22
+                    })`
+                );
+
+                gradient.addColorStop(
+                    1,
+                    "rgba(150, 145, 140, 0)"
+                );
+
+                ctx.fillStyle = gradient;
+
+                ctx.beginPath();
+
+                ctx.ellipse(
+                    x,
+                    y,
+                    size,
+                    size *
+                        (0.62 +
+                            Math.sin(
+                                particle.phase
+                            ) *
+                                0.18),
+                    particle.phase,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fill();
+            });
 
             /* =================================================
                CENTRAL ORGANIC CLOUD
             ================================================= */
 
             if (elapsed > 0.42) {
-
                 const cloudProgress =
                     Math.min(
                         1,
                         Math.max(
                             0,
-                            (elapsed -
-                                0.42) /
+                            (elapsed - 0.42) /
                                 0.95
                         )
                     );
 
-
                 cloudPuffs.forEach(
-                    (
-                        puff,
-                        index
-                    ) => {
-
-                        /*
-                         * Slight delay between puffs.
-                         * This makes the cloud grow naturally.
-                         */
+                    (puff, index) => {
                         const puffDelay =
-                            index *
-                            0.025;
-
+                            index * 0.025;
 
                         const puffProgress =
                             Math.min(
@@ -830,27 +608,18 @@ function SmokeCanvas({
                                 )
                             );
 
-
                         const eased =
                             easeOut(
                                 puffProgress
                             );
 
-
-                        /*
-                         * Very subtle movement.
-                         * Enough to keep the smoke alive,
-                         * but not enough to make it look
-                         * like floating circles.
-                         */
                         const wobbleX =
                             Math.sin(
                                 elapsed *
                                     0.55 +
                                     index *
                                         1.73
-                            ) *
-                            7;
+                            ) * 7;
 
                         const wobbleY =
                             Math.cos(
@@ -858,9 +627,7 @@ function SmokeCanvas({
                                     0.48 +
                                     index *
                                         1.41
-                            ) *
-                            5;
-
+                            ) * 5;
 
                         const x =
                             centerX +
@@ -869,7 +636,6 @@ function SmokeCanvas({
                                 eased +
                             wobbleX;
 
-
                         const y =
                             centerY +
                             puff.y *
@@ -877,25 +643,17 @@ function SmokeCanvas({
                                 eased +
                             wobbleY;
 
-
                         const radius =
                             (isMobile
                                 ? 72
                                 : 105) *
                             puff.s *
                             (0.18 +
-                                eased *
-                                    0.82);
-
+                                eased * 0.82);
 
                         const alpha =
-                            0.105 *
-                            eased;
+                            0.105 * eased;
 
-
-                        /*
-                         * Soft layered gradient.
-                         */
                         const gradient =
                             ctx.createRadialGradient(
                                 x,
@@ -906,7 +664,6 @@ function SmokeCanvas({
                                 radius
                             );
 
-
                         gradient.addColorStop(
                             0,
                             `rgba(232, 227, 218, ${alpha})`
@@ -915,24 +672,21 @@ function SmokeCanvas({
                         gradient.addColorStop(
                             0.28,
                             `rgba(222, 216, 207, ${
-                                alpha *
-                                0.82
+                                alpha * 0.82
                             })`
                         );
 
                         gradient.addColorStop(
                             0.58,
                             `rgba(195, 189, 181, ${
-                                alpha *
-                                0.42
+                                alpha * 0.42
                             })`
                         );
 
                         gradient.addColorStop(
                             0.82,
                             `rgba(165, 160, 154, ${
-                                alpha *
-                                0.14
+                                alpha * 0.14
                             })`
                         );
 
@@ -941,66 +695,49 @@ function SmokeCanvas({
                             "rgba(150, 145, 140, 0)"
                         );
 
-
                         ctx.fillStyle =
                             gradient;
 
-
                         ctx.beginPath();
 
-
-                        /*
-                         * Deformed ellipse.
-                         * Each puff has a different rotation
-                         * and aspect ratio.
-                         */
                         ctx.ellipse(
                             x,
                             y,
                             radius *
-                                (0.78 +
+                                (0.72 +
                                     Math.sin(
                                         index *
-                                            2.17
+                                            2.71
                                     ) *
-                                        0.15),
+                                        0.22),
                             radius *
-                                (0.56 +
+                                (0.50 +
                                     Math.cos(
                                         index *
-                                            1.61
+                                            1.93
                                     ) *
-                                        0.17),
-                            index *
-                                0.43,
+                                        0.24),
+                            index * 0.67,
                             0,
                             Math.PI * 2
                         );
-
 
                         ctx.fill();
                     }
                 );
             }
 
-
             /* =================================================
                DENSE CORE
-               
-               A very soft centre prevents gaps between
-               individual puffs without creating a circle.
             ================================================= */
 
             if (elapsed > 0.65) {
-
                 const coreProgress =
                     Math.min(
                         1,
-                        (elapsed -
-                            0.65) /
+                        (elapsed - 0.65) /
                             0.7
                     );
-
 
                 const coreGradient =
                     ctx.createRadialGradient(
@@ -1013,7 +750,6 @@ function SmokeCanvas({
                             ? 110
                             : 155
                     );
-
 
                 coreGradient.addColorStop(
                     0,
@@ -1044,36 +780,26 @@ function SmokeCanvas({
                     "rgba(150, 145, 140, 0)"
                 );
 
-
                 ctx.fillStyle =
                     coreGradient;
 
-
-                /*
-                 * Notice this is NOT an ellipse.
-                 * The core is simply a very soft haze.
-                 */
                 ctx.fillRect(
                     centerX -
                         (isMobile
                             ? 110
                             : 155),
-
                     centerY -
                         (isMobile
                             ? 100
                             : 140),
-
-                    (isMobile
+                    isMobile
                         ? 220
-                        : 310),
-
-                    (isMobile
+                        : 310,
+                    isMobile
                         ? 200
-                        : 280)
+                        : 280
                 );
             }
-
 
             /* =================================================
                SMOKE BASE AT VASE
@@ -1085,12 +811,7 @@ function SmokeCanvas({
                     elapsed / 0.75
                 );
 
-
-            if (
-                baseProgress >
-                0
-            ) {
-
+            if (baseProgress > 0) {
                 const baseGradient =
                     ctx.createRadialGradient(
                         originX,
@@ -1100,7 +821,6 @@ function SmokeCanvas({
                         originY,
                         48
                     );
-
 
                 baseGradient.addColorStop(
                     0,
@@ -1131,13 +851,10 @@ function SmokeCanvas({
                     "rgba(150, 145, 140, 0)"
                 );
 
-
                 ctx.fillStyle =
                     baseGradient;
 
-
                 ctx.beginPath();
-
 
                 ctx.ellipse(
                     originX,
@@ -1149,20 +866,14 @@ function SmokeCanvas({
                     Math.PI * 2
                 );
 
-
                 ctx.fill();
             }
-
 
             /* =================================================
                CONTINUE ANIMATION
             ================================================= */
 
-            if (
-                elapsed <
-                2.9
-            ) {
-
+            if (elapsed < 2.9) {
                 animationFrame =
                     requestAnimationFrame(
                         draw
@@ -1170,15 +881,10 @@ function SmokeCanvas({
             }
         };
 
-
         animationFrame =
-            requestAnimationFrame(
-                draw
-            );
-
+            requestAnimationFrame(draw);
 
         return () => {
-
             cancelAnimationFrame(
                 animationFrame
             );
@@ -1188,19 +894,12 @@ function SmokeCanvas({
                 resize
             );
         };
-
-    }, [
-        originX,
-        originY,
-    ]);
-
+    }, [originX, originY]);
 
     return (
         <canvas
             ref={canvasRef}
-            className={
-                styles.smokeCanvas
-            }
+            className={styles.smokeCanvas}
             aria-hidden="true"
         />
     );
@@ -1212,24 +911,17 @@ function SmokeCanvas({
 ========================================================= */
 
 export default function EventsPage() {
-
     const overlayRef =
-        useRef<HTMLDivElement>(
-            null
-        );
+        useRef<HTMLDivElement>(null);
 
     const smokeTimerRef =
-        useRef<number | null>(
-            null
-        );
+        useRef<number | null>(null);
 
     const [
         selectedCategory,
         setSelectedCategory,
     ] =
-        useState<Category | null>(
-            null
-        );
+        useState<Category | null>(null);
 
     const [
         smokeOrigin,
@@ -1245,17 +937,14 @@ export default function EventsPage() {
         setCurrentIndex,
     ] = useState(0);
 
-
     /* =====================================================
        SPOTLIGHT
     ===================================================== */
 
     useEffect(() => {
-
         const handleMouseMove = (
             e: globalThis.MouseEvent
         ) => {
-
             const overlay =
                 overlayRef.current;
 
@@ -1265,12 +954,10 @@ export default function EventsPage() {
                 overlay.getBoundingClientRect();
 
             const x =
-                e.clientX -
-                rect.left;
+                e.clientX - rect.left;
 
             const y =
-                e.clientY -
-                rect.top;
+                e.clientY - rect.top;
 
             overlay.style.setProperty(
                 "--mouse-x",
@@ -1283,23 +970,18 @@ export default function EventsPage() {
             );
         };
 
-
         window.addEventListener(
             "mousemove",
             handleMouseMove
         );
 
-
         return () => {
-
             window.removeEventListener(
                 "mousemove",
                 handleMouseMove
             );
         };
-
     }, []);
-
 
     /* =====================================================
        OPEN CATEGORY
@@ -1309,26 +991,21 @@ export default function EventsPage() {
         category: Category,
         e: ReactMouseEvent<HTMLElement>
     ) => {
-
         if (
             smokeTimerRef.current !==
             null
         ) {
-
             window.clearTimeout(
                 smokeTimerRef.current
             );
         }
-
 
         const vase =
             e.currentTarget.querySelector(
                 "img"
             );
 
-
         if (!vase) {
-
             setSelectedCategory(
                 category
             );
@@ -1338,63 +1015,44 @@ export default function EventsPage() {
             return;
         }
 
-
         const rect =
             vase.getBoundingClientRect();
 
-
-        /*
-         * Smoke always starts from the
-         * mouth/top of the vase.
-         */
         const originX =
             rect.left +
-            rect.width /
-                1.5;
+            rect.width / 1.5;
 
         const originY =
             rect.top +
-            rect.height *
-                0.05;
-
+            rect.height * 0.05;
 
         setSmokeOrigin({
             x: originX,
             y: originY,
         });
 
-
-        /*
-         * Modal timing remains independent
-         * from the smoke position.
-         */
         smokeTimerRef.current =
-            window.setTimeout(
-                () => {
+            window.setTimeout(() => {
+                setSelectedCategory(
+                    category
+                );
 
-                    setSelectedCategory(
-                        category
-                    );
+                setCurrentIndex(0);
 
-                    setCurrentIndex(0);
-
-                },
-                1100
-            );
+                smokeTimerRef.current =
+                    null;
+            }, 1100);
     };
-
 
     /* =====================================================
        CLOSE MODAL
     ===================================================== */
 
     const closeModal = () => {
-
         if (
             smokeTimerRef.current !==
             null
         ) {
-
             window.clearTimeout(
                 smokeTimerRef.current
             );
@@ -1403,166 +1061,110 @@ export default function EventsPage() {
                 null;
         }
 
-
-        setSelectedCategory(
-            null
-        );
-
+        setSelectedCategory(null);
         setCurrentIndex(0);
-
-        setSmokeOrigin(
-            null
-        );
+        setSmokeOrigin(null);
     };
-
 
     /* =====================================================
        CURRENT EVENTS
     ===================================================== */
 
-    const currentEvents:
-        EventData[] =
+    const currentEvents: EventData[] =
         selectedCategory
             ? eventsData[
                   selectedCategory
               ]
             : [];
 
-
     /* =====================================================
        NEXT EVENT
     ===================================================== */
 
     const handleNext = () => {
-
-        if (
-            currentEvents.length <=
-            1
-        )
+        if (currentEvents.length <= 1) {
             return;
+        }
 
-
-        setCurrentIndex(
-            (prev) => {
-
-                if (
-                    prev >=
-                    currentEvents.length -
-                        1
-                ) {
-
-                    return 0;
-                }
-
-                return prev + 1;
+        setCurrentIndex((prev) => {
+            if (
+                prev >=
+                currentEvents.length - 1
+            ) {
+                return 0;
             }
-        );
-    };
 
+            return prev + 1;
+        });
+    };
 
     /* =====================================================
        PREVIOUS EVENT
     ===================================================== */
 
     const handlePrev = () => {
-
-        if (
-            currentEvents.length <=
-            1
-        )
+        if (currentEvents.length <= 1) {
             return;
+        }
 
-
-        setCurrentIndex(
-            (prev) => {
-
-                if (
-                    prev <= 0
-                ) {
-
-                    return (
-                        currentEvents.length -
-                        1
-                    );
-                }
-
-                return prev - 1;
+        setCurrentIndex((prev) => {
+            if (prev <= 0) {
+                return (
+                    currentEvents.length - 1
+                );
             }
-        );
-    };
 
+            return prev - 1;
+        });
+    };
 
     /* =====================================================
        KEYBOARD
     ===================================================== */
 
     useEffect(() => {
-
-        if (!selectedCategory)
+        if (!selectedCategory) {
             return;
-
+        }
 
         const handleKeyDown = (
             e: KeyboardEvent
         ) => {
-
-            if (
-                e.key ===
-                "Escape"
-            ) {
-
+            if (e.key === "Escape") {
                 closeModal();
             }
 
-
-            if (
-                e.key ===
-                "ArrowRight"
-            ) {
-
+            if (e.key === "ArrowRight") {
                 handleNext();
             }
 
-
-            if (
-                e.key ===
-                "ArrowLeft"
-            ) {
-
+            if (e.key === "ArrowLeft") {
                 handlePrev();
             }
         };
-
 
         document.addEventListener(
             "keydown",
             handleKeyDown
         );
 
-
         return () => {
-
             document.removeEventListener(
                 "keydown",
                 handleKeyDown
             );
         };
-
     }, [
         selectedCategory,
         currentEvents.length,
     ]);
-
 
     /* =====================================================
        CURRENT EVENT
     ===================================================== */
 
     const currentEvent =
-        currentEvents[
-            currentIndex
-        ];
-
+        currentEvents[currentIndex];
 
     return (
         <div
@@ -1570,7 +1172,6 @@ export default function EventsPage() {
                 styles.fullPageContainer
             }
         >
-
             {/* =================================================
                 NAV
             ================================================= */}
@@ -1579,26 +1180,18 @@ export default function EventsPage() {
                 <Nav />
             </section>
 
-
             {/* =================================================
                 TITLE
             ================================================= */}
 
             <section
-                className={
-                    styles.title
-                }
+                className={styles.title}
             >
-
                 <img
-                    src={
-                        eventsTitle
-                    }
+                    src={eventsTitle}
                     alt="Events"
                 />
-
             </section>
-
 
             {/* =================================================
                 DRAMA
@@ -1615,16 +1208,11 @@ export default function EventsPage() {
                     )
                 }
             >
-
                 <img
-                    src={
-                        dramaVase
-                    }
+                    src={dramaVase}
                     alt="Drama and Theatre"
                 />
-
             </section>
-
 
             {/* =================================================
                 PHOTOGRAPHY
@@ -1641,16 +1229,13 @@ export default function EventsPage() {
                     )
                 }
             >
-
                 <img
                     src={
                         photographyVase
                     }
                     alt="Photography"
                 />
-
             </section>
-
 
             {/* =================================================
                 DANCE
@@ -1667,16 +1252,11 @@ export default function EventsPage() {
                     )
                 }
             >
-
                 <img
-                    src={
-                        danceVase
-                    }
+                    src={danceVase}
                     alt="Dance"
                 />
-
             </section>
-
 
             {/* =================================================
                 MISC / FASHION
@@ -1693,16 +1273,11 @@ export default function EventsPage() {
                     )
                 }
             >
-
                 <img
-                    src={
-                        otherVase
-                    }
+                    src={otherVase}
                     alt="Miscellaneous"
                 />
-
             </section>
-
 
             {/* =================================================
                 MUSIC
@@ -1719,16 +1294,11 @@ export default function EventsPage() {
                     )
                 }
             >
-
                 <img
-                    src={
-                        musicVase
-                    }
+                    src={musicVase}
                     alt="Music"
                 />
-
             </section>
-
 
             {/* =================================================
                 SMOKE
@@ -1745,37 +1315,28 @@ export default function EventsPage() {
                 />
             )}
 
-
             {/* =================================================
                 SPOTLIGHT
             ================================================= */}
 
             <div
-                ref={
-                    overlayRef
-                }
+                ref={overlayRef}
                 className={
                     styles.spotlightOverlay
                 }
             />
 
-
             {/* =================================================
                 MODAL
             ================================================= */}
 
-            {selectedCategory !==
-                null && (
-
+            {selectedCategory !== null && (
                 <div
                     className={
                         styles.modalOverlay
                     }
-                    onClick={
-                        closeModal
-                    }
+                    onClick={closeModal}
                 >
-
                     <div
                         className={
                             currentEvents.length ===
@@ -1787,7 +1348,6 @@ export default function EventsPage() {
                             e.stopPropagation()
                         }
                     >
-
                         {/* =====================================
                             CLOSE
                         ===================================== */}
@@ -1804,53 +1364,42 @@ export default function EventsPage() {
                             ×
                         </button>
 
-
                         {/* =====================================
                             NO EVENTS
                         ===================================== */}
 
-                        {
-                            currentEvents.length ===
-                            0 ? (
-
+                        {currentEvents.length ===
+                        0 ? (
                             <div
                                 className={
                                     styles.noEventsContent
                                 }
                             >
-
                                 <h2>
                                     No Events Found
                                 </h2>
 
                                 <p>
                                     Alas! There are no{" "}
-                                    {
-                                        selectedCategory ===
-                                        "photography"
-                                            ? "photography"
-                                            : selectedCategory
-                                    }{" "}
+                                    {selectedCategory ===
+                                    "photography"
+                                        ? "photography"
+                                        : selectedCategory}{" "}
                                     events to discover
                                     at the moment.
                                 </p>
-
                             </div>
-
                         ) : (
-
-                            /* =================================
-                               EVENT
-                            ================================= */
-
                             <>
+                                {/* =================================
+                                   EVENT
+                                ================================= */}
 
                                 <div
                                     className={
                                         styles.modalContent
                                     }
                                 >
-
                                     {/* =========================
                                         LEFT
                                     ========================= */}
@@ -1860,29 +1409,23 @@ export default function EventsPage() {
                                             styles.eventInfo
                                         }
                                     >
-
                                         <h2>
                                             {
                                                 currentEvent.name
                                             }
                                         </h2>
 
-
-                                        {
-                                            currentEvent.description &&
-                                            (
-                                                <p
-                                                    className={
-                                                        styles.description
-                                                    }
-                                                >
-                                                    {
-                                                        currentEvent.description
-                                                    }
-                                                </p>
-                                            )
-                                        }
-
+                                        {currentEvent.description && (
+                                            <p
+                                                className={
+                                                    styles.description
+                                                }
+                                            >
+                                                {
+                                                    currentEvent.description
+                                                }
+                                            </p>
+                                        )}
 
                                         {/* DETAILS */}
 
@@ -1891,7 +1434,6 @@ export default function EventsPage() {
                                                 styles.eventDetails
                                             }
                                         >
-
                                             {/* CATEGORY */}
 
                                             <div
@@ -1899,7 +1441,6 @@ export default function EventsPage() {
                                                     styles.detail
                                                 }
                                             >
-
                                                 <span
                                                     className={
                                                         styles.icon
@@ -1913,73 +1454,57 @@ export default function EventsPage() {
                                                         currentEvent.category
                                                     }
                                                 </span>
-
                                             </div>
-
 
                                             {/* CLUB */}
 
-                                            {
-                                                currentEvent.club_name &&
-                                                (
-                                                    <div
+                                            {currentEvent.club_name && (
+                                                <div
+                                                    className={
+                                                        styles.detail
+                                                    }
+                                                >
+                                                    <span
                                                         className={
-                                                            styles.detail
+                                                            styles.icon
                                                         }
                                                     >
+                                                        ◆
+                                                    </span>
 
-                                                        <span
-                                                            className={
-                                                                styles.icon
-                                                            }
-                                                        >
-                                                            ◆
-                                                        </span>
-
-                                                        <span>
-                                                            {
-                                                                currentEvent.club_name
-                                                            }
-                                                        </span>
-
-                                                    </div>
-                                                )
-                                            }
-
+                                                    <span>
+                                                        {
+                                                            currentEvent.club_name
+                                                        }
+                                                    </span>
+                                                </div>
+                                            )}
 
                                             {/* VENUE */}
 
-                                            {
-                                                currentEvent.venue &&
-                                                (
-                                                    <div
+                                            {currentEvent.venue && (
+                                                <div
+                                                    className={
+                                                        styles.detail
+                                                    }
+                                                >
+                                                    <span
                                                         className={
-                                                            styles.detail
+                                                            styles.icon
                                                         }
                                                     >
+                                                        ⌖
+                                                    </span>
 
-                                                        <span
-                                                            className={
-                                                                styles.icon
-                                                            }
-                                                        >
-                                                            ⌖
-                                                        </span>
-
-                                                        <span>
-                                                            {
-                                                                currentEvent.venue
-                                                            }
-                                                        </span>
-
-                                                    </div>
-                                                )
-                                            }
-
+                                                    <span>
+                                                        {
+                                                            currentEvent.venue
+                                                        }
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
-
                                     </div>
-
 
                                     {/* =========================
                                         RIGHT IMAGE
@@ -1990,111 +1515,87 @@ export default function EventsPage() {
                                             styles.eventImage
                                         }
                                     >
-
-                                        {
-                                            currentEvent.image_url ? (
-
-                                                <img
-                                                    src={
-                                                        currentEvent.image_url
-                                                    }
-                                                    alt={
+                                        {currentEvent.image_url ? (
+                                            <img
+                                                src={
+                                                    currentEvent.image_url
+                                                }
+                                                alt={
+                                                    currentEvent.name
+                                                }
+                                            />
+                                        ) : (
+                                            <div
+                                                className={
+                                                    styles.imagePlaceholder
+                                                }
+                                            >
+                                                <span>
+                                                    {
                                                         currentEvent.name
                                                     }
-                                                />
-
-                                            ) : (
-
-                                                <div
-                                                    className={
-                                                        styles.imagePlaceholder
-                                                    }
-                                                >
-
-                                                    <span>
-                                                        {
-                                                            currentEvent.name
-                                                        }
-                                                    </span>
-
-                                                </div>
-
-                                            )
-                                        }
-
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
-
                                 </div>
-
 
                                 {/* =================================
                                     EVENT NAVIGATION
                                 ================================= */}
 
-                                {
-                                    currentEvents.length >
+                                {currentEvents.length >
                                     1 && (
-
-                                        <div
+                                    <div
+                                        className={
+                                            styles.navigation
+                                        }
+                                    >
+                                        <button
                                             className={
-                                                styles.navigation
+                                                styles.navButton
+                                            }
+                                            onClick={
+                                                handlePrev
+                                            }
+                                            aria-label="Previous event"
+                                        >
+                                            ‹
+                                        </button>
+
+                                        <span
+                                            className={
+                                                styles.counter
                                             }
                                         >
+                                            {
+                                                currentIndex +
+                                                1
+                                            }
+                                            {" / "}
+                                            {
+                                                currentEvents.length
+                                            }
+                                        </span>
 
-                                            <button
-                                                className={
-                                                    styles.navButton
-                                                }
-                                                onClick={
-                                                    handlePrev
-                                                }
-                                                aria-label="Previous event"
-                                            >
-                                                ‹
-                                            </button>
-
-
-                                            <span
-                                                className={
-                                                    styles.counter
-                                                }
-                                            >
-                                                {
-                                                    currentIndex +
-                                                    1
-                                                }
-                                                {" / "}
-                                                {
-                                                    currentEvents.length
-                                                }
-                                            </span>
-
-
-                                            <button
-                                                className={
-                                                    styles.navButton
-                                                }
-                                                onClick={
-                                                    handleNext
-                                                }
-                                                aria-label="Next event"
-                                            >
-                                                ›
-                                            </button>
-
-                                        </div>
-                                    )
-                                }
-
+                                        <button
+                                            className={
+                                                styles.navButton
+                                            }
+                                            onClick={
+                                                handleNext
+                                            }
+                                            aria-label="Next event"
+                                        >
+                                            ›
+                                        </button>
+                                    </div>
+                                )}
                             </>
-
                         )}
-
                     </div>
-
                 </div>
             )}
-
         </div>
     );
 }
