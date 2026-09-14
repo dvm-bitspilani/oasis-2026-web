@@ -1,7 +1,9 @@
   /* ======================================================
     PRELOADER
   ====================================================== */
-
+body {
+  font-family: 'Almalik', sans-serif;
+}
   .preloader {
     position: fixed;
     inset: 0;
@@ -31,6 +33,13 @@
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
+  .starLogo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 
   /* ======================================================
@@ -352,97 +361,30 @@
 
 
 
-  // .loadingBarRow {
-  //   position: fixed;
-
-  //   left: 50%;
-  //   bottom: 15%;
-
-  //   transform: translateX(-50%);
-
-  //   z-index: 4;
-
-  //   display: flex;
-  //   align-items: center;
-  //   gap: 10px;
-
-  //   pointer-events: none;
-  // }
+ 
   .loadingBarPercent {
     font-variant-numeric: tabular-nums;
 
     min-width: 3ch;
+    // position: absolute;
 
     text-align: right;
-
     color: rgba(220, 245, 255, 0.9);
 
-    font-size: 12px;
-
+    font-size: 30px;
     letter-spacing: 0.02em;
-
+    color: #718493;
+    padding-bottom: 1%;
     text-shadow: 0 0 6px rgba(100, 190, 255, 0.5);
   }
+.loadingBarRow{
+  width: 100%;
+  display: flex;
 
-  /* ======================================================
-    LOADING BAR
-  ====================================================== */
-
-  .loadingBar {
-    position: relative;
-
-    width:0;
-
-    height: 2px;
-
-    overflow: hidden;
-
-    background:
-      rgba(255, 231, 180, 0.12);
-
-    border-radius: 999px;
-
-    pointer-events: none;
-  }
-
-
-  /* ======================================================
-    LOADING BAR FILL
-  ====================================================== */
-
-  .loadingBarFill {
-    position: absolute;
-
-    top: 0;
-    left: 0;
-
-    width: 0%;
-    height: 100%;
-
-    background:
-      linear-gradient(
-        90deg,
-
-        rgba(100, 180, 255, 0.15) 0%,
-
-        rgba(130, 205, 255, 0.65) 50%,
-
-        rgba(220, 245, 255, 1) 100%
-      );
-
-    border-radius: inherit;
-
-    transition:
-      width 180ms ease-out;
-
-    box-shadow:
-      0 0 8px
-      rgba(100, 190, 255, 0.55),
-
-      0 0 16px
-      rgba(70, 160, 255, 0.25);
-  }
-
+  justify-content: center;
+  align-items: flex-end;
+  height: 100vh;
+}
 
   /* ======================================================
     TABLET
@@ -900,39 +842,94 @@
     transform: translateX(20vw);
   }
 }
-.logoPath path {
+.logoPath path,
+.logoPathC11 path,
+.logoPathC2 path ,
+.logoPathC3 path,
+.logoPathC4 path{
   fill: none;
-  stroke: #b4e1ff;
+  stroke: white;
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   animation: drawLogo 2s ease forwards;
+
+  animation-play-state: paused;   // <-- key change
 }
-.logoPathC2 path {
-  fill: none;
-  stroke: #b4e1ff;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: drawLogo 2s ease forwards;
-}
-.logoPathC11 path {
-  fill: none;
-  stroke: #b4e1ff;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: drawLogo 2s ease forwards;
+.logoStart path {
+  animation-play-state: running;
 }
 
 @keyframes drawLogo {
   to {
     stroke-dashoffset: 0;
   }
+}
+.logoPathC1 path   { animation-delay: 0s;    }
+.logoPathC2 path    { animation-delay: 0.15s; }
+.logoPathC11 path  { animation-delay: 0.9s;  }
+.logoPath path      { animation-delay: 0.55s; } // c3
+.logoPathC4 path   { animation-delay: 0.75s;  }
+
+.light {
+  position: absolute;
+  top:   20%;
+  left: 0%;
+
+  // transform: translate(-50%, -50%);
+  width: 25vw;
+  height: 30vh;
+  z-index: 1000;
+  opacity: 1;
+  visibility: visible;
+  display: block;
+  pointer-events: none;
+}
+.light img{
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.light2 {
+  position: absolute;
+  top:   20%;
+  right:  10%;
+
+  // transform: translate(-50%, -50%);
+  width: 30vw;
+  height: 50vh;
+  z-index: 1000;
+  opacity: 1;
+  visibility: visible;
+  display: block;
+  pointer-events: none;
+}
+.light2 img{
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.light3 {
+  position: absolute;
+  bottom:   0%;
+  left:  0%;
+
+  // transform: translate(-50%, -50%);
+  // width: 30vw;
+  // height: 30vh;
+  z-index: 1000;
+  opacity: 1;
+  visibility: visible;
+  display: block;
+  pointer-events: none;
+}
+.light3 img{
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
