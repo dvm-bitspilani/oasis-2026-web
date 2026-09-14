@@ -1,11 +1,12 @@
 import { Route, Routes } from "react-router-dom";
 import { TransitionProvider } from "../context/TransitionProvider";
-import Reg from "../pages/registration/components/Events/Events"
+
 import Registration from "../pages/registration/Registration";
 import Home from "../pages/Home";
 import Events from "../pages/registration/components/Events/Events";
 import ComingSoon from "../pages/ComingSoon";
 import About from "../pages/About";
+
 interface AppRoutesProps {
   preloaderDone: boolean;
   preloaderExiting: boolean;
@@ -46,10 +47,7 @@ export default function AppRoutes({
           path="/aboutUs"
           element={<About />}
         />
-        <Route
-          path="/Reg"
-          element={<Reg />}
-        />
+       
       </Routes>
     </TransitionProvider>
   ); 
