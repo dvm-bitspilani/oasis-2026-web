@@ -328,8 +328,8 @@ function SmokeCanvas({
 
         // Sized to roughly cover the modal footprint
         // (modal is min(920px, 90vw) wide x 430px+ tall)
-        const cloudWidth = isMobile ? 300 : 620;
-        const cloudHeight = isMobile ? 320 : 520;
+        const cloudWidth = isMobile ? 380 : 780;
+        const cloudHeight = isMobile ? 340 : 540;
 
         /* =====================================================
            PARTICLE WISPS
@@ -355,13 +355,13 @@ function SmokeCanvas({
                         centerX +
                         (Math.random() - 0.5) *
                             cloudWidth *
-                            (0.5 + Math.random() * 0.95),
+                            (0.5 + Math.random() * 1.2),
 
                     targetY:
                         centerY +
                         (Math.random() - 0.5) *
                             cloudHeight *
-                            (0.45 + Math.random() * 0.6),
+                            (0.45 + Math.random() * 0.5),
 
                     size:
                         10 +
@@ -386,7 +386,7 @@ function SmokeCanvas({
                     // Denser base opacity so the cloud reads
                     // as a solid backdrop rather than a wisp.
                     opacity:
-                        0.4 +
+                        0.6 +
                         Math.random() * 0.55,
                 };
             }
@@ -397,35 +397,26 @@ function SmokeCanvas({
         ===================================================== */
 
         const cloudPuffs = [
-            { x: -0.52, y: 0.42, s: 0.70 },
-            { x: -0.30, y: 0.46, s: 0.92 },
-            { x: -0.06, y: 0.44, s: 1.05 },
-            { x: 0.20, y: 0.40, s: 0.88 },
-            { x: 0.44, y: 0.34, s: 0.66 },
-            { x: 0.60, y: 0.24, s: 0.48 },
+            { x: -0.42, y: 0.30, s: 0.72 },
+            { x: -0.24, y: 0.38, s: 0.88 },
+            { x: -0.06, y: 0.36, s: 1.00 },
+            { x: 0.14, y: 0.34, s: 0.88 },
+            { x: 0.32, y: 0.26, s: 0.68 },
 
-            { x: -0.60, y: 0.10, s: 0.62 },
-            { x: -0.38, y: 0.08, s: 0.95 },
-            { x: -0.14, y: 0.06, s: 1.18 },
-            { x: 0.10, y: 0.10, s: 1.10 },
-            { x: 0.34, y: 0.06, s: 0.84 },
-            { x: 0.52, y: -0.02, s: 0.58 },
+            { x: -0.46, y: 0.08, s: 0.76 },
+            { x: -0.26, y: 0.08, s: 1.00 },
+            { x: -0.06, y: 0.04, s: 1.12 },
+            { x: 0.14, y: 0.06, s: 1.00 },
+            { x: 0.34, y: 0.02, s: 0.76 },
 
-            { x: -0.44, y: -0.16, s: 0.60 },
-            { x: -0.22, y: -0.20, s: 0.86 },
-            { x: -0.02, y: -0.22, s: 0.95 },
-            { x: 0.20, y: -0.18, s: 0.70 },
-            { x: 0.38, y: -0.10, s: 0.46 },
+            { x: -0.38, y: -0.14, s: 0.72 },
+            { x: -0.18, y: -0.18, s: 0.90 },
+            { x: 0.02, y: -0.18, s: 0.92 },
+            { x: 0.20, y: -0.14, s: 0.72 },
 
-            { x: -0.34, y: -0.38, s: 0.48 },
-            { x: -0.14, y: -0.42, s: 0.66 },
-            { x: 0.06, y: -0.40, s: 0.58 },
-            { x: 0.24, y: -0.32, s: 0.36 },
-
-            { x: -0.46, y: -0.58, s: 0.26 },
-            { x: -0.10, y: -0.64, s: 0.30 },
-            { x: 0.16, y: -0.56, s: 0.22 },
-            { x: 0.42, y: -0.44, s: 0.18 },
+            { x: -0.26, y: -0.32, s: 0.56 },
+            { x: -0.06, y: -0.36, s: 0.64 },
+            { x: 0.14, y: -0.30, s: 0.52 },
         ];
 
         /* =====================================================
@@ -468,7 +459,7 @@ function SmokeCanvas({
                     easeOut(rawProgress);
 
                 const riseAmount = Math.min(
-                    window.innerHeight * 0.42,
+                    window.innerHeight * 0.2,
                     390
                 );
 
@@ -540,14 +531,14 @@ function SmokeCanvas({
                 );
 
                 gradient.addColorStop(
-                    0.32,
+                    0.5,
                     `rgba(215, 209, 201, ${
                         alpha * 0.62
                     })`
                 );
 
                 gradient.addColorStop(
-                    0.68,
+                    0.8,
                     `rgba(180, 176, 170, ${
                         alpha * 0.22
                     })`
@@ -581,13 +572,12 @@ function SmokeCanvas({
             });
 
             /* =================================================
-               CENTRAL ORGANIC CLOUD
+               CENTRAL SOFT CLOUD
 
-               Each puff position is rendered as a small cluster
-               of soft, near-round lobes rather than one stretched
-               ellipse. The lobes overlap and drift independently,
-               so the silhouette reads as fluffy and irregular —
-               like real smoke — instead of a stamped oval shape.
+               The cloud is built from one large continuous base
+               with subtle internal density. The smaller puffs stay
+               inside that base so they cannot form separate lobes
+               around the silhouette.
             ================================================= */
 
             if (elapsed > 0.42) {
@@ -601,10 +591,102 @@ function SmokeCanvas({
                         )
                     );
 
+                const eased = easeOut(
+                    cloudProgress
+                );
+
+                const baseRadius = isMobile
+                    ? 215
+                    : 350;
+
+                ctx.save();
+
+                // Blur only the central cloud so the silhouette stays soft.
+                ctx.filter = isMobile
+                    ? "blur(10px)"
+                    : "blur(16px)";
+
+                /* ---------------------------------------------
+                   CONTINUOUS OUTER BODY
+                --------------------------------------------- */
+
+                /*
+                 * Feather the main ellipse itself.
+                 * The gradient is rendered in normalized coordinates and
+                 * then stretched to the ellipse, so the fade follows the
+                 * actual silhouette instead of being clipped at the edge.
+                 */
+                const baseGradient =
+                    ctx.createRadialGradient(
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        1
+                    );
+
+                baseGradient.addColorStop(
+                    0,
+                    `rgba(232, 227, 218, ${0.24 * eased})`
+                );
+
+                baseGradient.addColorStop(
+                    0.38,
+                    `rgba(225, 220, 212, ${0.20 * eased})`
+                );
+
+                baseGradient.addColorStop(
+                    0.62,
+                    `rgba(210, 204, 196, ${0.13 * eased})`
+                );
+
+                baseGradient.addColorStop(
+                    0.78,
+                    `rgba(190, 185, 178, ${0.055 * eased})`
+                );
+
+                // Extra-long feather at the outer silhouette.
+                baseGradient.addColorStop(
+                    0.90,
+                    `rgba(180, 175, 168, ${0.018 * eased})`
+                );
+
+                baseGradient.addColorStop(
+                    1,
+                    "rgba(170, 165, 158, 0)"
+                );
+
+                ctx.save();
+
+                ctx.translate(centerX, centerY);
+                ctx.scale(
+                    baseRadius * 1.1,
+                    baseRadius * 0.80
+                );
+
+                ctx.fillStyle = baseGradient;
+
+                ctx.beginPath();
+                ctx.arc(
+                    0,
+                    0,
+                    1,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+
+                ctx.restore();
+
+                /* ---------------------------------------------
+                   INNER SMOKE DENSITY
+                --------------------------------------------- */
+
                 cloudPuffs.forEach(
                     (puff, index) => {
                         const puffDelay =
-                            index * 0.025;
+                            index * 0.015;
 
                         const puffProgress =
                             Math.min(
@@ -613,190 +695,107 @@ function SmokeCanvas({
                                     0,
                                     (cloudProgress -
                                         puffDelay) /
-                                        0.72
+                                        0.75
                                 )
                             );
 
-                        const eased =
-                            easeOut(
-                                puffProgress
-                            );
-
-                        const wobbleX =
-                            Math.sin(
-                                elapsed *
-                                    0.55 +
-                                    index *
-                                        1.73
-                            ) * 7;
-
-                        const wobbleY =
-                            Math.cos(
-                                elapsed *
-                                    0.48 +
-                                    index *
-                                        1.41
-                            ) * 5;
+                        const puffEase = easeOut(
+                            puffProgress
+                        );
 
                         const x =
                             centerX +
                             puff.x *
                                 cloudWidth *
-                                eased +
-                            wobbleX;
+                                puffEase *
+                                0.62;
 
                         const y =
                             centerY +
                             puff.y *
                                 cloudHeight *
-                                eased +
-                            wobbleY;
+                                puffEase *
+                                0.58;
 
                         const radius =
-                            (isMobile
-                                ? 105
-                                : 165) *
+                         (isMobile ? 115 : 180) *
                             puff.s *
-                            (0.2 +
-                                eased * 0.85);
+                            (0.25 + puffEase * 0.60);
 
-                        // Denser puff alpha (was 0.11)
                         const alpha =
-                            0.19 * eased;
+                            0.105 * puffEase;
 
                         /*
-                         * A puff is a cluster of one main lobe
-                         * plus three smaller ones, each offset
-                         * and jittered independently.
+                         * Feathered puff:
+                         * Instead of drawing a normal ellipse and letting
+                         * the gradient get clipped by its hard boundary,
+                         * the gradient itself is mapped to the ellipse.
+                         * This gives the outer 25-30% of every puff a very
+                         * soft falloff, especially on the edge puffs.
                          */
-                        const lobes = [
-                            { dx: 0, dy: 0, r: 1, freq: 0.6 },
-                            { dx: 0.36, dy: -0.16, r: 0.6, freq: 0.9 },
-                            { dx: -0.32, dy: 0.14, r: 0.56, freq: 0.75 },
-                            { dx: 0.06, dy: 0.34, r: 0.5, freq: 1.05 },
-                        ];
-
-                        lobes.forEach((lobe, lobeIndex) => {
-                            const lobeJitterX =
-                                Math.sin(
-                                    elapsed *
-                                        lobe.freq +
-                                        index * 2.3 +
-                                        lobeIndex
-                                ) *
-                                radius *
-                                0.06;
-
-                            const lobeJitterY =
-                                Math.cos(
-                                    elapsed *
-                                        lobe.freq *
-                                        0.8 +
-                                        index * 1.9 +
-                                        lobeIndex
-                                ) *
-                                radius *
-                                0.06;
-
-                            const lobeX =
-                                x +
-                                lobe.dx * radius +
-                                lobeJitterX;
-
-                            const lobeY =
-                                y +
-                                lobe.dy * radius +
-                                lobeJitterY;
-
-                            const lobeRadius =
-                                radius * lobe.r;
-
-                            const gradient =
-                                ctx.createRadialGradient(
-                                    lobeX,
-                                    lobeY,
-                                    0,
-                                    lobeX,
-                                    lobeY,
-                                    lobeRadius
-                                );
-
-                            gradient.addColorStop(
+                        const puffGradient =
+                            ctx.createRadialGradient(
                                 0,
-                                `rgba(232, 227, 218, ${alpha})`
-                            );
-
-                            gradient.addColorStop(
-                                0.22,
-                                `rgba(226, 220, 211, ${
-                                    alpha * 0.92
-                                })`
-                            );
-
-                            gradient.addColorStop(
-                                0.42,
-                                `rgba(214, 208, 199, ${
-                                    alpha * 0.74
-                                })`
-                            );
-
-                            gradient.addColorStop(
-                                0.6,
-                                `rgba(198, 192, 184, ${
-                                    alpha * 0.52
-                                })`
-                            );
-
-                            gradient.addColorStop(
-                                0.76,
-                                `rgba(180, 175, 168, ${
-                                    alpha * 0.32
-                                })`
-                            );
-
-                            gradient.addColorStop(
-                                0.9,
-                                `rgba(163, 158, 152, ${
-                                    alpha * 0.14
-                                })`
-                            );
-
-                            gradient.addColorStop(
-                                1,
-                                "rgba(150, 145, 140, 0)"
-                            );
-
-                            ctx.fillStyle = gradient;
-
-                            ctx.beginPath();
-
-                            ctx.ellipse(
-                                lobeX,
-                                lobeY,
-                                lobeRadius *
-                                    (0.92 +
-                                        Math.sin(
-                                            lobeIndex * 2.1 +
-                                                index
-                                        ) *
-                                            0.08),
-                                lobeRadius *
-                                    (0.88 +
-                                        Math.cos(
-                                            lobeIndex * 1.7 +
-                                                index
-                                        ) *
-                                            0.1),
-                                (index + lobeIndex) *
-                                    0.5,
                                 0,
-                                Math.PI * 2
+                                0,
+                                0,
+                                0,
+                                1
                             );
 
-                            ctx.fill();
-                        });
+                        puffGradient.addColorStop(
+                            0,
+                            `rgba(232, 227, 218, ${alpha})`
+                        );
+
+                        puffGradient.addColorStop(
+                            0.38,
+                            `rgba(225, 220, 212, ${alpha * 0.72})`
+                        );
+
+                        puffGradient.addColorStop(
+                            0.64,
+                            `rgba(205, 200, 192, ${alpha * 0.32})`
+                        );
+
+                        puffGradient.addColorStop(
+                            0.78,
+                            `rgba(185, 180, 174, ${alpha * 0.12})`
+                        );
+
+                        // Long, soft feather at the silhouette.
+                        puffGradient.addColorStop(
+                            0.90,
+                            `rgba(170, 165, 158, ${alpha * 0.035})`
+                        );
+
+                        puffGradient.addColorStop(
+                            1,
+                            "rgba(160, 155, 150, 0)"
+                        );
+
+                        ctx.save();
+
+                        ctx.translate(x, y);
+                        ctx.scale(radius, radius * 0.82);
+
+                        ctx.fillStyle = puffGradient;
+
+                        ctx.beginPath();
+                        ctx.arc(
+                            0,
+                            0,
+                            1,
+                            0,
+                            Math.PI * 2
+                        );
+                        ctx.fill();
+
+                        ctx.restore();
                     }
                 );
+
+                ctx.restore();
             }
 
             /* =================================================
@@ -819,8 +818,8 @@ function SmokeCanvas({
                         centerX,
                         centerY,
                         isMobile
-                            ? 190
-                            : 280
+                            ? 230
+                            : 350
                     );
 
                 coreGradient.addColorStop(
@@ -858,18 +857,18 @@ function SmokeCanvas({
                 ctx.fillRect(
                     centerX -
                         (isMobile
-                            ? 190
-                            : 280),
+                            ? 230
+                            : 350),
                     centerY -
                         (isMobile
                             ? 170
                             : 250),
                     isMobile
-                        ? 380
-                        : 560,
+                        ? 460
+                        : 700,
                     isMobile
-                        ? 340
-                        : 500
+                        ? 400
+                        : 600
                 );
             }
 
