@@ -72,43 +72,38 @@ if (isOasisDomain) {
 /* ======================================================
    PRELOADER ASSETS
 ====================================================== */
+/* ======================================================
+   PRELOADER ASSETS
+====================================================== */
 
-const assets = [
+const isMobile = window.innerWidth <= 768;
+
+const mobileAssets = [
   video,
-
   camel,
-  camel1,
-  camel2,
-  camel3,
-  camel4,
-  camelLand,
-
+  // camel1,
+  // camel2,
+  // camel3,
+  // camel4,
+  // camelLand,
   Castle,
-
   cloudBig,
   cloudSmall,
   cloudThree,
-
   hamLine,
-
   LogoOasis,
   Moon,
-
   navCircle,
-  navSan,
-
+  // navSan,
   regBtn,
   registerBtn,
-
   sand,
   sandImg,
-
   RegBg,
   leftbottom,
   rightbottom,
   lefttop,
   righttop,
-
   book,
   buttonBg,
   inputBg,
@@ -116,23 +111,64 @@ const assets = [
   searchBg,
   line,
   wheel,
-
-  modalFrame,
   modalFrameMobile,
   closedBook,
-
   Syamsiah,
   EB,
   Cinzel,
-
   Scroll1,
   Scroll2,
-
   googleButton,
   lamps,
   instructionsBG,
 ];
 
+const desktopAssets = [
+  video,
+  camel,
+  camel1,
+  camel2,
+  camel3,
+  camel4,
+  camelLand,
+  Castle,
+  cloudBig,
+  cloudSmall,
+  cloudThree,
+  hamLine,
+  LogoOasis,
+  Moon,
+  navCircle,
+  navSan,
+  regBtn,
+  registerBtn,
+  sand,
+  sandImg,
+  RegBg,
+  leftbottom,
+  rightbottom,
+  lefttop,
+  righttop,
+  book,
+  buttonBg,
+  inputBg,
+  btn,
+  searchBg,
+  line,
+  wheel,
+  modalFrame,
+  closedBook,
+  Syamsiah,
+  EB,
+  Cinzel,
+  Scroll1,
+  Scroll2,
+  googleButton,
+  lamps,
+  instructionsBG,
+];
+
+const assets = isMobile ? mobileAssets : desktopAssets;
 /* ======================================================
    TRANSITION SETTINGS
 ====================================================== */
