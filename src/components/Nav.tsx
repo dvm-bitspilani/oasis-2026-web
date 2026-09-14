@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import styles from "../styles/Nav.module.scss";
 import navLine from "../assets/hamLine.svg";
-import navMob from "../assets/navMobNav.png";
+import navMob from "../assets/about/arrow.png";
 import { useTransition } from "../context/TransitionProvider";
 
 const LINKS = [

@@ -179,6 +179,18 @@ export default function Home({
     () => window.innerWidth <= MOBILE_BREAKPOINT,
   );
 
+  /* Gates Nav + Register interactivity until the full intro sequence
+     (main timeline + every cloud-string retraction) has finished. */
+  const [introComplete, setIntroComplete] = useState(false);
+  const pendingRetractionsRef = useRef(0);
+  const mainTimelineDoneRef = useRef(false);
+
+  const maybeFinishIntro = () => {
+    if (mainTimelineDoneRef.current && pendingRetractionsRef.current <= 0) {
+      setIntroComplete(true);
+    }
+  };
+
   const { navigateWithTransition } = useTransition();
 
   /* ---------------------------------------------------------------
@@ -353,6 +365,10 @@ export default function Home({
         anchorX: number;
         hookY: number;
       }[];
+
+      /* Reset the retraction gate for this run of the effect. */
+      mainTimelineDoneRef.current = false;
+      pendingRetractionsRef.current = cloudRigs.length;
 
       let paths: SVGPathElement[] = [];
 
@@ -780,6 +796,14 @@ export default function Home({
         path.style.opacity = "0";
         path.style.strokeDasharray = "none";
         path.style.strokeDashoffset = "0";
+
+        /* This cloud's string is fully retracted — count it toward
+           the intro-complete gate for Nav / Register. */
+        pendingRetractionsRef.current = Math.max(
+          0,
+          pendingRetractionsRef.current - 1,
+        );
+        maybeFinishIntro();
       },
     });
   });
@@ -814,6 +838,14 @@ export default function Home({
           FADE_ELEMENTS_START,
         );
       }
+
+      /* Main timeline (castle/moon/clouds/content fade) has now finished
+         playing. Combined with all cloud-string retractions completing,
+         this unlocks Nav + Register. */
+      tl.eventCallback("onComplete", () => {
+        mainTimelineDoneRef.current = true;
+        maybeFinishIntro();
+      });
     }, containerRef);
 
     return () => ctx.revert();
@@ -1052,7 +1084,12 @@ export default function Home({
 
   return (
     <div className={styles.container} ref={containerRef}>
-      <div>
+      <div
+        style={{
+          pointerEvents: introComplete ? "auto" : "none",
+        }}
+        aria-hidden={!introComplete}
+      >
         <Nav />
       </div>
 
@@ -1179,14 +1216,21 @@ export default function Home({
         type="button"
         className={`${styles.regBtn} ${overCarpet ? styles.carpetHover : ""}`}
         aria-label="Register"
+        aria-disabled={!introComplete}
+        tabIndex={introComplete ? 0 : -1}
         style={
           {
             "--reg-carpet-mask": `url(${RegCarpet})`,
+            pointerEvents: introComplete ? "auto" : "none",
           } as CSSProperties
         }
-        onPointerMove={(e) => setOverCarpet(isOverCarpet(e.clientX, e.clientY))}
+        onPointerMove={(e) => {
+          if (!introComplete) return;
+          setOverCarpet(isOverCarpet(e.clientX, e.clientY));
+        }}
         onPointerLeave={() => setOverCarpet(false)}
         onClick={(e) => {
+          if (!introComplete) return;
           /* detail === 0 means keyboard activation (Enter/Space), where there
              is no cursor position to test — always allow those through. */
           if (e.detail !== 0 && !isOverCarpet(e.clientX, e.clientY)) return;

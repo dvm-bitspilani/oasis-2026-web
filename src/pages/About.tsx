@@ -360,7 +360,7 @@ const About = () => {
       const leftExpr = `calc(50% - (${widthExpr}) / 2)`;
       const topExpr = `calc(50% - (${heightExpr}) / 2)`;
 
-      const CONTROLS_HEIGHT_PCT = isMobile ? 12 : 11;
+      const CONTROLS_HEIGHT_PCT = isMobile ? 12 : 18;
       const CONTROLS_GAP_PCT = 0.5;
 
       gsap.set(vidRef.current, {
