@@ -1,8 +1,10 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import Preloader from "./pages/Preloader";
 import { useTransition } from "./context/TransitionProvider";
+import ReactGA from "react-ga4";
 
 import video from "./assets/video/curtain.mp4";
 import camel from "./assets/camelLand.png";
@@ -50,8 +52,22 @@ import Cinzel from "./assets/fonts/Cinzel-VariableFont_wght.ttf";
 import Scroll1 from "/instructionsScroll.png";
 import Scroll2 from "/instructionsScrollLong.png";
 import googleButton from "/googleReg.svg";
-import lamps from "/game-icons_magic-lamp.svg";
+import lamps from "./assets/game-icons_magic-lamp.svg";
 import instructionsBG from "/instructionsBG.png";
+
+/* ======================================================
+   GOOGLE ANALYTICS
+====================================================== */
+
+const TRACKING_ID = "G-SZVHE46Z2K";
+
+const isOasisDomain =
+  window.location.hostname === "bits-oasis.org" ||
+  window.location.hostname === "www.bits-oasis.org";
+
+if (isOasisDomain) {
+  ReactGA.initialize(TRACKING_ID);
+}
 
 /* ======================================================
    PRELOADER ASSETS
@@ -134,27 +150,25 @@ export default function App() {
 
   const isHome = location.pathname === "/";
 
-  /*
-   * IMPORTANT:
-   *
-   * Do NOT initialize this from `entered`.
-   *
-   * `entered` can remain true inside TransitionProvider,
-   * which causes the preloader to be skipped after reload.
-   *
-   * This state belongs to this App mount, so every browser
-   * reload starts with:
-   *
-   * preloaderDone = false
-   */
+  /* ======================================================
+     GOOGLE ANALYTICS PAGEVIEW
+  ====================================================== */
+
+  useEffect(() => {
+    if (isOasisDomain) {
+      ReactGA.send({
+        hitType: "pageview",
+        page: location.pathname + location.search,
+      });
+    }
+  }, [location]);
+
+  /* ======================================================
+     PRELOADER STATE
+  ====================================================== */
+
   const [preloaderDone, setPreloaderDone] = useState(false);
 
-  /*
-   * Controls the home page curtain/content entrance.
-   *
-   * Starts false so the home content is initially below
-   * the viewport and moves upward when the preloader exits.
-   */
   const [homeExiting, setHomeExiting] = useState(false);
 
   /* ======================================================
@@ -162,35 +176,23 @@ export default function App() {
   ====================================================== */
 
   const handlePreloaderExit = () => {
-    /*
-     * Start moving the home page into view.
-     */
     setHomeExiting(true);
   };
 
   /* ======================================================
-     * ENTER COMPLETE
+     ENTER COMPLETE
   ====================================================== */
 
   const handleEnter = () => {
-    /*
-     * Keep your existing transition context in sync.
-     */
     markEntered();
 
-    /*
-     * Tell App that the preloader is completely finished.
-     */
     setPreloaderDone(true);
 
-    /*
-     * Make sure the home page is visible.
-     */
     setHomeExiting(true);
   };
 
   /* ======================================================
-     * INTRO STATE
+     INTRO STATE
   ====================================================== */
 
   const introActive = isHome && !preloaderDone;
