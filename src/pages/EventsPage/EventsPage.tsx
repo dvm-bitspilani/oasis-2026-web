@@ -328,8 +328,9 @@ function SmokeCanvas({
 
         // Sized to roughly cover the modal footprint
         // (modal is min(920px, 90vw) wide x 430px+ tall)
-        const cloudWidth = isMobile ? 380 : 780;
-        const cloudHeight = isMobile ? 340 : 540;
+        // Widened / heightened from the original 380/780 x 340/540.
+        const cloudWidth = isMobile ? 420 : 900;
+        const cloudHeight = isMobile ? 380 : 600;
 
         /* =====================================================
            PARTICLE WISPS
@@ -342,6 +343,30 @@ function SmokeCanvas({
             () => {
                 const side = Math.random() > 0.5 ? 1 : -1;
 
+                const rawTargetX =
+                    (Math.random() - 0.5) *
+                    cloudWidth *
+                    (0.5 + Math.random() * 1.1);
+
+                const rawTargetY =
+                    (Math.random() - 0.5) *
+                    cloudHeight *
+                    (0.45 + Math.random() * 0.6);
+
+                // Clamp each particle's target to the cloud's ellipse so
+                // none can land as an isolated blob outside the silhouette,
+                // no matter how large the multipliers above roll.
+                // Computed once here at setup (not per animation frame),
+                // so this adds no runtime cost.
+                const ellipseA = cloudWidth * 0.5;
+                const ellipseB = cloudHeight * 0.5;
+                const ellipseDist = Math.sqrt(
+                    (rawTargetX / ellipseA) ** 2 +
+                        (rawTargetY / ellipseB) ** 2
+                );
+                const clampScale =
+                    ellipseDist > 1 ? 1 / ellipseDist : 1;
+
                 return {
                     startX:
                         originX +
@@ -353,15 +378,11 @@ function SmokeCanvas({
 
                     targetX:
                         centerX +
-                        (Math.random() - 0.5) *
-                            cloudWidth *
-                            (0.5 + Math.random() * 1.2),
+                        rawTargetX * clampScale,
 
                     targetY:
                         centerY +
-                        (Math.random() - 0.5) *
-                            cloudHeight *
-                            (0.45 + Math.random() * 0.5),
+                        rawTargetY * clampScale,
 
                     size:
                         10 +
@@ -527,26 +548,26 @@ function SmokeCanvas({
 
                 gradient.addColorStop(
                     0,
-                    `rgba(232, 227, 218, ${alpha})`
+                    `rgba(100, 195, 225, ${alpha})`
                 );
 
                 gradient.addColorStop(
                     0.5,
-                    `rgba(215, 209, 201, ${
+                    `rgba(60, 170, 205, ${
                         alpha * 0.62
                     })`
                 );
 
                 gradient.addColorStop(
                     0.8,
-                    `rgba(180, 176, 170, ${
+                    `rgba(37, 150, 190, ${
                         alpha * 0.22
                     })`
                 );
 
                 gradient.addColorStop(
                     1,
-                    "rgba(150, 145, 140, 0)"
+                    "rgba(20, 100, 130, 0)"
                 );
 
                 ctx.fillStyle = gradient;
@@ -595,9 +616,12 @@ function SmokeCanvas({
                     cloudProgress
                 );
 
+                // Widened to match the larger cloudWidth/cloudHeight above
+                // (was 215 / 350) so the visible silhouette actually
+                // covers the area the particles are clamped to.
                 const baseRadius = isMobile
-                    ? 215
-                    : 350;
+                    ? 250
+                    : 400;
 
                 ctx.save();
 
@@ -628,33 +652,33 @@ function SmokeCanvas({
 
                 baseGradient.addColorStop(
                     0,
-                    `rgba(232, 227, 218, ${0.24 * eased})`
+                    `rgba(100, 195, 225, ${0.24 * eased})`
                 );
 
                 baseGradient.addColorStop(
                     0.38,
-                    `rgba(225, 220, 212, ${0.20 * eased})`
+                    `rgba(70, 175, 210, ${0.20 * eased})`
                 );
 
                 baseGradient.addColorStop(
                     0.62,
-                    `rgba(210, 204, 196, ${0.13 * eased})`
+                    `rgba(50, 160, 195, ${0.13 * eased})`
                 );
 
                 baseGradient.addColorStop(
                     0.78,
-                    `rgba(190, 185, 178, ${0.055 * eased})`
+                    `rgba(40, 150, 190, ${0.055 * eased})`
                 );
 
                 // Extra-long feather at the outer silhouette.
                 baseGradient.addColorStop(
                     0.90,
-                    `rgba(180, 175, 168, ${0.018 * eased})`
+                    `rgba(30, 130, 165, ${0.018 * eased})`
                 );
 
                 baseGradient.addColorStop(
                     1,
-                    "rgba(170, 165, 158, 0)"
+                    "rgba(25, 110, 140, 0)"
                 );
 
                 ctx.save();
@@ -745,33 +769,33 @@ function SmokeCanvas({
 
                         puffGradient.addColorStop(
                             0,
-                            `rgba(232, 227, 218, ${alpha})`
+                            `rgba(100, 195, 225, ${alpha})`
                         );
 
                         puffGradient.addColorStop(
                             0.38,
-                            `rgba(225, 220, 212, ${alpha * 0.72})`
+                            `rgba(70, 175, 210, ${alpha * 0.72})`
                         );
 
                         puffGradient.addColorStop(
                             0.64,
-                            `rgba(205, 200, 192, ${alpha * 0.32})`
+                            `rgba(45, 155, 195, ${alpha * 0.32})`
                         );
 
                         puffGradient.addColorStop(
                             0.78,
-                            `rgba(185, 180, 174, ${alpha * 0.12})`
+                            `rgba(37, 150, 190, ${alpha * 0.12})`
                         );
 
                         // Long, soft feather at the silhouette.
                         puffGradient.addColorStop(
                             0.90,
-                            `rgba(170, 165, 158, ${alpha * 0.035})`
+                            `rgba(30, 130, 165, ${alpha * 0.035})`
                         );
 
                         puffGradient.addColorStop(
                             1,
-                            "rgba(160, 155, 150, 0)"
+                            "rgba(25, 110, 140, 0)"
                         );
 
                         ctx.save();
@@ -824,7 +848,7 @@ function SmokeCanvas({
 
                 coreGradient.addColorStop(
                     0,
-                    `rgba(230, 225, 216, ${
+                    `rgba(100, 195, 225, ${
                         0.14 *
                         coreProgress
                     })`
@@ -832,7 +856,7 @@ function SmokeCanvas({
 
                 coreGradient.addColorStop(
                     0.38,
-                    `rgba(210, 204, 196, ${
+                    `rgba(50, 160, 195, ${
                         0.10 *
                         coreProgress
                     })`
@@ -840,7 +864,7 @@ function SmokeCanvas({
 
                 coreGradient.addColorStop(
                     0.72,
-                    `rgba(180, 175, 169, ${
+                    `rgba(37, 150, 190, ${
                         0.04 *
                         coreProgress
                     })`
@@ -848,7 +872,7 @@ function SmokeCanvas({
 
                 coreGradient.addColorStop(
                     1,
-                    "rgba(150, 145, 140, 0)"
+                    "rgba(25, 110, 140, 0)"
                 );
 
                 ctx.fillStyle =
@@ -961,7 +985,7 @@ function SmokeCanvas({
 
                 baseGradient.addColorStop(
                     0,
-                    `rgba(225, 220, 212, ${
+                    `rgba(100, 195, 225, ${
                         0.30 *
                         baseProgress
                     })`
@@ -969,7 +993,7 @@ function SmokeCanvas({
 
                 baseGradient.addColorStop(
                     0.38,
-                    `rgba(205, 199, 191, ${
+                    `rgba(60, 170, 205, ${
                         0.18 *
                         baseProgress
                     })`
@@ -977,7 +1001,7 @@ function SmokeCanvas({
 
                 baseGradient.addColorStop(
                     0.7,
-                    `rgba(175, 170, 164, ${
+                    `rgba(37, 150, 190, ${
                         0.06 *
                         baseProgress
                     })`
@@ -985,7 +1009,7 @@ function SmokeCanvas({
 
                 baseGradient.addColorStop(
                     1,
-                    "rgba(150, 145, 140, 0)"
+                    "rgba(25, 110, 140, 0)"
                 );
 
                 ctx.fillStyle =
