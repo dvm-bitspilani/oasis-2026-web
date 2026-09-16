@@ -1,0 +1,133 @@
+.wrapper {
+    position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+
+
+
+
+.heading {
+  width: 90%;
+  padding-top: 40px;
+  display: flex;
+  justify-content: center;
+
+  img {
+    width: 40%;
+  }
+}
+.cushion {
+  position: absolute;
+  bottom: 13%;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  .FrontendButton {
+    width: 28%;
+    margin-left: 100px;
+    z-index: 1;
+
+    clip-path: polygon(
+      8% 8%,
+      30% 13%,
+      60% 10%,
+      92% 3%,
+      83% 12%,
+      83% 50%,
+      90% 85%,
+      90% 85%,
+      60% 84%,
+      12% 91%,
+      11% 90%,
+      3.3% 15%
+    );
+  }
+  .BackendButton {
+    margin-left: -130px;
+    width: 28%;
+    z-index: 2;
+
+    clip-path: polygon(
+      13% 8%,
+      30% 13%,
+      60% 10%,
+      92% 10%,
+      92% 12%,
+      87.5% 40%,
+      87.5% 75%,
+      90% 90%,
+      50% 87%,
+      11% 87%,
+      7.2% 92%,
+      8.5% 12%
+    );
+  }
+  .UiButton {
+    margin-left: -200px;
+    width: 38%;
+    z-index: 1;
+    margin-bottom: -20px;
+
+    clip-path: polygon(
+      21% 8%,
+      49% 22%,
+      75% 20%,
+      92% 30%,
+      86% 12%,
+      78% 50%,
+      76% 75%,
+      78% 97%,
+      80% 84%,
+      43% 78%,
+      17% 75%,
+      23% 35%
+    );
+  }
+  .cushionButton {
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    img {
+      object-fit: contain;
+      padding: 0;
+      margin: 0;
+    }
+    .Frontend {
+      width: 100%;
+    }
+    .Backend {
+      width: 100%;
+    }
+    .Ui {
+      width: 100%;
+    }
+  }
+}
+
+.back{
+    position: absolute;
+    top:5%;
+    left: 3%;
+    width: 5%;
+
+    .BackButton{
+        width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+       pointer-events: auto;
+
+    .backImg{
+     
+    object-fit: contain;
+    width: 100%}
+}
+}
+
+
+}

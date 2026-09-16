@@ -6,6 +6,7 @@ import Home from "../pages/Home";
 import Events from "../pages/registration/components/Events/Events";
 import ComingSoon from "../pages/ComingSoon";
 import About from "../pages/About";
+import DevPage from "../pages/DevPage/DevPage";
 
 interface AppRoutesProps {
   preloaderDone: boolean;
@@ -33,7 +34,10 @@ export default function AppRoutes({
           path="/comingsoon"
           element={<ComingSoon />}
         />
-        
+         <Route
+          path="/DevPage"
+          element={<DevPage />}
+        />
         <Route
           path="/register"
           element={<Registration />}
