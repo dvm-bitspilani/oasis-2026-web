@@ -296,6 +296,8 @@
 
 /* ========================================= */
 /* CUSTOM SCROLLBAR                          */
+/* Shared by the left events list and the     */
+/* right page's description area.             */
 /* ========================================= */
 
 .customScrollbar {
@@ -751,14 +753,19 @@
 
 /* ========================================= */
 /* EVENT CONTENT                             */
+/*                                            */
+/* min-height removed: the description now    */
+/* gets an exact pixel height from JS, so     */
+/* this wrapper must be free to be exactly    */
+/* as tall as title + description and no      */
+/* taller, otherwise it would push back       */
+/* under .eventControls again.                */
 /* ========================================= */
 
 .eventContent {
   width: 100%;
 
   height: auto;
-  min-height: 150px;
-  max-height: none;
 
   display: flex;
 
@@ -811,18 +818,48 @@
 }
 
 /* ========================================= */
-/* EVENT DESCRIPTION                         */
+/* EVENT DESCRIPTION — SCROLL AREA           */
+/*                                            */
+/* The height of this box is written inline   */
+/* from Events.tsx: it's the distance between */
+/* the bottom of .eventTitle and the top of   */
+/* .eventControls, measured at runtime.       */
+/* That's why there's no height here — the    */
+/* controls are absolutely positioned at      */
+/* top: 70%, so the space above them changes  */
+/* with viewport height and with how many     */
+/* lines the title wraps to.                  */
 /* ========================================= */
 
-.eventDescription {
+.eventDescriptionArea {
+  position: relative;
+
   width: 100%;
 
   max-width: 32vw;
 
-  height: auto;
-  min-height: 100px;
+  display: flex;
+
+  align-items: stretch;
+  justify-content: center;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+/* ========================================= */
+/* EVENT DESCRIPTION                         */
+/* ========================================= */
+
+.eventDescription {
+  flex: 1 1 auto;
+
+  min-width: 0;
 
   margin: 0;
+
+  padding: 0 0.8vw 0 0;
 
   color: #38170b;
 
@@ -834,7 +871,22 @@
 
   text-align: center;
 
-  overflow: visible;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  box-sizing: border-box;
+
+  /* Native bar hidden — the line + wheel drive it,
+     same as .eventsList on the left page. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+}
+
+.eventDescription::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* ========================================= */
@@ -1034,7 +1086,7 @@
 }
 
 /* ========================================= */
-/* CURRENT PAGE                              */
+/* CURRENT PAGE                             */
 /* ========================================= */
 
 .pageNumber.currentPage {
@@ -1178,7 +1230,7 @@
     top:55% ;
     height:10vh ;
   }
-  
+
 }
 
 /* =========================================================== */
@@ -1650,8 +1702,11 @@
     font-size: clamp(1.7rem, 8vw, 3rem);
   }
 
-  .eventDescription {
+  .eventDescriptionArea {
     max-width: 80vw;
+  }
+
+  .eventDescription {
     font-size: 3.7vw;
     line-height: 1.6;
   }
@@ -1693,7 +1748,7 @@
     top:55% ;
     height:10vh ;
   }
-  
+
 }
 
 @media (max-height: 900px) and (min-width: 901px) {

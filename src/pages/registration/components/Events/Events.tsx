@@ -49,6 +49,13 @@ interface EventsProps {
 
 const MOBILE_BREAKPOINT = 900;
 
+/*
+ * Breathing room kept between the bottom of the
+ * description box and the top of the ADD / REMOVE
+ * button, in px.
+ */
+const DESCRIPTION_BOTTOM_GAP = 16;
+
 /* ========================================= */
 /* COMPONENT                                 */
 /* ========================================= */
@@ -135,6 +142,55 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
 
     const [isDraggingScrollbar, setIsDraggingScrollbar] =
       useState(false);
+
+    /* ========================================= */
+    /* RIGHT PAGE — DESCRIPTION REFS             */
+    /*                                           */
+    /* eventTitleRef and eventControlsRef are    */
+    /* only used for measurement: the gap        */
+    /* between them is the height the            */
+    /* description is allowed to occupy.         */
+    /* ========================================= */
+
+    const eventTitleRef =
+      useRef<HTMLHeadingElement>(null);
+
+    const eventControlsRef =
+      useRef<HTMLDivElement>(null);
+
+    const eventDescRef =
+      useRef<HTMLParagraphElement>(null);
+
+    const [descMaxHeight, setDescMaxHeight] =
+      useState<number | null>(null);
+
+    /* ========================================= */
+    /* RIGHT PAGE — DESCRIPTION SCROLL STATE     */
+    /*                                           */
+    /* Mirrors the left list's smooth scroll +   */
+    /* draggable wheel exactly, just pointed at  */
+    /* the description element instead.          */
+    /* ========================================= */
+
+    const descScrollAnimationRef =
+      useRef<number | null>(null);
+
+    const descTargetScrollTopRef =
+      useRef(0);
+
+    const descDragStartYRef =
+      useRef(0);
+
+    const descDragStartScrollTopRef =
+      useRef(0);
+
+    const [descScrollY, setDescScrollY] =
+      useState(0);
+
+    const [
+      isDraggingDescScrollbar,
+      setIsDraggingDescScrollbar,
+    ] = useState(false);
 
     /* ========================================= */
     /* SEARCH                                    */
@@ -383,7 +439,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
     /* ========================================= */
     /* SCROLLBAR WHEEL DRAG MOVE                */
     /* ========================================= */
-    console.log(window.innerHeight , window.innerWidth)
+
     const handleScrollbarPointerMove = (
       e: React.PointerEvent<HTMLImageElement>
     ) => {
@@ -558,6 +614,357 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         }
       };
     }, [filteredEvents.length]);
+
+    /* ========================================================= */
+    /* RIGHT PAGE — DESCRIPTION SCROLL LOGIC                     */
+    /* ========================================================= */
+
+    const updateDescScrollY = () => {
+      const el = eventDescRef.current;
+
+      if (!el) return;
+
+      const maxScroll =
+        el.scrollHeight - el.clientHeight;
+
+      const progress =
+        maxScroll > 0
+          ? el.scrollTop / maxScroll
+          : 0;
+
+      setDescScrollY(
+        Math.max(
+          0,
+          Math.min(1, progress)
+        )
+      );
+    };
+
+    const animateDescScroll = () => {
+      const el = eventDescRef.current;
+
+      if (!el) return;
+
+      const current = el.scrollTop;
+
+      const target =
+        descTargetScrollTopRef.current;
+
+      const next =
+        current +
+        (target - current) * 0.16;
+
+      el.scrollTop = next;
+
+      updateDescScrollY();
+
+      if (
+        Math.abs(target - next) > 0.5
+      ) {
+        descScrollAnimationRef.current =
+          requestAnimationFrame(
+            animateDescScroll
+          );
+      } else {
+        el.scrollTop = target;
+
+        updateDescScrollY();
+
+        descScrollAnimationRef.current = null;
+      }
+    };
+
+    const startDescSmoothScroll = () => {
+      if (
+        descScrollAnimationRef.current === null
+      ) {
+        descScrollAnimationRef.current =
+          requestAnimationFrame(
+            animateDescScroll
+          );
+      }
+    };
+
+    const handleDescWheel = (
+      e: React.WheelEvent<HTMLDivElement>
+    ) => {
+      const el = eventDescRef.current;
+
+      if (!el) return;
+
+      const maxScroll =
+        el.scrollHeight - el.clientHeight;
+
+      if (maxScroll <= 0) return;
+
+      e.preventDefault();
+
+      const base = Math.max(
+        0,
+        Math.min(
+          maxScroll,
+          descTargetScrollTopRef.current
+        )
+      );
+
+      descTargetScrollTopRef.current =
+        Math.max(
+          0,
+          Math.min(
+            maxScroll,
+            base + e.deltaY * 0.85
+          )
+        );
+
+      startDescSmoothScroll();
+    };
+
+    const handleDescScrollbarPointerDown = (
+      e: React.PointerEvent<HTMLImageElement>
+    ) => {
+      const el = eventDescRef.current;
+
+      const track =
+        e.currentTarget.parentElement;
+
+      if (!el || !track) return;
+
+      const maxScroll =
+        el.scrollHeight - el.clientHeight;
+
+      if (maxScroll <= 0) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      setIsDraggingDescScrollbar(true);
+
+      descDragStartYRef.current =
+        e.clientY;
+
+      descDragStartScrollTopRef.current =
+        el.scrollTop;
+
+      e.currentTarget.setPointerCapture(
+        e.pointerId
+      );
+    };
+
+    const handleDescScrollbarPointerMove = (
+      e: React.PointerEvent<HTMLImageElement>
+    ) => {
+      if (!isDraggingDescScrollbar) return;
+
+      const el = eventDescRef.current;
+
+      const track =
+        e.currentTarget.parentElement;
+
+      const wheelEl =
+        e.currentTarget;
+
+      if (!el || !track) return;
+
+      const trackHeight =
+        track.clientHeight;
+
+      const wheelHeight =
+        wheelEl.clientHeight;
+
+      const availableTravel =
+        Math.max(
+          1,
+          trackHeight - wheelHeight
+        );
+
+      const maxScroll =
+        el.scrollHeight - el.clientHeight;
+
+      const deltaY =
+        e.clientY -
+        descDragStartYRef.current;
+
+      const scrollDelta =
+        (deltaY / availableTravel) *
+        maxScroll;
+
+      const nextScroll =
+        Math.max(
+          0,
+          Math.min(
+            maxScroll,
+            descDragStartScrollTopRef.current +
+              scrollDelta
+          )
+        );
+
+      descTargetScrollTopRef.current =
+        nextScroll;
+
+      el.scrollTop =
+        nextScroll;
+
+      updateDescScrollY();
+    };
+
+    const handleDescScrollbarPointerUp = (
+      e: React.PointerEvent<HTMLImageElement>
+    ) => {
+      setIsDraggingDescScrollbar(false);
+
+      try {
+        e.currentTarget.releasePointerCapture(
+          e.pointerId
+        );
+      } catch {
+        // Pointer capture may already
+        // have been released.
+      }
+    };
+
+    const handleDescScrollbarTrackClick = (
+      e: React.MouseEvent<HTMLDivElement>
+    ) => {
+      const el = eventDescRef.current;
+
+      const track = e.currentTarget;
+
+      if (!el) return;
+
+      const maxScroll =
+        el.scrollHeight - el.clientHeight;
+
+      if (maxScroll <= 0) return;
+
+      const rect =
+        track.getBoundingClientRect();
+
+      const clickY =
+        e.clientY - rect.top;
+
+      const progress =
+        Math.max(
+          0,
+          Math.min(
+            1,
+            clickY / rect.height
+          )
+        );
+
+      descTargetScrollTopRef.current =
+        progress * maxScroll;
+
+      startDescSmoothScroll();
+    };
+
+    /* ========================================================= */
+    /* MEASURE THE HEIGHT LEFT FOR THE DESCRIPTION               */
+    /*                                                           */
+    /* .eventControls is absolutely positioned (top: 70%), and   */
+    /* the heading / title sizes are clamp()'d, so the leftover  */
+    /* space isn't a number that can be written in CSS. Reading  */
+    /* the live boxes gives the exact gap:                       */
+    /*                                                           */
+    /*   controls.top - title.bottom - gap                       */
+    /*                                                           */
+    /* Recomputed on resize and whenever the active event        */
+    /* changes, since a longer title can wrap to another line.   */
+    /* ========================================================= */
+
+    useEffect(() => {
+      if (isMobile) return;
+
+      const recalcDescHeight = () => {
+        const title = eventTitleRef.current;
+        const controls = eventControlsRef.current;
+
+        if (!title || !controls) return;
+
+        const titleBottom =
+          title.getBoundingClientRect().bottom;
+
+        const controlsTop =
+          controls.getBoundingClientRect().top;
+
+        const available =
+          controlsTop -
+          titleBottom -
+          DESCRIPTION_BOTTOM_GAP;
+
+        setDescMaxHeight(
+          Math.max(60, available)
+        );
+      };
+
+      /*
+       * Two passes: one now, one after the browser has
+       * laid out this frame — fonts and the clamp()'d
+       * title can settle a frame late.
+       */
+      recalcDescHeight();
+
+      const raf = requestAnimationFrame(
+        recalcDescHeight
+      );
+
+      window.addEventListener(
+        "resize",
+        recalcDescHeight
+      );
+
+      return () => {
+        cancelAnimationFrame(raf);
+
+        window.removeEventListener(
+          "resize",
+          recalcDescHeight
+        );
+      };
+    }, [activeEvent, isMobile]);
+
+    /* ========================================= */
+    /* RESET DESCRIPTION SCROLL ON EVENT CHANGE  */
+    /* ========================================= */
+
+    useEffect(() => {
+      const el = eventDescRef.current;
+
+      if (!el) return;
+
+      if (
+        descScrollAnimationRef.current !== null
+      ) {
+        cancelAnimationFrame(
+          descScrollAnimationRef.current
+        );
+
+        descScrollAnimationRef.current = null;
+      }
+
+      el.scrollTop = 0;
+
+      descTargetScrollTopRef.current = 0;
+
+      updateDescScrollY();
+    }, [activeEvent, descMaxHeight]);
+
+    /* ========================================= */
+    /* CLEAN UP DESCRIPTION ANIMATION FRAME      */
+    /* ========================================= */
+
+    useEffect(() => {
+      return () => {
+        if (
+          descScrollAnimationRef.current !== null
+        ) {
+          cancelAnimationFrame(
+            descScrollAnimationRef.current
+          );
+
+          descScrollAnimationRef.current = null;
+        }
+      };
+    }, []);
 
     /* ========================================= */
     /* KEEP ACTIVE EVENT VALID AFTER SEARCH      */
@@ -1209,6 +1616,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                             }
                           >
                             <h2
+                              ref={eventTitleRef}
                               className={
                                 styles.eventTitle
                               }
@@ -1218,20 +1626,93 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                               }
                             </h2>
 
-                            <p
+                            {/* ================================= */}
+                            {/* DESCRIPTION — height comes from    */}
+                            {/* the measurement effect, and it     */}
+                            {/* scrolls with the same line +       */}
+                            {/* wheel as the left page.            */}
+                            {/* ================================= */}
+
+                            <div
                               className={
-                                styles.eventDescription
+                                styles.eventDescriptionArea
+                              }
+                              style={{
+                                height: descMaxHeight
+                                  ? `${descMaxHeight}px`
+                                  : undefined,
+                              }}
+                              onWheel={
+                                handleDescWheel
                               }
                             >
-                              {
-                                activeEvent.about
-                              }
-                            </p>
+                              <p
+                                ref={eventDescRef}
+                                className={
+                                  styles.eventDescription
+                                }
+                              >
+                                {
+                                  activeEvent.about
+                                }
+                              </p>
+
+                              <div
+                                className={
+                                  styles.customScrollbar
+                                }
+                                onMouseDown={
+                                  handleDescScrollbarTrackClick
+                                }
+                              >
+                                <img
+                                  src={line}
+                                  className={
+                                    styles.scrollbarLine
+                                  }
+                                  alt=""
+                                  draggable={false}
+                                />
+
+                                <img
+                                  src={wheel}
+                                  className={`
+                                    ${styles.scrollbarWheel}
+                                    ${
+                                      isDraggingDescScrollbar
+                                        ? styles.scrollbarWheelDragging
+                                        : ""
+                                    }
+                                  `}
+                                  style={{
+                                    top: `${descScrollY * 100}%`,
+                                  }}
+                                  alt="Scroll"
+                                  draggable={false}
+                                  onPointerDown={
+                                    handleDescScrollbarPointerDown
+                                  }
+                                  onPointerMove={
+                                    handleDescScrollbarPointerMove
+                                  }
+                                  onPointerUp={
+                                    handleDescScrollbarPointerUp
+                                  }
+                                  onPointerCancel={
+                                    handleDescScrollbarPointerUp
+                                  }
+                                  onClick={(e) =>
+                                    e.stopPropagation()
+                                  }
+                                />
+                              </div>
+                            </div>
                           </div>
 
                           {/* FIXED CONTROLS */}
 
                           <div
+                            ref={eventControlsRef}
                             className={
                               styles.eventControls
                             }
