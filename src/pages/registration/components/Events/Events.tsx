@@ -49,12 +49,46 @@ interface EventsProps {
 
 const MOBILE_BREAKPOINT = 900;
 
-/*
- * Breathing room kept between the bottom of the
- * description box and the top of the ADD / REMOVE
- * button, in px.
- */
-const DESCRIPTION_BOTTOM_GAP = 16;
+/* ========================================================= */
+/* BOOK BOX                                                  */
+/*                                                           */
+/* The whole desktop layout hangs off one rectangle: the     */
+/* book. It's sized here rather than in CSS because it's a   */
+/* two-way constraint — the book must fit the width AND the  */
+/* height while keeping its aspect ratio, which is a min()   */
+/* of two different units that also has to be readable back  */
+/* as a number for the page columns.                         */
+/*                                                           */
+/*   width  = min(vw * MAX_W, vh * MAX_H * ASPECT)           */
+/*   height = width / ASPECT                                 */
+/*                                                           */
+/* Tune BOOK_MAX_VW / BOOK_MAX_VH to make the book bigger or */
+/* smaller; everything inside re-scales with it.             */
+/* ========================================================= */
+
+const BOOK_ASPECT = 1.4;   /* width : height of book.png    */
+const BOOK_MAX_VW = 0.78;  /* at most 78% of the viewport w */
+const BOOK_MAX_VH = 0.88;  /* at most 88% of the viewport h */
+
+interface BookBox {
+  width: number;
+  height: number;
+}
+
+const measureBookBox = (): BookBox => {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  const width = Math.min(
+    vw * BOOK_MAX_VW,
+    vh * BOOK_MAX_VH * BOOK_ASPECT
+  );
+
+  return {
+    width,
+    height: width / BOOK_ASPECT,
+  };
+};
 
 /* ========================================= */
 /* COMPONENT                                 */
@@ -63,8 +97,7 @@ const DESCRIPTION_BOTTOM_GAP = 16;
 const Events = forwardRef<HTMLDivElement, EventsProps>(
   ({ userData, setUserData, onClickBack }, ref) => {
     /* ========================================= */
-    /* EVENTS DATA — fetched from the backend,   */
-    /* falls back to TEST_EVENTS on failure/empty */
+    /* EVENTS DATA                               */
     /* ========================================= */
 
     const [events, setEvents] = useState<Event[]>([]);
@@ -86,10 +119,30 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         window.innerWidth < MOBILE_BREAKPOINT
     );
 
+    /* ========================================= */
+    /* BOOK BOX                                  */
+    /*                                           */
+    /* Null on mobile / before mount, in which   */
+    /* case the CSS fallbacks take over.         */
+    /* ========================================= */
+
+    const [bookBox, setBookBox] =
+      useState<BookBox | null>(null);
+
     useEffect(() => {
       const handleViewportResize = () => {
-        setIsMobile(
-          window.innerWidth < MOBILE_BREAKPOINT
+        const mobile =
+          window.innerWidth < MOBILE_BREAKPOINT;
+
+        setIsMobile(mobile);
+
+        /*
+         * Mobile has its own book framing (see the
+         * ≤900px block in the stylesheet), so the
+         * measured box is only published on desktop.
+         */
+        setBookBox(
+          mobile ? null : measureBookBox()
         );
       };
 
@@ -100,9 +153,19 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         handleViewportResize
       );
 
+      window.addEventListener(
+        "orientationchange",
+        handleViewportResize
+      );
+
       return () => {
         window.removeEventListener(
           "resize",
+          handleViewportResize
+        );
+
+        window.removeEventListener(
+          "orientationchange",
           handleViewportResize
         );
       };
@@ -144,33 +207,17 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
       useState(false);
 
     /* ========================================= */
-    /* RIGHT PAGE — DESCRIPTION REFS             */
+    /* DESCRIPTION SCROLL (RIGHT PAGE)           */
     /*                                           */
-    /* eventTitleRef and eventControlsRef are    */
-    /* only used for measurement: the gap        */
-    /* between them is the height the            */
-    /* description is allowed to occupy.         */
+    /* The description's height is pure flex now */
+    /* — it's whatever the column has left after */
+    /* the heading, title and controls — so      */
+    /* there's nothing to measure, only to       */
+    /* scroll.                                   */
     /* ========================================= */
-
-    const eventTitleRef =
-      useRef<HTMLHeadingElement>(null);
-
-    const eventControlsRef =
-      useRef<HTMLDivElement>(null);
 
     const eventDescRef =
       useRef<HTMLParagraphElement>(null);
-
-    const [descMaxHeight, setDescMaxHeight] =
-      useState<number | null>(null);
-
-    /* ========================================= */
-    /* RIGHT PAGE — DESCRIPTION SCROLL STATE     */
-    /*                                           */
-    /* Mirrors the left list's smooth scroll +   */
-    /* draggable wheel exactly, just pointed at  */
-    /* the description element instead.          */
-    /* ========================================= */
 
     const descScrollAnimationRef =
       useRef<number | null>(null);
@@ -450,7 +497,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
       const track =
         e.currentTarget.parentElement;
 
-      const wheel =
+      const wheelEl =
         e.currentTarget;
 
       if (!list || !track) return;
@@ -459,7 +506,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         track.clientHeight;
 
       const wheelHeight =
-        wheel.clientHeight;
+        wheelEl.clientHeight;
 
       const availableTravel =
         Math.max(
@@ -616,7 +663,8 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
     }, [filteredEvents.length]);
 
     /* ========================================================= */
-    /* RIGHT PAGE — DESCRIPTION SCROLL LOGIC                     */
+    /* DESCRIPTION SCROLL LOGIC                                  */
+    /* Same easing and same wheel drag as the left list.         */
     /* ========================================================= */
 
     const updateDescScrollY = () => {
@@ -857,73 +905,13 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
       startDescSmoothScroll();
     };
 
-    /* ========================================================= */
-    /* MEASURE THE HEIGHT LEFT FOR THE DESCRIPTION               */
-    /*                                                           */
-    /* .eventControls is absolutely positioned (top: 70%), and   */
-    /* the heading / title sizes are clamp()'d, so the leftover  */
-    /* space isn't a number that can be written in CSS. Reading  */
-    /* the live boxes gives the exact gap:                       */
-    /*                                                           */
-    /*   controls.top - title.bottom - gap                       */
-    /*                                                           */
-    /* Recomputed on resize and whenever the active event        */
-    /* changes, since a longer title can wrap to another line.   */
-    /* ========================================================= */
-
-    useEffect(() => {
-      if (isMobile) return;
-
-      const recalcDescHeight = () => {
-        const title = eventTitleRef.current;
-        const controls = eventControlsRef.current;
-
-        if (!title || !controls) return;
-
-        const titleBottom =
-          title.getBoundingClientRect().bottom;
-
-        const controlsTop =
-          controls.getBoundingClientRect().top;
-
-        const available =
-          controlsTop -
-          titleBottom -
-          DESCRIPTION_BOTTOM_GAP;
-
-        setDescMaxHeight(
-          Math.max(60, available)
-        );
-      };
-
-      /*
-       * Two passes: one now, one after the browser has
-       * laid out this frame — fonts and the clamp()'d
-       * title can settle a frame late.
-       */
-      recalcDescHeight();
-
-      const raf = requestAnimationFrame(
-        recalcDescHeight
-      );
-
-      window.addEventListener(
-        "resize",
-        recalcDescHeight
-      );
-
-      return () => {
-        cancelAnimationFrame(raf);
-
-        window.removeEventListener(
-          "resize",
-          recalcDescHeight
-        );
-      };
-    }, [activeEvent, isMobile]);
-
     /* ========================================= */
-    /* RESET DESCRIPTION SCROLL ON EVENT CHANGE  */
+    /* DESCRIPTION — RESET + RESIZE              */
+    /*                                           */
+    /* The box grows and shrinks with the book,  */
+    /* so the wheel's position has to be         */
+    /* recomputed after a resize as well as      */
+    /* after an event change.                    */
     /* ========================================= */
 
     useEffect(() => {
@@ -946,14 +934,31 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
       descTargetScrollTopRef.current = 0;
 
       updateDescScrollY();
-    }, [activeEvent, descMaxHeight]);
-
-    /* ========================================= */
-    /* CLEAN UP DESCRIPTION ANIMATION FRAME      */
-    /* ========================================= */
+    }, [activeEvent, bookBox]);
 
     useEffect(() => {
+      const handleDescResize = () => {
+        const el = eventDescRef.current;
+
+        if (!el) return;
+
+        descTargetScrollTopRef.current =
+          el.scrollTop;
+
+        updateDescScrollY();
+      };
+
+      window.addEventListener(
+        "resize",
+        handleDescResize
+      );
+
       return () => {
+        window.removeEventListener(
+          "resize",
+          handleDescResize
+        );
+
         if (
           descScrollAnimationRef.current !== null
         ) {
@@ -1107,7 +1112,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         return;
       }
 
-      const currentIndex =
+      const currentEventIndex =
         filteredEvents.findIndex(
           (event) =>
             event.id ===
@@ -1115,7 +1120,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         );
 
       const nextIndex =
-        (currentIndex + 1) %
+        (currentEventIndex + 1) %
         filteredEvents.length;
 
       /*
@@ -1143,7 +1148,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         return;
       }
 
-      const currentIndex =
+      const currentEventIndex =
         filteredEvents.findIndex(
           (event) =>
             event.id ===
@@ -1151,7 +1156,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         );
 
       const previousIndex =
-        (currentIndex -
+        (currentEventIndex -
           1 +
           filteredEvents.length) %
         filteredEvents.length;
@@ -1230,6 +1235,26 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
     };
 
     /* ========================================= */
+    /* CONTAINER STYLE                          */
+    /*                                           */
+    /* --book-w / --book-h drive the book art,   */
+    /* the content overlay, both page columns,   */
+    /* and every font size and control size      */
+    /* inside them.                              */
+    /* ========================================= */
+
+    const containerStyle = {
+      backgroundImage: `url(${RegBg})`,
+
+      ...(bookBox
+        ? {
+            "--book-w": `${bookBox.width}px`,
+            "--book-h": `${bookBox.height}px`,
+          }
+        : {}),
+    } as React.CSSProperties;
+
+    /* ========================================= */
     /* RENDER                                   */
     /* ========================================= */
 
@@ -1240,9 +1265,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
           className={
             styles.eventsContainer
           }
-          style={{
-            backgroundImage: `url(${RegBg})`,
-          }}
+          style={containerStyle}
         >
           {/* ================================= */}
           {/* CORNER DECORATIONS                  */}
@@ -1315,7 +1338,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
               }}
             />
 
-            {/* CONTENT */}
+            {/* CONTENT — same rectangle as the book */}
 
             <div
               className={
@@ -1616,7 +1639,6 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                             }
                           >
                             <h2
-                              ref={eventTitleRef}
                               className={
                                 styles.eventTitle
                               }
@@ -1627,21 +1649,18 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                             </h2>
 
                             {/* ================================= */}
-                            {/* DESCRIPTION — height comes from    */}
-                            {/* the measurement effect, and it     */}
-                            {/* scrolls with the same line +       */}
-                            {/* wheel as the left page.            */}
+                            {/* DESCRIPTION                        */}
+                            {/*                                    */}
+                            {/* Fills the space left between the   */}
+                            {/* title and the controls, and        */}
+                            {/* scrolls with the same line + wheel */}
+                            {/* as the left page.                  */}
                             {/* ================================= */}
 
                             <div
                               className={
                                 styles.eventDescriptionArea
                               }
-                              style={{
-                                height: descMaxHeight
-                                  ? `${descMaxHeight}px`
-                                  : undefined,
-                              }}
                               onWheel={
                                 handleDescWheel
                               }
@@ -1709,10 +1728,9 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                             </div>
                           </div>
 
-                          {/* FIXED CONTROLS */}
+                          {/* CONTROLS */}
 
                           <div
-                            ref={eventControlsRef}
                             className={
                               styles.eventControls
                             }
@@ -1939,4 +1957,4 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
 
 Events.displayName = "Events";
 
-export default Events;
+export default Events;  
