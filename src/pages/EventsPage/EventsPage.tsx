@@ -16,7 +16,6 @@ import otherVase from "/otherVase.png";
 import musicVase from "/musicVase.png";
 import eventsTitle from "/eventsTitle.png";
 
-
 /* =========================================================
    EVENT TYPES
 ========================================================= */
@@ -29,6 +28,7 @@ interface EventData {
     venue: string | null;
     description: string | null;
     image_url: string | null;
+    rulebook: string | null;
 }
 
 type Category =
@@ -37,7 +37,6 @@ type Category =
     | "dance"
     | "misc"
     | "music";
-
 
 /* =========================================================
    EVENT DATA
@@ -54,6 +53,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "Celebrated for its deeply emotional and socially impactful plays that resonate with audiences long after the curtain falls. Their repertoire includes thought-provoking dramas such as Court Martial, and Seven Steps Around the Fire, among others. Experience storytelling that's as enlightening as it is entertaining. Join us for an unforgettable theatrical experience.",
             image_url: null,
+            rulebook: null,
         },
         {
             id: "street-play",
@@ -64,6 +64,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "Right from the streets, a loud and larger-than-life exchange of ideologies, with drama full of humor and zeal. Street Plays aka Nukkad Natak, are carried out to propagate social and political messages among the masses, amidst the direct, intimate and effective means of theater by means of shouts, chants, drums and catchy songs.",
             image_url: null,
+            rulebook: "YOUR_STREET_PLAY_RULEBOOK_LINK",
         },
         {
             id: "stage-play",
@@ -74,6 +75,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "The stage, a neutral territory outside the jurisdiction of fate where stars may be crossed with impunity. A truer and more real place does not exist in the universe. The Stage Play event brings you a wholesome feat of drama to awaken and thrill your senses. It gives you a chance to captivate your audience with your actions and expressions and to watch and perform captivating plays.",
             image_url: null,
+            rulebook: "YOUR_STAGE_PLAY_RULEBOOK_LINK",
         },
         {
             id: "metamorphosis",
@@ -84,6 +86,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "Metamorphosis, our flagship short film competition, returns at Oasis. Create a captivating narrative around a theme, push your artistic boundaries, and compete for an exciting prize pool. Your masterpiece premieres at Oasis before a discerning audience and expert judges. Embrace the challenge!",
             image_url: null,
+            rulebook: null,
         },
         {
             id: "hypercut",
@@ -94,6 +97,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "HyperCut is an exciting Ad making competition, where novel filmmakers will have to bring forth their love of film making and combine it with their knowledge of advertisements. Participants will have to make an advertisement on a well known brand and the best entries will be screened as well.",
             image_url: null,
+            rulebook: null,
         },
     ],
 
@@ -109,6 +113,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "This event is conducted in the central auditorium. After the initial elimination round, about six to eight teams are shortlisted for the final round. The final round features contemporary dance performances that are usually based on a certain theme.",
             image_url: null,
+            rulebook: "YOUR_CHOREO_RULEBOOK_LINK",
         },
         {
             id: "street-dance",
@@ -119,6 +124,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "Street Dance is considered a crowd favorite and is held in the Rotunda, the open-air amphitheater of BITS. The first stage consists of 2 rounds; a performance and a battle round. From this, 4 teams are selected for the second stage. The second stage is a face-off challenge between pairs of teams. These pairs are allotted randomly.",
             image_url: null,
+            rulebook: "YOUR_STREET_DANCE_RULEBOOK_LINK",
         },
         {
             id: "desert-duel",
@@ -129,6 +135,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "It is a solo dance event in which dancers from every college participate and showcase their talent. Depending on the dancer, styles can vary from western to classical to hip-hop and even to the typical Bollywood style.",
             image_url: null,
+            rulebook: null,
         },
         {
             id: "razzmatazz",
@@ -139,6 +146,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "A group dance competition that tests finesse and artistry in showcasing coordinated group choreographies. With equal weightage in judgement given to execution, presentation and creativity, it is fashioned to test the esprit de corps of the participating teams. All forms of dance including fusions are allowed. So trip the light fantastic toe and let there be a dazzle-daze of sheer splendor.",
             image_url: null,
+            rulebook: null,
         },
         {
             id: "tandav",
@@ -149,6 +157,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "Oasis' flagship Indian classical dance competition. Solo performers from across the nation gather to showcase the rich heritage of Indian classical dance, captivating audiences with their grace, rhythm, precision, and storytelling. The event not only highlights technical mastery but also celebrates the depth of expression and the spiritual essence embedded in classical forms.",
             image_url: null,
+            rulebook: null,
         },
     ],
 
@@ -161,6 +170,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description: null,
             image_url: null,
+            rulebook: "YOUR_FASHP_RULEBOOK_LINK",
         },
     ],
 
@@ -174,6 +184,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "With participants from over 10 institutions, Pitch Perfect is the platform for a growing crowd of Cappella enthusiasts to face off against each other. A battle of the bands with no instruments, this symphony of voices at the NAB Auditorium is establishing a new dimensionality of music vastly unexplored till date.",
             image_url: null,
+            rulebook: "YOUR_PITCH_PERFECT_RULEBOOK_LINK",
         },
         {
             id: "swaranjali",
@@ -184,6 +195,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "Swaranjali is a classical music competition that invites participants trained in both the Carnatic and Hindustani styles, covering a range of vocal and instrumental forms. The instruments include violin, sitar, veena, flute, Hawaiian guitar, tabla, mridangam etc. The competition features four categories: Solo Vocals, Solo Wind and String, Solo Percussion, and Group.",
             image_url: null,
+            rulebook: null,
         },
         {
             id: "tarang",
@@ -194,6 +206,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "Tarang - a musical fusion extravaganza from the Indian heartland and its innumerably diverse facets. Cover an existing piece, or create your own. Come participate in our Indian fusion battle of bands to claim the title of the best band.",
             image_url: null,
+            rulebook: "YOUR_TARANG_RULEBOOK_LINK",
         },
         {
             id: "andholika",
@@ -204,6 +217,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "Andholika is a talent hunt for the most versatile singer among the participants. The event is split into two categories, Eastern and Western. The event consists of an audition round and a final round. 4 finalists will be selected from each category. A winner and runner up will be awarded from each category.",
             image_url: null,
+            rulebook: null,
         },
         {
             id: "rap-wars",
@@ -214,6 +228,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "RapWars is a rap-battle event with a legacy of 13 years which includes names like Seedhe Maut, Divine, Brodha V, Wolf Cryman and many more. Shortlisted through preliminary rounds in 4 cities, the 8 finalists will do whatever it takes to spit bars par excellence and take the crown home.",
             image_url: null,
+            rulebook: null,
         },
         {
             id: "scontro",
@@ -224,6 +239,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "A high-energy DJ Battle where talented DJs showcase their skills in live mixing, beat-matching, and creative transitions. DJs compete against each other, bringing their unique styles, from hard hitting bass drops to smooth grooves. The battle emphasizes technical proficiency, creativity, and the ability to engage the crowd through music.",
             image_url: null,
+            rulebook: null,
         },
         {
             id: "axetacy",
@@ -234,6 +250,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "Solo Guitar Competition. A thrilling guitar showdown for both acoustic and electric players. Open to all individual participants who can play the guitar. The event features two rounds: Qualifier and Final, with judging criteria determined by the panel.",
             image_url: null,
+            rulebook: null,
         },
         {
             id: "drum-duels",
@@ -244,6 +261,7 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "A Solo Drumming Competition. A dynamic event for drummers showcasing their creativity and control. Participants are tested in two rounds: replicating a drum track and creating beats for a bass line. Shortlisted drummers then face off in duels.",
             image_url: null,
+            rulebook: null,
         },
         {
             id: "beat-brawl",
@@ -254,10 +272,10 @@ const eventsData: Record<Category, EventData[]> = {
             description:
                 "An electrifying platform dedicated to beatboxing, the raw vocal art form known for its rhythmic intensity and limitless creativity. Designed to promote and elevate beatbox culture among the youth, BeatBrawl celebrates individuality and performance artistry.",
             image_url: null,
+            rulebook: null,
         },
     ],
 };
-
 
 /* =========================================================
    SMOKE TRANSITION
@@ -297,11 +315,17 @@ function SmokeCanvas({
                 2
             );
 
-            canvas.width = window.innerWidth * dpr;
-            canvas.height = window.innerHeight * dpr;
+            canvas.width =
+                window.innerWidth * dpr;
 
-            canvas.style.width = `${window.innerWidth}px`;
-            canvas.style.height = `${window.innerHeight}px`;
+            canvas.height =
+                window.innerHeight * dpr;
+
+            canvas.style.width =
+                `${window.innerWidth}px`;
+
+            canvas.style.height =
+                `${window.innerHeight}px`;
 
             ctx.setTransform(
                 dpr,
@@ -315,22 +339,29 @@ function SmokeCanvas({
 
         resize();
 
-        window.addEventListener("resize", resize);
+        window.addEventListener(
+            "resize",
+            resize
+        );
 
         /* =====================================================
            BASIC SETTINGS
         ===================================================== */
 
-        const isMobile = window.innerWidth <= 700;
+        const isMobile =
+            window.innerWidth <= 700;
 
-        const centerX = window.innerWidth * 0.5;
-        const centerY = window.innerHeight * 0.5 - 20;
+        const centerX =
+            window.innerWidth * 0.5;
 
-        // Sized to roughly cover the modal footprint
-        // (modal is min(920px, 90vw) wide x 430px+ tall)
-        // Widened / heightened from the original 380/780 x 340/540.
-        const cloudWidth = isMobile ? 420 : 900;
-        const cloudHeight = isMobile ? 380 : 600;
+        const centerY =
+            window.innerHeight * 0.5 - 20;
+
+        const cloudWidth =
+            isMobile ? 420 : 900;
+
+        const cloudHeight =
+            isMobile ? 850 : 600;
 
         /* =====================================================
            PARTICLE WISPS
@@ -338,39 +369,53 @@ function SmokeCanvas({
 
         const particles = Array.from(
             {
-                length: isMobile ? 320 : 520,
+                length:
+                    isMobile ? 320 : 520,
             },
             () => {
-                const side = Math.random() > 0.5 ? 1 : -1;
+                const side =
+                    Math.random() > 0.5
+                        ? 1
+                        : -1;
 
                 const rawTargetX =
                     (Math.random() - 0.5) *
                     cloudWidth *
-                    (0.5 + Math.random() * 1.1);
+                    (0.5 +
+                        Math.random() * 1.1);
 
                 const rawTargetY =
                     (Math.random() - 0.5) *
                     cloudHeight *
-                    (0.45 + Math.random() * 0.6);
+                    (0.45 +
+                        Math.random() * 0.6);
 
-                // Clamp each particle's target to the cloud's ellipse so
-                // none can land as an isolated blob outside the silhouette,
-                // no matter how large the multipliers above roll.
-                // Computed once here at setup (not per animation frame),
-                // so this adds no runtime cost.
-                const ellipseA = cloudWidth * 0.5;
-                const ellipseB = cloudHeight * 0.5;
-                const ellipseDist = Math.sqrt(
-                    (rawTargetX / ellipseA) ** 2 +
-                        (rawTargetY / ellipseB) ** 2
-                );
+                const ellipseA =
+                    cloudWidth * 0.5;
+
+                const ellipseB =
+                    cloudHeight * 0.5;
+
+                const ellipseDist =
+                    Math.sqrt(
+                        (rawTargetX /
+                            ellipseA) **
+                            2 +
+                            (rawTargetY /
+                                ellipseB) **
+                                2
+                    );
+
                 const clampScale =
-                    ellipseDist > 1 ? 1 / ellipseDist : 1;
+                    ellipseDist > 1
+                        ? 1 / ellipseDist
+                        : 1;
 
                 return {
                     startX:
                         originX +
-                        (Math.random() - 0.5) * 50,
+                        (Math.random() - 0.5) *
+                            50,
 
                     startY:
                         originY +
@@ -378,19 +423,22 @@ function SmokeCanvas({
 
                     targetX:
                         centerX +
-                        rawTargetX * clampScale,
+                        rawTargetX *
+                            clampScale,
 
                     targetY:
                         centerY +
-                        rawTargetY * clampScale,
+                        rawTargetY *
+                            clampScale,
 
                     size:
                         10 +
-                        Math.random() * 60,
+                        Math.random() * 70,
 
                     drift:
                         side *
-                        (18 + Math.random() * 10),
+                        (18 +
+                            Math.random() * 60),
 
                     phase:
                         Math.random() *
@@ -398,14 +446,13 @@ function SmokeCanvas({
                         2,
 
                     speed:
-                        0.3 +
-                        Math.random() * 0.45,
+                        0.8 +
+                        Math.random() *
+                            0.55,
 
                     delay:
-                        Math.random() * 0.35,
+                        Math.random() * 0.2,
 
-                    // Denser base opacity so the cloud reads
-                    // as a solid backdrop rather than a wisp.
                     opacity:
                         0.6 +
                         Math.random() * 0.55,
@@ -467,22 +514,26 @@ function SmokeCanvas({
             ================================================= */
 
             particles.forEach((particle) => {
-                const rawProgress = Math.max(
-                    0,
-                    Math.min(
-                        1,
-                        (elapsed - particle.delay) /
-                            2.35
-                    )
-                );
+                const rawProgress =
+                    Math.max(
+                        0,
+                        Math.min(
+                            1,
+                            (elapsed -
+                                particle.delay) /
+                                2.35
+                        )
+                    );
 
                 const progress =
                     easeOut(rawProgress);
 
-                const riseAmount = Math.min(
-                    window.innerHeight * 0.2,
-                    390
-                );
+                const riseAmount =
+                    Math.min(
+                        window.innerHeight *
+                            0.2,
+                        390
+                    );
 
                 const rise =
                     Math.sin(
@@ -515,7 +566,8 @@ function SmokeCanvas({
                         spread;
 
                 const risingY =
-                    particle.startY - rise;
+                    particle.startY -
+                    rise;
 
                 const y =
                     risingY +
@@ -594,11 +646,6 @@ function SmokeCanvas({
 
             /* =================================================
                CENTRAL SOFT CLOUD
-
-               The cloud is built from one large continuous base
-               with subtle internal density. The smaller puffs stay
-               inside that base so they cannot form separate lobes
-               around the silhouette.
             ================================================= */
 
             if (elapsed > 0.42) {
@@ -612,34 +659,20 @@ function SmokeCanvas({
                         )
                     );
 
-                const eased = easeOut(
-                    cloudProgress
-                );
+                const eased =
+                    easeOut(cloudProgress);
 
-                // Widened to match the larger cloudWidth/cloudHeight above
-                // (was 215 / 350) so the visible silhouette actually
-                // covers the area the particles are clamped to.
-                const baseRadius = isMobile
-                    ? 250
-                    : 400;
+                const baseRadius =
+                    isMobile
+                        ? 250
+                        : 400;
 
                 ctx.save();
 
-                // Blur only the central cloud so the silhouette stays soft.
                 ctx.filter = isMobile
                     ? "blur(10px)"
                     : "blur(16px)";
 
-                /* ---------------------------------------------
-                   CONTINUOUS OUTER BODY
-                --------------------------------------------- */
-
-                /*
-                 * Feather the main ellipse itself.
-                 * The gradient is rendered in normalized coordinates and
-                 * then stretched to the ellipse, so the fade follows the
-                 * actual silhouette instead of being clipped at the edge.
-                 */
                 const baseGradient =
                     ctx.createRadialGradient(
                         0,
@@ -652,28 +685,37 @@ function SmokeCanvas({
 
                 baseGradient.addColorStop(
                     0,
-                    `rgba(91, 81, 137, ${0.24 * eased})`
+                    `rgba(91, 81, 137, ${
+                        0.24 * eased
+                    })`
                 );
 
                 baseGradient.addColorStop(
                     0.38,
-                    `rgba(91, 81, 137, ${0.20 * eased})`
+                    `rgba(91, 81, 137, ${
+                        0.20 * eased
+                    })`
                 );
 
                 baseGradient.addColorStop(
                     0.62,
-                    `rgba(91, 81, 137, ${0.13 * eased})`
+                    `rgba(91, 81, 137, ${
+                        0.13 * eased
+                    })`
                 );
 
                 baseGradient.addColorStop(
                     0.78,
-                    `rgba(91, 81, 137, ${0.055 * eased})`
+                    `rgba(91, 81, 137, ${
+                        0.055 * eased
+                    })`
                 );
 
-                // Extra-long feather at the outer silhouette.
                 baseGradient.addColorStop(
                     0.90,
-                    `rgba(91, 81, 137, ${0.018 * eased})`
+                    `rgba(91, 81, 137, ${
+                        0.018 * eased
+                    })`
                 );
 
                 baseGradient.addColorStop(
@@ -683,15 +725,21 @@ function SmokeCanvas({
 
                 ctx.save();
 
-                ctx.translate(centerX, centerY);
+                ctx.translate(
+                    centerX,
+                    centerY
+                );
+
                 ctx.scale(
                     baseRadius * 1.1,
                     baseRadius * 0.80
                 );
 
-                ctx.fillStyle = baseGradient;
+                ctx.fillStyle =
+                    baseGradient;
 
                 ctx.beginPath();
+
                 ctx.arc(
                     0,
                     0,
@@ -699,13 +747,10 @@ function SmokeCanvas({
                     0,
                     Math.PI * 2
                 );
+
                 ctx.fill();
 
                 ctx.restore();
-
-                /* ---------------------------------------------
-                   INNER SMOKE DENSITY
-                --------------------------------------------- */
 
                 cloudPuffs.forEach(
                     (puff, index) => {
@@ -723,9 +768,10 @@ function SmokeCanvas({
                                 )
                             );
 
-                        const puffEase = easeOut(
-                            puffProgress
-                        );
+                        const puffEase =
+                            easeOut(
+                                puffProgress
+                            );
 
                         const x =
                             centerX +
@@ -742,21 +788,18 @@ function SmokeCanvas({
                                 0.58;
 
                         const radius =
-                         (isMobile ? 115 : 180) *
+                            (isMobile
+                                ? 115
+                                : 180) *
                             puff.s *
-                            (0.25 + puffEase * 0.60);
+                            (0.25 +
+                                puffEase *
+                                    0.60);
 
                         const alpha =
-                            0.105 * puffEase;
+                            0.105 *
+                            puffEase;
 
-                        /*
-                         * Feathered puff:
-                         * Instead of drawing a normal ellipse and letting
-                         * the gradient get clipped by its hard boundary,
-                         * the gradient itself is mapped to the ellipse.
-                         * This gives the outer 25-30% of every puff a very
-                         * soft falloff, especially on the edge puffs.
-                         */
                         const puffGradient =
                             ctx.createRadialGradient(
                                 0,
@@ -774,23 +817,30 @@ function SmokeCanvas({
 
                         puffGradient.addColorStop(
                             0.38,
-                            `rgba(91, 81, 137, ${alpha * 0.72})`
+                            `rgba(91, 81, 137, ${
+                                alpha * 0.72
+                            })`
                         );
 
                         puffGradient.addColorStop(
                             0.64,
-                            `rgba(45, 155, 195, ${alpha * 0.32})`
+                            `rgba(45, 155, 195, ${
+                                alpha * 0.32
+                            })`
                         );
 
                         puffGradient.addColorStop(
                             0.78,
-                            `rgba(91, 81, 137, ${alpha * 0.12})`
+                            `rgba(91, 81, 137, ${
+                                alpha * 0.12
+                            })`
                         );
 
-                        // Long, soft feather at the silhouette.
                         puffGradient.addColorStop(
                             0.90,
-                            `rgba(91, 81, 137, ${alpha * 0.035})`
+                            `rgba(91, 81, 137, ${
+                                alpha * 0.035
+                            })`
                         );
 
                         puffGradient.addColorStop(
@@ -801,11 +851,17 @@ function SmokeCanvas({
                         ctx.save();
 
                         ctx.translate(x, y);
-                        ctx.scale(radius, radius * 0.82);
 
-                        ctx.fillStyle = puffGradient;
+                        ctx.scale(
+                            radius,
+                            radius * 0.82
+                        );
+
+                        ctx.fillStyle =
+                            puffGradient;
 
                         ctx.beginPath();
+
                         ctx.arc(
                             0,
                             0,
@@ -813,6 +869,7 @@ function SmokeCanvas({
                             0,
                             Math.PI * 2
                         );
+
                         ctx.fill();
 
                         ctx.restore();
@@ -898,19 +955,14 @@ function SmokeCanvas({
 
             /* =================================================
                READABILITY VIGNETTE
-
-               Sits behind the modal text once the cloud has
-               settled. Unlike the puffs/core above, this does
-               not fade back out — it holds steady so contrast
-               is reliable regardless of which animation frame
-               the smoke happens to be on when the modal opens.
             ================================================= */
 
             if (elapsed > 0.5) {
                 const vignetteAlpha =
                     Math.min(
                         1,
-                        (elapsed - 0.5) / 0.6
+                        (elapsed - 0.5) /
+                            0.6
                     ) * 0.35;
 
                 const vignette =
@@ -933,7 +985,8 @@ function SmokeCanvas({
                 vignette.addColorStop(
                     0.6,
                     `rgba(30, 26, 20, ${
-                        vignetteAlpha * 0.55
+                        vignetteAlpha *
+                        0.55
                     })`
                 );
 
@@ -942,7 +995,8 @@ function SmokeCanvas({
                     "rgba(30, 26, 20, 0)"
                 );
 
-                ctx.fillStyle = vignette;
+                ctx.fillStyle =
+                    vignette;
 
                 ctx.fillRect(
                     centerX -
@@ -1390,9 +1444,7 @@ export default function EventsPage() {
                 }
             >
                 <img
-                    src={
-                        photographyVase
-                    }
+                    src={photographyVase}
                     alt="Photography"
                 />
             </section>
@@ -1594,7 +1646,6 @@ export default function EventsPage() {
                                                 styles.eventDetails
                                             }
                                         >
-
                                             {/* CLUB */}
 
                                             {currentEvent.club_name && (
@@ -1643,6 +1694,23 @@ export default function EventsPage() {
                                                 </div>
                                             )}
                                         </div>
+
+                                        {/* RULEBOOK */}
+
+                                        {currentEvent.rulebook && (
+                                            <a
+                                                href={
+                                                    "https://docs.google.com/document/d/19yAh7FlGDDVqDHc4ZiUbPv1kwSmhOCYdFTghMzR0UAE/edit?tab=t.0"
+                                                }
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className={
+                                                    styles.rulebookButton
+                                                }
+                                            >
+                                                Rulebook
+                                            </a>
+                                        )}
                                     </div>
 
                                     {/* =========================
