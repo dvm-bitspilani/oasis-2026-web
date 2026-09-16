@@ -52,7 +52,7 @@ import Cinzel from "./assets/fonts/Cinzel-VariableFont_wght.ttf";
 import Scroll1 from "/instructionsScroll.png";
 import Scroll2 from "/instructionsScrollLong.png";
 import googleButton from "/googleReg.svg";
-import lamps from "./assets/game-icons_magic-lamp.svg";
+// import lamps from "./assets/game-icons_magic-lamp.svg";
 import instructionsBG from "/instructionsBG.png";
 
 /* ======================================================
@@ -129,7 +129,7 @@ const assets = [
   Scroll2,
 
   googleButton,
-  lamps,
+  // lamps,
   instructionsBG,
 ];
 
