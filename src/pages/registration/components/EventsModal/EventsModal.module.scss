@@ -12,9 +12,6 @@
 
 /* ================================================= */
 /* SAME BOOK-PAGE FRAME AS THE CONFIRM MODAL          */
-/* (this modal only ever renders on mobile, so it     */
-/* uses the mobile frame directly instead of the      */
-/* desktop/mobile CSS-var switch ConfirmModal needs)  */
 /* ================================================= */
 
 .selectedEvents {
@@ -22,21 +19,18 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
- 
+
   --modal-w: min(90vw, 95svh * 0.4702);
 
   width: var(--modal-w);
   aspect-ratio: 860 / 1829;
   max-height: 80vh;
-  // height: auto;
 
   border-radius: 8px;
   z-index: 1001;
 
-  /* extra top padding so the heading clears the ornate flourish  */
-  /* built into the frame artwork instead of colliding with it,   */
-  /* and a bit more on the sides/bottom so nothing hugs the border */
-  padding: calc(var(--modal-w) * 0.21) calc(var(--modal-w) * 0.14)
+  padding: calc(var(--modal-w) * 0.21)
+    calc(var(--modal-w) * 0.14)
     calc(var(--modal-w) * 0.1);
 
   display: flex;
@@ -52,10 +46,9 @@
   overflow: hidden;
 
   /* ============================================ */
-  /* CLOSE BUTTON — round dark chip behind a gold  */
-  /* icon so it reads against ANY part of the      */
-  /* busy border artwork, not just the plain paper */
+  /* CLOSE BUTTON                                  */
   /* ============================================ */
+
   .close {
     position: absolute;
     top: calc(var(--modal-w) * 0.055);
@@ -63,6 +56,7 @@
 
     width: calc(var(--modal-w) * 0.095);
     height: calc(var(--modal-w) * 0.095);
+
     min-width: 32px;
     min-height: 32px;
 
@@ -99,41 +93,54 @@
     }
   }
 
+  /* ============================================ */
+  /* HEADING                                       */
+  /* ============================================ */
+
   .heading {
     flex-shrink: 0;
-
     margin: 0 0 calc(var(--modal-w) * 0.03);
 
     color: #3a2411;
-    font: 400 calc(var(--modal-w) * 0.075) "Syamsiah";
-    text-align: center;
 
+    font: 400 calc(var(--modal-w) * 0.075) "Syamsiah";
+
+    text-align: center;
     text-shadow: 0 1px 1px rgba(255, 255, 255, 0.25);
   }
 
+  /* ============================================ */
+  /* DESCRIPTION                                   */
+  /* ============================================ */
+
   .description {
     flex: 1 1 auto;
-    min-height: 0; // let the paragraph shrink to the space that's actually left, instead of forcing the box taller than the frame
+    min-height: 0;
 
     margin: 0 0 calc(var(--modal-w) * 0.04);
 
     color: #432611;
+
     font: 400 calc(var(--modal-w) * 0.05) "EB";
     line-height: 1.65;
     letter-spacing: 0.5px;
+
     text-align: center;
 
     overflow-y: auto;
     scrollbar-width: none;
+
     &::-webkit-scrollbar {
       display: none;
     }
 
-    /* fade only the bottom edge as a scroll hint — a top fade   */
-    /* doesn't make sense here since there's nothing hidden      */
-    /* above the very first line, and it was washing that line   */
-    /* out for short descriptions that never even scroll         */
-    mask-image: linear-gradient(to bottom, #000 92%, transparent 100%);
+    /* Fade only the bottom edge as a scroll hint */
+    mask-image: linear-gradient(
+      to bottom,
+      #000 92%,
+      transparent 100%
+    );
+
     -webkit-mask-image: linear-gradient(
       to bottom,
       #000 92%,
@@ -142,14 +149,12 @@
   }
 
   /* ============================================ */
-  /* SAME BANNER AS THE EVENT-LIST / CONFIRM MODAL */
-  /* BUTTONS — inputBg.png outline + inputBgFilled */
-  /* .png mask that reveals a red gradient fill    */
+  /* BUTTONS — ALWAYS RED                          */
   /* ============================================ */
+
   .confirmButton,
   .removeButton {
     flex-shrink: 0;
-
     position: relative;
 
     width: 100%;
@@ -160,40 +165,38 @@
     padding: 0 4%;
 
     border: none;
-
     background-color: transparent;
+
     background-position: center;
     background-size: 100% 100%;
     background-repeat: no-repeat;
 
-    color: #38170b;
+    color: #fed59b;
 
     font-family: "Cinzel", serif;
     font-size: calc(var(--modal-w) * 0.05);
     font-weight: 700;
 
     cursor: pointer;
-
     box-sizing: border-box;
+
     overflow: hidden;
 
     display: flex;
     align-items: center;
     justify-content: center;
+
     text-align: center;
 
     appearance: none;
     -webkit-appearance: none;
     -webkit-tap-highlight-color: transparent;
 
-    transition:
-      transform 0.3s ease,
-      filter 0.3s ease;
+    transition: transform 0.3s ease;
 
-    /* red gradient fill, masked to the banner's silhouette */
+    /* Always-visible red fill */
     &::before {
       content: "";
-
       position: absolute;
       inset: 0;
 
@@ -205,84 +208,69 @@
 
       -webkit-mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
       mask-image: url("../../../../assets/registration/reg/inputBgFilled.png");
+
       -webkit-mask-size: 100% 100%;
       mask-size: 100% 100%;
+
       -webkit-mask-position: center;
       mask-position: center;
+
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
 
-      -webkit-clip-path: inset(0 100% 0 0);
-      clip-path: inset(0 100% 0 0);
-
       z-index: 0;
       pointer-events: none;
-
-      transition:
-        -webkit-clip-path 0.45s ease,
-        clip-path 0.45s ease;
     }
 
     span {
       position: relative;
-
       z-index: 2;
 
       display: block;
-
       width: 100%;
 
       margin: 0;
       padding: 0;
 
       text-align: center;
-
       line-height: 1;
 
       color: inherit;
 
       transition:
-        transform 0.3s ease,
         letter-spacing 0.3s ease,
-        text-shadow 0.3s ease,
-        color 0.3s ease;
+        text-shadow 0.3s ease;
     }
 
-    /* no :hover states — this modal is mobile-only, so the tap */
-    /* (:active) feedback below is what actually gets used      */
     &:active {
       transform: scale(0.97);
     }
   }
 
-  /* ADD — plain banner outline, same as an unselected event item */
+  /* ============================================ */
+  /* ADD BUTTON                                    */
+  /* ============================================ */
+
   .confirmButton {
-    color: #671c07;
+    color: #fed59b;
 
-
-  filter:
-    drop-shadow(0 0 1.5px #241006)
-   ;
+    filter: drop-shadow(0 0 1.5px #241006);
   }
 
-  /* REMOVE — permanently in the "selected" state, i.e. already   */
-  /* filled + gold, same as the currently-active/selected event   */
-  /* item, since the event behind this button is already added   */
+  /* ============================================ */
+  /* REMOVE BUTTON                                 */
+  /* ============================================ */
+
   .removeButton {
     transform: scale(1.02);
 
-    filter: brightness(1.1) drop-shadow(0 0 8px rgba(229, 195, 132, 0.5));
-
-    &::before {
-      -webkit-clip-path: inset(0 0 0 0);
-      clip-path: inset(0 0 0 0);
-    }
+    filter:
+      brightness(1.1)
+      drop-shadow(0 0 8px rgba(229, 195, 132, 0.5));
 
     span {
       letter-spacing: 0.04em;
-
       color: #fed59b;
-
       text-shadow: 0 0 7px rgba(254, 213, 155, 0.8);
     }
 

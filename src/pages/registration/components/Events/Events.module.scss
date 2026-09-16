@@ -459,7 +459,7 @@
 
   width: 96%;
 
-  height: calc(var(--book-h) * 0.07);
+  height: calc(var(--book-h) * 0.055);
   min-height: 34px;
 
   margin: 0 auto;
@@ -479,7 +479,7 @@
 
   font-size: clamp(
     11px,
-    calc(var(--book-h) * 0.032),
+    calc(var(--book-h) * 0.026),
     18px
   );
 
@@ -1311,6 +1311,11 @@
 /* of the desktop sizing math reaches this layout.               */
 /* =========================================================== */
 
+
+/* ================================================= */
+/* MOBILE OVERRIDES FROM SECOND FILE                 */
+/* ================================================= */
+
 @media (max-width: 900px) {
   .eventsContainer {
     /*
@@ -1346,7 +1351,6 @@
     background-position: center;
     background-repeat: no-repeat;
   }
-
   .lefttop {
     width: 45%;
   }
@@ -1362,9 +1366,9 @@
   .rightbottom {
     width: 30%;
   }
-
   /* ========================================= */
-  /* BOOK FRAME                                 */
+  /* BOOK FRAME — same box as register's        */
+  /* .bookContainer on mobile                   */
   /* ========================================= */
 
   .bookFrame {
@@ -1385,30 +1389,41 @@
     z-index: 4;
   }
 
+  /* the old page-edge gradient belonged to the centred card
+     layout; the frame now runs off-screen on the right */
   .bookFrame::after {
     content: none;
   }
 
   /* ========================================= */
-  /* BOOK ART — flat crop                       */
+  /* BOOK ART — flat crop, same values as       */
+  /* register's mobile book                     */
   /* ========================================= */
 
   .bookContainer {
     position: absolute;
 
-    top: 52%;
+    top: 42%;
     left: 13vw;
 
-    transform: translateY(-50%);
+    transform: translateY(
+      -50%
+    );
 
     width: 92vw;
+
     height: 78vh;
 
-    background-size: 180% 100%;
+    aspect-ratio: auto;
 
-    background-position: left top;
+    background-size:
+      180% 100%;
 
-    background-repeat: no-repeat;
+    background-position:
+      left top;
+
+    background-repeat:
+      no-repeat;
 
     overflow: hidden;
   }
@@ -1421,16 +1436,11 @@
     position: absolute;
     inset: 0;
 
-    top: 0;
-    left: 0;
-
-    transform: none;
-
     width: 100%;
     height: 100%;
-
+    top: 53%;
+    left: 60%;
     padding: 0;
-
     display: block;
 
     z-index: 5;
@@ -1451,6 +1461,11 @@
   /* ========================================= */
   /* LEFT PAGE — pinned onto the book's left    */
   /* page using the shared frame coordinates.   */
+  /* Heading + search are fixed, the list       */
+  /* scrolls internally (flex: 1), and CONFIRM  */
+  /* is a normal flow item AFTER the list — so  */
+  /* it can never overlap it and never scrolls  */
+  /* with it.                                   */
   /* ========================================= */
 
   .eventsPage {
@@ -1476,7 +1491,7 @@
 
     margin: 0 0 2.5vw;
 
-    font-size: clamp(1.2rem, 6vw, 1.7rem);
+    //font-size: clamp(1.2rem, 6vw, 1.7rem);
   }
 
   .searchContainer {
@@ -1531,16 +1546,10 @@
   }
 
   .scrollbarWheel {
-    left: 43%;
-
     width: 7vw;
     height: 7vw;
-
     min-width: 24px;
     min-height: 24px;
-
-    max-width: none;
-    max-height: none;
   }
 
   .eventItem {
@@ -1552,6 +1561,8 @@
 
     min-height: 32px;
 
+    /* the base rule indents items to clear the wheel;
+       on mobile the wheel already has its own column */
     margin: 0 auto;
 
     padding: 0 2.5vw;
@@ -1560,6 +1571,11 @@
 
     /*
       MUST stay 100% 100% to match the ::before mask.
+
+      With `contain` the outline art shrank to preserve its
+      aspect ratio while the red fill still stretched to the
+      full button box — so the fill rendered wider than the
+      frame it sits in. Both now map to the same rectangle.
     */
     background-size: 100% 100%;
     background-repeat: no-repeat;
@@ -1576,6 +1592,13 @@
 
   /* ========================================= */
   /* NO SCALING, NO ANIMATION ON MOBILE         */
+  /*                                            */
+  /* Rows are already full-width inside a       */
+  /* narrow page, so any scale made the         */
+  /* highlighted row wider than its neighbours. */
+  /* The gradient fill + gold text carry the    */
+  /* state on their own here, and the fill      */
+  /* appears instantly instead of wiping in.    */
   /* ========================================= */
 
   .eventItem,
@@ -1623,20 +1646,61 @@
     display: none;
   }
 
+  .eventNavigation {
+    margin-top: 4vw;
+    gap: 2vw;
+  }
+
+  .pageNumbers {
+    gap: 2.5vw;
+  }
+
+  .navArrow {
+    width: 9vw;
+    height: 11vw;
+    min-width: 0;
+    min-height: 0;
+    font-size: 12vw;
+  }
+
+  .pageNumber {
+    min-width: 6vw;
+    font-size: 6vw;
+  }
+
+  .pageNumber.currentPage {
+    font-size: 9vw;
+  }
+
+  .rightOuter {
+    width: 100%;
+    min-height: 60vw;
+    margin-left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   /* ========================================= */
   /* CONFIRM BUTTON — normal flex-flow item,    */
   /* always below the (scrollable) list.        */
   /* ========================================= */
 
   .confirmButton {
+    position: static;
+
     flex-shrink: 0;
+
+    bottom: auto;
+    left: auto;
+
+    transform: none;
 
     width: 68%;
     height: 8vw;
 
     min-width: 0;
     min-height: 30px;
-    max-height: none;
 
     margin: 2.5vw auto 0;
 
@@ -1658,6 +1722,7 @@
 
 /* =========================================================== */
 /* SMALL MOBILE (<=600px)                                       */
+/* Same step-down the register page makes at this width.        */
 /* =========================================================== */
 
 @media (max-width: 600px) {
@@ -1665,6 +1730,8 @@
     No --lp-* overrides here on purpose: the book crop is the
     same 180% 100% / left top at every mobile width, so the
     fractions set in the 900px block already land correctly.
+    Overriding them here is what pushed the rows outside the
+    page border.
   */
 
   .bookFrame {
@@ -1675,12 +1742,34 @@
 
   .bookContainer {
     top: 50%;
-    left: -15%;
     width: 115vw;
 
     height: 85vh;
 
-    background-size: 170% 100%;
+    background-size:
+      170% 100%;
+  }
+
+  .eventInfo {
+    width: 85%;
+    max-width: none;
+    justify-content: center;
+  }
+
+  .eventTitle {
+    margin-bottom: 4vw;
+    font-size: clamp(1.7rem, 8vw, 3rem);
+  }
+
+  .eventDescription {
+    max-width: 80vw;
+    font-size: 3.7vw;
+    line-height: 1.6;
+  }
+
+  .emptyInfo {
+    width: 85%;
+    flex: 1;
   }
 
   .confirmButton {
@@ -1693,60 +1782,63 @@
   }
 }
 
-/* =========================================================== */
-/* DECORATIVE CORNER TWEAKS                                     */
-/*                                                              */
-/* The old short-window desktop queries that shifted            */
-/* .eventsPage / .infoPage / .eventControls are gone: the       */
-/* book box is now measured and every page element is sized     */
-/* off it, so short windows are handled by the measurement      */
-/* instead of by hand-tuned padding.                            */
-/* =========================================================== */
+/* ========================================= */
+/* SHORT DESKTOP WINDOWS                     */
+/* Both queries carry min-width: 901px so     */
+/* they can never reach the mobile layout.    */
+/* ========================================= */
 
-@media screen and (max-width: 1501px) {
-  .rightbottom {
-    right: -3%;
-    bottom: -20%;
-  }
-}
 
-@media screen and (max-width: 1401px) {
-  .leftbottom {
-    bottom: 3%;
-  }
-}
+/* ================================================= */
+/* REMAINING DESKTOP-ONLY RULES FROM FIRST FILE      */
+/* ================================================= */
 
-@media screen and (max-width: 1075px) {
-  .righttop {
-    scale: 0.6;
-  }
-}
-
-@media screen and (max-width: 577px) {
-  .righttop {
-    top: -5%;
-    scale: 0.8;
+@media (min-width: 901px) {
+  @media screen and (max-width: 1501px) {
+    .rightbottom {
+      right: -3%;
+      bottom: -20%;
+    }
   }
 
-  .leftbottom {
-    left: 110px;
-    bottom: 92px;
-    scale: 3.2;
+  @media screen and (max-width: 1401px) {
+    .leftbottom {
+      bottom: 3%;
+    }
   }
 
-  .lefttop{
-    left: -10%;
-    top: -10%;
-    scale: 1;
+  @media screen and (max-width: 1075px) {
+    .righttop {
+      scale: 0.6;
+    }
   }
 
-  .rightbottom{
-    right: -44px;
-    bottom: 42px;
-    scale: 2.9;
-  }
+  @media screen and (max-width: 577px) {
+    .righttop {
+      top: -5%;
+      scale: 0.8;
+    }
 
-  .rightmid{
-    display: none;
+    .leftbottom {
+      left: 110px;
+      bottom: 92px;
+      scale: 3.2;
+    }
+
+    .lefttop{
+      left: -10%;
+      top: -10%;
+      scale: 1;
+    }
+
+    .rightbottom{
+      right: -44px;
+      bottom: 42px;
+      scale: 2.9;
+    }
+
+    .rightmid{
+      display: none;
+    }
   }
 }
