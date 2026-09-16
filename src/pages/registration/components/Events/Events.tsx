@@ -49,6 +49,47 @@ interface EventsProps {
 
 const MOBILE_BREAKPOINT = 900;
 
+/* ========================================================= */
+/* BOOK BOX                                                  */
+/*                                                           */
+/* The whole desktop layout hangs off one rectangle: the     */
+/* book. It's sized here rather than in CSS because it's a   */
+/* two-way constraint — the book must fit the width AND the  */
+/* height while keeping its aspect ratio, which is a min()   */
+/* of two different units that also has to be readable back  */
+/* as a number for the page columns.                         */
+/*                                                           */
+/*   width  = min(vw * MAX_W, vh * MAX_H * ASPECT)           */
+/*   height = width / ASPECT                                 */
+/*                                                           */
+/* Tune BOOK_MAX_VW / BOOK_MAX_VH to make the book bigger or */
+/* smaller; everything inside re-scales with it.             */
+/* ========================================================= */
+
+const BOOK_ASPECT = 1.4;   /* width : height of book.png    */
+const BOOK_MAX_VW = 0.78;  /* at most 78% of the viewport w */
+const BOOK_MAX_VH = 0.88;  /* at most 88% of the viewport h */
+
+interface BookBox {
+  width: number;
+  height: number;
+}
+
+const measureBookBox = (): BookBox => {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  const width = Math.min(
+    vw * BOOK_MAX_VW,
+    vh * BOOK_MAX_VH * BOOK_ASPECT
+  );
+
+  return {
+    width,
+    height: width / BOOK_ASPECT,
+  };
+};
+
 /* ========================================= */
 /* COMPONENT                                 */
 /* ========================================= */
@@ -56,8 +97,7 @@ const MOBILE_BREAKPOINT = 900;
 const Events = forwardRef<HTMLDivElement, EventsProps>(
   ({ userData, setUserData, onClickBack }, ref) => {
     /* ========================================= */
-    /* EVENTS DATA — fetched from the backend,   */
-    /* falls back to TEST_EVENTS on failure/empty */
+    /* EVENTS DATA                               */
     /* ========================================= */
 
     const [events, setEvents] = useState<Event[]>([]);
@@ -79,10 +119,30 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         window.innerWidth < MOBILE_BREAKPOINT
     );
 
+    /* ========================================= */
+    /* BOOK BOX                                  */
+    /*                                           */
+    /* Null on mobile / before mount, in which   */
+    /* case the CSS fallbacks take over.         */
+    /* ========================================= */
+
+    const [bookBox, setBookBox] =
+      useState<BookBox | null>(null);
+
     useEffect(() => {
       const handleViewportResize = () => {
-        setIsMobile(
-          window.innerWidth < MOBILE_BREAKPOINT
+        const mobile =
+          window.innerWidth < MOBILE_BREAKPOINT;
+
+        setIsMobile(mobile);
+
+        /*
+         * Mobile has its own book framing (see the
+         * ≤900px block in the stylesheet), so the
+         * measured box is only published on desktop.
+         */
+        setBookBox(
+          mobile ? null : measureBookBox()
         );
       };
 
@@ -93,9 +153,19 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         handleViewportResize
       );
 
+      window.addEventListener(
+        "orientationchange",
+        handleViewportResize
+      );
+
       return () => {
         window.removeEventListener(
           "resize",
+          handleViewportResize
+        );
+
+        window.removeEventListener(
+          "orientationchange",
           handleViewportResize
         );
       };
@@ -135,6 +205,39 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
 
     const [isDraggingScrollbar, setIsDraggingScrollbar] =
       useState(false);
+
+    /* ========================================= */
+    /* DESCRIPTION SCROLL (RIGHT PAGE)           */
+    /*                                           */
+    /* The description's height is pure flex now */
+    /* — it's whatever the column has left after */
+    /* the heading, title and controls — so      */
+    /* there's nothing to measure, only to       */
+    /* scroll.                                   */
+    /* ========================================= */
+
+    const eventDescRef =
+      useRef<HTMLParagraphElement>(null);
+
+    const descScrollAnimationRef =
+      useRef<number | null>(null);
+
+    const descTargetScrollTopRef =
+      useRef(0);
+
+    const descDragStartYRef =
+      useRef(0);
+
+    const descDragStartScrollTopRef =
+      useRef(0);
+
+    const [descScrollY, setDescScrollY] =
+      useState(0);
+
+    const [
+      isDraggingDescScrollbar,
+      setIsDraggingDescScrollbar,
+    ] = useState(false);
 
     /* ========================================= */
     /* SEARCH                                    */
@@ -383,7 +486,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
     /* ========================================= */
     /* SCROLLBAR WHEEL DRAG MOVE                */
     /* ========================================= */
-    console.log(window.innerHeight , window.innerWidth)
+
     const handleScrollbarPointerMove = (
       e: React.PointerEvent<HTMLImageElement>
     ) => {
@@ -394,7 +497,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
       const track =
         e.currentTarget.parentElement;
 
-      const wheel =
+      const wheelEl =
         e.currentTarget;
 
       if (!list || !track) return;
@@ -403,7 +506,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         track.clientHeight;
 
       const wheelHeight =
-        wheel.clientHeight;
+        wheelEl.clientHeight;
 
       const availableTravel =
         Math.max(
@@ -559,6 +662,315 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
       };
     }, [filteredEvents.length]);
 
+    /* ========================================================= */
+    /* DESCRIPTION SCROLL LOGIC                                  */
+    /* Same easing and same wheel drag as the left list.         */
+    /* ========================================================= */
+
+    const updateDescScrollY = () => {
+      const el = eventDescRef.current;
+
+      if (!el) return;
+
+      const maxScroll =
+        el.scrollHeight - el.clientHeight;
+
+      const progress =
+        maxScroll > 0
+          ? el.scrollTop / maxScroll
+          : 0;
+
+      setDescScrollY(
+        Math.max(
+          0,
+          Math.min(1, progress)
+        )
+      );
+    };
+
+    const animateDescScroll = () => {
+      const el = eventDescRef.current;
+
+      if (!el) return;
+
+      const current = el.scrollTop;
+
+      const target =
+        descTargetScrollTopRef.current;
+
+      const next =
+        current +
+        (target - current) * 0.16;
+
+      el.scrollTop = next;
+
+      updateDescScrollY();
+
+      if (
+        Math.abs(target - next) > 0.5
+      ) {
+        descScrollAnimationRef.current =
+          requestAnimationFrame(
+            animateDescScroll
+          );
+      } else {
+        el.scrollTop = target;
+
+        updateDescScrollY();
+
+        descScrollAnimationRef.current = null;
+      }
+    };
+
+    const startDescSmoothScroll = () => {
+      if (
+        descScrollAnimationRef.current === null
+      ) {
+        descScrollAnimationRef.current =
+          requestAnimationFrame(
+            animateDescScroll
+          );
+      }
+    };
+
+    const handleDescWheel = (
+      e: React.WheelEvent<HTMLDivElement>
+    ) => {
+      const el = eventDescRef.current;
+
+      if (!el) return;
+
+      const maxScroll =
+        el.scrollHeight - el.clientHeight;
+
+      if (maxScroll <= 0) return;
+
+      e.preventDefault();
+
+      const base = Math.max(
+        0,
+        Math.min(
+          maxScroll,
+          descTargetScrollTopRef.current
+        )
+      );
+
+      descTargetScrollTopRef.current =
+        Math.max(
+          0,
+          Math.min(
+            maxScroll,
+            base + e.deltaY * 0.85
+          )
+        );
+
+      startDescSmoothScroll();
+    };
+
+    const handleDescScrollbarPointerDown = (
+      e: React.PointerEvent<HTMLImageElement>
+    ) => {
+      const el = eventDescRef.current;
+
+      const track =
+        e.currentTarget.parentElement;
+
+      if (!el || !track) return;
+
+      const maxScroll =
+        el.scrollHeight - el.clientHeight;
+
+      if (maxScroll <= 0) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      setIsDraggingDescScrollbar(true);
+
+      descDragStartYRef.current =
+        e.clientY;
+
+      descDragStartScrollTopRef.current =
+        el.scrollTop;
+
+      e.currentTarget.setPointerCapture(
+        e.pointerId
+      );
+    };
+
+    const handleDescScrollbarPointerMove = (
+      e: React.PointerEvent<HTMLImageElement>
+    ) => {
+      if (!isDraggingDescScrollbar) return;
+
+      const el = eventDescRef.current;
+
+      const track =
+        e.currentTarget.parentElement;
+
+      const wheelEl =
+        e.currentTarget;
+
+      if (!el || !track) return;
+
+      const trackHeight =
+        track.clientHeight;
+
+      const wheelHeight =
+        wheelEl.clientHeight;
+
+      const availableTravel =
+        Math.max(
+          1,
+          trackHeight - wheelHeight
+        );
+
+      const maxScroll =
+        el.scrollHeight - el.clientHeight;
+
+      const deltaY =
+        e.clientY -
+        descDragStartYRef.current;
+
+      const scrollDelta =
+        (deltaY / availableTravel) *
+        maxScroll;
+
+      const nextScroll =
+        Math.max(
+          0,
+          Math.min(
+            maxScroll,
+            descDragStartScrollTopRef.current +
+              scrollDelta
+          )
+        );
+
+      descTargetScrollTopRef.current =
+        nextScroll;
+
+      el.scrollTop =
+        nextScroll;
+
+      updateDescScrollY();
+    };
+
+    const handleDescScrollbarPointerUp = (
+      e: React.PointerEvent<HTMLImageElement>
+    ) => {
+      setIsDraggingDescScrollbar(false);
+
+      try {
+        e.currentTarget.releasePointerCapture(
+          e.pointerId
+        );
+      } catch {
+        // Pointer capture may already
+        // have been released.
+      }
+    };
+
+    const handleDescScrollbarTrackClick = (
+      e: React.MouseEvent<HTMLDivElement>
+    ) => {
+      const el = eventDescRef.current;
+
+      const track = e.currentTarget;
+
+      if (!el) return;
+
+      const maxScroll =
+        el.scrollHeight - el.clientHeight;
+
+      if (maxScroll <= 0) return;
+
+      const rect =
+        track.getBoundingClientRect();
+
+      const clickY =
+        e.clientY - rect.top;
+
+      const progress =
+        Math.max(
+          0,
+          Math.min(
+            1,
+            clickY / rect.height
+          )
+        );
+
+      descTargetScrollTopRef.current =
+        progress * maxScroll;
+
+      startDescSmoothScroll();
+    };
+
+    /* ========================================= */
+    /* DESCRIPTION — RESET + RESIZE              */
+    /*                                           */
+    /* The box grows and shrinks with the book,  */
+    /* so the wheel's position has to be         */
+    /* recomputed after a resize as well as      */
+    /* after an event change.                    */
+    /* ========================================= */
+
+    useEffect(() => {
+      const el = eventDescRef.current;
+
+      if (!el) return;
+
+      if (
+        descScrollAnimationRef.current !== null
+      ) {
+        cancelAnimationFrame(
+          descScrollAnimationRef.current
+        );
+
+        descScrollAnimationRef.current = null;
+      }
+
+      el.scrollTop = 0;
+
+      descTargetScrollTopRef.current = 0;
+
+      updateDescScrollY();
+    }, [activeEvent, bookBox]);
+
+    useEffect(() => {
+      const handleDescResize = () => {
+        const el = eventDescRef.current;
+
+        if (!el) return;
+
+        descTargetScrollTopRef.current =
+          el.scrollTop;
+
+        updateDescScrollY();
+      };
+
+      window.addEventListener(
+        "resize",
+        handleDescResize
+      );
+
+      return () => {
+        window.removeEventListener(
+          "resize",
+          handleDescResize
+        );
+
+        if (
+          descScrollAnimationRef.current !== null
+        ) {
+          cancelAnimationFrame(
+            descScrollAnimationRef.current
+          );
+
+          descScrollAnimationRef.current = null;
+        }
+      };
+    }, []);
+
     /* ========================================= */
     /* KEEP ACTIVE EVENT VALID AFTER SEARCH      */
     /* ========================================= */
@@ -700,7 +1112,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         return;
       }
 
-      const currentIndex =
+      const currentEventIndex =
         filteredEvents.findIndex(
           (event) =>
             event.id ===
@@ -708,7 +1120,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         );
 
       const nextIndex =
-        (currentIndex + 1) %
+        (currentEventIndex + 1) %
         filteredEvents.length;
 
       /*
@@ -736,7 +1148,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         return;
       }
 
-      const currentIndex =
+      const currentEventIndex =
         filteredEvents.findIndex(
           (event) =>
             event.id ===
@@ -744,7 +1156,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
         );
 
       const previousIndex =
-        (currentIndex -
+        (currentEventIndex -
           1 +
           filteredEvents.length) %
         filteredEvents.length;
@@ -823,6 +1235,26 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
     };
 
     /* ========================================= */
+    /* CONTAINER STYLE                          */
+    /*                                           */
+    /* --book-w / --book-h drive the book art,   */
+    /* the content overlay, both page columns,   */
+    /* and every font size and control size      */
+    /* inside them.                              */
+    /* ========================================= */
+
+    const containerStyle = {
+      backgroundImage: `url(${RegBg})`,
+
+      ...(bookBox
+        ? {
+            "--book-w": `${bookBox.width}px`,
+            "--book-h": `${bookBox.height}px`,
+          }
+        : {}),
+    } as React.CSSProperties;
+
+    /* ========================================= */
     /* RENDER                                   */
     /* ========================================= */
 
@@ -833,9 +1265,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
           className={
             styles.eventsContainer
           }
-          style={{
-            backgroundImage: `url(${RegBg})`,
-          }}
+          style={containerStyle}
         >
           {/* ================================= */}
           {/* CORNER DECORATIONS                  */}
@@ -908,7 +1338,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
               }}
             />
 
-            {/* CONTENT */}
+            {/* CONTENT — same rectangle as the book */}
 
             <div
               className={
@@ -1218,18 +1648,87 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                               }
                             </h2>
 
-                            <p
+                            {/* ================================= */}
+                            {/* DESCRIPTION                        */}
+                            {/*                                    */}
+                            {/* Fills the space left between the   */}
+                            {/* title and the controls, and        */}
+                            {/* scrolls with the same line + wheel */}
+                            {/* as the left page.                  */}
+                            {/* ================================= */}
+
+                            <div
                               className={
-                                styles.eventDescription
+                                styles.eventDescriptionArea
+                              }
+                              onWheel={
+                                handleDescWheel
                               }
                             >
-                              {
-                                activeEvent.about
-                              }
-                            </p>
+                              <p
+                                ref={eventDescRef}
+                                className={
+                                  styles.eventDescription
+                                }
+                              >
+                                {
+                                  activeEvent.about
+                                }
+                              </p>
+
+                              <div
+                                className={
+                                  styles.customScrollbar
+                                }
+                                onMouseDown={
+                                  handleDescScrollbarTrackClick
+                                }
+                              >
+                                <img
+                                  src={line}
+                                  className={
+                                    styles.scrollbarLine
+                                  }
+                                  alt=""
+                                  draggable={false}
+                                />
+
+                                <img
+                                  src={wheel}
+                                  className={`
+                                    ${styles.scrollbarWheel}
+                                    ${
+                                      isDraggingDescScrollbar
+                                        ? styles.scrollbarWheelDragging
+                                        : ""
+                                    }
+                                  `}
+                                  style={{
+                                    top: `${descScrollY * 100}%`,
+                                  }}
+                                  alt="Scroll"
+                                  draggable={false}
+                                  onPointerDown={
+                                    handleDescScrollbarPointerDown
+                                  }
+                                  onPointerMove={
+                                    handleDescScrollbarPointerMove
+                                  }
+                                  onPointerUp={
+                                    handleDescScrollbarPointerUp
+                                  }
+                                  onPointerCancel={
+                                    handleDescScrollbarPointerUp
+                                  }
+                                  onClick={(e) =>
+                                    e.stopPropagation()
+                                  }
+                                />
+                              </div>
+                            </div>
                           </div>
 
-                          {/* FIXED CONTROLS */}
+                          {/* CONTROLS */}
 
                           <div
                             className={
@@ -1458,4 +1957,4 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
 
 Events.displayName = "Events";
 
-export default Events;
+export default Events;  

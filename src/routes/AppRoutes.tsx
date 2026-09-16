@@ -33,7 +33,7 @@ export default function AppRoutes({
           path="/comingsoon"
           element={<ComingSoon />}
         />
-        
+
         <Route
           path="/register"
           element={<Registration />}
@@ -50,5 +50,5 @@ export default function AppRoutes({
        
       </Routes>
     </TransitionProvider>
-  ); 
+  );
 }

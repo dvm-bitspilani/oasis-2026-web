@@ -10,7 +10,10 @@ body {
   scrollbar-width: none;
   font-family: 'EB Garamond', serif;
   font-weight: 700;
+
 }
+
+
 
 body::-webkit-scrollbar {
   display: none;
@@ -18,7 +21,8 @@ body::-webkit-scrollbar {
 
 
 .about {
-  height: 100vh;
+  height: 100svh;
+  min-height: 100svh;
   width: 100%;
   background-color: black;
   background-size: cover;
@@ -447,11 +451,8 @@ body::-webkit-scrollbar {
 
   .about {
     width: 100vw;
-    height: 100vh;
     height: 100svh;
-    height: 100dvh;
-    min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100svh;
     position: relative;
     overflow: hidden;
     overflow-y: hidden;
@@ -463,9 +464,7 @@ body::-webkit-scrollbar {
     position: fixed;
     inset: 0;
     width: 100vw;
-    height: 100vh;
     height: 100svh;
-    height: 100dvh;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -477,9 +476,7 @@ body::-webkit-scrollbar {
     position: fixed;
     inset: 0;
     width: 100vw;
-    height: 100vh;
     height: 100svh;
-    height: 100dvh;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -491,6 +488,7 @@ body::-webkit-scrollbar {
     position: absolute;
     width: 100vw;
     height: 100svh;
+    min-height: 100svh;
     left: 0;
     top: 0;
     margin: 0;
