@@ -160,7 +160,7 @@
 .content {
   position: absolute;
 
-  top: var(--book-top);
+  top: calc(var(--book-top) - 50px);
   left: 50%;
 
   transform: translate(-50%, -50%);
@@ -168,10 +168,12 @@
   width: var(--book-w);
   height: var(--book-h);
 
-  padding:
-    var(--page-top)
-    var(--page-outer)
-    var(--page-bottom);
+  padding:var(--page-outer);
+    // var(--page-top)
+    // var(--page-outer);
+    // var(--page-bottom);
+  // padding-top: -0px;
+  padding-bottom: 20px;
 
   box-sizing: border-box;
 
@@ -248,7 +250,7 @@
   font-weight: 400;
 
   line-height: 1;
-
+  margin-top: 20px;
   text-align: center;
 }
 
@@ -457,7 +459,7 @@
 
   width: 96%;
 
-  height: calc(var(--book-h) * 0.085);
+  height: calc(var(--book-h) * 0.07);
   min-height: 34px;
 
   margin: 0 auto;
@@ -798,7 +800,7 @@
   font-weight: 400;
 
   line-height: 1;
-
+  margin-top: 20px;
   text-align: center;
 }
 
@@ -879,7 +881,7 @@
 
   font-size: clamp(
     1.1rem,
-    calc(var(--book-h) * 0.072),
+    calc(var(--book-h) * 0.06),
     3.2rem
   );
 
@@ -913,7 +915,7 @@
   flex: 1 1 auto;
 
   width: 100%;
-
+  padding-left: 20px;
   min-height: 0;
 
   display: flex;
@@ -944,7 +946,7 @@
 
   font-size: clamp(
     12px,
-    calc(var(--book-h) * 0.033),
+    calc(var(--book-h) * 0.02),
     20px
   );
 
@@ -980,7 +982,7 @@
 
   width: 100%;
 
-  margin-top: calc(var(--book-h) * 0.022);
+  margin-top: calc(var(--book-h) * 0.01);
 
   display: flex;
   flex-direction: column;
