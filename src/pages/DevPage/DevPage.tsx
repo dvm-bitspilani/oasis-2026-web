@@ -7,9 +7,12 @@ import Frontend from "../../assets/DevPage/Frontend.png"
 import Backend from "../../assets/DevPage/Backend.png"
 import Ui from "../../assets/DevPage/ui.png"
 import BackButton from "../../assets/DevPage/BackButton.png"
+import bgPink from "../../assets/DevPage/bpPink.png"
 export default function DevPage() {
-
      const [activeVertical, setActiveVertical] = useState<string | null>(null);
+     const handleFrontendClick=()=>{
+
+     }
   return (
     <div
     className={styles.wrapper}
@@ -33,6 +36,9 @@ export default function DevPage() {
             <button className={styles.BackButton}>
                 <img  className={styles.backImg} src={BackButton} alt="Back" />
             </button>
+        </div>
+        <div className={styles.curtainOverlay}>
+          {/* <img src={bgPink} alt="curtainPink" /> */}
         </div>
     </div>
   )
