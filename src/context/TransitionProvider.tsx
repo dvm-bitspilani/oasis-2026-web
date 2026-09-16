@@ -97,9 +97,7 @@ export function TransitionProvider({
   // NAVIGATION
   // =========================================
 
-  const navigateWithTransition = (
-    to: string,
-  ) => {
+  const navigateWithTransition = (to: string) => {
     if (
       to === location.pathname ||
       navigatingRef.current
@@ -107,11 +105,16 @@ export function TransitionProvider({
       return;
     }
 
-    /*
-     * Once the user navigates, the intro
-     * preloader should never play again
-     * during this session.
-     */
+    // Skip transition when entering or leaving About Us
+    if (
+      to === "/aboutUs" ||
+      location.pathname === "/aboutUs"
+    ) {
+      markEntered();
+      navigate(to);
+      return;
+    }
+
     markEntered();
 
     navigatingRef.current = true;
