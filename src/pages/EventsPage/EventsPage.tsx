@@ -548,26 +548,26 @@ function SmokeCanvas({
 
                 gradient.addColorStop(
                     0,
-                    `rgba(100, 195, 225, ${alpha})`
+                    `rgba(91, 81, 137, ${alpha})`
                 );
 
                 gradient.addColorStop(
                     0.5,
-                    `rgba(60, 170, 205, ${
+                    `rgba(91, 81, 137, ${
                         alpha * 0.62
                     })`
                 );
 
                 gradient.addColorStop(
                     0.8,
-                    `rgba(37, 150, 190, ${
+                    `rgba(91, 81, 137, ${
                         alpha * 0.22
                     })`
                 );
 
                 gradient.addColorStop(
                     1,
-                    "rgba(20, 100, 130, 0)"
+                    "rgba(91, 81, 137, 0)"
                 );
 
                 ctx.fillStyle = gradient;
@@ -652,33 +652,33 @@ function SmokeCanvas({
 
                 baseGradient.addColorStop(
                     0,
-                    `rgba(100, 195, 225, ${0.24 * eased})`
+                    `rgba(91, 81, 137, ${0.24 * eased})`
                 );
 
                 baseGradient.addColorStop(
                     0.38,
-                    `rgba(70, 175, 210, ${0.20 * eased})`
+                    `rgba(91, 81, 137, ${0.20 * eased})`
                 );
 
                 baseGradient.addColorStop(
                     0.62,
-                    `rgba(50, 160, 195, ${0.13 * eased})`
+                    `rgba(91, 81, 137, ${0.13 * eased})`
                 );
 
                 baseGradient.addColorStop(
                     0.78,
-                    `rgba(40, 150, 190, ${0.055 * eased})`
+                    `rgba(91, 81, 137, ${0.055 * eased})`
                 );
 
                 // Extra-long feather at the outer silhouette.
                 baseGradient.addColorStop(
                     0.90,
-                    `rgba(30, 130, 165, ${0.018 * eased})`
+                    `rgba(91, 81, 137, ${0.018 * eased})`
                 );
 
                 baseGradient.addColorStop(
                     1,
-                    "rgba(25, 110, 140, 0)"
+                    "rgba(91, 81, 137, 0)"
                 );
 
                 ctx.save();
@@ -769,12 +769,12 @@ function SmokeCanvas({
 
                         puffGradient.addColorStop(
                             0,
-                            `rgba(100, 195, 225, ${alpha})`
+                            `rgba(91, 81, 137, ${alpha})`
                         );
 
                         puffGradient.addColorStop(
                             0.38,
-                            `rgba(70, 175, 210, ${alpha * 0.72})`
+                            `rgba(91, 81, 137, ${alpha * 0.72})`
                         );
 
                         puffGradient.addColorStop(
@@ -784,18 +784,18 @@ function SmokeCanvas({
 
                         puffGradient.addColorStop(
                             0.78,
-                            `rgba(37, 150, 190, ${alpha * 0.12})`
+                            `rgba(91, 81, 137, ${alpha * 0.12})`
                         );
 
                         // Long, soft feather at the silhouette.
                         puffGradient.addColorStop(
                             0.90,
-                            `rgba(30, 130, 165, ${alpha * 0.035})`
+                            `rgba(91, 81, 137, ${alpha * 0.035})`
                         );
 
                         puffGradient.addColorStop(
                             1,
-                            "rgba(25, 110, 140, 0)"
+                            "rgba(91, 81, 137, 0)"
                         );
 
                         ctx.save();
@@ -848,7 +848,7 @@ function SmokeCanvas({
 
                 coreGradient.addColorStop(
                     0,
-                    `rgba(100, 195, 225, ${
+                    `rgba(91, 81, 137, ${
                         0.14 *
                         coreProgress
                     })`
@@ -856,7 +856,7 @@ function SmokeCanvas({
 
                 coreGradient.addColorStop(
                     0.38,
-                    `rgba(50, 160, 195, ${
+                    `rgba(91, 81, 137, ${
                         0.10 *
                         coreProgress
                     })`
@@ -864,7 +864,7 @@ function SmokeCanvas({
 
                 coreGradient.addColorStop(
                     0.72,
-                    `rgba(37, 150, 190, ${
+                    `rgba(91, 81, 137, ${
                         0.04 *
                         coreProgress
                     })`
@@ -872,7 +872,7 @@ function SmokeCanvas({
 
                 coreGradient.addColorStop(
                     1,
-                    "rgba(25, 110, 140, 0)"
+                    "rgba(91, 81, 137, 0)"
                 );
 
                 ctx.fillStyle =
@@ -985,7 +985,7 @@ function SmokeCanvas({
 
                 baseGradient.addColorStop(
                     0,
-                    `rgba(100, 195, 225, ${
+                    `rgba(91, 81, 137, ${
                         0.30 *
                         baseProgress
                     })`
@@ -993,7 +993,7 @@ function SmokeCanvas({
 
                 baseGradient.addColorStop(
                     0.38,
-                    `rgba(60, 170, 205, ${
+                    `rgba(91, 81, 137, ${
                         0.18 *
                         baseProgress
                     })`
@@ -1001,7 +1001,7 @@ function SmokeCanvas({
 
                 baseGradient.addColorStop(
                     0.7,
-                    `rgba(37, 150, 190, ${
+                    `rgba(91, 81, 137, ${
                         0.06 *
                         baseProgress
                     })`
@@ -1009,7 +1009,7 @@ function SmokeCanvas({
 
                 baseGradient.addColorStop(
                     1,
-                    "rgba(25, 110, 140, 0)"
+                    "rgba(91, 81, 137, 0)"
                 );
 
                 ctx.fillStyle =
@@ -1594,27 +1594,6 @@ export default function EventsPage() {
                                                 styles.eventDetails
                                             }
                                         >
-                                            {/* CATEGORY */}
-
-                                            <div
-                                                className={
-                                                    styles.detail
-                                                }
-                                            >
-                                                <span
-                                                    className={
-                                                        styles.icon
-                                                    }
-                                                >
-                                                    ♛
-                                                </span>
-
-                                                <span>
-                                                    {
-                                                        currentEvent.category
-                                                    }
-                                                </span>
-                                            </div>
 
                                             {/* CLUB */}
 
