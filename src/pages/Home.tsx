@@ -15,6 +15,8 @@ import sandImg from "../assets/sandfinal.png";
 import sandMob from "../assets/maybefinalsorry.png";
 import cloudSmall from "../assets/cloudSmall.svg";
 import cloudBig from "../assets/cloudBig.svg";
+
+import bgBottom from "../assets/about/bgBottom.png";
 import cloudThree from "../assets/cloudThree.svg";
 import Castle from "../assets/castlefinal2.png";
 import Moon from "../assets/Moon.png";
@@ -198,7 +200,7 @@ export default function Home({
   const portholeInnerRef = useRef<HTMLDivElement>(null);
 
   const overlayCloudRefs = useRef<(HTMLDivElement | null)[]>([]);
-
+  const bgBottomRef = useRef<HTMLDivElement | null>(null);
   const [isMobile, setIsMobile] = useState(
     () => window.innerWidth <= MOBILE_BREAKPOINT,
   );
@@ -318,35 +320,46 @@ export default function Home({
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline();
+      tl.to(sandRef.current, {
+    yPercent: 100,
+    duration: 1,
+    ease: "none",
+  }, 0)
+      .to(castleEl, {
+  // x: window.innerWidth * 0.05,
 
-      tl.to(castleEl, {
-        x: window.innerWidth * 0.05,
-        // scale: 0.8,
-        rotateZ: 60,
-        duration: 1,
-        y: window.innerHeight * 1,
-        ease: "none",
-      }).to(moonRef.current, {
-        x: window.innerWidth * 0.05,
-        y: -window.innerHeight * 0.02,
-        scale: 0.8,
-        duration: 1,
-        ease: "none",
-      }, 0).to(sandRef.current, {
-        // x:window.innerWidth*0.05,
-        y: window.innerHeight * 0.5,
-        // scale: 0.8,
-        duration: 1,
-        ease: "none",
-      }, 0).from(leftRef.current, {
-        x:-window.innerWidth*0.05,
-        rotateZ:-10,
-        // y: window.innerHeight * 0.5,
-        opacity:0,
-        // scale: 0.8,
-        duration: 1,
-        ease: "none",
-      }, 0);
+  // scale: 0.8,
+  // duration: 1,
+  // ease: "none",
+    yPercent: 200,
+    // rotateZ:60,z
+    duration: 1,
+    ease: "none",
+}, "<-0.05")
+      .to(castleEl, {
+  // x: window.innerWidth * 0.05,
+
+  // scale: 0.8,
+  // duration: 1,
+  // ease: "none",
+    yPercent: 200,
+    // rotateZ:60,z
+    duration: 1,
+    ease: "none",
+}, "<-0.05")  
+  
+  .from(leftRef.current, {
+    x: -window.innerWidth * 0.05,
+    rotateZ: -10,
+    opacity: 0,
+    duration: 1,
+    ease: "none",
+  }, 0);
+  // .to(bgBottomRef.current, {
+  //   bottom: "0%",
+  //   duration: 1.5,
+  //   ease: "power3.out",
+  // }, 1); // starts only once the sand tween above has fully finished
 
       ScrollTrigger.create({
         trigger: secRef.current,
@@ -1102,8 +1115,8 @@ export default function Home({
       const camel2MiddlePath = toPx(CAMEL_2_MIDDLE_PATH);
       const camel2LowerPath = toPx(CAMEL_2_LOWER_PATH);
 
-      const FADE_DURATION = 5;
-      const HOLD_DURATION = 5;
+      const FADE_DURATION = 0.2;
+      const HOLD_DURATION = 0.2;
 
       const FADE_IN_EASE = "sine.inOut";
       const FADE_OUT_EASE = "power1.in";
@@ -1445,7 +1458,10 @@ export default function Home({
       <div ref={leftRef} className={styles.leftTop}>
         <SvgImg src={bgLeft} />
       </div>
-      
+      {/* <div ref={bgBottomRef} className={styles.bgBottom}>
+        <SvgImg src={bgBottom} />
+      </div> */}
+
     </div>
   );
 }
