@@ -6,7 +6,9 @@ import {
   type CSSProperties,
 } from "react";
 import gsap from "gsap";
-
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import bgLeft from "../assets/about/pillarTop-trimmed.png"
+gsap.registerPlugin(ScrollTrigger);
 import styles from "../styles/Home.module.scss";
 import bg from "../assets/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg";
 import sandImg from "../assets/sandfinal.png";
@@ -56,6 +58,26 @@ type Point = {
 
 const MOBILE_BREAKPOINT = 650;
 
+const SvgImg = ({
+  src,
+  fit = "contain",
+}: {
+  src: string;
+  fit?: "contain" | "cover";
+}) => (
+  <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+    <image
+      href={src}
+      x="0"
+      y="0"
+      width="100"
+      height="100"
+      preserveAspectRatio={
+        fit === "cover" ? "xMidYMid slice" : "xMidYMid meet"
+      }
+    />
+  </svg>
+);
 const CLOUDS_DESKTOP: Cloud[] = [
   {
     src: cloudSmall,
@@ -164,11 +186,13 @@ export default function Home({
   const castleRef = useRef<HTMLDivElement>(null);
 
   const sandRef = useRef<HTMLDivElement>(null);
-
+  const secRef = useRef<HTMLDivElement>(null);
   const introStringLayerRef = useRef<SVGSVGElement>(null);
 
   const moonRef = useRef<HTMLDivElement>(null);
 
+
+  const leftRef = useRef<HTMLDivElement>(null);
   const portholeRef = useRef<HTMLDivElement>(null);
 
   const portholeInnerRef = useRef<HTMLDivElement>(null);
@@ -289,6 +313,63 @@ export default function Home({
 
     const containerEl = containerRef.current;
     const castleEl = castleRef.current;
+
+    if (!containerEl || !castleEl) return;
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline();
+
+      tl.to(castleEl, {
+        x: window.innerWidth * 0.05,
+        // scale: 0.8,
+        rotateZ: 60,
+        duration: 1,
+        y: window.innerHeight * 1,
+        ease: "none",
+      }).to(moonRef.current, {
+        x: window.innerWidth * 0.05,
+        y: -window.innerHeight * 0.02,
+        scale: 0.8,
+        duration: 1,
+        ease: "none",
+      }, 0).to(sandRef.current, {
+        // x:window.innerWidth*0.05,
+        y: window.innerHeight * 0.5,
+        // scale: 0.8,
+        duration: 1,
+        ease: "none",
+      }, 0).from(leftRef.current, {
+        x:-window.innerWidth*0.05,
+        rotateZ:-10,
+        // y: window.innerHeight * 0.5,
+        opacity:0,
+        // scale: 0.8,
+        duration: 1,
+        ease: "none",
+      }, 0);
+
+      ScrollTrigger.create({
+        trigger: secRef.current,
+        start: "top top",
+        end: "bottom bottom",
+        pin: containerEl,
+        scrub: 2,
+        animation: tl,
+        invalidateOnRefresh: true,
+        markers: true,
+      });
+    }, containerRef);
+
+    return () => {
+      ctx.revert();
+    };
+  }, [preloaderDone]);
+
+  useLayoutEffect(() => {
+    if (!preloaderDone) return;
+
+    const containerEl = containerRef.current;
+    const castleEl = castleRef.current;
     const moonEl = moonRef.current;
     const portholeEl = portholeRef.current;
     const stringLayer = introStringLayerRef.current;
@@ -361,10 +442,10 @@ export default function Home({
           };
         })
         .filter(Boolean) as {
-        el: HTMLDivElement;
-        anchorX: number;
-        hookY: number;
-      }[];
+          el: HTMLDivElement;
+          anchorX: number;
+          hookY: number;
+        }[];
 
       /* Reset the retraction gate for this run of the effect. */
       mainTimelineDoneRef.current = false;
@@ -432,9 +513,8 @@ export default function Home({
           TOP_Y +
           (endY - TOP_Y) * HOOK_T;
 
-        return `M ${anchorX} ${TOP_Y} C ${anchorX} ${control1Y} ${
-          anchorX + sag
-        } ${control2Y} ${anchorX} ${endY}`;
+        return `M ${anchorX} ${TOP_Y} C ${anchorX} ${control1Y} ${anchorX + sag
+          } ${control2Y} ${anchorX} ${endY}`;
       };
 
       const liftDistance = window.innerHeight * 1.3;
@@ -698,119 +778,119 @@ export default function Home({
             },
 
             onComplete: () => {
-  /* ================================================
-     CLOUD STAYS AT FINAL POSITION
-     ================================================ */
+              /* ================================================
+                 CLOUD STAYS AT FINAL POSITION
+                 ================================================ */
 
-  gsap.set(rig.el, {
-    y: 0,
-    opacity: 1,
-  });
+              gsap.set(rig.el, {
+                y: 0,
+                opacity: 1,
+              });
 
-  /* ================================================
-     STRING IS NOW FULLY TAUT
-     ================================================ */
+              /* ================================================
+                 STRING IS NOW FULLY TAUT
+                 ================================================ */
 
-  path.setAttribute(
-    "d",
-    buildPath(
-      rig.anchorX,
-      rig.hookY,
-      0
-    )
-  );
+              path.setAttribute(
+                "d",
+                buildPath(
+                  rig.anchorX,
+                  rig.hookY,
+                  0
+                )
+              );
 
-  path.style.strokeDasharray = "none";
-  path.style.strokeDashoffset = "0";
-  path.style.opacity = "1";
+              path.style.strokeDasharray = "none";
+              path.style.strokeDashoffset = "0";
+              path.style.opacity = "1";
 
-  /* ================================================
-     HOLD STRING FOR A MOMENT
-     ================================================ */
+              /* ================================================
+                 HOLD STRING FOR A MOMENT
+                 ================================================ */
 
-  gsap.delayedCall(0.8, () => {
-    const retractState = {
-      p: 0,
-    };
+              gsap.delayedCall(0.8, () => {
+                const retractState = {
+                  p: 0,
+                };
 
-    gsap.to(retractState, {
-      p: 1,
+                gsap.to(retractState, {
+                  p: 1,
 
-      duration: 0.55,
+                  duration: 0.55,
 
-      ease: "power2.in",
+                  ease: "power2.in",
 
-      onUpdate: () => {
-        const p = retractState.p;
+                  onUpdate: () => {
+                    const p = retractState.p;
 
-        /*
-          hookY -> START_LEN
+                    /*
+                      hookY -> START_LEN
+            
+                      The bottom of the string travels
+                      upward toward the top.
+                    */
+                    const endY = gsap.utils.interpolate(
+                      rig.hookY,
+                      START_LEN,
+                      p
+                    );
 
-          The bottom of the string travels
-          upward toward the top.
-        */
-        const endY = gsap.utils.interpolate(
-          rig.hookY,
-          START_LEN,
-          p
-        );
+                    /*
+                      String becomes more curved while
+                      retracting upward.
+                    */
+                    const sag = gsap.utils.interpolate(
+                      0,
+                      START_SAG,
+                      p
+                    );
 
-        /*
-          String becomes more curved while
-          retracting upward.
-        */
-        const sag = gsap.utils.interpolate(
-          0,
-          START_SAG,
-          p
-        );
+                    path.setAttribute(
+                      "d",
+                      buildPath(
+                        rig.anchorX,
+                        endY,
+                        sag
+                      )
+                    );
 
-        path.setAttribute(
-          "d",
-          buildPath(
-            rig.anchorX,
-            endY,
-            sag
-          )
-        );
+                    /*
+                      Draw direction is reversed so the
+                      visible string retracts toward the top.
+                    */
+                    const length = path.getTotalLength();
 
-        /*
-          Draw direction is reversed so the
-          visible string retracts toward the top.
-        */
-        const length = path.getTotalLength();
+                    path.style.strokeDasharray =
+                      `${length}`;
 
-        path.style.strokeDasharray =
-          `${length}`;
+                    path.style.strokeDashoffset =
+                      `${length * p}`;
 
-        path.style.strokeDashoffset =
-          `${length * p}`;
+                    path.style.opacity = "1";
+                  },
 
-        path.style.opacity = "1";
-      },
+                  onComplete: () => {
+                    /*
+                      Completely gone after retracting.
+                    */
+                    path.style.opacity = "0";
+                    path.style.strokeDasharray = "none";
+                    path.style.strokeDashoffset = "0";
 
-      onComplete: () => {
-        /*
-          Completely gone after retracting.
-        */
-        path.style.opacity = "0";
-        path.style.strokeDasharray = "none";
-        path.style.strokeDashoffset = "0";
-
-        /* This cloud's string is fully retracted — count it toward
-           the intro-complete gate for Nav / Register. */
-        pendingRetractionsRef.current = Math.max(
-          0,
-          pendingRetractionsRef.current - 1,
-        );
-        maybeFinishIntro();
-      },
-    });
-  });
-},
+                    /* This cloud's string is fully retracted — count it toward
+                       the intro-complete gate for Nav / Register. */
+                    pendingRetractionsRef.current = Math.max(
+                      0,
+                      pendingRetractionsRef.current - 1,
+                    );
+                    maybeFinishIntro();
+                  },
+                });
+              });
+            },
           },
           CLOUD_DROP_START +
-            index * CLOUD_DROP_STAGGER,
+          index * CLOUD_DROP_STAGGER,
         );
       });
 
@@ -852,26 +932,26 @@ export default function Home({
   }, [preloaderDone]);
 
   useEffect(() => {
-  if (window.innerWidth > 650) return;
+    if (window.innerWidth > 650) return;
 
-  let resizeTimer: ReturnType<typeof setTimeout>;
+    let resizeTimer: ReturnType<typeof setTimeout>;
 
-  const handleResize = () => {
-    clearTimeout(resizeTimer);
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
 
-    resizeTimer = setTimeout(() => {
-      window.location.reload();
-    }, 300);
-  };
+      resizeTimer = setTimeout(() => {
+        window.location.reload();
+      }, 300);
+    };
 
-  window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize);
 
-  return () => {
-    clearTimeout(resizeTimer);
-    window.removeEventListener("resize", handleResize);
-  };
-}, []);
-  
+    return () => {
+      clearTimeout(resizeTimer);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       cloudRefs.current.forEach((cloud, i) => {
@@ -925,7 +1005,7 @@ export default function Home({
         portholeInner.style.left = `${-left}px`;
         portholeInner.style.width = `${containerBox.width}px`;
         portholeInner.style.height = `${containerBox.height}px`;
-            }
+      }
 
       cloudRefs.current.forEach((real, i) => {
         const overlay = overlayCloudRefs.current[i];
@@ -1083,283 +1163,289 @@ export default function Home({
   }, [isMobile]);
 
   return (
-    <div className={styles.container} ref={containerRef}>
-      <div
-        style={{
-          pointerEvents: introComplete ? "auto" : "none",
-        }}
-        aria-hidden={!introComplete}
-      >
-        <Nav />
-      </div>
+    <div ref={secRef} className={styles.scrollSection}>
+      <div className={styles.container} ref={containerRef}>
+        <div
+          style={{
+            pointerEvents: introComplete ? "auto" : "none",
+          }}
+          aria-hidden={!introComplete}
+        >
+          <Nav />
+        </div>
 
-      <div
-        className={styles.background}
-        style={{
-          backgroundImage: `url(${bg})`,
-        }}
-      />
+        <div
+          className={styles.background}
+          style={{
+            backgroundImage: `url(${bg})`,
+          }}
+        />
 
-      <ShootingStars />
+        <ShootingStars />
 
-      <div className={styles.sand} data-sand-parallax ref={sandRef}>
-        <img src={bgImg} className={styles.sandImg} alt="" />
-      </div>
+        <div className={styles.sand} data-sand-parallax ref={sandRef}>
+          <img src={bgImg} className={styles.sandImg} alt="" />
+        </div>
 
-      <div
-        className={styles.castle}
-        data-castle-drown
-        ref={castleRef}
-        style={{
-          visibility: preloaderDone
-            ? // ||
+        <div
+          className={styles.castle}
+          data-castle-drown
+          ref={castleRef}
+          style={{
+            visibility: preloaderDone
+              ? // ||
               // preloaderExiting
               "visible"
-            : "hidden",
-        }}
-      >
-        <img src={Castle} className={styles.castleImg} alt="" />
-      </div>
+              : "hidden",
+          }}
+        >
+          <img src={Castle} className={styles.castleImg} alt="" />
+        </div>
 
-      <div className={styles.clouds} ref={cloudsRef}>
-        {CLOUDS.map((c, i) => (
-          <div
-            key={i}
-            className={styles.cloud}
-            data-cloud-string
-            style={{
-              top: c.top,
-              left: c.left,
-              width: c.width,
-              visibility: preloaderDone
-                ? //  ||
-                  // preloaderExiting
-                  "visible"
-                : "hidden",
-            }}
-            ref={(el) => {
-              cloudRefs.current[i] = el;
-            }}
-          >
-            <img src={c.src} alt="" />
-          </div>
-        ))}
-      </div>
-
-      <svg
-        ref={introStringLayerRef}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          pointerEvents: "none",
-          zIndex: 3,
-        }}
-      />
-
-      <div
-        className={styles.moon}
-        data-moon-shrink
-        ref={moonRef}
-        style={{
-          visibility: preloaderDone
-            ? // ||
-              // preloaderExiting
-              "visible"
-            : "hidden",
-        }}
-      >
-        <img src={Moon} className={styles.moonImg} alt="" />
-      </div>
-
-      <div
-        className={styles.moonCloudOverlay}
-        ref={portholeRef}
-        style={{
-          visibility: preloaderDone
-            ? // ||
-              // preloaderExiting
-              "visible"
-            : "hidden",
-        }}
-      >
-        <div className={styles.moonCloudOverlayInner} ref={portholeInnerRef}>
+        <div className={styles.clouds} ref={cloudsRef}>
           {CLOUDS.map((c, i) => (
             <div
               key={i}
               className={styles.cloud}
+              data-cloud-string
               style={{
                 top: c.top,
                 left: c.left,
                 width: c.width,
-                filter: MOON_CLOUD_TINT,
+                visibility: preloaderDone
+                  ? //  ||
+                  // preloaderExiting
+                  "visible"
+                  : "hidden",
               }}
               ref={(el) => {
-                overlayCloudRefs.current[i] = el;
+                cloudRefs.current[i] = el;
               }}
             >
               <img src={c.src} alt="" />
             </div>
           ))}
         </div>
-      </div>
 
-      <div className={styles.oasisLogo}>
-        <img src={LogoOasis} alt="Oasis" />
-      </div>
-
-      {/* The shine in Home.module.scss masks itself with the carpet PNG so the
-          light is clipped to the fabric and never touches the cacti. The URL is
-          only known after the bundler hashes the asset, hence the CSS variable. */}
-      <button
-        type="button"
-        className={`${styles.regBtn} ${overCarpet ? styles.carpetHover : ""}`}
-        aria-label="Register"
-        aria-disabled={!introComplete}
-        tabIndex={introComplete ? 0 : -1}
-        style={
-          {
-            "--reg-carpet-mask": `url(${RegCarpet})`,
-            pointerEvents: introComplete ? "auto" : "none",
-          } as CSSProperties
-        }
-        onPointerMove={(e) => {
-          if (!introComplete) return;
-          setOverCarpet(isOverCarpet(e.clientX, e.clientY));
-        }}
-        onPointerLeave={() => setOverCarpet(false)}
-        onClick={(e) => {
-          if (!introComplete) return;
-          /* detail === 0 means keyboard activation (Enter/Space), where there
-             is no cursor position to test — always allow those through. */
-          if (e.detail !== 0 && !isOverCarpet(e.clientX, e.clientY)) return;
-          navigateWithTransition("/register");
-        }}
-      >
-        {/* Cacti sit behind. The carpet's tied ends drape in front of the arms
-            in the original artwork, so the carpet paints second. Swap the two
-            lines if your export has the overlap the other way round. */}
-        <img className={styles.regCactusLayer} src={RegCactus} alt="" />
-        <img
-          ref={carpetImgRef}
-          className={styles.regCarpetLayer}
-          src={RegCarpet}
-          alt=""
+        <svg
+          ref={introStringLayerRef}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            pointerEvents: "none",
+            zIndex: 3,
+          }}
         />
 
-        <svg
-          className={styles.regBtnText}
-          viewBox="0 0 220 90"
-          preserveAspectRatio="xMidYMid meet"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <path id="curve" d="M -4,4 Q 110,84 224,4" fill="transparent" />
-
-          <text textLength="120" lengthAdjust="spacingAndGlyphs">
-            <textPath href="#curve" startOffset="50%" textAnchor="middle">
-              REGISTER
-            </textPath>
-          </text>
-        </svg>
-      </button>
-
-      <div
-        ref={camelRef}
-        className={styles.camelLand}
-        style={{
-          visibility: preloaderDone
-            ? // ||
+        <div
+          className={styles.moon}
+          data-moon-shrink
+          ref={moonRef}
+          style={{
+            visibility: preloaderDone
+              ? // ||
               // preloaderExiting
               "visible"
-            : "hidden",
-        }}
-      >
-        <img src={camelLand} alt="" />
-      </div>
-      <div ref={camel2Ref} className={styles.camelLand2}>
-        <img src={camelLand2} alt="" />
-      </div>
-
-      {/* SOCIAL LINKS */}
-      <div className={styles.links}>
-        <svg
-          viewBox="0 0 100 100"
-          className={styles.linksSvg}
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="xMidYMid meet"
+              : "hidden",
+          }}
         >
-          <image
-            href={bgPath}
-            x="0"
-            y="0"
-            width="110"
-            height="100"
-            className={styles.socialLink}
+          <img src={Moon} className={styles.moonImg} alt="" />
+        </div>
+
+        <div
+          className={styles.moonCloudOverlay}
+          ref={portholeRef}
+          style={{
+            visibility: preloaderDone
+              ? // ||
+              // preloaderExiting
+              "visible"
+              : "hidden",
+          }}
+        >
+          <div className={styles.moonCloudOverlayInner} ref={portholeInnerRef}>
+            {CLOUDS.map((c, i) => (
+              <div
+                key={i}
+                className={styles.cloud}
+                style={{
+                  top: c.top,
+                  left: c.left,
+                  width: c.width,
+                  filter: MOON_CLOUD_TINT,
+                }}
+                ref={(el) => {
+                  overlayCloudRefs.current[i] = el;
+                }}
+              >
+                <img src={c.src} alt="" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.oasisLogo}>
+          <img src={LogoOasis} alt="Oasis" />
+        </div>
+
+        {/* The shine in Home.module.scss masks itself with the carpet PNG so the
+          light is clipped to the fabric and never touches the cacti. The URL is
+          only known after the bundler hashes the asset, hence the CSS variable. */}
+        <button
+          type="button"
+          className={`${styles.regBtn} ${overCarpet ? styles.carpetHover : ""}`}
+          aria-label="Register"
+          aria-disabled={!introComplete}
+          tabIndex={introComplete ? 0 : -1}
+          style={
+            {
+              "--reg-carpet-mask": `url(${RegCarpet})`,
+              pointerEvents: introComplete ? "auto" : "none",
+            } as CSSProperties
+          }
+          onPointerMove={(e) => {
+            if (!introComplete) return;
+            setOverCarpet(isOverCarpet(e.clientX, e.clientY));
+          }}
+          onPointerLeave={() => setOverCarpet(false)}
+          onClick={(e) => {
+            if (!introComplete) return;
+            /* detail === 0 means keyboard activation (Enter/Space), where there
+               is no cursor position to test — always allow those through. */
+            if (e.detail !== 0 && !isOverCarpet(e.clientX, e.clientY)) return;
+            navigateWithTransition("/register");
+          }}
+        >
+          {/* Cacti sit behind. The carpet's tied ends drape in front of the arms
+            in the original artwork, so the carpet paints second. Swap the two
+            lines if your export has the overlap the other way round. */}
+          <img className={styles.regCactusLayer} src={RegCactus} alt="" />
+          <img
+            ref={carpetImgRef}
+            className={styles.regCarpetLayer}
+            src={RegCarpet}
+            alt=""
           />
 
-          <a
-            href="https://www.instagram.com/bitsoasis/"
-            target="_blank"
-            rel="noreferrer"
+          <svg
+            className={styles.regBtnText}
+            viewBox="0 0 220 90"
+            preserveAspectRatio="xMidYMid meet"
+            aria-hidden="true"
+            focusable="false"
           >
-            <image
-              href={instagramIcon}
-              x="43"
-              y="68"
-              width="12"
-              height="12"
-              className={styles.socialLink}
-            />
-          </a>
+            <path id="curve" d="M -4,4 Q 110,84 224,4" fill="transparent" />
 
-          <a
-            href="https://www.linkedin.com/company/oasis24-bits-pilani/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <image
-              href={LinkdinIcon}
-              x="87"
-              y="46"
-              width="12"
-              height="12"
-              className={styles.socialLink}
-            />
-          </a>
+            <text textLength="120" lengthAdjust="spacingAndGlyphs">
+              <textPath href="#curve" startOffset="50%" textAnchor="middle">
+                REGISTER
+              </textPath>
+            </text>
+          </svg>
+        </button>
 
-          <a
-            href="https://www.youtube.com/@oasisbitspilani6375"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <image
-              href={youtubeIcon}
-              x="53"
-              y="25"
-              width="12"
-              height="12"
-              className={styles.socialLink}
-            />
-          </a>
+        <div
+          ref={camelRef}
+          className={styles.camelLand}
+          style={{
+            visibility: preloaderDone
+              ? // ||
+              // preloaderExiting
+              "visible"
+              : "hidden",
+          }}
+        >
+          <img src={camelLand} alt="" />
+        </div>
+        <div ref={camel2Ref} className={styles.camelLand2}>
+          <img src={camelLand2} alt="" />
+        </div>
 
-          <a
-            href="https://x.com/bitsoasis"
-            target="_blank"
-            rel="noreferrer"
+        {/* SOCIAL LINKS */}
+        <div className={styles.links}>
+          <svg
+            viewBox="0 0 100 100"
+            className={styles.linksSvg}
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="xMidYMid meet"
           >
             <image
-              href={twitterIcon}
-              x="1"
-              y="23"
-              width="12"
-              height="12"
+              href={bgPath}
+              x="0"
+              y="0"
+              width="110"
+              height="100"
               className={styles.socialLink}
             />
-          </a>
-        </svg>
+
+            <a
+              href="https://www.instagram.com/bitsoasis/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <image
+                href={instagramIcon}
+                x="43"
+                y="68"
+                width="12"
+                height="12"
+                className={styles.socialLink}
+              />
+            </a>
+
+            <a
+              href="https://www.linkedin.com/company/oasis24-bits-pilani/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <image
+                href={LinkdinIcon}
+                x="87"
+                y="46"
+                width="12"
+                height="12"
+                className={styles.socialLink}
+              />
+            </a>
+
+            <a
+              href="https://www.youtube.com/@oasisbitspilani6375"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <image
+                href={youtubeIcon}
+                x="53"
+                y="25"
+                width="12"
+                height="12"
+                className={styles.socialLink}
+              />
+            </a>
+
+            <a
+              href="https://x.com/bitsoasis"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <image
+                href={twitterIcon}
+                x="1"
+                y="23"
+                width="12"
+                height="12"
+                className={styles.socialLink}
+              />
+            </a>
+          </svg>
+        </div>
       </div>
+      <div ref={leftRef} className={styles.leftTop}>
+        <SvgImg src={bgLeft} />
+      </div>
+      
     </div>
   );
 }
