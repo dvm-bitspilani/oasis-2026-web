@@ -283,21 +283,35 @@
   .container {
     position: absolute;
     left: auto;
-    right: 5%;
-    width: 98vw;
+    right: 2%;
+
+    width: 96vw;
     height: 40px;
+
+    margin-left: 0;
+    padding: 0;
+
+    box-sizing: border-box;
   }
 
   a {
     font-size: 0.75rem;
+    white-space: nowrap;
   }
 
   .rectangle {
     width: 100%;
+    margin-right: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
 
   .desktopLinks {
+    width: 100%;
+    display: flex;
     flex-wrap: nowrap;
     white-space: nowrap;
+    gap: 0.5rem;
+    justify-content: space-around;
   }
 }
