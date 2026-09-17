@@ -281,33 +281,32 @@
 @media (max-width: 650px) {
   .container {
     position: absolute;
-    left: auto;
-    right: 2%;
+    top: 24px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-55%);
 
-    width: clamp(280px, 96vw, 624px);
+    width: 100%;
+    max-width: 624px;
     height: clamp(36px, 10vw, 65px);
 
     margin-left: 0;
     padding: 0;
     box-sizing: border-box;
-  }
 
-  a {
-    font-size: clamp(0.6rem, 3.2vw, 1.2rem);
-    white-space: nowrap;
-    margin-top: 1.5%;
   }
 
   .rectangle {
-    width: 100%;
+    width: 96vw;
+    max-width: 624px;
     height: 100%;
 
-    margin-right: 0;
+    margin: 0;
     padding: 0 clamp(0.25rem, 1.5vw, 1rem);
 
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: center;
 
     box-sizing: border-box;
   }
@@ -322,7 +321,12 @@
 
     flex-wrap: nowrap;
     white-space: nowrap;
-
     gap: clamp(0.25rem, 1.5vw, 1rem);
+  }
+
+  a {
+    font-size: clamp(0.6rem, 3.2vw, 1.2rem);
+    white-space: nowrap;
+    margin-top: 1.5%;
   }
 }
