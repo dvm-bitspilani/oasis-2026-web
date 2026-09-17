@@ -559,14 +559,12 @@ body {
 
     .loadingBarRow {
 
-      bottom: 15%;
+      margin-bottom: 15%;
+    }
+    .loadingBarPercent{
+      margin-bottom: 15%;
     }
 
-    .loadingBar {
-
-      width:
-        min(230px, 62vw);
-    }
   }
 
 

@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import styles from "../styles/Nav.module.scss";
 import navLine from "../assets/hamLine.svg";
-import navMob from "../assets/about/arrow.png";
+// import navMob from "../assets/about/arrow.png";
 import { useTransition } from "../context/TransitionProvider";
 
 const LINKS = [
@@ -38,7 +38,7 @@ export default function Nav() {
             className={styles.mobileNavDecoration}
             aria-label="Home"
           >
-            <img src={navMob} alt="" />
+            {/* <img src={navMob} alt="" /> */}
           </NavLink>
 
           <NavLink
@@ -55,7 +55,7 @@ export default function Nav() {
             className={styles.mobileNavDecoration}
             aria-label="About Us"
           >
-            <img src={navMob} alt="" />
+            {/* <img src={navMob} alt="" /> */}
           </NavLink>
         </div>
 
