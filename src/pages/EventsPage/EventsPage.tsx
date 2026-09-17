@@ -305,6 +305,10 @@ function SmokeCanvas({
 
         const startTime = performance.now();
 
+        let lastDrawTime = 0;
+
+        const frameInterval = 1000 / 40; // cap the heavy work at ~40fps
+
         /* =====================================================
            CANVAS RESIZE
         ===================================================== */
@@ -312,7 +316,7 @@ function SmokeCanvas({
         const resize = () => {
             const dpr = Math.min(
                 window.devicePixelRatio || 1,
-                2
+                1.5
             );
 
             canvas.width =
@@ -364,101 +368,242 @@ function SmokeCanvas({
             isMobile ? 850 : 600;
 
         /* =====================================================
-           PARTICLE WISPS
+           PRE-RENDERED TEXTURES
+           Built once, off the main draw loop. Each has its own
+           softness baked in via a one-time canvas blur, so the
+           draw loop never needs ctx.filter or a fresh gradient.
         ===================================================== */
 
-        const particles = Array.from(
-            {
-                length:
-                    isMobile ? 320 : 520,
-            },
-            () => {
-                const side =
-                    Math.random() > 0.5
-                        ? 1
-                        : -1;
+        const makeSoftSprite = (
+            blurPx: number
+        ) => {
+            const spriteSize = 256;
 
-                const rawTargetX =
+            const sprite =
+                document.createElement(
+                    "canvas"
+                );
+
+            sprite.width = spriteSize;
+            sprite.height = spriteSize;
+
+            const sctx =
+                sprite.getContext("2d");
+
+            if (!sctx) return sprite;
+
+            const r = spriteSize / 2;
+
+            sctx.filter =
+                `blur(${blurPx}px)`;
+
+            const gradient =
+                sctx.createRadialGradient(
+                    r,
+                    r,
+                    0,
+                    r,
+                    r,
+                    r * 0.78
+                );
+
+            gradient.addColorStop(
+                0,
+                "rgba(91, 81, 137, 1)"
+            );
+
+            gradient.addColorStop(
+                0.5,
+                "rgba(91, 81, 137, 0.62)"
+            );
+
+            gradient.addColorStop(
+                0.8,
+                "rgba(91, 81, 137, 0.22)"
+            );
+
+            gradient.addColorStop(
+                1,
+                "rgba(91, 81, 137, 0)"
+            );
+
+            sctx.fillStyle = gradient;
+
+            sctx.beginPath();
+
+            sctx.arc(
+                r,
+                r,
+                r * 0.78,
+                0,
+                Math.PI * 2
+            );
+
+            sctx.fill();
+
+            return sprite;
+        };
+
+        // sharper texture for individual wisps, softer one for the big cloud body/puffs
+        const particleSprite =
+            makeSoftSprite(
+                isMobile ? 3 : 4
+            );
+
+        const puffSprite =
+            makeSoftSprite(
+                isMobile ? 10 : 16
+            );
+
+        /* =====================================================
+           PARTICLE WISPS
+           Big particles are biased close to the center and stay
+           put once they arrive. Small particles are biased out
+           toward the rim and keep idly floating once settled.
+           Fewer particles overall since the big/small split does
+           the coverage work that raw count used to.
+        ===================================================== */
+
+        const coreCount =
+            isMobile ? 55 : 90;
+
+        const edgeCount =
+            isMobile ? 105 : 170;
+
+        const makeParticle = (
+            isCore: boolean
+        ) => {
+            const side =
+                Math.random() > 0.5
+                    ? 1
+                    : -1;
+
+            // how far out toward the rim this particle's target sits
+            const reach = isCore
+                ? 0.10 +
+                  Math.random() * 0.35
+                : 0.55 +
+                  Math.random() * 0.55;
+
+            const angle =
+                Math.random() *
+                Math.PI *
+                2;
+
+            const rawTargetX =
+                Math.cos(angle) *
+                cloudWidth *
+                0.5 *
+                reach;
+
+            const rawTargetY =
+                Math.sin(angle) *
+                cloudHeight *
+                0.5 *
+                reach;
+
+            const ellipseA =
+                cloudWidth * 0.5;
+
+            const ellipseB =
+                cloudHeight * 0.5;
+
+            const ellipseDist =
+                Math.sqrt(
+                    (rawTargetX /
+                        ellipseA) **
+                        2 +
+                        (rawTargetY /
+                            ellipseB) **
+                            2
+                );
+
+            const clampScale =
+                ellipseDist > 1
+                    ? 1 / ellipseDist
+                    : 1;
+
+            return {
+                startX:
+                    originX +
                     (Math.random() - 0.5) *
-                    cloudWidth *
-                    (0.5 +
-                        Math.random() * 1.1);
+                        50,
 
-                const rawTargetY =
-                    (Math.random() - 0.5) *
-                    cloudHeight *
-                    (0.45 +
-                        Math.random() * 0.6);
+                startY:
+                    originY +
+                    Math.random() * 20,
 
-                const ellipseA =
-                    cloudWidth * 0.5;
+                targetX:
+                    centerX +
+                    rawTargetX *
+                        clampScale,
 
-                const ellipseB =
-                    cloudHeight * 0.5;
+                targetY:
+                    centerY +
+                    rawTargetY *
+                        clampScale,
 
-                const ellipseDist =
-                    Math.sqrt(
-                        (rawTargetX /
-                            ellipseA) **
-                            2 +
-                            (rawTargetY /
-                                ellipseB) **
-                                2
-                    );
+                size: isCore
+                    ? 50 +
+                      Math.random() * 55
+                    : 22 +
+                      Math.random() * 28,
 
-                const clampScale =
-                    ellipseDist > 1
-                        ? 1 / ellipseDist
-                        : 1;
+                drift:
+                    side *
+                    (isCore
+                        ? 8 +
+                          Math.random() * 12
+                        : 22 +
+                          Math.random() * 55),
 
-                return {
-                    startX:
-                        originX +
-                        (Math.random() - 0.5) *
-                            50,
+                phase:
+                    Math.random() *
+                    Math.PI *
+                    2,
 
-                    startY:
-                        originY +
-                        Math.random() * 20,
+                speed:
+                    0.8 +
+                    Math.random() *
+                        0.55,
 
-                    targetX:
-                        centerX +
-                        rawTargetX *
-                            clampScale,
+                delay:
+                    Math.random() * 0.2,
 
-                    targetY:
-                        centerY +
-                        rawTargetY *
-                            clampScale,
+                opacity:
+                    0.6 +
+                    Math.random() * 0.55,
 
-                    size:
-                        10 +
-                        Math.random() * 70,
+                isCore,
 
-                    drift:
-                        side *
-                        (18 +
-                            Math.random() * 60),
+                // idle floating once settled — zero for core particles, so
+                // they're the ones that "stay in the middle"
+                idleDrift: isCore
+                    ? 0
+                    : 6 +
+                      Math.random() * 14,
 
-                    phase:
-                        Math.random() *
-                        Math.PI *
-                        2,
+                idlePhase:
+                    Math.random() *
+                    Math.PI *
+                    2,
 
-                    speed:
-                        0.8 +
-                        Math.random() *
-                            0.55,
+                idleSpeed:
+                    0.25 +
+                    Math.random() * 0.3,
+            };
+        };
 
-                    delay:
-                        Math.random() * 0.2,
-
-                    opacity:
-                        0.6 +
-                        Math.random() * 0.55,
-                };
-            }
-        );
+        const particles = [
+            ...Array.from(
+                { length: coreCount },
+                () => makeParticle(true)
+            ),
+            ...Array.from(
+                { length: edgeCount },
+                () => makeParticle(false)
+            ),
+        ];
 
         /* =====================================================
            CENTRAL CLOUD PUFFS
@@ -471,16 +616,6 @@ function SmokeCanvas({
             { x: 0.14, y: 0.34, s: 0.88 },
             { x: 0.32, y: 0.26, s: 0.68 },
 
-            { x: -0.46, y: 0.08, s: 0.76 },
-            { x: -0.26, y: 0.08, s: 1.00 },
-            { x: -0.06, y: 0.04, s: 1.12 },
-            { x: 0.14, y: 0.06, s: 1.00 },
-            { x: 0.34, y: 0.02, s: 0.76 },
-
-            { x: -0.38, y: -0.14, s: 0.72 },
-            { x: -0.18, y: -0.18, s: 0.90 },
-            { x: 0.02, y: -0.18, s: 0.92 },
-            { x: 0.20, y: -0.14, s: 0.72 },
 
             { x: -0.26, y: -0.32, s: 0.56 },
             { x: -0.06, y: -0.36, s: 0.64 },
@@ -499,6 +634,20 @@ function SmokeCanvas({
         ===================================================== */
 
         const draw = (now: number) => {
+            if (
+                now - lastDrawTime <
+                frameInterval
+            ) {
+                animationFrame =
+                    requestAnimationFrame(
+                        draw
+                    );
+
+                return;
+            }
+
+            lastDrawTime = now;
+
             const elapsed =
                 (now - startTime) / 1000;
 
@@ -545,7 +694,7 @@ function SmokeCanvas({
                 const spread =
                     Math.pow(
                         progress,
-                        1.35
+                        1.3
                     );
 
                 const wave =
@@ -556,14 +705,53 @@ function SmokeCanvas({
                             particle.phase
                     );
 
+                const insideCloudStart = 0.75;
+
+                const insideCloudFactor =
+                    Math.min(
+                        1,
+                        Math.max(
+                            0,
+                            (spread -
+                                insideCloudStart) /
+                                (1 -
+                                    insideCloudStart)
+                        )
+                    );
+
+                // once a particle has fully arrived, small ones keep
+                // idly floating in place; core ones stay still
+                const settled =
+                    rawProgress >= 1;
+
+                const idleX = settled
+                    ? Math.cos(
+                          elapsed *
+                              particle.idleSpeed +
+                              particle.idlePhase
+                      ) * particle.idleDrift
+                    : 0;
+
+                const idleY = settled
+                    ? Math.sin(
+                          elapsed *
+                              particle.idleSpeed *
+                              0.8 +
+                              particle.idlePhase
+                      ) *
+                      particle.idleDrift *
+                      0.6
+                    : 0;
+
                 const x =
                     particle.startX +
                     (particle.targetX -
                         particle.startX) *
                         spread +
                     wave *
-                        particle.drift *
-                        spread;
+                        particle.drift * 0.2 *
+                        insideCloudFactor +
+                    idleX;
 
                 const risingY =
                     particle.startY -
@@ -576,76 +764,50 @@ function SmokeCanvas({
                         Math.pow(
                             progress,
                             1.8
-                        );
+                        ) +
+                    idleY;
 
                 const size =
                     particle.size *
-                    (0.62 +
-                        progress * 1.15);
+                    (2 +
+                        progress * 1.5);
 
                 const alpha =
                     particle.opacity *
                     (0.10 +
                         progress * 0.46);
 
-                const gradient =
-                    ctx.createRadialGradient(
-                        x,
-                        y,
-                        0,
-                        x,
-                        y,
-                        size
-                    );
+                const aspect =
+                    0.62 +
+                    Math.sin(
+                        particle.phase
+                    ) * 0.18;
 
-                gradient.addColorStop(
-                    0,
-                    `rgba(91, 81, 137, ${alpha})`
+                ctx.save();
+
+                ctx.globalAlpha = alpha;
+
+                ctx.translate(x, y);
+
+                ctx.rotate(particle.phase);
+
+                ctx.scale(1, aspect);
+
+                ctx.drawImage(
+                    particleSprite,
+                    -size,
+                    -size,
+                    size * 2,
+                    size * 2
                 );
 
-                gradient.addColorStop(
-                    0.5,
-                    `rgba(91, 81, 137, ${
-                        alpha * 0.62
-                    })`
-                );
-
-                gradient.addColorStop(
-                    0.8,
-                    `rgba(91, 81, 137, ${
-                        alpha * 0.22
-                    })`
-                );
-
-                gradient.addColorStop(
-                    1,
-                    "rgba(91, 81, 137, 0)"
-                );
-
-                ctx.fillStyle = gradient;
-
-                ctx.beginPath();
-
-                ctx.ellipse(
-                    x,
-                    y,
-                    size,
-                    size *
-                        (0.62 +
-                            Math.sin(
-                                particle.phase
-                            ) *
-                                0.18),
-                    particle.phase,
-                    0,
-                    Math.PI * 2
-                );
-
-                ctx.fill();
+                ctx.restore();
             });
 
             /* =================================================
                CENTRAL SOFT CLOUD
+               (pre-rendered sprite — no per-frame gradients,
+               no runtime blur)
             ================================================= */
 
             if (elapsed > 0.42) {
@@ -669,61 +831,8 @@ function SmokeCanvas({
 
                 ctx.save();
 
-                ctx.filter = isMobile
-                    ? "blur(10px)"
-                    : "blur(16px)";
-
-                const baseGradient =
-                    ctx.createRadialGradient(
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        1
-                    );
-
-                baseGradient.addColorStop(
-                    0,
-                    `rgba(91, 81, 137, ${
-                        0.24 * eased
-                    })`
-                );
-
-                baseGradient.addColorStop(
-                    0.38,
-                    `rgba(91, 81, 137, ${
-                        0.20 * eased
-                    })`
-                );
-
-                baseGradient.addColorStop(
-                    0.62,
-                    `rgba(91, 81, 137, ${
-                        0.13 * eased
-                    })`
-                );
-
-                baseGradient.addColorStop(
-                    0.78,
-                    `rgba(91, 81, 137, ${
-                        0.055 * eased
-                    })`
-                );
-
-                baseGradient.addColorStop(
-                    0.90,
-                    `rgba(91, 81, 137, ${
-                        0.018 * eased
-                    })`
-                );
-
-                baseGradient.addColorStop(
-                    1,
-                    "rgba(91, 81, 137, 0)"
-                );
-
-                ctx.save();
+                ctx.globalAlpha =
+                    0.24 * eased;
 
                 ctx.translate(
                     centerX,
@@ -731,24 +840,17 @@ function SmokeCanvas({
                 );
 
                 ctx.scale(
-                    baseRadius * 1.1,
-                    baseRadius * 0.80
-                );
-
-                ctx.fillStyle =
-                    baseGradient;
-
-                ctx.beginPath();
-
-                ctx.arc(
-                    0,
-                    0,
                     1,
-                    0,
-                    Math.PI * 2
+                    0.8 / 1.1
                 );
 
-                ctx.fill();
+                ctx.drawImage(
+                    puffSprite,
+                    -baseRadius * 1.1,
+                    -baseRadius * 1.1,
+                    baseRadius * 1.1 * 2,
+                    baseRadius * 1.1 * 2
+                );
 
                 ctx.restore();
 
@@ -800,83 +902,32 @@ function SmokeCanvas({
                             0.105 *
                             puffEase;
 
-                        const puffGradient =
-                            ctx.createRadialGradient(
-                                0,
-                                0,
-                                0,
-                                0,
-                                0,
-                                1
-                            );
-
-                        puffGradient.addColorStop(
-                            0,
-                            `rgba(91, 81, 137, ${alpha})`
-                        );
-
-                        puffGradient.addColorStop(
-                            0.38,
-                            `rgba(91, 81, 137, ${
-                                alpha * 0.72
-                            })`
-                        );
-
-                        puffGradient.addColorStop(
-                            0.64,
-                            `rgba(45, 155, 195, ${
-                                alpha * 0.32
-                            })`
-                        );
-
-                        puffGradient.addColorStop(
-                            0.78,
-                            `rgba(91, 81, 137, ${
-                                alpha * 0.12
-                            })`
-                        );
-
-                        puffGradient.addColorStop(
-                            0.90,
-                            `rgba(91, 81, 137, ${
-                                alpha * 0.035
-                            })`
-                        );
-
-                        puffGradient.addColorStop(
-                            1,
-                            "rgba(91, 81, 137, 0)"
-                        );
-
                         ctx.save();
 
-                        ctx.translate(x, y);
+                        ctx.globalAlpha =
+                            alpha;
+
+                        ctx.translate(
+                            x,
+                            y
+                        );
 
                         ctx.scale(
-                            radius,
-                            radius * 0.82
-                        );
-
-                        ctx.fillStyle =
-                            puffGradient;
-
-                        ctx.beginPath();
-
-                        ctx.arc(
-                            0,
-                            0,
                             1,
-                            0,
-                            Math.PI * 2
+                            0.82
                         );
 
-                        ctx.fill();
+                        ctx.drawImage(
+                            puffSprite,
+                            -radius,
+                            -radius,
+                            radius * 2,
+                            radius * 2
+                        );
 
                         ctx.restore();
                     }
                 );
-
-                ctx.restore();
             }
 
             /* =================================================
@@ -1088,12 +1139,10 @@ function SmokeCanvas({
                CONTINUE ANIMATION
             ================================================= */
 
-            if (elapsed < 2.9) {
-                animationFrame =
-                    requestAnimationFrame(
-                        draw
-                    );
-            }
+            animationFrame =
+                requestAnimationFrame(
+                    draw
+                );
         };
 
         animationFrame =
