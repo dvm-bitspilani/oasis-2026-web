@@ -361,11 +361,13 @@ function SmokeCanvas({
         const centerY =
             window.innerHeight * 0.5 - 20;
 
+        // Cloud footprint scaled up ~1.4x in both directions on
+        // mobile and desktop, compared to the original size.
         const cloudWidth =
-            isMobile ? 500 : 1000;
+            isMobile ? 980 : 1400;
 
         const cloudHeight =
-            isMobile ? 400 : 500;
+            isMobile ? 1190 : 700;
 
         /* =====================================================
            PRE-RENDERED TEXTURES
@@ -460,15 +462,16 @@ function SmokeCanvas({
            Big particles are biased close to the center and stay
            put once they arrive. Small particles are biased out
            toward the rim and keep idly floating once settled.
-           Fewer particles overall since the big/small split does
-           the coverage work that raw count used to.
+           Counts are scaled up (~2x) alongside the larger cloud
+           footprint so the wisp density per unit area stays the
+           same as before.
         ===================================================== */
 
         const coreCount =
-            isMobile ? 55 : 100;
+            isMobile ? 150 : 200;
 
         const edgeCount =
-            isMobile ? 105 : 220;
+            isMobile ? 170 : 440;
 
         const makeParticle = (
     isCore: boolean
@@ -486,29 +489,18 @@ function SmokeCanvas({
      */
     const reach = isCore
         ? 0.08 + Math.random() * 0.28
-        : 0.35 + Math.random() * 0.45;
+        : 0.355 + Math.random() * 0.45;
 
     /*
-     * On mobile, bias particles downward/slightly
-     * around the centre instead of allowing a full
-     * circular distribution.
+     * Full circular distribution so particles spread
+     * evenly in every direction (left/right/up/down)
+     * around the center, instead of being biased
+     * toward one side.
      */
-    let angle =
+    const angle =
         Math.random() *
         Math.PI *
         2;
-
-    if (isMobile) {
-        /*
-         * Bias the vertical position toward the
-         * lower half of the cloud.
-         */
-        angle =
-            Math.PI * 0.15 +
-            Math.random() *
-                Math.PI *
-                1.7;
-    }
 
     const rawTargetX =
         Math.cos(angle) *
@@ -625,16 +617,26 @@ function SmokeCanvas({
 
         /* =====================================================
            CENTRAL CLOUD PUFFS
+           Mirrored above/below and left/right of center so the
+           cloud reads as evenly filled on every side, rather
+           than concentrated toward one corner. 12 puffs spread
+           over the larger footprint keeps density on par with
+           the original 5-puff version.
         ===================================================== */
 
         const cloudPuffs = [
             { x: -0.42, y: 0.30, s: 0.72 },
+            { x: 0.42, y: 0.30, s: 0.72 },
+            { x: -0.42, y: -0.30, s: 0.68 },
+            { x: 0.42, y: -0.30, s: 0.68 },
             { x: -0.24, y: 0.38, s: 0.88 },
+            { x: 0.24, y: 0.38, s: 0.88 },
+            { x: -0.24, y: -0.38, s: 0.80 },
+            { x: 0.24, y: -0.38, s: 0.80 },
             { x: -0.06, y: 0.36, s: 1.00 },
-            { x: 0.14, y: 0.34, s: 0.88 },
-            { x: 0.32, y: 0.26, s: 0.68 },
-
-
+            { x: 0.06, y: -0.36, s: 0.92 },
+            { x: 0, y: 0.12, s: 0.75 },
+            { x: 0, y: -0.12, s: 0.75 },
         ];
 
         /* =====================================================
@@ -764,7 +766,7 @@ function SmokeCanvas({
                         particle.startX) *
                         spread +
                     wave *
-                        particle.drift * 0.2 *
+                        particle.drift * 0.25 *
                         insideCloudFactor +
                     idleX;
 
@@ -841,8 +843,8 @@ function SmokeCanvas({
 
                 const baseRadius =
                     isMobile
-                        ? 200
-                        : 400;
+                        ? 280
+                        : 560;
 
                 ctx.save();
 
@@ -906,8 +908,8 @@ function SmokeCanvas({
 
                         const radius =
                             (isMobile
-                                ? 115
-                                : 180) *
+                                ? 161
+                                : 252) *
                             puff.s *
                             (0.25 +
                                 puffEase *
@@ -965,8 +967,8 @@ function SmokeCanvas({
                         centerX,
                         centerY,
                         isMobile
-                            ? 230
-                            : 350
+                            ? 322
+                            : 490
                     );
 
                 coreGradient.addColorStop(
@@ -1004,18 +1006,18 @@ function SmokeCanvas({
                 ctx.fillRect(
                     centerX -
                         (isMobile
-                            ? 230
-                            : 350),
+                            ? 322
+                            : 490),
                     centerY -
                         (isMobile
-                            ? 170
-                            : 250),
+                            ? 238
+                            : 350),
                     isMobile
-                        ? 460
-                        : 700,
+                        ? 644
+                        : 980,
                     isMobile
-                        ? 400
-                        : 600
+                        ? 560
+                        : 840
                 );
             }
 
@@ -1039,8 +1041,8 @@ function SmokeCanvas({
                         centerX,
                         centerY,
                         isMobile
-                            ? 260
-                            : 480
+                            ? 364
+                            : 672
                     );
 
                 vignette.addColorStop(
@@ -1067,18 +1069,18 @@ function SmokeCanvas({
                 ctx.fillRect(
                     centerX -
                         (isMobile
-                            ? 260
-                            : 480),
+                            ? 364
+                            : 672),
                     centerY -
                         (isMobile
-                            ? 230
-                            : 420),
+                            ? 322
+                            : 588),
                     isMobile
-                        ? 520
-                        : 960,
+                        ? 728
+                        : 1344,
                     isMobile
-                        ? 460
-                        : 840
+                        ? 644
+                        : 1176
                 );
             }
 
