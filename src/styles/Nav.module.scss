@@ -170,52 +170,17 @@
     text-shadow: 0 -2.5px 0 #EED8AF;
   }
 
-  .rectangle a {
-    display: inline-block;
-    transition: transform 200ms ease, text-shadow 200ms ease;
-    transform-origin: center;
+.rectangle a {
+  display: inline-block;
+  transition: transform 200ms ease, text-shadow 200ms ease;
+  transform-origin: center;
 
-    &:hover,
-    &:focus-visible {
-      transform: scale(1.15);
-      text-shadow: 0 -2.875px 0 #EED8AF;
-      outline: none;
-    }
+  &:hover,
+  &:focus-visible {
+    transform: scale(1.15);
+    text-shadow: 0 0 10px rgba(238, 216, 175, 0.7);
   }
-
-  .mobileHomeNav {
-    display: none;
-  }
-
-  .desktopLinks {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    gap: 1.5rem;
-  }
-
-  @media screen and (max-width: 1600px) {
-    a {
-      font-size: 1.25rem;
-    }
-  }
-
-  @media (min-width: 751px) and (max-width: 1100px) {
-    .container {
-      position: absolute;
-      top: 24px;
-      left: -50%;
-      width: 150vw;
-      height: 10vh;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      margin-left: 5%;
-      z-index: 5000;
-    }
-  }
+}
 
 @media (max-width: 650px) {
   .container {

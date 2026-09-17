@@ -43,6 +43,7 @@ export default function AppRoutes({
           path="/eventReg"
           element={<Events />}
         />
+
         <Route
           path="/aboutUs"
           element={<About />}
