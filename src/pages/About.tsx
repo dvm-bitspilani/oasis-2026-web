@@ -14,9 +14,6 @@ import play from "../assets/about/play.png";
 import ff from "../assets/about/ffControl.png";
 import playBtn from "../assets/about/playBtn.png";
 import { useTransition } from "../context/TransitionProvider";
-import ff from "../assets/about/ffControl.png";
-import playBtn from "../assets/about/playBtn.png";
-import { useTransition } from "../context/TransitionProvider";
 import bgVid from "../assets/about/bgVideo.png";
 import cover from "../assets/about/cover.png";
 import backBtn from "../assets/about/backBtn.png";
@@ -52,10 +49,6 @@ const ABOUT_ASSETS = [
 ];
 
 gsap.registerPlugin(ScrollTrigger);
-
-ScrollTrigger.config({
-  ignoreMobileResize: true,
-});
 
 ScrollTrigger.config({
   ignoreMobileResize: true,
@@ -320,7 +313,6 @@ const About = () => {
 
       gsap.set(headRef.current, {
         y: "-40vh",
-        y: "-40vh",
         opacity: 1,
       });
 
@@ -436,17 +428,13 @@ const About = () => {
 
       const SHRINK_DURATION = 0.5;
       const CROSSFADE_DURATION = 0.35;
-      const SHRINK_DURATION = 0.5;
-      const CROSSFADE_DURATION = 0.35;
 
       tl.to(
-        [bgRef.current, bgSolidRef.current],
         [bgRef.current, bgSolidRef.current],
         {
           scaleX: 1,
           scaleY: 1,
           ease: "none",
-          duration: SHRINK_DURATION,
           duration: SHRINK_DURATION,
         },
         0
@@ -454,11 +442,7 @@ const About = () => {
 
       tl.to(
         bgRef.current,
-        bgRef.current,
         {
-          opacity: 0,
-          duration: CROSSFADE_DURATION,
-          ease: "power1.inOut",
           opacity: 0,
           duration: CROSSFADE_DURATION,
           ease: "power1.inOut",
@@ -468,29 +452,18 @@ const About = () => {
 
       tl.to(
         bgSolidRef.current,
-        SHRINK_DURATION - CROSSFADE_DURATION / 2
-      );
-
-      tl.to(
-        bgSolidRef.current,
         {
           opacity: 1,
-          duration: CROSSFADE_DURATION,
-          ease: "power1.inOut",
           duration: CROSSFADE_DURATION,
           ease: "power1.inOut",
         },
         SHRINK_DURATION - CROSSFADE_DURATION / 2
-        SHRINK_DURATION - CROSSFADE_DURATION / 2
       );
 
       tl.to(
         bgBackRef.current,
-      tl.to(
-        bgBackRef.current,
         {
           opacity: 1,
-          duration: 0.3,
           duration: 0.3,
         },
         0.4
@@ -518,15 +491,10 @@ const About = () => {
           opacity: 1,
           duration: 0.4,
           ease: "power1.inOut",
-          duration: 0.4,
-          ease: "power1.inOut",
         },
-        0.5
         0.5
       );
 
-      tl.to(
-        vidBgRef.current,
       tl.to(
         vidBgRef.current,
         {
@@ -631,11 +599,9 @@ const About = () => {
 
   return (
     <div ref={containerRef} className={styles.about}>
-    <div ref={containerRef} className={styles.about}>
       <div
         ref={bgBackRef}
         className={styles.bgBack}
-        style={{ backgroundImage: `url(${bgback})` }}
         style={{ backgroundImage: `url(${bgback})` }}
       />
 
@@ -643,14 +609,8 @@ const About = () => {
         ref={bgRef}
         className={styles.bgFront}
         style={{ backgroundImage: `url(${cover})` }}
-        style={{ backgroundImage: `url(${cover})` }}
       />
 
-      <div
-        ref={bgSolidRef}
-        className={styles.bgFrontSolid}
-        style={{ backgroundImage: `url(${cover})` }}
-      />
       <div
         ref={bgSolidRef}
         className={styles.bgFrontSolid}
@@ -659,23 +619,13 @@ const About = () => {
 
       {!clicked && (
         <div ref={cloudRef} className={styles.cloud}>
-        <div ref={cloudRef} className={styles.cloud}>
           <SvgImg src={cloud} />
 
-          <div onClick={clickHandler} className={styles.play}>
           <div onClick={clickHandler} className={styles.play}>
             <SvgImg src={play} />
           </div>
 
           <div className={styles.text}>
-            Oasis, the annual cultural extravaganza of Birla Institute of
-            Technology and Science, Pilani, has been a vibrant part of
-            India's cultural tapestry since 1971. Managed entirely by
-            students, it's a dazzling showcase of talent in Dance, Drama,
-            Literature, Comedy, Fashion, and Music. It's where dreams come
-            alive, laughter fills the air, and creativity knows no bounds.
-            Step into the world of Oasis, where youth's boundless potential
-            shines...
             Oasis, the annual cultural extravaganza of Birla Institute of
             Technology and Science, Pilani, has been a vibrant part of
             India's cultural tapestry since 1971. Managed entirely by
@@ -698,7 +648,6 @@ const About = () => {
             style={{ width: "100%", height: "100%" }}
           />
         </div>
-      </div>
       </div>
 
       <div
@@ -746,18 +695,12 @@ const About = () => {
           <img src={backBg} alt="" />
         </div>
       )}
-      {!clicked && (
-        <div className={styles.bgBottom} ref={bottomBack}>
-          <img src={backBg} alt="" />
-        </div>
-      )}
 
-      <div ref={bottomL} className={styles.leftCloud}>
+      <div ref={bottomL}  className={styles.leftCloud}>
         <SvgImg src={leftCloud} />
       </div>
 
       {!clicked && (
-        <div ref={headRef} className={styles.head}>
         <div ref={headRef} className={styles.head}>
           <SvgImg src={head} />
         </div>
@@ -767,7 +710,6 @@ const About = () => {
         <SvgImg src={bgLeft} />
       </div>
 
-      <div ref={bottomR} className={styles.rightCloud}>
       <div ref={bottomR} className={styles.rightCloud}>
         <SvgImg src={leftCloud} />
       </div>
