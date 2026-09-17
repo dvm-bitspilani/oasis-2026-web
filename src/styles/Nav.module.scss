@@ -278,40 +278,51 @@
 //     transform: translateY(-50%) scaleX(-1.15);
 //     outline: none;
 //   }
-// }
 @media (max-width: 650px) {
   .container {
     position: absolute;
     left: auto;
     right: 2%;
 
-    width: 96vw;
-    height: 40px;
+    width: clamp(280px, 96vw, 624px);
+    height: clamp(36px, 10vw, 65px);
 
     margin-left: 0;
     padding: 0;
-
     box-sizing: border-box;
   }
 
   a {
-    font-size: 0.75rem;
+    font-size: clamp(0.6rem, 3.2vw, 1.2rem);
     white-space: nowrap;
+    margin-top: 1.5%;
   }
 
   .rectangle {
     width: 100%;
+    height: 100%;
+
     margin-right: 0;
-    padding: 0;
+    padding: 0 clamp(0.25rem, 1.5vw, 1rem);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
     box-sizing: border-box;
   }
 
   .desktopLinks {
     width: 100%;
+    height: 100%;
+
     display: flex;
+    align-items: center;
+    justify-content: space-around;
+
     flex-wrap: nowrap;
     white-space: nowrap;
-    gap: 0.5rem;
-    justify-content: space-around;
+
+    gap: clamp(0.25rem, 1.5vw, 1rem);
   }
 }
