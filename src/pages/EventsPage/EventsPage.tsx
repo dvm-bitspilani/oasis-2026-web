@@ -362,10 +362,10 @@ function SmokeCanvas({
             window.innerHeight * 0.5 - 20;
 
         const cloudWidth =
-            isMobile ? 420 : 1000;
+            isMobile ? 500 : 1000;
 
         const cloudHeight =
-            isMobile ? 850 : 500;
+            isMobile ? 400 : 500;
 
         /* =====================================================
            PRE-RENDERED TEXTURES
@@ -471,128 +471,146 @@ function SmokeCanvas({
             isMobile ? 105 : 220;
 
         const makeParticle = (
-            isCore: boolean
-        ) => {
-            const side =
-                Math.random() > 0.5
-                    ? 1
-                    : -1;
+    isCore: boolean
+) => {
+    const side =
+        Math.random() > 0.5
+            ? 1
+            : -1;
 
-            // how far out toward the rim this particle's target sits
-            const reach = isCore
-                ? 0.10 +
-                  Math.random() * 0.35
-                : 0.55 +
-                  Math.random() * 0.55;
+    /*
+     * MOBILE:
+     * Keep the smoke concentrated around the center
+     * instead of allowing particles to randomly spread
+     * far above it.
+     */
+    const reach = isCore
+        ? 0.08 + Math.random() * 0.28
+        : 0.35 + Math.random() * 0.45;
 
-            const angle =
-                Math.random() *
+    /*
+     * On mobile, bias particles downward/slightly
+     * around the centre instead of allowing a full
+     * circular distribution.
+     */
+    let angle =
+        Math.random() *
+        Math.PI *
+        2;
+
+    if (isMobile) {
+        /*
+         * Bias the vertical position toward the
+         * lower half of the cloud.
+         */
+        angle =
+            Math.PI * 0.15 +
+            Math.random() *
                 Math.PI *
-                2;
+                1.7;
+    }
 
-            const rawTargetX =
-                Math.cos(angle) *
-                cloudWidth *
-                0.6 *
-                reach;
+    const rawTargetX =
+        Math.cos(angle) *
+        cloudWidth *
+        0.6 *
+        reach;
 
-            const rawTargetY =
-                Math.sin(angle) *
-                cloudHeight *
-                0.5 *
-                reach;
+    const rawTargetY =
+        Math.sin(angle) *
+        cloudHeight *
+        0.5 *
+        reach;
 
-            const ellipseA =
-                cloudWidth * 0.5;
+    const ellipseA =
+        cloudWidth * 0.5;
 
-            const ellipseB =
-                cloudHeight * 0.5;
+    const ellipseB =
+        cloudHeight * 0.5;
 
-            const ellipseDist =
-                Math.sqrt(
-                    (rawTargetX /
-                        ellipseA) **
-                        2 +
-                        (rawTargetY /
-                            ellipseB) **
-                            2
-                );
+    const ellipseDist =
+        Math.sqrt(
+            (rawTargetX /
+                ellipseA) ** 2 +
+                (rawTargetY /
+                    ellipseB) ** 2
+        );
 
-            const clampScale =
-                ellipseDist > 1
-                    ? 1 / ellipseDist
-                    : 1;
+    const clampScale =
+        ellipseDist > 1
+            ? 1 / ellipseDist
+            : 1;
 
-            return {
-                startX:
-                    originX +
-                    (Math.random() - 0.5) *
-                        50,
+    return {
+        startX:
+            originX +
+            (Math.random() - 0.5) *
+                35,
 
-                startY:
-                    originY +
-                    Math.random() * 20,
+        startY:
+            originY +
+            Math.random() *
+                18,
 
-                targetX:
-                    centerX +
-                    rawTargetX *
-                        clampScale,
+        targetX:
+            centerX +
+            rawTargetX *
+                clampScale,
 
-                targetY:
-                    centerY +
-                    rawTargetY *
-                        clampScale,
+        targetY:
+            centerY +
+            rawTargetY *
+                clampScale,
 
-                size: isCore
-                    ? 50 +
-                      Math.random() * 55
-                    : 22 +
-                      Math.random() * 28,
+        size: isCore
+            ? 48 +
+              Math.random() * 45
+            : 20 +
+              Math.random() * 25,
 
-                drift:
-                    side *
-                    (isCore
-                        ? 8 +
-                          Math.random() * 12
-                        : 22 +
-                          Math.random() * 55),
+        drift:
+            side *
+            (isCore
+                ? 6 +
+                  Math.random() * 10
+                : 18 +
+                  Math.random() * 35),
 
-                phase:
-                    Math.random() *
-                    Math.PI *
-                    2,
+        phase:
+            Math.random() *
+            Math.PI *
+            2,
 
-                speed:
-                    0.8 +
-                    Math.random() *
-                        0.55,
+        speed:
+            0.7 +
+            Math.random() *
+                0.45,
 
-                delay:
-                    Math.random() * 0.2,
+        delay:
+            Math.random() * 0.2,
 
-                opacity:
-                    0.6 +
-                    Math.random() * 0.55,
+        opacity:
+            0.55 +
+            Math.random() * 0.45,
 
-                isCore,
+        isCore,
 
-                // idle floating once settled — zero for core particles, so
-                // they're the ones that "stay in the middle"
-                idleDrift: isCore
-                    ? 0
-                    : 6 +
-                      Math.random() * 14,
+        idleDrift: isCore
+            ? 0
+            : 5 +
+              Math.random() * 10,
 
-                idlePhase:
-                    Math.random() *
-                    Math.PI *
-                    2,
+        idlePhase:
+            Math.random() *
+            Math.PI *
+            2,
 
-                idleSpeed:
-                    0.25 +
-                    Math.random() * 0.3,
-            };
-        };
+        idleSpeed:
+            0.2 +
+            Math.random() * 0.25,
+    };
+};
+        
 
         const particles = [
             ...Array.from(
@@ -617,9 +635,6 @@ function SmokeCanvas({
             { x: 0.32, y: 0.26, s: 0.68 },
 
 
-            { x: -0.26, y: -0.32, s: 0.56 },
-            { x: -0.06, y: -0.36, s: 0.64 },
-            { x: 0.14, y: -0.30, s: 0.52 },
         ];
 
         /* =====================================================
@@ -826,7 +841,7 @@ function SmokeCanvas({
 
                 const baseRadius =
                     isMobile
-                        ? 250
+                        ? 200
                         : 400;
 
                 ctx.save();
@@ -841,7 +856,7 @@ function SmokeCanvas({
 
                 ctx.scale(
                     1,
-                    0.8 / 1.1
+                    isMobile ? 0.7 : 0.8 / 1.1
                 );
 
                 ctx.drawImage(
