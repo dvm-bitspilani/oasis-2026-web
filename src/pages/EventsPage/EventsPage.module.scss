@@ -15,13 +15,19 @@
     isolation: isolate;
 }
 
+/* =========================================================
+   SPOTLIGHT
+========================================================= */
+
 .spotlightOverlay {
     position: absolute;
     inset: 0;
     z-index: 5;
     pointer-events: none;
+
     backdrop-filter: brightness(0.4);
     -webkit-backdrop-filter: brightness(0.4);
+
     mask-image: radial-gradient(
         circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
         transparent 0px,
@@ -29,6 +35,7 @@
         black 300px,
         black 100%
     );
+
     -webkit-mask-image: radial-gradient(
         circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
         transparent 0px,
@@ -37,6 +44,10 @@
         black 100%
     );
 }
+
+/* =========================================================
+   CATEGORY POTS
+========================================================= */
 
 .dramaContainer {
     position: absolute;
@@ -71,12 +82,20 @@
     right: 5%;
 }
 
+/* =========================================================
+   TITLE
+========================================================= */
+
 .title {
     position: absolute;
     top: 0%;
     left: 0%;
     filter: brightness(3);
 }
+
+/* =========================================================
+   DESKTOP / SMALLER DESKTOP
+========================================================= */
 
 @media screen and (max-width: 1600px) {
     .dramaContainer,
@@ -113,21 +132,26 @@
 
     .spotlightOverlay {
         mask-image: radial-gradient(
-        circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-        transparent 0px,
-        transparent 140px,
-        black 220px,
-        black 100%
-    );
-    -webkit-mask-image: radial-gradient(
-        circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-        transparent 0px,
-        transparent 140px,
-        black 220px,
-        black 100%
-    );
+            circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            transparent 0px,
+            transparent 140px,
+            black 220px,
+            black 100%
+        );
+
+        -webkit-mask-image: radial-gradient(
+            circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            transparent 0px,
+            transparent 140px,
+            black 220px,
+            black 100%
+        );
     }
 }
+
+/* =========================================================
+   MOBILE PAGE
+========================================================= */
 
 @media screen and (max-width: 577px) {
     .spotlightOverlay {
@@ -174,6 +198,7 @@
         right: -35%;
     }
 }
+
 /* =========================================================
    CLICKABLE POTS
 ========================================================= */
@@ -183,7 +208,6 @@
 .danceContainer,
 .otherContainer,
 .musicContainer {
-
     cursor: pointer;
 
     img {
@@ -204,28 +228,20 @@
     }
 }
 
-
 /* =========================================================
    MODAL OVERLAY
 ========================================================= */
 
 .modalOverlay {
-
     position: fixed;
-
     inset: 0;
-
     z-index: 20;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     padding: 30px;
-
-
 
     animation:
         eventsOverlayIn
@@ -234,26 +250,20 @@
         forwards;
 }
 
-
 /* =========================================================
    MODAL
 ========================================================= */
 
 .modal {
-
     position: relative;
 
     width: min(920px, 90vw);
-
     min-height: 430px;
 
     padding:
         48px
         55px
         30px;
-
-  
-
 
     color: #f5eee3;
 
@@ -264,33 +274,26 @@
         forwards;
 }
 
-
 /* =========================================================
-   CLOSE
+   CLOSE BUTTON
 ========================================================= */
 
 .closeButton {
-
     position: absolute;
-
     top: 12px;
-
     right: 18px;
 
     z-index: 10;
 
     width: 40px;
-
     height: 40px;
 
     border: none;
-
     background: transparent;
 
     color: #e5ad2f;
 
     font-size: 36px;
-
     line-height: 1;
 
     cursor: pointer;
@@ -300,64 +303,52 @@
         color 0.2s ease;
 }
 
-
 .closeButton:hover {
-
-    transform:
-        scale(1.15);
-
-    color:
-        #ffe8a0;
+    transform: scale(1.15);
+    color: #ffe8a0;
 }
-
 
 /* =========================================================
    MODAL CONTENT
+   FLEX VERSION
+
+   Left and right sides now have independent widths/heights.
+   Changes in description/rulebook do not affect image sizing.
 ========================================================= */
 
 .modalContent {
-
     position: relative;
-
     z-index: 2;
 
-    display: grid;
-
-    grid-template-columns:
-        1fr 1fr;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
     gap: 45px;
 
-    align-items: center;
+    width: 100%;
 }
-
 
 /* =========================================================
    EVENT INFORMATION
 ========================================================= */
 
 .eventInfo {
+    width: calc(50% - 23px);
+    flex: 0 0 calc(50% - 23px);
 
     display: flex;
-
     flex-direction: column;
-
     justify-content: center;
+
+    min-width: 0;
 }
 
-
 .eventInfo h2 {
-
     margin:
         0 0 25px;
 
-    color:
-        #e5ad2f;
-
-    /*
-       Replace this with your actual
-       Arabian/Oasis font if needed.
-    */
+    color: #e5ad2f;
 
     font-family:
         "Your Arabic Font",
@@ -368,154 +359,157 @@
 
     line-height: 1.1;
 
-    letter-spacing:
-        1px;
+    letter-spacing: 1px;
 }
 
+/* =========================================================
+   DESCRIPTION
+========================================================= */
 
 .description {
-
     margin:
         0 0 28px;
 
-    color:
-        #f5eee3;
+    color: #f5eee3;
 
-    font-size:
-        15px;
+    font-size: 15px;
 
-    line-height:
-        1.7;
+    line-height: 1.7;
 
-    letter-spacing:
-        0.4px;
-    font-family: serif;    
+    letter-spacing: 0.4px;
+
+    font-family: serif;
 }
-
 
 /* =========================================================
    EVENT DETAILS
 ========================================================= */
 
 .eventDetails {
-
     display: flex;
-
     flex-direction: column;
-
     gap: 13px;
 }
 
-
 .detail {
-
     display: flex;
-
     align-items: center;
 
     gap: 12px;
 
-    color:
-        #f5eee3;
+    color: #f5eee3;
 
-    font-size:
-        15px;
-        font-family: serif;
+    font-size: 15px;
+
+    font-family: serif;
+
     span {
         font-family: serif;
-    }    
+    }
 }
-
 
 .icon {
-
     width: 24px;
 
-    color:
-        #e5ad2f;
+    color: #e5ad2f;
 
-    font-size:
-        18px;
+    font-size: 18px;
 
-    text-align:
-        center;
+    text-align: center;
 }
-
 
 /* =========================================================
    EVENT IMAGE
+   FIXED INDEPENDENT DIMENSIONS
 ========================================================= */
 
 .eventImage {
-
     position: relative;
 
-    width: 100%;
+    width: calc(50% - 23px);
+    flex: 0 0 calc(50% - 23px);
+
+    height: 300px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
+
+    min-width: 0;
 }
 
-
 .eventImage img {
-
     display: block;
 
     width: 100%;
+    height: 300px;
 
     max-height: 300px;
-    border: #e5ad2f bold 1px;
+
+    border: 1px solid #e5ad2f;
+
     object-fit: cover;
 }
 
-
-/* Used while image_url is null */
+/* =========================================================
+   IMAGE PLACEHOLDER
+========================================================= */
 
 .imagePlaceholder {
-
     width: 100%;
-
-    min-height: 280px;
+    height: 300px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     padding: 30px;
 
-    color:
-        #e5ad2f;
+    color: #e5ad2f;
 
-    text-align:
-        center;
+    text-align: center;
 
-    font-family:
-        serif;
+    font-family: serif;
 
-    font-size:
-        28px;
+    font-size: 28px;
 }
 
+/* =========================================================
+   RULEBOOK
+========================================================= */
+
+.rulebookButton {
+    font-family: serif;
+
+    margin-top: 1rem;
+
+    font-size: 1.2rem;
+
+    padding-left: 2rem;
+
+    color: #e5ad2f;
+
+    text-decoration: none;
+
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.rulebookButton:hover {
+    color: #ffe08a;
+}
 
 /* =========================================================
    NAVIGATION
 ========================================================= */
 
 .navigation {
-
     position: relative;
-
     z-index: 3;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     gap: 25px;
@@ -523,25 +517,17 @@
     margin-top: 20px;
 }
 
-
 .navButton {
-
     width: 45px;
-
     height: 45px;
 
     border: none;
-
     background: transparent;
 
-    color:
-        #dba92d;
+    color: #dba92d;
 
-    font-size:
-        48px;
-
-    line-height:
-        0.7;
+    font-size: 48px;
+    line-height: 0.7;
 
     cursor: pointer;
 
@@ -550,57 +536,39 @@
         color 0.2s ease;
 }
 
-
 .navButton:hover {
-
-    transform:
-        scale(1.2);
-
-    color:
-        #ffe08a;
+    transform: scale(1.2);
+    color: #ffe08a;
 }
-
 
 .counter {
-
     min-width: 50px;
 
-    color:
-        #f5eee3;
+    color: #f5eee3;
 
-    font-size:
-        14px;
+    font-size: 14px;
 
-    text-align:
-        center;
+    text-align: center;
 
-    opacity:
-        0.8;
+    opacity: 0.8;
 }
 
-
 /* =========================================================
-   NO EVENTS
+   NO EVENTS MODAL
 ========================================================= */
 
 .noEventsModal {
-
     position: relative;
 
-    width:
-        min(600px, 90vw);
+    width: min(600px, 90vw);
 
-    min-height:
-        300px;
+    min-height: 300px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
-    padding:
-        50px;
+    padding: 50px;
 
     animation:
         eventsModalIn
@@ -609,63 +577,45 @@
         forwards;
 }
 
-
 .noEventsContent {
-
     position: relative;
-
     z-index: 2;
 
-    text-align:
-        center;
+    text-align: center;
 
-    color:
-        #f5eee3;
+    color: #f5eee3;
 }
 
-
 .noEventsContent h2 {
-
     margin:
         0 0 18px;
 
-    color:
-        #e5ad2f;
+    color: #e5ad2f;
 
     font-family:
         "Your Arabic Font",
         serif;
 
-    font-size:
-        42px;
+    font-size: 42px;
 }
-
 
 .noEventsContent p {
+    margin: 0;
 
-    margin:
-        0;
+    color: #f5eee3;
 
-    color:
-        #f5eee3;
+    font-size: 16px;
 
-    font-size:
-        16px;
+    line-height: 1.6;
 
-    line-height:
-        1.6;
-
-    opacity:
-        0.85;
+    opacity: 0.85;
 }
-
 
 /* =========================================================
    ANIMATIONS
 ========================================================= */
 
 @keyframes eventsOverlayIn {
-
     from {
         opacity: 0;
     }
@@ -675,11 +625,8 @@
     }
 }
 
-
 @keyframes eventsModalIn {
-
     from {
-
         opacity: 0;
 
         transform:
@@ -688,7 +635,6 @@
     }
 
     to {
-
         opacity: 1;
 
         transform:
@@ -697,110 +643,114 @@
     }
 }
 
-
 /* =========================================================
-   MOBILE
+   MOBILE MODAL
 ========================================================= */
 
 @media (max-width: 700px) {
-
     .modalOverlay {
-
-        padding:
-            15px;
+        padding: 15px;
     }
-
 
     .modal {
+        width: 100%;
 
-        width:
-            100%;
+        max-height: 90vh;
 
-        max-height:
-            90vh;
-
-        overflow-y:
-            auto;
+        overflow-y: auto;
 
         padding:
-            45px 25px 25px;
-    }
-
-
-    .modalContent {
-
-        grid-template-columns:
-            1fr;
-
-        gap:
+            45px
+            25px
             25px;
     }
 
+    /* Independent vertical sections on mobile */
+
+    .modalContent {
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 25px;
+    }
+
+    /* =====================================================
+       MOBILE IMAGE
+    ===================================================== */
 
     .eventImage {
+        order: -1;
 
-        order:
-            -1;
+        width: 100%;
+        flex: 0 0 auto;
+
+        height: 220px;
     }
-
 
     .eventImage img {
+        width: 100%;
 
-        max-height:
-            220px;
+        height: 220px;
+
+        max-height: 220px;
     }
-
 
     .imagePlaceholder {
+        width: 100%;
 
-        min-height:
-            180px;
+        height: 180px;
+
+        min-height: 180px;
     }
 
+    /* =====================================================
+       MOBILE EVENT INFO
+    ===================================================== */
+
+    .eventInfo {
+        width: 100%;
+
+        flex: 0 0 auto;
+    }
 
     .eventInfo h2 {
+        margin-bottom: 18px;
 
-        margin-bottom:
-            18px;
-
-        font-size:
-            34px;
+        font-size: 34px;
     }
-
 
     .description {
+        font-size: 14px;
 
-        font-size:
-            14px;
-
-        line-height:
-            1.55;
+        line-height: 1.55;
     }
 
+    /* =====================================================
+       MOBILE NAVIGATION
+    ===================================================== */
 
     .navigation {
-
-        margin-top:
-            15px;
+        margin-top: 15px;
     }
 
+    /* =====================================================
+       MOBILE NO EVENTS
+    ===================================================== */
 
     .noEventsModal {
-
-        min-height:
-            250px;
+        min-height: 250px;
 
         padding:
-            35px 25px;
+            35px
+            25px;
     }
-
 
     .noEventsContent h2 {
-
-        font-size:
-            34px;
+        font-size: 34px;
     }
-
 }
 
 /* =========================================================
@@ -810,15 +760,13 @@
 
 .smokeCanvas {
     position: fixed;
+
     inset: 0;
+
     width: 100vw;
     height: 100vh;
+
     z-index: 10;
+
     pointer-events: none;
-}
-.rulebookButton{
-    font-family:serif;
-    margin-top: 1rem;
-    font-size: 1.2rem;
-    padding-left:2rem;
 }
