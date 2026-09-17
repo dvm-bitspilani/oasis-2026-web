@@ -362,10 +362,10 @@ function SmokeCanvas({
             window.innerHeight * 0.5 - 20;
 
         const cloudWidth =
-            isMobile ? 420 : 900;
+            isMobile ? 420 : 1000;
 
         const cloudHeight =
-            isMobile ? 850 : 600;
+            isMobile ? 850 : 500;
 
         /* =====================================================
            PRE-RENDERED TEXTURES
@@ -465,10 +465,10 @@ function SmokeCanvas({
         ===================================================== */
 
         const coreCount =
-            isMobile ? 55 : 90;
+            isMobile ? 55 : 100;
 
         const edgeCount =
-            isMobile ? 105 : 170;
+            isMobile ? 105 : 220;
 
         const makeParticle = (
             isCore: boolean
@@ -493,7 +493,7 @@ function SmokeCanvas({
             const rawTargetX =
                 Math.cos(angle) *
                 cloudWidth *
-                0.5 *
+                0.6 *
                 reach;
 
             const rawTargetY =
