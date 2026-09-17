@@ -375,76 +375,196 @@ function SmokeCanvas({
            softness baked in via a one-time canvas blur, so the
            draw loop never needs ctx.filter or a fresh gradient.
         ===================================================== */
+const makeSoftSprite = (
+    blurPx: number
+) => {
+    const spriteSize = 256;
 
-        const makeSoftSprite = (
-            blurPx: number
-        ) => {
-            const spriteSize = 256;
+    const sprite =
+        document.createElement(
+            "canvas"
+        );
 
-            const sprite =
-                document.createElement(
-                    "canvas"
-                );
+    sprite.width = spriteSize;
+    sprite.height = spriteSize;
 
-            sprite.width = spriteSize;
-            sprite.height = spriteSize;
+    const sctx =
+        sprite.getContext("2d");
 
-            const sctx =
-                sprite.getContext("2d");
+    if (!sctx) return sprite;
 
-            if (!sctx) return sprite;
+    const r = spriteSize / 2;
 
-            const r = spriteSize / 2;
+    sctx.filter =
+        `blur(${blurPx}px)`;
 
-            sctx.filter =
-                `blur(${blurPx}px)`;
+    const gradient =
+        sctx.createRadialGradient(
+            r,
+            r,
+            0,
+            r,
+            r,
+            r * 0.78
+        );
 
-            const gradient =
-                sctx.createRadialGradient(
-                    r,
-                    r,
-                    0,
-                    r,
-                    r,
-                    r * 0.78
-                );
+    gradient.addColorStop(
+        0,
+        "rgba(91, 81, 137, 1)"
+    );
 
-            gradient.addColorStop(
-                0,
-                "rgba(91, 81, 137, 1)"
-            );
+    gradient.addColorStop(
+        0.5,
+        "rgba(91, 81, 137, 0.62)"
+    );
 
-            gradient.addColorStop(
-                0.5,
-                "rgba(91, 81, 137, 0.62)"
-            );
+    gradient.addColorStop(
+        0.8,
+        "rgba(91, 81, 137, 0.22)"
+    );
 
-            gradient.addColorStop(
-                0.8,
-                "rgba(91, 81, 137, 0.22)"
-            );
+    gradient.addColorStop(
+        1,
+        "rgba(91, 81, 137, 0)"
+    );
 
-            gradient.addColorStop(
-                1,
-                "rgba(91, 81, 137, 0)"
-            );
+    sctx.fillStyle = gradient;
 
-            sctx.fillStyle = gradient;
+    sctx.beginPath();
 
-            sctx.beginPath();
+    sctx.arc(
+        r,
+        r,
+        r * 0.78,
+        0,
+        Math.PI * 2
+    );
 
-            sctx.arc(
-                r,
-                r,
-                r * 0.78,
-                0,
-                Math.PI * 2
-            );
+    sctx.fill();
 
-            sctx.fill();
+    /* =====================================================
+       TEXTURE PASS
+       Scatter uneven light/dark specks over the base gradient
+       with a lighter blur than the base, so the sprite reads
+       as grainy smoke instead of a flat soft disc.
+    ===================================================== */
 
-            return sprite;
-        };
+    sctx.filter =
+        `blur(${blurPx * 0.4}px)`;
+
+    const textureSpecks = 40;
+
+    for (
+        let i = 0;
+        i < textureSpecks;
+        i++
+    ) {
+        const angle =
+            Math.random() *
+            Math.PI *
+            2;
+
+        const dist =
+            Math.random() *
+            r *
+            0.75;
+
+        const speckX =
+            r +
+            Math.cos(angle) *
+                dist;
+
+        const speckY =
+            r +
+            Math.sin(angle) *
+                dist;
+
+        const speckRadius =
+            6 +
+            Math.random() * 22;
+
+        const isLight =
+            Math.random() > 0.45;
+
+        sctx.globalAlpha =
+            0.08 +
+            Math.random() * 0.16;
+
+        sctx.fillStyle = isLight
+            ? "rgba(160, 150, 200, 1)"
+            : "rgba(50, 44, 78, 1)";
+
+        sctx.beginPath();
+
+        sctx.arc(
+            speckX,
+            speckY,
+            speckRadius,
+            0,
+            Math.PI * 2
+        );
+
+        sctx.fill();
+    }
+
+    sctx.globalAlpha = 1;
+
+    /* =====================================================
+       CLIP TEXTURE TO SOFT CIRCLE
+       Cuts the specks back down to the original falloff shape
+       so grain doesn't spill a hard edge outside the cloud.
+    ===================================================== */
+
+    sctx.globalCompositeOperation =
+        "destination-in";
+
+    sctx.filter =
+        `blur(${blurPx}px)`;
+
+    const clipGradient =
+        sctx.createRadialGradient(
+            r,
+            r,
+            0,
+            r,
+            r,
+            r * 0.78
+        );
+
+    clipGradient.addColorStop(
+        0,
+        "rgba(255, 255, 255, 1)"
+    );
+
+    clipGradient.addColorStop(
+        0.8,
+        "rgba(255, 255, 255, 1)"
+    );
+
+    clipGradient.addColorStop(
+        1,
+        "rgba(255, 255, 255, 0)"
+    );
+
+    sctx.fillStyle = clipGradient;
+
+    sctx.beginPath();
+
+    sctx.arc(
+        r,
+        r,
+        r * 0.78,
+        0,
+        Math.PI * 2
+    );
+
+    sctx.fill();
+
+    sctx.globalCompositeOperation =
+        "source-over";
+
+    return sprite;
+};
 
         // sharper texture for individual wisps, softer one for the big cloud body/puffs
         const particleSprite =
@@ -488,7 +608,9 @@ function SmokeCanvas({
      * far above it.
      */
     const reach = isCore
-        ? 0.08 + Math.random() * 0.28
+    ? 0.08 + Math.random() * 0.28
+    : isMobile
+        ? 0.25 + Math.random() * 0.3
         : 0.355 + Math.random() * 0.45;
 
     /*

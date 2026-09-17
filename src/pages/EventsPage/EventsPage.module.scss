@@ -1,6 +1,7 @@
 * {
     overflow: hidden;
     overscroll-behavior: none;
+    font-family: serif;
 }
 
 .fullPageContainer {
@@ -419,6 +420,10 @@
 
     font-size:
         15px;
+        font-family: serif;
+    span {
+        font-family: serif;
+    }    
 }
 
 
@@ -812,7 +817,7 @@
     pointer-events: none;
 }
 .rulebookButton{
-    font-family:sans-serif;
+    font-family:serif;
     margin-top: 1rem;
     font-size: 1.2rem;
     padding-left:2rem;
