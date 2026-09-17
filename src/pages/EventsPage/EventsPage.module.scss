@@ -1,17 +1,40 @@
+
 * {
     overflow: hidden;
     overscroll-behavior: none;
 }
 
+
+/* =========================================================
+   FULL PAGE
+========================================================= */
+
 .fullPageContainer {
     background-image: url(/eventsPagebg.png);
-    background-position: bottom;
+    background-position: bottom center;
     background-repeat: no-repeat;
     background-size: cover;
+
     width: 100%;
+
+    /*
+     * dvh follows the actual visible Safari viewport.
+     * svh is kept as the fallback.
+     */
     height: 100svh;
+    height: 100dvh;
+
+    min-height: 100svh;
+
     position: relative;
+
+    overflow: hidden;
 }
+
+
+/* =========================================================
+   SPOTLIGHT
+========================================================= */
 
 .spotlightOverlay {
     position: absolute;
@@ -46,34 +69,34 @@
 
 .dramaContainer {
     position: absolute;
-    bottom: 0%;
+    bottom: 0;
     left: 25%;
     margin-bottom: 450px;
 }
 
 .photographyContainer {
     position: absolute;
-    bottom: 0%;
+    bottom: 0;
     right: 25%;
     margin-bottom: 450px;
 }
 
 .danceContainer {
     position: absolute;
-    bottom: 0%;
+    bottom: 0;
     left: 5%;
 }
 
 .otherContainer {
     position: absolute;
-    bottom: 0%;
+    bottom: 0;
     left: 35%;
     margin-bottom: -140px;
 }
 
 .musicContainer {
     position: absolute;
-    bottom: 0%;
+    bottom: 0;
     right: 5%;
 }
 
@@ -84,8 +107,8 @@
 
 .title {
     position: absolute;
-    top: 0%;
-    left: 0%;
+    top: 0;
+    left: 0;
     filter: brightness(3);
 }
 
@@ -131,7 +154,7 @@
     .spotlightOverlay {
         mask-image: radial-gradient(
             circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            transparent 0px,
+            transparent 0,
             transparent 140px,
             black 220px,
             black 100%
@@ -139,13 +162,18 @@
 
         -webkit-mask-image: radial-gradient(
             circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            transparent 0px,
+            transparent 0,
             transparent 140px,
             black 220px,
             black 100%
         );
     }
 }
+
+
+/* =========================================================
+   <= 1200px
+========================================================= */
 
 @media screen and (max-width: 1200px) {
 
@@ -157,31 +185,26 @@
         scale: 0.7;
     }
 
-    /* TOP LEFT */
     .dramaContainer {
         left: 5%;
         margin-bottom: 450px;
     }
 
-    /* TOP RIGHT */
     .photographyContainer {
         right: 3%;
         margin-bottom: 450px;
     }
 
-    /* BOTTOM LEFT */
     .danceContainer {
         left: -8%;
         margin-bottom: -80px;
     }
 
-    /* CENTER */
     .otherContainer {
         left: 19%;
         margin-bottom: -210px;
     }
 
-    /* BOTTOM RIGHT */
     .musicContainer {
         right: -8%;
         margin-bottom: -95px;
@@ -194,6 +217,11 @@
     }
 }
 
+
+/* =========================================================
+   <= 975px
+========================================================= */
+
 @media screen and (max-width: 975px) {
 
     .dramaContainer,
@@ -204,31 +232,26 @@
         scale: 0.6;
     }
 
-    /* TOP LEFT */
     .dramaContainer {
         left: 5%;
         margin-bottom: 450px;
     }
 
-    /* TOP RIGHT */
     .photographyContainer {
         right: 3%;
         margin-bottom: 450px;
     }
 
-    /* BOTTOM LEFT */
     .danceContainer {
         left: -8%;
         margin-bottom: -90px;
     }
 
-    /* CENTER */
     .otherContainer {
         left: 17%;
         margin-bottom: -220px;
     }
 
-    /* BOTTOM RIGHT */
     .musicContainer {
         right: -8%;
         margin-bottom: -105px;
@@ -241,6 +264,11 @@
     }
 }
 
+
+/* =========================================================
+   <= 900px
+========================================================= */
+
 @media screen and (max-width: 900px) {
 
     .dramaContainer,
@@ -251,31 +279,26 @@
         scale: 0.58;
     }
 
-    /* TOP LEFT */
     .dramaContainer {
         left: 5%;
         margin-bottom: 300px;
     }
 
-    /* TOP RIGHT */
     .photographyContainer {
         right: 3%;
         margin-bottom: 300px;
     }
 
-    /* BOTTOM LEFT */
     .danceContainer {
         left: -8%;
         margin-bottom: -100px;
     }
 
-    /* CENTER */
     .otherContainer {
         left: 13%;
         margin-bottom: -230px;
     }
 
-    /* BOTTOM RIGHT */
     .musicContainer {
         right: -8%;
         margin-bottom: -115px;
@@ -288,11 +311,23 @@
     }
 }
 
+
 /* =========================================================
    <= 700px
 ========================================================= */
 
 @media screen and (max-width: 700px) {
+
+    /*
+     * Important Safari fix:
+     * The whole scene follows the dynamic viewport.
+     */
+    .fullPageContainer {
+        height: 100dvh;
+        min-height: 100dvh;
+
+        background-position: center bottom;
+    }
 
     .dramaContainer,
     .photographyContainer,
@@ -341,10 +376,16 @@
 
 
 /* =========================================================
-   <= 577px
+   IPHONE / MOBILE HEIGHT FIX
+   Especially around 440 x 956
 ========================================================= */
 
 @media screen and (max-width: 577px) {
+
+    .fullPageContainer {
+        height: 100dvh;
+        min-height: 100dvh;
+    }
 
     .spotlightOverlay {
         display: none;
@@ -392,6 +433,102 @@
     }
 }
 
+@media screen and (max-width: 577px) and (max-height: 450px) {
+
+    .fullPageContainer {
+        height: 100dvh;
+        min-height: 100dvh;
+    }
+
+    .spotlightOverlay {
+        display: none;
+    }
+
+    .title {
+        left: -13%;
+        top: -8%;
+        filter: brightness(2);
+        scale: 0.45;
+    }
+
+    /* TOP POTS */
+
+    .dramaContainer {
+        left: -25%;
+        margin-bottom: 150px;
+        scale: 0.45;
+    }
+
+    .photographyContainer {
+        right: -20%;
+        margin-bottom: 150px;
+        scale: 0.45;
+    }
+
+    /* BOTTOM POTS */
+
+    .danceContainer {
+        left: -33%;
+        margin-bottom: -145px;
+        scale: 0.4;
+    }
+
+    .otherContainer {
+        left: -17%;
+        margin-bottom: -260px;
+        scale: 0.4;
+    }
+
+    .musicContainer {
+        right: -39%;
+        margin-bottom: -165px;
+        scale: 0.36;
+    }
+}
+
+
+/* =========================================================
+   440px WIDTH
+========================================================= */
+
+@media screen and (min-width: 401px) and (max-width: 460px) {
+
+    /*
+     * Keep the composition tied to the actual dynamic
+     * viewport rather than Safari's small viewport.
+     */
+
+    .dramaContainer {
+        left: -23%;
+        margin-bottom: 185px;
+    }
+
+    .photographyContainer {
+        right: -18%;
+        margin-bottom: 185px;
+    }
+
+    .danceContainer {
+        left: -31%;
+        margin-bottom: -145px;
+    }
+
+    .otherContainer {
+        left: -14%;
+        margin-bottom: -255px;
+    }
+
+    .musicContainer {
+        right: -37%;
+        margin-bottom: -165px;
+    }
+
+    .title {
+        left: -12%;
+        top: -8%;
+    }
+}
+
 
 /* =========================================================
    <= 400px
@@ -399,13 +536,16 @@
 
 @media screen and (max-width: 400px) {
 
+    .fullPageContainer {
+        height: 100dvh;
+        min-height: 100dvh;
+    }
+
     .title {
         left: -18%;
         top: -8%;
         scale: 0.35;
     }
-
-    /* TOP LEFT */
 
     .dramaContainer {
         left: -31%;
@@ -413,15 +553,11 @@
         scale: 0.35;
     }
 
-    /* TOP RIGHT */
-
     .photographyContainer {
         right: -28%;
         margin-bottom: 165px;
         scale: 0.35;
     }
-
-    /* BOTTOM LEFT */
 
     .danceContainer {
         left: -39%;
@@ -429,15 +565,11 @@
         scale: 0.35;
     }
 
-    /* CENTER */
-
     .otherContainer {
         left: -25%;
         margin-bottom: -260px;
         scale: 0.35;
     }
-
-    /* BOTTOM RIGHT */
 
     .musicContainer {
         right: -44%;
@@ -445,6 +577,11 @@
         scale: 0.35;
     }
 }
+
+
+/* =========================================================
+   <= 365px
+========================================================= */
 
 @media screen and (max-width: 365px) {
 
@@ -454,15 +591,11 @@
         scale: 0.35;
     }
 
-    /* TOP LEFT */
-
     .dramaContainer {
         left: -31%;
         margin-bottom: 165px;
         scale: 0.35;
     }
-
-    /* TOP RIGHT */
 
     .photographyContainer {
         right: -28%;
@@ -470,15 +603,11 @@
         scale: 0.35;
     }
 
-    /* BOTTOM LEFT */
-
     .danceContainer {
         left: -39%;
         margin-bottom: -145px;
         scale: 0.35;
     }
-
-    /* CENTER */
 
     .otherContainer {
         left: -26%;
@@ -486,14 +615,13 @@
         scale: 0.35;
     }
 
-    /* BOTTOM RIGHT */
-
     .musicContainer {
         right: -49%;
         margin-bottom: -160px;
         scale: 0.35;
     }
 }
+
 
 /* =========================================================
    CLICKABLE POTS
@@ -642,8 +770,7 @@
 }
 
 .eventInfo h2 {
-    margin:
-        0 0 25px;
+    margin: 0 0 25px;
 
     color: #e5ad2f;
 
@@ -665,8 +792,7 @@
 ========================================================= */
 
 .description {
-    margin:
-        0 0 28px;
+    margin: 0 0 28px;
 
     color: #f5eee3;
 
@@ -798,7 +924,6 @@
 }
 
 
-
 /* =========================================================
    NAVIGATION
 ========================================================= */
@@ -887,12 +1012,11 @@
 }
 
 .noEventsContent h2 {
-    margin:
-        0 0 18px;
+    margin: 0 0 18px;
 
     color: #e5ad2f;
 
-    font-family:serif;
+    font-family: serif;
 
     font-size: 42px;
 }
@@ -901,7 +1025,9 @@
     margin: 0;
 
     color: #f5eee3;
+
     font-family: serif;
+
     font-size: 16px;
 
     line-height: 1.6;
@@ -958,7 +1084,7 @@
     .modal {
         width: 100%;
 
-        max-height: 90vh;
+        max-height: 90dvh;
 
         overflow-y: auto;
 
@@ -980,7 +1106,7 @@
 
     .eventImage {
         order: -1;
-        display:none;
+        display: none;
 
         width: 100%;
         flex: 0 0 auto;
@@ -1050,7 +1176,8 @@
     inset: 0;
 
     width: 100vw;
-    height: 100vh;
+
+    height: 100dvh;
 
     z-index: 10;
 
