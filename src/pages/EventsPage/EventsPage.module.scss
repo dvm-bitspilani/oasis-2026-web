@@ -433,58 +433,6 @@
     }
 }
 
-@media screen and (max-width: 577px) and (max-height: 450px) {
-
-    .fullPageContainer {
-        height: 100dvh;
-        min-height: 100dvh;
-    }
-
-    .spotlightOverlay {
-        display: none;
-    }
-
-    .title {
-        left: -13%;
-        top: -8%;
-        filter: brightness(2);
-        scale: 0.45;
-    }
-
-    /* TOP POTS */
-
-    .dramaContainer {
-        left: -25%;
-        margin-bottom: 150px;
-        scale: 0.45;
-    }
-
-    .photographyContainer {
-        right: -20%;
-        margin-bottom: 150px;
-        scale: 0.45;
-    }
-
-    /* BOTTOM POTS */
-
-    .danceContainer {
-        left: -33%;
-        margin-bottom: -145px;
-        scale: 0.4;
-    }
-
-    .otherContainer {
-        left: -17%;
-        margin-bottom: -260px;
-        scale: 0.4;
-    }
-
-    .musicContainer {
-        right: -39%;
-        margin-bottom: -165px;
-        scale: 0.36;
-    }
-}
 
 
 /* =========================================================
@@ -549,13 +497,13 @@
 
     .dramaContainer {
         left: -31%;
-        margin-bottom: 165px;
+        margin-bottom: 100px;
         scale: 0.35;
     }
 
     .photographyContainer {
         right: -28%;
-        margin-bottom: 165px;
+        margin-bottom: 100px;
         scale: 0.35;
     }
 
@@ -1182,4 +1130,70 @@
     z-index: 10;
 
     pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+@media (max-width: 402px) and (min-height: 714px) and (max-height:836px) {
+
+    .fullPageContainer {
+        height: 100dvh;
+        min-height: 100dvh;
+    }
+
+    .spotlightOverlay {
+        display: none;
+    }
+
+    
+    .title {
+        display: none;
+        left: -13%;
+        top: -8%;
+        filter: brightness(2);
+        scale: 0.45;
+    }
+
+    /* TOP POTS */
+
+    .dramaContainer {
+        left: -25%;
+        margin-bottom: 150px;
+        scale: 0.45;
+    }
+
+    .photographyContainer {
+        right: -25%;
+        margin-bottom: 150px;
+        scale: 0.45;
+    }
+
+    /* BOTTOM POTS */
+
+    .danceContainer {
+        left: -33%;
+        margin-bottom: -145px;
+        scale: 0.36;
+    }
+
+    .otherContainer {
+        left: -20%;
+        margin-bottom: -260px;
+        scale: 0.36;
+    }
+
+    .musicContainer {
+        right: -39%;
+        margin-bottom: -165px;
+        scale: 0.36;
+    }
 }
