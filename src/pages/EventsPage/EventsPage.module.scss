@@ -44,7 +44,7 @@
     pointer-events: none;
 
     backdrop-filter: brightness(0.4);
-    -webkit-backdrop-filter: brightness(0.4);
+    // -webkit-backdrop-filter: brightness(0.4);
 
     mask-image: radial-gradient(
         circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
