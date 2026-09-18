@@ -1,6 +1,31 @@
+/* =========================================================== */
+/* OUTER SHELL                                                  */
+/*                                                              */
+/* --book-w / --book-h are written from Events.tsx (desktop     */
+/* only) after measuring the viewport. The fallbacks here keep  */
+/* the layout correct for the first paint and for SSR.          */
+/*                                                              */
+/* Everything else on the desktop layout — page columns, font   */
+/* sizes, row heights, button sizes — is a fraction of those    */
+/* two values, so the whole page scales with the book instead   */
+/* of with the viewport. That's what keeps the content inside   */
+/* the pages at every window size.                              */
+/* =========================================================== */
+
 .eventsContainer {
   position: relative;
   overscroll-behavior: none;
+
+  /* ---- BOOK BOX (overwritten inline from JS) ---- */
+  --book-w: 75vw;
+  --book-h: calc(75vw / 1.4);
+  --book-top: 52%;
+
+  /* ---- PAGE GEOMETRY, as fractions of the book ---- */
+  --page-outer: 7%;   /* gap from the book's outer edges  */
+  --page-gutter: 9%;  /* the spine gap between the pages  */
+  --page-top: 9%;     /* top margin inside the pages      */
+  --page-bottom: 7%;  /* bottom margin inside the pages   */
 
   width: 100%;
   min-height: 100svh;
@@ -100,25 +125,26 @@
 }
 
 /* ========================================= */
-/* BOOK                                      */
+/* BOOK ART                                  */
+/*                                            */
+/* Width and height both come from the vars, */
+/* so the box is exactly the book's drawn    */
+/* rectangle — no aspect-ratio guessing, and */
+/* no letterboxing for `contain` to absorb.  */
 /* ========================================= */
 
 .bookContainer {
   position: absolute;
 
-  top: 52%;
+  top: var(--book-top);
   left: 50%;
 
-  transform: translate(
-    -50%,
-    -50%
-  );
+  transform: translate(-50%, -50%);
 
-  width: 75vw;
+  width: var(--book-w);
+  height: var(--book-h);
 
-  aspect-ratio: 1.4;
-
-  background-size: contain;
+  background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
 
@@ -128,47 +154,74 @@
 }
 
 /* ========================================= */
-/* CONTENT                                   */
+/* CONTENT — same rectangle as the book       */
 /* ========================================= */
 
 .content {
-  position: relative;
+  position: absolute;
+
+  top: calc(var(--book-top) - 50px);
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: var(--book-w);
+  height: var(--book-h);
+
+  padding:var(--page-outer);
+    // var(--page-top)
+    // var(--page-outer);
+    // var(--page-bottom);
+  // padding-top: -0px;
+  padding-bottom: 20px;
+
+  box-sizing: border-box;
 
   z-index: 5;
 
-  width: min(1100px, 90vw);
-  height: 100vh;
-  display: flex;
-  justify-content: center;
+  display: block;
 }
 
 
 /* ========================================= */
-/* EVENTS AREA                               */
+/* EVENTS AREA — the two pages                */
 /* ========================================= */
 
 .eventsArea {
   width: 100%;
-  margin-top: 10%;
+  height: 100%;
+
+  min-height: 0;
+
+  margin: 0;
+
   display: flex;
   align-items: stretch;
-  height: 100%;
-  gap: 4vw;
+
+  gap: var(--page-gutter);
 }
 
 /* ========================================= */
 /* LEFT PAGE                                 */
+/*                                            */
+/* flex: 1 1 0 on both pages splits the       */
+/* remaining width evenly, so the left column */
+/* always sits on the left leaf and the right */
+/* column on the right leaf, whatever the     */
+/* book's size.                               */
 /* ========================================= */
 
 .eventsPage {
-  width: 50%;
+  flex: 1 1 0;
+
+  min-width: 0;
+  min-height: 0;
+
   height: 100%;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  min-width: 0;
 
   background: transparent;
 }
@@ -178,20 +231,26 @@
 /* ========================================= */
 
 .chooseEventsHeading {
+  flex-shrink: 0;
+
   width: 100%;
 
-  margin: 0 0 3vw;
+  margin: 0 0 calc(var(--book-h) * 0.03);
 
   color: #6c1700;
 
   font-family: "Syamsiah", sans-serif;
 
-  font-size: clamp(3rem, 7vw, 5rem);
+  font-size: clamp(
+    1.5rem,
+    calc(var(--book-h) * 0.105),
+    5rem
+  );
 
   font-weight: 400;
 
   line-height: 1;
-
+  margin-top: 20px;
   text-align: center;
 }
 
@@ -200,19 +259,21 @@
 /* ========================================= */
 
 .searchContainer {
+  flex-shrink: 0;
+
   width: 100%;
 
-  height: 3.3vw;
-  min-height: 40px;
+  height: calc(var(--book-h) * 0.075);
+  min-height: 32px;
 
-  margin-bottom: 1vw;
+  margin-bottom: calc(var(--book-h) * 0.022);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
   background-position: center;
-  background-size: contain;
+  background-size: 100% 100%;
   background-repeat: no-repeat;
 
   box-sizing: border-box;
@@ -233,7 +294,11 @@
 
   font-family: "Cinzel", serif;
 
-  font-size: clamp(12px, 1vw, 18px);
+  font-size: clamp(
+    11px,
+    calc(var(--book-h) * 0.032),
+    18px
+  );
 
   text-align: center;
 
@@ -248,15 +313,18 @@
 }
 
 /* ========================================= */
-/* EVENTS LIST                               */
+/* EVENTS LIST — takes whatever vertical      */
+/* space the heading and search leave over    */
 /* ========================================= */
 
 .eventsScrollArea {
   position: relative;
 
+  flex: 1 1 auto;
+
   width: 100%;
-  height: 28vw;
-  max-height: 55svh;
+
+  min-height: 0;
 
   display: flex;
   align-items: stretch;
@@ -265,13 +333,16 @@
 }
 
 .eventsList {
-  width: calc(100% - 1.8vw);
+  flex: 1 1 auto;
+
+  min-width: 0;
+
   height: 100%;
 
   display: flex;
   flex-direction: column;
 
-  gap: 0.7vw;
+  gap: calc(var(--book-h) * 0.016);
 
   overflow-y: auto;
   overflow-x: hidden;
@@ -296,13 +367,20 @@
 
 /* ========================================= */
 /* CUSTOM SCROLLBAR                          */
+/*                                            */
+/* Shared by the left events list and the     */
+/* right page's description area. Sized off   */
+/* the book so the wheel can never be taller  */
+/* than the track it rides on.                */
 /* ========================================= */
 
 .customScrollbar {
   position: relative;
 
-  width: 3vw;
-  min-width: 40px;
+  flex-shrink: 0;
+
+  width: calc(var(--book-w) * 0.038);
+  min-width: 22px;
 
   height: 100%;
 
@@ -336,18 +414,21 @@
   /*
    * CENTER OF WHEEL = CENTER OF LINE
    */
-  left: 43%;
+  left: 50%;
 
   /*
    * scrollY controls this value
    */
   top: 0;
 
-  width: 2.5vw;
-  height: 2.5vw;
+  width: calc(var(--book-w) * 0.055);
+  height: calc(var(--book-w) * 0.055);
 
-  min-width: 100px;
-  min-height: 100px;
+  min-width: 28px;
+  min-height: 28px;
+
+  max-width: 90px;
+  max-height: 90px;
 
   transform: translate(-50%, -50%);
 
@@ -363,12 +444,8 @@
     filter 0.15s ease;
 }
 
-/*.scrollbarWheel:hover {
-}*/
-
 .scrollbarWheelDragging {
   cursor: grabbing;
-
 }
 
 /* ========================================= */
@@ -380,12 +457,12 @@
 
   flex: 0 0 auto;
 
-  width: 90%;
+  width: 96%;
 
-  min-height: 42px;
-  height: 3.5vw;
+  height: calc(var(--book-h) * 0.055);
+  min-height: 34px;
 
-  margin-left: 5%;
+  margin: 0 auto;
   padding: 0 1vw;
 
   border: none;
@@ -399,7 +476,12 @@
   color: #38170b;
 
   font-family: "Cinzel", serif;
-  font-size: clamp(12px, 1vw, 18px);
+
+  font-size: clamp(
+    11px,
+    calc(var(--book-h) * 0.026),
+    18px
+  );
 
   cursor: pointer;
 
@@ -499,7 +581,7 @@
 /* ACTIVE — set from JS (desktop only) */
 
 .eventItem.active {
-  transform: scale(1.06);
+  transform: scale(1.04);
 
   filter:
     brightness(1.08)
@@ -514,7 +596,7 @@
 }
 
 .eventItem.active span {
-  transform: scale(1.04);
+  transform: scale(1.03);
 
   letter-spacing: 0.04em;
 
@@ -536,7 +618,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .eventItem:hover {
-    transform: scale(1.06);
+    transform: scale(1.04);
 
     filter:
       brightness(1.08)
@@ -551,7 +633,7 @@
   }
 
   .eventItem:hover span {
-    transform: scale(1.04);
+    transform: scale(1.03);
 
     letter-spacing: 0.04em;
 
@@ -562,7 +644,7 @@
   }
 
   .eventItem.selected:hover {
-    transform: scale(1.08);
+    transform: scale(1.06);
 
     filter: brightness(1.15) drop-shadow(0 0 14px rgba(254, 213, 155, 0.85));
   }
@@ -574,7 +656,7 @@
 /* ========================================= */
 
 .eventItem.selected {
-  transform: scale(1.04);
+  transform: scale(1.03);
 
   filter: brightness(1.12) drop-shadow(0 0 10px rgba(229, 195, 132, 0.65));
 
@@ -604,11 +686,11 @@
   }
 
   60% {
-    transform: scale(1.07);
+    transform: scale(1.06);
   }
 
   100% {
-    transform: scale(1.04);
+    transform: scale(1.03);
   }
 }
 
@@ -621,9 +703,11 @@
 /* ========================================= */
 
 .message {
+  flex: 1 1 auto;
+
   width: 100%;
 
-  min-height: 100px;
+  min-height: 0;
 
   display: flex;
   align-items: center;
@@ -635,7 +719,11 @@
 
   font-family: "Cinzel", serif;
 
-  font-size: clamp(12px, 1vw, 18px);
+  font-size: clamp(
+    11px,
+    calc(var(--book-h) * 0.032),
+    18px
+  );
 
   text-align: center;
 }
@@ -645,17 +733,19 @@
 /* ========================================= */
 
 .infoPage {
-  width: 50%;
+  flex: 1 1 0;
 
-  min-height: 34vw;
+  min-width: 0;
+  min-height: 0;
 
-  padding-left: 35px;
-  padding-right: 35px;
+  height: 100%;
+
+  padding: 0;
 
   box-sizing: border-box;
 
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
 
   position: relative;
@@ -675,9 +765,10 @@
   width: 100%;
   height: 100%;
 
+  min-height: 0;
+
   display: flex;
   flex-direction: column;
-  justify-self: center;
   align-items: center;
 
   box-sizing: border-box;
@@ -690,45 +781,52 @@
 /* ========================================= */
 
 .eventHeading {
+  flex-shrink: 0;
+
   width: 100%;
 
-  margin: 0 0 1.5vw;
+  margin: 0 0 calc(var(--book-h) * 0.02);
 
   color: #6c1700;
 
   font-family: "Syamsiah", sans-serif;
 
-  font-size: clamp(3rem, 7vw, 5rem);
+  font-size: clamp(
+    1.5rem,
+    calc(var(--book-h) * 0.105),
+    5rem
+  );
 
   font-weight: 400;
 
   line-height: 1;
-
+  margin-top: 20px;
   text-align: center;
-
-  flex-shrink: 0;
 }
 
 /* ========================================= */
 /* RIGHT EVENT CONTENT                       */
+/*                                            */
+/* One flex column from the heading down to   */
+/* CONFIRM. Nothing here is absolutely        */
+/* positioned any more, so the controls can   */
+/* never sit on top of the description —      */
+/* the description simply gets the space      */
+/* that's left after they've been laid out.   */
 /* ========================================= */
 
 .eventInfo {
-  width: 80%;
+  flex: 1 1 auto;
 
-  max-width: 450px;
+  width: 100%;
 
-  height: auto;
-  min-height: 380px;
-  max-height: none;
+  min-height: 0;
 
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
 
-  margin: 0 auto;
+  margin: 0;
 
   text-align: center;
 
@@ -754,23 +852,16 @@
 /* ========================================= */
 
 .eventContent {
+  flex: 1 1 auto;
+
   width: 100%;
 
-  height: auto;
-  min-height: 150px;
-  max-height: none;
+  min-height: 0;
 
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   justify-content: flex-start;
-
-  overflow: visible;
-
-  flex-shrink: 0;
 }
 
 /* ========================================= */
@@ -778,18 +869,21 @@
 /* ========================================= */
 
 .eventTitle {
+  flex-shrink: 0;
+
   width: 100%;
 
-  height: auto;
-  min-height: 45px;
-
-  margin: 1vw 0 1.5vw;
+  margin: 0 0 calc(var(--book-h) * 0.022);
 
   color: #38170b;
 
   font-family: "Cinzel", serif;
 
-  font-size: clamp(1.8rem, 3vw, 4rem);
+  font-size: clamp(
+    1.1rem,
+    calc(var(--book-h) * 0.06),
+    3.2rem
+  );
 
   font-weight: 400;
 
@@ -802,12 +896,35 @@
   z-index: 6;
 
   display: flex;
-
   align-items: center;
+  justify-content: center;
+}
 
+/* ========================================= */
+/* EVENT DESCRIPTION — SCROLL AREA           */
+/*                                            */
+/* flex: 1 1 auto + min-height: 0 is what     */
+/* makes this "whatever height is left".      */
+/* Overflow goes to the custom scrollbar      */
+/* instead of pushing the buttons down.       */
+/* ========================================= */
+
+.eventDescriptionArea {
+  position: relative;
+
+  flex: 1 1 auto;
+
+  width: 100%;
+  padding-left: 20px;
+  min-height: 0;
+
+  display: flex;
+  align-items: stretch;
   justify-content: center;
 
-  flex-shrink: 0;
+  overflow: hidden;
+
+  box-sizing: border-box;
 }
 
 /* ========================================= */
@@ -815,49 +932,64 @@
 /* ========================================= */
 
 .eventDescription {
-  width: 100%;
+  flex: 1 1 auto;
 
-  max-width: 32vw;
-
-  height: auto;
-  min-height: 100px;
+  min-width: 0;
 
   margin: 0;
+
+  padding: 0 0.6vw 0 0;
 
   color: #38170b;
 
   font-family: "Cinzel", serif;
 
-  font-size: clamp(13px, 1.15vw, 20px);
+  font-size: clamp(
+    12px,
+    calc(var(--book-h) * 0.02),
+    20px
+  );
 
-  line-height: 1.7;
+  line-height: 1.65;
 
   text-align: center;
 
-  overflow: visible;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  box-sizing: border-box;
+
+  /* Native bar hidden — the line + wheel drive it,
+     same as .eventsList on the left page. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+}
+
+.eventDescription::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* ========================================= */
-/* FIXED CONTROLS                            */
+/* CONTROLS — now a normal flow block at the  */
+/* bottom of the right page                   */
 /* ========================================= */
 
 .eventControls {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: 70%;
+  flex-shrink: 0;
 
   width: 100%;
-  height: 17vw;
-  min-height: 220px;
-  max-height: 290px;
+
+  margin-top: calc(var(--book-h) * 0.01);
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  flex-shrink: 0;
+  gap: calc(var(--book-h) * 0.012);
+
   z-index: 20;
 }
 
@@ -866,15 +998,13 @@
 /* ========================================= */
 
 .eventActionButton {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  flex-shrink: 0;
 
-  width: min(320px, 20vw);
-  height: 5vw;
-  min-width: 150px;
-  min-height: 55px;
+  width: min(320px, calc(var(--book-w) * 0.26));
+
+  height: calc(var(--book-h) * 0.105);
+  min-height: 38px;
+  max-height: 70px;
 
   margin: 0;
   padding: 0;
@@ -887,7 +1017,13 @@
 
   color: #fed59b;
   font-family: "Cinzel", serif;
-  font-size: clamp(15px, 1.2vw, 22px);
+
+  font-size: clamp(
+    12px,
+    calc(var(--book-h) * 0.036),
+    22px
+  );
+
   font-weight: 700;
 
   cursor: pointer;
@@ -899,7 +1035,6 @@
 
   appearance: none;
   -webkit-appearance: none;
-  flex-shrink: 0;
 
   transition:
     transform 0.25s ease,
@@ -907,12 +1042,12 @@
 }
 
 .eventActionButton:hover {
-  transform: translateX(-50%) scale(1.06);
+  transform: scale(1.06);
   filter: brightness(1.1) drop-shadow(0 0 8px rgba(254, 213, 155, 0.55));
 }
 
 .eventActionButton:active {
-  transform: translateX(-50%) scale(0.96);
+  transform: scale(0.96);
 }
 
 /* ========================================= */
@@ -920,23 +1055,17 @@
 /* ========================================= */
 
 .eventNavigation {
-  position: absolute;
-  top: 6vw;
-  left: 50%;
-  transform: translateX(-50%);
+  flex-shrink: 0;
 
   width: 100%;
-  height: 5vw;
-  min-height: 55px;
 
   margin: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1vw;
 
-  flex-shrink: 0;
+  gap: calc(var(--book-w) * 0.02);
 }
 
 /* ========================================= */
@@ -950,7 +1079,7 @@
 
   justify-content: center;
 
-  gap: 1vw;
+  gap: calc(var(--book-w) * 0.02);
 }
 
 /* ========================================= */
@@ -958,15 +1087,12 @@
 /* ========================================= */
 
 .navArrow {
-  width: 2.5vw;
+  width: auto;
 
-  height: 3.5vw;
+  min-width: 0;
+  min-height: 0;
 
-  min-width: 35px;
-
-  min-height: 40px;
-
-  padding: 0;
+  padding: 0 0.3vw;
 
   border: none;
 
@@ -976,7 +1102,11 @@
 
   font-family: serif;
 
-  font-size: clamp(38px, 3.5vw, 58px);
+  font-size: clamp(
+    24px,
+    calc(var(--book-h) * 0.085),
+    58px
+  );
 
   font-weight: 400;
 
@@ -1006,9 +1136,9 @@
 /* ========================================= */
 
 .pageNumber {
-  min-width: 2vw;
+  min-width: 0;
 
-  padding: 0;
+  padding: 0 0.2vw;
 
   border: none;
 
@@ -1018,7 +1148,11 @@
 
   font-family: serif;
 
-  font-size: clamp(1.5rem, 2.2vw, 3rem);
+  font-size: clamp(
+    0.95rem,
+    calc(var(--book-h) * 0.05),
+    3rem
+  );
 
   font-weight: 400;
 
@@ -1034,13 +1168,17 @@
 }
 
 /* ========================================= */
-/* CURRENT PAGE                              */
+/* CURRENT PAGE                             */
 /* ========================================= */
 
 .pageNumber.currentPage {
   color: #38170b;
 
-  font-size: clamp(2.2rem, 3.5vw, 4.2rem);
+  font-size: clamp(
+    1.4rem,
+    calc(var(--book-h) * 0.078),
+    4.2rem
+  );
 
   font-weight: 700;
 
@@ -1062,9 +1200,11 @@
 /* ========================================= */
 
 .emptyInfo {
+  flex: 1 1 auto;
+
   width: 80%;
 
-  flex: 1;
+  min-height: 0;
 
   display: flex;
 
@@ -1086,7 +1226,11 @@
 
   font-family: "Cinzel", serif;
 
-  font-size: clamp(11px, 0.9vw, 16px);
+  font-size: clamp(
+    11px,
+    calc(var(--book-h) * 0.03),
+    16px
+  );
 
   line-height: 1.6;
 }
@@ -1096,18 +1240,15 @@
 /* ========================================= */
 
 .confirmButton {
-  position: absolute;
-  z-index: 20;
+  flex-shrink: 0;
 
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  width: min(240px, calc(var(--book-w) * 0.22));
 
-  width: min(240px, 16vw);
-  height: 5vw;
-  min-width: 150px;
-  min-height: 55px;
+  height: calc(var(--book-h) * 0.105);
+  min-height: 38px;
+  max-height: 70px;
 
+  margin: 0;
   padding: 0;
   border: none;
 
@@ -1119,7 +1260,13 @@
 
   color: #fed59b;
   font-family: "Cinzel", serif;
-  font-size: clamp(15px, 1.2vw, 22px);
+
+  font-size: clamp(
+    12px,
+    calc(var(--book-h) * 0.036),
+    22px
+  );
+
   font-weight: 700;
 
   display: flex;
@@ -1139,72 +1286,35 @@
 }
 
 .confirmButton:hover {
-  transform: translateX(-50%) scale(1.08);
+  transform: scale(1.08);
   filter: brightness(1.12) drop-shadow(0 0 10px rgba(254, 213, 155, 0.65));
 }
 
 .confirmButton:active {
-  transform: translateX(-50%) scale(0.96);
+  transform: scale(0.96);
 }
 
 .confirmButton:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   filter: none;
-  transform: translateX(-50%);
-}
-
-/* ========================================= */
-/* SHORT VIEWPORTS (desktop only)            */
-/* ========================================= */
-@media (max-height: 900px) and (min-width: 1300px) and (max-width: 1600px) {
-  .eventsPage {
-    padding-left: 50px;
-  }
-}
-@media (max-height: 800px) and (min-width: 901px) {
-  .infoPage {
-    padding-right: 35px;
-    width: 50%;
-  }
-
-  .eventsPage {
-    padding-left: 100px;
-  }
-  .scrollbarLine{
-    height: 80%;
-  }
-  .eventControls{
-    top:55% ;
-    height:10vh ;
-  }
-  
+  transform: none;
 }
 
 /* =========================================================== */
 /* MOBILE (<=900px)                                             */
 /*                                                               */
-/* Book framing copied from Register.module.scss:                */
-/*                                                               */
-/*   - .eventsContainer is a fixed 100svh box with overflow      */
-/*     hidden. It does NOT scroll and has no margin or padding,  */
-/*     so nothing can push the book down — this is what removes  */
-/*     the white strip at the top.                               */
-/*                                                               */
-/*   - .bookFrame is the register page's .bookContainer: an      */
-/*     absolutely positioned 92vw x 78vh box at top:52% /        */
-/*     left:13vw, vertically centred with translateY(-50%).      */
-/*     It runs off the right edge on purpose, so the visible     */
-/*     book is flush right with wood showing only on the left.   */
-/*                                                               */
-/*   - .bookContainer (the art) fills that frame with the same   */
-/*     flat crop: background-size 180% 100%, position left top.  */
-/*                                                               */
-/*   - .content overlays the frame exactly, and .eventsPage is   */
-/*     pinned onto the left page with the --lp-* percentages.    */
-/*     Those four values are the only ones to nudge if the       */
-/*     content doesn't sit perfectly on the page.                */
+/* Unchanged behaviour: the book is its own flat crop anchored   */
+/* to the left, the right page isn't rendered, and the left      */
+/* page is pinned with the --lp-* fractions. These rules come    */
+/* after the desktop ones and override the book box, so none     */
+/* of the desktop sizing math reaches this layout.               */
 /* =========================================================== */
+
+
+/* ================================================= */
+/* MOBILE OVERRIDES FROM SECOND FILE                 */
+/* ================================================= */
 
 @media (max-width: 900px) {
   .eventsContainer {
@@ -1293,7 +1403,7 @@
   .bookContainer {
     position: absolute;
 
-    top: 52%;
+    top: 42%;
     left: 13vw;
 
     transform: translateY(
@@ -1328,7 +1438,8 @@
 
     width: 100%;
     height: 100%;
-
+    top: 53%;
+    left: 60%;
     padding: 0;
     display: block;
 
@@ -1677,95 +1788,57 @@
 /* they can never reach the mobile layout.    */
 /* ========================================= */
 
-@media (max-height: 800px) and (min-width: 901px) {
-  .infoPage {
-    padding-right: 35px;
-    width: 50%;
+
+/* ================================================= */
+/* REMAINING DESKTOP-ONLY RULES FROM FIRST FILE      */
+/* ================================================= */
+
+@media (min-width: 901px) {
+  @media screen and (max-width: 1501px) {
+    .rightbottom {
+      right: -3%;
+      bottom: -20%;
+    }
   }
 
-  .eventsPage {
-    padding-left: 100px;
-  }
-  .scrollbarLine{
-    height: 80%;
-  }
-  .eventControls{
-    top:55% ;
-    height:10vh ;
-  }
-  
-}
-
-@media (max-height: 900px) and (min-width: 901px) {
-  .infoPage {
-    margin-right: 6%;
+  @media screen and (max-width: 1401px) {
+    .leftbottom {
+      bottom: 3%;
+    }
   }
 
-  .eventsPage {
-    margin-left: 4%;
+  @media screen and (max-width: 1075px) {
+    .righttop {
+      scale: 0.6;
+    }
   }
 
-  .searchContainer {
-    width: 90%;
-    margin-right: 10%;
-  }
-}
+  @media screen and (max-width: 577px) {
+    .righttop {
+      top: -5%;
+      scale: 0.8;
+    }
 
-/*Additions for new design*/
-@media screen and (max-width: 1501px) {
-  .rightbottom {
-    right: -3%;
-    bottom: -20%;
-  }
-}
+    .leftbottom {
+      left: 110px;
+      bottom: 92px;
+      scale: 3.2;
+    }
 
-@media screen and (max-width: 1401px) {
-  .leftbottom {
-    bottom: 3%;
-  }
-}
+    .lefttop{
+      left: -10%;
+      top: -10%;
+      scale: 1;
+    }
 
-@media screen and (max-width: 1075px) {
-  .righttop {
-    scale: 0.6;
-  }
-}
+    .rightbottom{
+      right: -44px;
+      bottom: 42px;
+      scale: 2.9;
+    }
 
-@media screen and (max-width: 577px) {
-  .righttop {
-    top: -5%;
-    scale: 0.8;
-  }
-  /*
-  .backButton {
-    scale: 0.5;
-    top: 2%;
-    left: -3%;
-  }*/
-
-  .leftbottom {
-    left: 110px;
-    bottom: 92px;
-    scale: 3.2;
-  }
-
-  .lefttop{
-    left: -10%;
-    top: -10%;
-    scale: 1;
-  }
-
-  .rightbottom{
-    right: -44px;
-    bottom: 42px;
-    scale: 2.9;
-  }
-
-  .rightmid{
-    display: none;
-  }
-
-  .eventsPage {
-    margin: 20px 0 0 50px;
+    .rightmid{
+      display: none;
+    }
   }
 }

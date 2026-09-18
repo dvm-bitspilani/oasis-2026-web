@@ -173,6 +173,9 @@ const Registration = () => {
   const handleSuccess = (response: any) => {
     const idToken = response.credential;
 
+
+
+
     axios
       .post(
         "https://bits-oasis.org/2026/main/registrations/google-reg/",
@@ -218,7 +221,7 @@ const Registration = () => {
       });
   };
 
-  // console.log("CURRENT PAGE:", currentPage);
+  console.log("CURRENT PAGE:", currentPage);
 
   return (
     <div>

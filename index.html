@@ -3,20 +3,27 @@
   <head>
 
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/oasisIcon.png" />
+    <link rel="icon" type="image/png" href="/oasisIcon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- ===================== PRIMARY / SEO META ===================== -->
+
+    <!-- ===================== PRIMARY / SEO META ===================== -->
     <title>Oasis 2026 | BITS Pilani's Annual Cultural Fest</title>
     <meta name="application-name" content="OASIS 2026" />
+    <meta name="theme-color" content="#000000" />
     <meta name="theme-color" content="#000000" />
 
     <meta
       name="description"
       content="The official website of Oasis 2026 | The Arabian Nights. Asia's Largest Student-Run College Cultural Festival returns for its 56th edition in 2026! Est. 1971"
+    />
+    <meta
+      name="keywords"
+      content="oasis, Oasis, oasis bits pilani, Oasis Bits Pilani, Oasis BITS Pilani, bits, BITS, BITS Pilani, bits pilani, bits pilani pilani campus, bppc, college fest, oasis 2026, Oasis 2026, oasis site, oasis website, Oasis site, Oasis website, oasis bits, bits oasis, bits pilani oasis, oasis bppc, college fest bits, bits pilani fest, oasis 2026 dates, bits pilani cultural fest, oasis bits pilani 2026, oasis in pilani, bppc fest, rocktaves, engineering, bits fest 2026, student fest india"
     />
     <meta
       name="keywords"
@@ -30,7 +37,16 @@
     <link rel="canonical" href="https://www.bits-oasis.org/" />
 
     <!-- ===================== OPEN GRAPH (Facebook, WhatsApp, LinkedIn, Google) ===================== -->
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large" />
+
+    <!-- Canonical URL — prevents duplicate-content issues (www vs non-www, http vs https, etc.) -->
+    <link rel="canonical" href="https://www.bits-oasis.org/" />
+
+    <!-- ===================== OPEN GRAPH (Facebook, WhatsApp, LinkedIn, Google) ===================== -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Oasis 2026 | BITS Pilani" />
+    <meta property="og:url" content="https://www.bits-oasis.org/" />
     <meta property="og:site_name" content="Oasis 2026 | BITS Pilani" />
     <meta property="og:url" content="https://www.bits-oasis.org/" />
     <meta property="og:title" content="OASIS 2026 | The Arabian Nights" />
@@ -91,10 +107,64 @@
     }
     </script>
 
+    <meta property="og:image" content="https://www.bits-oasis.org/oasisIcon.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Oasis 2026 - The Arabian Nights - BITS Pilani Annual Cultural Fest" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- ===================== TWITTER / X CARD ===================== -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- PLACEHOLDER: replace with your official Oasis Twitter/X handle if you have one -->
+    <meta name="twitter:site" content="@bitsoasis" />
+    <meta name="twitter:title" content="OASIS 2026 | The Arabian Nights" />
+    <meta
+      name="twitter:description"
+      content="The official website of Oasis 2026 | The Arabian Nights. Asia's Largest Student-Run College Cultural Festival returns for its 56th edition in 2026! Est. 1971"
+    />
+    <meta name="twitter:image" content="https://www.bits-oasis.org/oasisIcon.png" />
+    <meta name="twitter:image:alt" content="Oasis 2026 - The Arabian Nights - BITS Pilani Annual Cultural Fest" />
+
+    <!-- ===================== STRUCTURED DATA (JSON-LD) ===================== -->
+    <!-- Helps Google show rich results (event dates, location, logo) directly in search -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Event",
+      "name": "Oasis 2026 - The Arabian Nights",
+      "description": "Asia's Largest Student-Run College Cultural Festival, the 56th edition of Oasis, BITS Pilani's annual cultural fest.",
+      "startDate": "2026-10-29",
+      "endDate": "2026-11-02",
+      "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+      "eventStatus": "https://schema.org/EventScheduled",
+      "location": {
+        "@type": "Place",
+        "name": "BITS Pilani, Pilani Campus",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Pilani",
+          "addressRegion": "Rajasthan",
+          "postalCode": "333031",
+          "addressCountry": "IN"
+        }
+      },
+      "image": [
+        "https://www.bits-oasis.org/oasisIcon.png"
+      ],
+      "organizer": {
+        "@type": "Organization",
+        "name": "BITS Pilani Cultural Council (BPPC)",
+        "url": "https://www.bits-oasis.org/"
+      },
+      "url": "https://www.bits-oasis.org/"
+    }
+    </script>
+
   </head>
   <body>
     <div id="root"></div>
     <div id="backdrop-root"></div>
+    <div id="modal-root"></div>
     <div id="modal-root"></div>
 
     <script type="module" src="/src/main.tsx"></script>

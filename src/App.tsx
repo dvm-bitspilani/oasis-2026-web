@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import Preloader from "./pages/Preloader";
@@ -52,12 +51,7 @@ import Cinzel from "./assets/fonts/Cinzel-VariableFont_wght.ttf";
 import Scroll1 from "/instructionsScroll.png";
 import Scroll2 from "/instructionsScrollLong.png";
 import googleButton from "/googleReg.svg";
-import lamps from "./assets/game-icons_magic-lamp.svg";
-import instructionsBG from "/instructionsBG.png";
-
-/* ======================================================
-   GOOGLE ANALYTICS
-====================================================== */
+import instructionsBG from "./assets/preloader/bg_star.png";
 
 const TRACKING_ID = "G-SZVHE46Z2K";
 
@@ -69,46 +63,28 @@ if (isOasisDomain) {
   ReactGA.initialize(TRACKING_ID);
 }
 
-/* ======================================================
-   PRELOADER ASSETS
-====================================================== */
+const isMobile = window.innerWidth <= 768;
 
-const assets = [
+const mobileAssets = [
   video,
-
   camel,
-  camel1,
-  camel2,
-  camel3,
-  camel4,
-  camelLand,
-
   Castle,
-
   cloudBig,
   cloudSmall,
   cloudThree,
-
   hamLine,
-
   LogoOasis,
   Moon,
-
   navCircle,
-  navSan,
-
   regBtn,
   registerBtn,
-
   sand,
   sandImg,
-
   RegBg,
   leftbottom,
   rightbottom,
   lefttop,
   righttop,
-
   book,
   buttonBg,
   inputBg,
@@ -116,43 +92,73 @@ const assets = [
   searchBg,
   line,
   wheel,
-
-  modalFrame,
   modalFrameMobile,
   closedBook,
-
   Syamsiah,
   EB,
   Cinzel,
-
   Scroll1,
   Scroll2,
-
   googleButton,
-  lamps,
   instructionsBG,
 ];
 
-/* ======================================================
-   TRANSITION SETTINGS
-====================================================== */
+const desktopAssets = [
+  video,
+  camel,
+  camel1,
+  camel2,
+  camel3,
+  camel4,
+  camelLand,
+  Castle,
+  cloudBig,
+  cloudSmall,
+  cloudThree,
+  hamLine,
+  LogoOasis,
+  Moon,
+  navCircle,
+  navSan,
+  regBtn,
+  registerBtn,
+  sand,
+  sandImg,
+  RegBg,
+  leftbottom,
+  rightbottom,
+  lefttop,
+  righttop,
+  book,
+  buttonBg,
+  inputBg,
+  btn,
+  searchBg,
+  line,
+  wheel,
+  modalFrame,
+  closedBook,
+  Syamsiah,
+  EB,
+  Cinzel,
+  Scroll1,
+  Scroll2,
+  googleButton,
+  instructionsBG,
+];
 
-const TRANSITION_DURATION = 1140;
-
-/* ======================================================
-   APP
-====================================================== */
+const assets = isMobile ? mobileAssets : desktopAssets;
 
 export default function App() {
   const location = useLocation();
-
   const { markEntered } = useTransition();
-
   const isHome = location.pathname === "/";
 
-  /* ======================================================
-     GOOGLE ANALYTICS PAGEVIEW
-  ====================================================== */
+  const [homeReveal, setHomeReveal] = useState(false);
+  const [backgroundReady, setBackgroundReady] = useState(false);
+  const [preloaderMounted, setPreloaderMounted] = useState(false);
+
+  const homeWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOasisDomain) {
@@ -163,93 +169,69 @@ export default function App() {
     }
   }, [location]);
 
-  /* ======================================================
-     PRELOADER STATE
-  ====================================================== */
+  useEffect(() => {
+    if (!isHome) {
+      setBackgroundReady(true);
+      setPreloaderMounted(false);
+      return;
+    }
 
-  const [preloaderDone, setPreloaderDone] = useState(false);
+    const bgImage = new Image();
 
-  const [homeExiting, setHomeExiting] = useState(false);
+    bgImage.onload = () => {
+      setBackgroundReady(true);
+      setPreloaderMounted(true);
+    };
 
-  /* ======================================================
-     PRELOADER EXIT START
-  ====================================================== */
+    bgImage.onerror = () => {
+      setBackgroundReady(true);
+      setPreloaderMounted(true);
+    };
+
+    bgImage.src = instructionsBG;
+  }, [isHome]);
 
   const handlePreloaderExit = () => {
-    setHomeExiting(true);
+    setHomeReveal(true);
   };
 
-  /* ======================================================
-     ENTER COMPLETE
-  ====================================================== */
+  const handleExitProgress = (revealFraction: number) => {
+    const el = homeWrapRef.current;
+    if (!el) return;
+
+    const hiddenPercent = (1 - revealFraction) * 100;
+
+    el.style.transform = `translate3d(0, ${hiddenPercent}vh, 0)`;
+  };
 
   const handleEnter = () => {
     markEntered();
-
-    setPreloaderDone(true);
-
-    setHomeExiting(true);
+    setPreloaderMounted(false);
   };
-
-  /* ======================================================
-     INTRO STATE
-  ====================================================== */
-
-  const introActive = isHome && !preloaderDone;
 
   return (
     <>
-      {/* ==================================================
-          HOME PAGE TRANSITION WRAPPER
-      ================================================== */}
-
       <div
-        style={
-          introActive
-            ? {
-                position: "fixed",
-                inset: 0,
-                overflow: "hidden",
-              }
-            : undefined
-        }
+        ref={homeWrapRef}
+        style={{
+          position: "relative",
+          zIndex: 20,
+          transform: "translate3d(0, 100vh, 0)",
+          willChange: "transform",
+        }}
       >
-        <div
-          style={
-            introActive
-              ? {
-                  width: "100%",
-                  minHeight: "100%",
-
-                  transform: homeExiting
-                    ? "translate3d(0, 0, 0)"
-                    : "translate3d(0, 100%, 0)",
-
-                  transition: homeExiting
-                    ? `transform ${TRANSITION_DURATION}ms cubic-bezier(0.76, 0, 0.24, 1)`
-                    : "none",
-
-                  willChange: "transform",
-                }
-              : undefined
-          }
-        >
-          <AppRoutes
-            preloaderDone={preloaderDone}
-            preloaderExiting={homeExiting}
-          />
-        </div>
+        <AppRoutes
+          preloaderDone={homeReveal}
+          preloaderExiting={homeReveal}
+        />
       </div>
 
-      {/* ==================================================
-          PRELOADER
-      ================================================== */}
-
-      {isHome && !preloaderDone && (
+      {isHome && backgroundReady && preloaderMounted && (
         <Preloader
           assets={assets}
           onExitStart={handlePreloaderExit}
           onEnter={handleEnter}
+          onExitProgress={handleExitProgress}
         />
       )}
     </>

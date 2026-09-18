@@ -696,7 +696,7 @@ const About = () => {
         </div>
       )}
 
-      <div ref={bottomL} data-castle-drown className={styles.leftCloud}>
+      <div ref={bottomL} className={styles.leftCloud}>
         <SvgImg src={leftCloud} />
       </div>
 
@@ -748,4 +748,4 @@ const About = () => {
   );
 };
 
-export default About;
+export default About; 
