@@ -55,12 +55,12 @@ import instructionsBG from "./assets/preloader/bg_star.png";
 
 const TRACKING_ID = "G-SZVHE46Z2K";
 
-const isOasisDomain =
-  window.location.hostname === "bits-oasis.org" ||
-  window.location.hostname === "www.bits-oasis.org";
-
-if (isOasisDomain) {
+if (
+  window.location.hostname.search("bits-oasis.org") !== -1 ||
+  window.location.hostname === "oasis-2026-web.vercel.app"
+)  {
   ReactGA.initialize(TRACKING_ID);
+  console.log("Hey :)");
 }
 
 const isMobile = window.innerWidth <= 768;
@@ -161,12 +161,10 @@ export default function App() {
   const homeWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isOasisDomain) {
-      ReactGA.send({
-        hitType: "pageview",
-        page: location.pathname + location.search,
-      });
-    }
+    ReactGA.send({
+      hitType: "pageview",
+      page: location.pathname + location.search,
+    });
   }, [location]);
 
   useEffect(() => {
