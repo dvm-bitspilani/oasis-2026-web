@@ -58,7 +58,6 @@ const TRACKING_ID = "GT-PJRTJCBD";
 if (
   window.location.hostname.includes("bits-oasis.org")
 ) {
-  console.log("GA hostname matched:", window.location.hostname);
 
   ReactGA.initialize(TRACKING_ID, {
     gtagOptions: {
@@ -66,7 +65,7 @@ if (
     },
   });
 
-  console.log("GA initialized:", TRACKING_ID);
+
 }
 
 const isMobile = window.innerWidth <= 768;
@@ -167,7 +166,7 @@ export default function App() {
   const homeWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-  console.log("Sending GA pageview:", location.pathname);
+
 
   ReactGA.send({
     hitType: "pageview",
