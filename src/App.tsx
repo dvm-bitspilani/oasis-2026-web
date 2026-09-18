@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
@@ -59,24 +58,14 @@ import instructionsBG from "/instructionsBG.png";
    GOOGLE ANALYTICS
 ====================================================== */
 
-
-/* ======================================================
-   GOOGLE ANALYTICS
-====================================================== */
-
-const TRACKING_ID = "G-SZVHE46Z2K";
+const TRACKING_ID = "GT-PJRTJCBD";
 
 const isOasisDomain =
-  window.location.hostname === "bits-oasis.org" ||
-  window.location.hostname === "www.bits-oasis.org";
+  window.location.hostname.includes("bits-oasis.org");
 
 if (isOasisDomain) {
   ReactGA.initialize(TRACKING_ID);
 }
-
-/* ======================================================
-   PRELOADER ASSETS
-====================================================== */
 /* ======================================================
    PRELOADER ASSETS
 ====================================================== */
@@ -174,6 +163,7 @@ const desktopAssets = [
 ];
 
 const assets = isMobile ? mobileAssets : desktopAssets;
+
 /* ======================================================
    TRANSITION SETTINGS
 ====================================================== */
@@ -200,6 +190,7 @@ export default function App() {
       ReactGA.send({
         hitType: "pageview",
         page: location.pathname + location.search,
+        title: document.title,
       });
     }
   }, [location]);
