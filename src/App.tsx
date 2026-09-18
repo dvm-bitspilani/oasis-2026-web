@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect , useRef } from "react";
 import { useLocation } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import Preloader from "./pages/Preloader";
@@ -59,11 +58,6 @@ import instructionsBG from "/instructionsBG.png";
    GOOGLE ANALYTICS
 ====================================================== */
 
-
-/* ======================================================
-   GOOGLE ANALYTICS
-====================================================== */
-
 const TRACKING_ID = "G-SZVHE46Z2K";
 
 const isOasisDomain =
@@ -74,9 +68,6 @@ if (isOasisDomain) {
   ReactGA.initialize(TRACKING_ID);
 }
 
-/* ======================================================
-   PRELOADER ASSETS
-====================================================== */
 /* ======================================================
    PRELOADER ASSETS
 ====================================================== */
@@ -174,11 +165,6 @@ const desktopAssets = [
 ];
 
 const assets = isMobile ? mobileAssets : desktopAssets;
-/* ======================================================
-   TRANSITION SETTINGS
-====================================================== */
-
-const TRANSITION_DURATION = 1140;
 
 /* ======================================================
    APP
@@ -186,111 +172,62 @@ const TRANSITION_DURATION = 1140;
 
 export default function App() {
   const location = useLocation();
-
   const { markEntered } = useTransition();
-
   const isHome = location.pathname === "/";
-
-  /* ======================================================
-     GOOGLE ANALYTICS PAGEVIEW
-  ====================================================== */
 
   useEffect(() => {
     if (isOasisDomain) {
-      ReactGA.send({
-        hitType: "pageview",
-        page: location.pathname + location.search,
-      });
+      ReactGA.send({ hitType: "pageview", page: location.pathname + location.search });
     }
   }, [location]);
 
-  /* ======================================================
-     PRELOADER STATE
-  ====================================================== */
+  const [homeReveal, setHomeReveal] = useState(false);
+  const [preloaderMounted, setPreloaderMounted] = useState(true);
 
-  const [preloaderDone, setPreloaderDone] = useState(false);
-
-  const [homeExiting, setHomeExiting] = useState(false);
-
-  /* ======================================================
-     PRELOADER EXIT START
-  ====================================================== */
+  // Home's wrapper — starts fully hidden below the viewport. handleExitProgress
+  // moves it up in lockstep with the strings pulling on it.
+  const homeWrapRef = useRef<HTMLDivElement>(null);
 
   const handlePreloaderExit = () => {
-    setHomeExiting(true);
+    setHomeReveal(true);
   };
 
-  /* ======================================================
-     ENTER COMPLETE
-  ====================================================== */
+  const handleExitProgress = (revealFraction: number) => {
+    const el = homeWrapRef.current;
+    if (!el) return;
+    const hiddenPercent = (1 - revealFraction) * 100;
+    el.style.transform = `translate3d(0, ${hiddenPercent}vh, 0)`;
+  };
 
   const handleEnter = () => {
     markEntered();
-
-    setPreloaderDone(true);
-
-    setHomeExiting(true);
+    setPreloaderMounted(false);
   };
-
-  /* ======================================================
-     INTRO STATE
-  ====================================================== */
-
-  const introActive = isHome && !preloaderDone;
 
   return (
     <>
-      {/* ==================================================
-          HOME PAGE TRANSITION WRAPPER
-      ================================================== */}
-
+      {/* HOME — sits mid z-index: above the static preloader backdrop,
+          below the exit-string overlay. Starts translated fully off
+          the bottom of the screen; the preloader's exit sequence pulls
+          it up to translateY(0) via handleExitProgress. */}
       <div
-        style={
-          introActive
-            ? {
-                position: "fixed",
-                inset: 0,
-                overflow: "hidden",
-              }
-            : undefined
-        }
+        ref={homeWrapRef}
+        style={{
+          position: "relative",
+          zIndex: 20,
+          transform: "translate3d(0, 100vh, 0)",
+          willChange: "transform",
+        }}
       >
-        <div
-          style={
-            introActive
-              ? {
-                  width: "100%",
-                  minHeight: "100%",
-
-                  transform: homeExiting
-                    ? "translate3d(0, 0, 0)"
-                    : "translate3d(0, 100%, 0)",
-
-                  transition: homeExiting
-                    ? `transform ${TRANSITION_DURATION}ms cubic-bezier(0.76, 0, 0.24, 1)`
-                    : "none",
-
-                  willChange: "transform",
-                }
-              : undefined
-          }
-        >
-          <AppRoutes
-            preloaderDone={preloaderDone}
-            preloaderExiting={homeExiting}
-          />
-        </div>
+        <AppRoutes preloaderDone={homeReveal} preloaderExiting={homeReveal} />
       </div>
 
-      {/* ==================================================
-          PRELOADER
-      ================================================== */}
-
-      {isHome && !preloaderDone && (
+      {isHome && preloaderMounted && (
         <Preloader
           assets={assets}
           onExitStart={handlePreloaderExit}
           onEnter={handleEnter}
+          onExitProgress={handleExitProgress}
         />
       )}
     </>

@@ -6,6 +6,9 @@ body {
 }
   .preloader {
     position: fixed;
+    overflow: hidden;
+    overflow-y: hidden;
+    overscroll-behavior-y: none;
     inset: 0;
 
     width: 100vw;
