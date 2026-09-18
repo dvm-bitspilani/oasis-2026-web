@@ -146,7 +146,7 @@ export default function Preloader({
   const progressRef = useRef(assets.length === 0 ? 1 : 0);
   const logoCompleteRef = useRef(false);
   const [assetProgress, setAssetProgress] = useState(assets.length === 0 ? 1 : 0);
-  const [exiting, setExiting] = useState(false);
+  const setExiting = useState(false);
 
   /*
    * LOAD ASSETS
