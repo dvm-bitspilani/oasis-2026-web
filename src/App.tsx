@@ -56,11 +56,18 @@ import instructionsBG from "./assets/preloader/bg_star.png";
 const TRACKING_ID = "G-SZVHE46Z2K";
 
 if (
-  window.location.hostname.search("bits-oasis.org") !== -1 ||
+  window.location.hostname.includes("bits-oasis.org") ||
   window.location.hostname === "oasis-2026-web.vercel.app"
-)  {
-  ReactGA.initialize(TRACKING_ID);
-  console.log("Hey :)");
+) {
+  console.log("GA hostname matched:", window.location.hostname);
+
+  ReactGA.initialize(TRACKING_ID, {
+    gtagOptions: {
+      debug_mode: true,
+    },
+  });
+
+  console.log("GA initialized:", TRACKING_ID);
 }
 
 const isMobile = window.innerWidth <= 768;
@@ -161,11 +168,14 @@ export default function App() {
   const homeWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    ReactGA.send({
-      hitType: "pageview",
-      page: location.pathname + location.search,
-    });
-  }, [location]);
+  console.log("Sending GA pageview:", location.pathname);
+
+  ReactGA.send({
+    hitType: "pageview",
+    page: location.pathname + location.search,
+    title: document.title,
+  });
+}, [location]);
 
   useEffect(() => {
     if (!isHome) {
