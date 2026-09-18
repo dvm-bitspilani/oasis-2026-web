@@ -53,7 +53,7 @@ import Scroll2 from "/instructionsScrollLong.png";
 import googleButton from "/googleReg.svg";
 import instructionsBG from "./assets/preloader/bg_star.png";
 
-const TRACKING_ID = "G-SZVHE46Z2K";
+const TRACKING_ID = "GT-PJRTJCBD";
 
 if (
   window.location.hostname.includes("bits-oasis.org") ||
