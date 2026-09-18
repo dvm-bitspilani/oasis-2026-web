@@ -1508,7 +1508,7 @@ export default function EventsPage() {
 
         const originY =
             rect.top +
-            rect.height * 0.05;
+            rect.height *(- 0.15);
 
         setSmokeOrigin({
             x: originX,
