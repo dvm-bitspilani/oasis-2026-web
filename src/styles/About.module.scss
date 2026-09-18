@@ -46,7 +46,6 @@ body::-webkit-scrollbar {
   background-position: center;
   background-repeat: no-repeat;
   background-color: black;
-  background-color: black;
   z-index: 0;
 }
 
@@ -54,20 +53,6 @@ body::-webkit-scrollbar {
   position: absolute;
   inset: 0;
   opacity: 0.2;
-  opacity: 0.2;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: black;
-  mix-blend-mode: screen;
-  z-index: 1;
-}
-
-.bgFrontSolid {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
   background-size: cover;
@@ -86,9 +71,6 @@ body::-webkit-scrollbar {
   background-size: 120% 120%;
   background-position: center center;
   background-repeat: no-repeat;
-  opacity: 0;
-  mix-blend-mode: normal;
-  z-index: 2;
   opacity: 0;
   mix-blend-mode: normal;
   z-index: 2;
@@ -158,11 +140,6 @@ body::-webkit-scrollbar {
   z-index: 5;
   width: 100vw;
   height: 100vh;
-  bottom: -19%;
-  left: -47%;
-  z-index: 5;
-  width: 100vw;
-  height: 100vh;
   overflow: hidden;
   @extend %svgFill;
 }
@@ -171,13 +148,8 @@ body::-webkit-scrollbar {
   position: absolute;
   bottom: -19%;
   right: -47%;
-  bottom: -19%;
-  right: -47%;
   z-index: 22;
   transform: scaleX(-1);
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -317,7 +289,7 @@ body::-webkit-scrollbar {
   @extend %svgFill;
 }
 
-.bgVid {
+.video {
   position: absolute;
   background-size: contain;
   background-position: center;
