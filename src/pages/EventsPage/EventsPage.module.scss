@@ -54,13 +54,13 @@
         black 100%
     );
 
-    -webkit-mask-image: radial-gradient(
-        circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-        transparent 0px,
-        transparent 250px,
-        black 300px,
-        black 100%
-    );
+    // -webkit-mask-image: radial-gradient(
+    //     circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    //     transparent 0px,
+    //     transparent 250px,
+    //     black 300px,
+    //     black 100%
+    // );
 }
 
 
