@@ -53,14 +53,19 @@ import Scroll2 from "/instructionsScrollLong.png";
 import googleButton from "/googleReg.svg";
 import instructionsBG from "./assets/preloader/bg_star.png";
 
-const TRACKING_ID = "G-SZVHE46Z2K";
+const TRACKING_ID = "GT-PJRTJCBD";
 
-const isOasisDomain =
-  window.location.hostname === "bits-oasis.org" ||
-  window.location.hostname === "www.bits-oasis.org";
+if (
+  window.location.hostname.includes("bits-oasis.org")
+) {
 
-if (isOasisDomain) {
-  ReactGA.initialize(TRACKING_ID);
+  ReactGA.initialize(TRACKING_ID, {
+    gtagOptions: {
+      debug_mode: true,
+    },
+  });
+
+
 }
 
 const isMobile = window.innerWidth <= 768;
@@ -161,13 +166,14 @@ export default function App() {
   const homeWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isOasisDomain) {
-      ReactGA.send({
-        hitType: "pageview",
-        page: location.pathname + location.search,
-      });
-    }
-  }, [location]);
+
+
+  ReactGA.send({
+    hitType: "pageview",
+    page: location.pathname + location.search,
+    title: document.title,
+  });
+}, [location]);
 
   useEffect(() => {
     if (!isHome) {
