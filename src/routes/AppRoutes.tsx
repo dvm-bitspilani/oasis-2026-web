@@ -5,6 +5,7 @@ import Registration from "../pages/registration/Registration";
 import Home from "../pages/Home";
 import ComingSoon from "../pages/ComingSoon";
 import About from "../pages/About";
+import Contact from "../pages/Contact";
 
 // import EventsReg from "../pages/registration/components/Events/Events"
 import EventsPage from "../pages/EventsPage/EventsPage";
@@ -32,6 +33,11 @@ export default function AppRoutes({
         <Route
           path="/comingsoon"
           element={<ComingSoon />}
+        />
+
+        <Route
+          path="/contactus"
+          element={<Contact />}
         />
 
         <Route

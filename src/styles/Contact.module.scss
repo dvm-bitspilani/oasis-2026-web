@@ -1,0 +1,39 @@
+.mapContainer {
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  position: relative;
+  background-color: #0b0b0b;
+  user-select: none;
+
+  /* Prevents browser OS from hijacking trackpad/touch gestures into single-axis locks */
+  touch-action: none;
+  overscroll-behavior: none;
+
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  .mapImage {
+    display: block;
+    height: auto;
+    width: auto;
+    will-change: transform;
+    transform-origin: 0 0;
+    pointer-events: none; /* Prevents default image ghost-dragging */
+  }
+
+  .page {
+    width: 45vw;
+    height: 100dvh;
+    background-image: url(../assets/contact/page.png);
+    background-repeat: no-repeat;
+    background-position: left;
+    background-size: contain;
+
+    position: absolute;
+    inset: 0;
+  }
+}
