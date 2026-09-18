@@ -39,6 +39,57 @@ type Category =
     | "music";
 
 /* =========================================================
+   CATEGORY SMOKE COLORS
+========================================================= */
+
+const CATEGORY_COLORS: Record<Category, string> = {
+    drama: "#4d2b63",
+    photography: "#342875",
+    dance: "#50041d",
+    misc: "#3b0c3c",
+    music: "#03176b",
+};
+
+const DEFAULT_SMOKE_COLOR = "#5b5189";
+
+interface RgbColor {
+    r: number;
+    g: number;
+    b: number;
+}
+
+function hexToRgb(hex: string): RgbColor {
+    const sanitized = hex.replace("#", "");
+
+    const bigint = parseInt(sanitized, 16);
+
+    return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255,
+    };
+}
+
+function clampChannel(value: number) {
+    return Math.max(0, Math.min(255, value));
+}
+
+function adjustColor(
+    color: RgbColor,
+    amount: number
+): RgbColor {
+    return {
+        r: clampChannel(color.r + amount),
+        g: clampChannel(color.g + amount),
+        b: clampChannel(color.b + amount),
+    };
+}
+
+function rgbString(color: RgbColor) {
+    return `${color.r}, ${color.g}, ${color.b}`;
+}
+
+/* =========================================================
    EVENT DATA
 ========================================================= */
 
@@ -284,11 +335,13 @@ const eventsData: Record<Category, EventData[]> = {
 interface SmokeCanvasProps {
     originX: number;
     originY: number;
+    color: string;
 }
 
 function SmokeCanvas({
     originX,
     originY,
+    color,
 }: SmokeCanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -300,6 +353,26 @@ function SmokeCanvas({
         const ctx = canvas.getContext("2d");
 
         if (!ctx) return;
+
+        /* =====================================================
+           COLOR SETUP
+           Base smoke color comes from the active category. Speck
+           highlights/shadows are derived from it so the grain
+           texture always matches the category tint instead of a
+           fixed purple.
+        ===================================================== */
+
+        const baseColor = hexToRgb(color);
+
+        const baseColorStr = rgbString(baseColor);
+
+        const lightSpeckColor = rgbString(
+            adjustColor(baseColor, 70)
+        );
+
+        const darkSpeckColor = rgbString(
+            adjustColor(baseColor, -45)
+        );
 
         let animationFrame = 0;
 
@@ -410,22 +483,22 @@ const makeSoftSprite = (
 
     gradient.addColorStop(
         0,
-        "rgba(91, 81, 137, 1)"
+        `rgba(${baseColorStr}, 1)`
     );
 
     gradient.addColorStop(
         0.5,
-        "rgba(91, 81, 137, 0.62)"
+        `rgba(${baseColorStr}, 0.62)`
     );
 
     gradient.addColorStop(
         0.8,
-        "rgba(91, 81, 137, 0.22)"
+        `rgba(${baseColorStr}, 0.22)`
     );
 
     gradient.addColorStop(
         1,
-        "rgba(91, 81, 137, 0)"
+        `rgba(${baseColorStr}, 0)`
     );
 
     sctx.fillStyle = gradient;
@@ -446,7 +519,8 @@ const makeSoftSprite = (
        TEXTURE PASS
        Scatter uneven light/dark specks over the base gradient
        with a lighter blur than the base, so the sprite reads
-       as grainy smoke instead of a flat soft disc.
+       as grainy smoke instead of a flat soft disc. Speck colors
+       are derived from the category's base color.
     ===================================================== */
 
     sctx.filter =
@@ -491,8 +565,8 @@ const makeSoftSprite = (
             Math.random() * 0.16;
 
         sctx.fillStyle = isLight
-            ? "rgba(160, 150, 200, 1)"
-            : "rgba(50, 44, 78, 1)";
+            ? `rgba(${lightSpeckColor}, 1)`
+            : `rgba(${darkSpeckColor}, 1)`;
 
         sctx.beginPath();
 
@@ -696,12 +770,12 @@ const makeSoftSprite = (
             2,
 
         speed:
-            0.7 +
+            0.1 +
             Math.random() *
                 0.45,
 
         delay:
-            Math.random() * 0.2,
+            Math.random() * 0.8,
 
         opacity:
             0.55 +
@@ -819,7 +893,7 @@ const makeSoftSprite = (
                 const riseAmount =
                     Math.min(
                         window.innerHeight *
-                            0.2,
+                            0.4,
                         390
                     );
 
@@ -827,7 +901,7 @@ const makeSoftSprite = (
                     Math.sin(
                         progress *
                             Math.PI *
-                            0.72
+                            0.9
                     ) * riseAmount;
 
                 const spread =
@@ -1095,7 +1169,7 @@ const makeSoftSprite = (
 
                 coreGradient.addColorStop(
                     0,
-                    `rgba(91, 81, 137, ${
+                    `rgba(${baseColorStr}, ${
                         0.14 *
                         coreProgress
                     })`
@@ -1103,7 +1177,7 @@ const makeSoftSprite = (
 
                 coreGradient.addColorStop(
                     0.38,
-                    `rgba(91, 81, 137, ${
+                    `rgba(${baseColorStr}, ${
                         0.10 *
                         coreProgress
                     })`
@@ -1111,7 +1185,7 @@ const makeSoftSprite = (
 
                 coreGradient.addColorStop(
                     0.72,
-                    `rgba(91, 81, 137, ${
+                    `rgba(${baseColorStr}, ${
                         0.04 *
                         coreProgress
                     })`
@@ -1119,7 +1193,7 @@ const makeSoftSprite = (
 
                 coreGradient.addColorStop(
                     1,
-                    "rgba(91, 81, 137, 0)"
+                    `rgba(${baseColorStr}, 0)`
                 );
 
                 ctx.fillStyle =
@@ -1145,6 +1219,8 @@ const makeSoftSprite = (
 
             /* =================================================
                READABILITY VIGNETTE
+               (kept neutral/dark regardless of category so text
+               stays legible over any smoke color)
             ================================================= */
 
             if (elapsed > 0.5) {
@@ -1229,7 +1305,7 @@ const makeSoftSprite = (
 
                 baseGradient.addColorStop(
                     0,
-                    `rgba(91, 81, 137, ${
+                    `rgba(${baseColorStr}, ${
                         0.30 *
                         baseProgress
                     })`
@@ -1237,7 +1313,7 @@ const makeSoftSprite = (
 
                 baseGradient.addColorStop(
                     0.38,
-                    `rgba(91, 81, 137, ${
+                    `rgba(${baseColorStr}, ${
                         0.18 *
                         baseProgress
                     })`
@@ -1245,7 +1321,7 @@ const makeSoftSprite = (
 
                 baseGradient.addColorStop(
                     0.7,
-                    `rgba(91, 81, 137, ${
+                    `rgba(${baseColorStr}, ${
                         0.06 *
                         baseProgress
                     })`
@@ -1253,7 +1329,7 @@ const makeSoftSprite = (
 
                 baseGradient.addColorStop(
                     1,
-                    "rgba(91, 81, 137, 0)"
+                    `rgba(${baseColorStr}, 0)`
                 );
 
                 ctx.fillStyle =
@@ -1297,7 +1373,7 @@ const makeSoftSprite = (
                 resize
             );
         };
-    }, [originX, originY]);
+    }, [originX, originY, color]);
 
     return (
         <canvas
@@ -1333,6 +1409,12 @@ export default function EventsPage() {
             x: number;
             y: number;
         } | null>(null);
+
+    const [
+        smokeCategory,
+        setSmokeCategory,
+    ] =
+        useState<Category | null>(null);
 
     const [
         currentIndex,
@@ -1433,6 +1515,8 @@ export default function EventsPage() {
             y: originY,
         });
 
+        setSmokeCategory(category);
+
         smokeTimerRef.current =
             window.setTimeout(() => {
                 setSelectedCategory(
@@ -1466,6 +1550,7 @@ export default function EventsPage() {
         setSelectedCategory(null);
         setCurrentIndex(0);
         setSmokeOrigin(null);
+        setSmokeCategory(null);
     };
 
     /* =====================================================
@@ -1567,6 +1652,11 @@ export default function EventsPage() {
 
     const currentEvent =
         currentEvents[currentIndex];
+
+    const activeSmokeColor =
+        smokeCategory
+            ? CATEGORY_COLORS[smokeCategory]
+            : DEFAULT_SMOKE_COLOR;
 
     return (
         <div
@@ -1711,6 +1801,9 @@ export default function EventsPage() {
                     }
                     originY={
                         smokeOrigin.y
+                    }
+                    color={
+                        activeSmokeColor
                     }
                 />
             )}
