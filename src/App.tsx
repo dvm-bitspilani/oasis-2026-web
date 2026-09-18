@@ -56,8 +56,7 @@ import instructionsBG from "./assets/preloader/bg_star.png";
 const TRACKING_ID = "GT-PJRTJCBD";
 
 if (
-  window.location.hostname.includes("bits-oasis.org") ||
-  window.location.hostname === "oasis-2026-web.vercel.app"
+  window.location.hostname.includes("bits-oasis.org")
 ) {
   console.log("GA hostname matched:", window.location.hostname);
 
