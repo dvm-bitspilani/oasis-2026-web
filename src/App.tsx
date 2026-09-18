@@ -1,4 +1,4 @@
-import { useState, useEffect , useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import Preloader from "./pages/Preloader";
@@ -51,12 +51,7 @@ import Cinzel from "./assets/fonts/Cinzel-VariableFont_wght.ttf";
 import Scroll1 from "/instructionsScroll.png";
 import Scroll2 from "/instructionsScrollLong.png";
 import googleButton from "/googleReg.svg";
-// import lamps from "/game-icons_magic-lamp.svg";
-import instructionsBG from "/instructionsBG.png";
-
-/* ======================================================
-   GOOGLE ANALYTICS
-====================================================== */
+import instructionsBG from "./assets/preloader/bg_star.png";
 
 const TRACKING_ID = "G-SZVHE46Z2K";
 
@@ -68,20 +63,11 @@ if (isOasisDomain) {
   ReactGA.initialize(TRACKING_ID);
 }
 
-/* ======================================================
-   PRELOADER ASSETS
-====================================================== */
-
 const isMobile = window.innerWidth <= 768;
 
 const mobileAssets = [
   video,
   camel,
-  // camel1,
-  // camel2,
-  // camel3,
-  // camel4,
-  // camelLand,
   Castle,
   cloudBig,
   cloudSmall,
@@ -90,7 +76,6 @@ const mobileAssets = [
   LogoOasis,
   Moon,
   navCircle,
-  // navSan,
   regBtn,
   registerBtn,
   sand,
@@ -115,7 +100,6 @@ const mobileAssets = [
   Scroll1,
   Scroll2,
   googleButton,
-  // lamps,
   instructionsBG,
 ];
 
@@ -160,33 +144,52 @@ const desktopAssets = [
   Scroll1,
   Scroll2,
   googleButton,
-  // lamps,
   instructionsBG,
 ];
 
 const assets = isMobile ? mobileAssets : desktopAssets;
-
-/* ======================================================
-   APP
-====================================================== */
 
 export default function App() {
   const location = useLocation();
   const { markEntered } = useTransition();
   const isHome = location.pathname === "/";
 
+  const [homeReveal, setHomeReveal] = useState(false);
+  const [backgroundReady, setBackgroundReady] = useState(false);
+  const [preloaderMounted, setPreloaderMounted] = useState(false);
+
+  const homeWrapRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (isOasisDomain) {
-      ReactGA.send({ hitType: "pageview", page: location.pathname + location.search });
+      ReactGA.send({
+        hitType: "pageview",
+        page: location.pathname + location.search,
+      });
     }
   }, [location]);
 
-  const [homeReveal, setHomeReveal] = useState(false);
-  const [preloaderMounted, setPreloaderMounted] = useState(true);
+  useEffect(() => {
+    if (!isHome) {
+      setBackgroundReady(true);
+      setPreloaderMounted(false);
+      return;
+    }
 
-  // Home's wrapper — starts fully hidden below the viewport. handleExitProgress
-  // moves it up in lockstep with the strings pulling on it.
-  const homeWrapRef = useRef<HTMLDivElement>(null);
+    const bgImage = new Image();
+
+    bgImage.onload = () => {
+      setBackgroundReady(true);
+      setPreloaderMounted(true);
+    };
+
+    bgImage.onerror = () => {
+      setBackgroundReady(true);
+      setPreloaderMounted(true);
+    };
+
+    bgImage.src = instructionsBG;
+  }, [isHome]);
 
   const handlePreloaderExit = () => {
     setHomeReveal(true);
@@ -195,7 +198,9 @@ export default function App() {
   const handleExitProgress = (revealFraction: number) => {
     const el = homeWrapRef.current;
     if (!el) return;
+
     const hiddenPercent = (1 - revealFraction) * 100;
+
     el.style.transform = `translate3d(0, ${hiddenPercent}vh, 0)`;
   };
 
@@ -206,10 +211,6 @@ export default function App() {
 
   return (
     <>
-      {/* HOME — sits mid z-index: above the static preloader backdrop,
-          below the exit-string overlay. Starts translated fully off
-          the bottom of the screen; the preloader's exit sequence pulls
-          it up to translateY(0) via handleExitProgress. */}
       <div
         ref={homeWrapRef}
         style={{
@@ -219,10 +220,13 @@ export default function App() {
           willChange: "transform",
         }}
       >
-        <AppRoutes preloaderDone={homeReveal} preloaderExiting={homeReveal} />
+        <AppRoutes
+          preloaderDone={homeReveal}
+          preloaderExiting={homeReveal}
+        />
       </div>
 
-      {isHome && preloaderMounted && (
+      {isHome && backgroundReady && preloaderMounted && (
         <Preloader
           assets={assets}
           onExitStart={handlePreloaderExit}
