@@ -146,7 +146,6 @@ export default function Preloader({
   const progressRef = useRef(assets.length === 0 ? 1 : 0);
   const logoCompleteRef = useRef(false);
   const [assetProgress, setAssetProgress] = useState(assets.length === 0 ? 1 : 0);
-  const setExiting = useState(false);
 
   /*
    * LOAD ASSETS
@@ -586,7 +585,6 @@ export default function Preloader({
         window.clearInterval(timer);
 
         window.setTimeout(() => {
-          setExiting(true);
           onExitStart?.(); // Home mounts hidden below the fold at this point
 
           const vh = window.innerHeight;
