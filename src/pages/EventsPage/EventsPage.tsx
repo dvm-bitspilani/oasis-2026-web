@@ -1527,7 +1527,7 @@ export default function EventsPage() {
 
                 smokeTimerRef.current =
                     null;
-            }, 1100);
+            }, 2100);
     };
 
     /* =====================================================
