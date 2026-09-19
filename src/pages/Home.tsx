@@ -134,17 +134,17 @@ const CLOUDS_MOBILE: Cloud[] = [
 const MOON_CLOUD_TINT =
   "brightness(0.35) sepia(0.8) hue-rotate(20deg) saturate(1.5)";
 
-const CASTLE_RISE_START = 2;
+const CASTLE_RISE_START = 0;
 const CASTLE_RISE_DURATION = 3;
 const CASTLE_PEEK_RATIO = 0.72;
 
-const MOON_RISE_START = 2;
+const MOON_RISE_START = 0;
 const MOON_RISE_DURATION = 2.0;
 
-const CLOUD_DROP_START = 2;
+const CLOUD_DROP_START = 0.25;
 const CLOUD_DROP_STAGGER = 0.22;
 
-const FADE_ELEMENTS_START = 2.6;
+const FADE_ELEMENTS_START = 0.45  ;
 const FADE_ELEMENTS_DURATION = 1.15;
 const FADE_ELEMENTS_STAGGER = 0.12;
 

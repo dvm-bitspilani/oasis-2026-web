@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import Preloader from "./pages/Preloader";
@@ -51,7 +52,17 @@ import Cinzel from "./assets/fonts/Cinzel-VariableFont_wght.ttf";
 import Scroll1 from "/instructionsScroll.png";
 import Scroll2 from "/instructionsScrollLong.png";
 import googleButton from "/googleReg.svg";
-import instructionsBG from "./assets/preloader/bg_star.png";
+// import lamps from "/game-icons_magic-lamp.svg";
+import instructionsBG from "/instructionsBG.png";
+
+/* ======================================================
+   GOOGLE ANALYTICS
+====================================================== */
+
+
+/* ======================================================
+   GOOGLE ANALYTICS
+====================================================== */
 
 const TRACKING_ID = "GT-PJRTJCBD";
 
@@ -68,11 +79,23 @@ if (
 
 }
 
+/* ======================================================
+   PRELOADER ASSETS
+====================================================== */
+/* ======================================================
+   PRELOADER ASSETS
+====================================================== */
+
 const isMobile = window.innerWidth <= 768;
 
 const mobileAssets = [
   video,
   camel,
+  // camel1,
+  // camel2,
+  // camel3,
+  // camel4,
+  // camelLand,
   Castle,
   cloudBig,
   cloudSmall,
@@ -81,6 +104,7 @@ const mobileAssets = [
   LogoOasis,
   Moon,
   navCircle,
+  // navSan,
   regBtn,
   registerBtn,
   sand,
@@ -105,6 +129,7 @@ const mobileAssets = [
   Scroll1,
   Scroll2,
   googleButton,
+  // lamps,
   instructionsBG,
 ];
 
@@ -149,21 +174,31 @@ const desktopAssets = [
   Scroll1,
   Scroll2,
   googleButton,
+  // lamps,
   instructionsBG,
 ];
 
 const assets = isMobile ? mobileAssets : desktopAssets;
+/* ======================================================
+   TRANSITION SETTINGS
+====================================================== */
+
+const TRANSITION_DURATION = 1140;
+
+/* ======================================================
+   APP
+====================================================== */
 
 export default function App() {
   const location = useLocation();
+
   const { markEntered } = useTransition();
+
   const isHome = location.pathname === "/";
 
-  const [homeReveal, setHomeReveal] = useState(false);
-  const [backgroundReady, setBackgroundReady] = useState(false);
-  const [preloaderMounted, setPreloaderMounted] = useState(false);
-
-  const homeWrapRef = useRef<HTMLDivElement>(null);
+  /* ======================================================
+     GOOGLE ANALYTICS PAGEVIEW
+  ====================================================== */
 
   useEffect(() => {
 
@@ -175,71 +210,95 @@ export default function App() {
   });
 }, [location]);
 
-  useEffect(() => {
-    if (!isHome) {
-      setBackgroundReady(true);
-      setPreloaderMounted(false);
-      return;
-    }
+  /* ======================================================
+     PRELOADER STATE
+  ====================================================== */
 
-    const bgImage = new Image();
+  const [preloaderDone, setPreloaderDone] = useState(false);
 
-    bgImage.onload = () => {
-      setBackgroundReady(true);
-      setPreloaderMounted(true);
-    };
+  const [homeExiting, setHomeExiting] = useState(false);
 
-    bgImage.onerror = () => {
-      setBackgroundReady(true);
-      setPreloaderMounted(true);
-    };
-
-    bgImage.src = instructionsBG;
-  }, [isHome]);
+  /* ======================================================
+     PRELOADER EXIT START
+  ====================================================== */
 
   const handlePreloaderExit = () => {
-    setHomeReveal(true);
+    setHomeExiting(true);
   };
 
-  const handleExitProgress = (revealFraction: number) => {
-    const el = homeWrapRef.current;
-    if (!el) return;
-
-    const hiddenPercent = (1 - revealFraction) * 100;
-
-    el.style.transform = `translate3d(0, ${hiddenPercent}vh, 0)`;
-  };
+  /* ======================================================
+     ENTER COMPLETE
+  ====================================================== */
 
   const handleEnter = () => {
     markEntered();
-    setPreloaderMounted(false);
+
+    setPreloaderDone(true);
+
+    setHomeExiting(true);
   };
+
+  /* ======================================================
+     INTRO STATE
+  ====================================================== */
+
+  const introActive = isHome && !preloaderDone;
 
   return (
     <>
+      {/* ==================================================
+          HOME PAGE TRANSITION WRAPPER
+      ================================================== */}
+
       <div
-        ref={homeWrapRef}
-        style={{
-          position: "relative",
-          zIndex: 20,
-          transform: "translate3d(0, 100vh, 0)",
-          willChange: "transform",
-        }}
+        style={
+          introActive
+            ? {
+                position: "fixed",
+                inset: 0,
+                overflow: "hidden",
+              }
+            : undefined
+        }
       >
-        <AppRoutes
-          preloaderDone={homeReveal}
-          preloaderExiting={homeReveal}
-        />
+        <div
+          style={
+            introActive
+              ? {
+                  width: "100%",
+                  minHeight: "100%",
+
+                  transform: homeExiting
+                    ? "translate3d(0, 0, 0)"
+                    : "translate3d(0, 100%, 0)",
+
+                  transition: homeExiting
+                    ? `transform ${TRANSITION_DURATION}ms cubic-bezier(0.76, 0, 0.24, 1)`
+                    : "none",
+
+                  willChange: "transform",
+                }
+              : undefined
+          }
+        >
+          <AppRoutes
+            preloaderDone={preloaderDone}
+            preloaderExiting={homeExiting}
+          />
+        </div>
       </div>
 
-      {isHome && backgroundReady && preloaderMounted && (
+      {/* ==================================================
+          PRELOADER
+      ================================================== */}
+
+      {isHome && !preloaderDone && (
         <Preloader
           assets={assets}
           onExitStart={handlePreloaderExit}
           onEnter={handleEnter}
-          onExitProgress={handleExitProgress}
         />
       )}
     </>
   );
-}
+} 
