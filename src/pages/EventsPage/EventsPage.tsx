@@ -16,9 +16,26 @@ import otherVase from "/otherVase.png";
 import musicVase from "/musicVase.png";
 import eventsTitle from "/eventsTitle.png";
 
-/* =========================================================
-   EVENT TYPES
-========================================================= */
+import Swaranjali from "../../assets/Events/swaranjali.png";
+import PitchPerfect from "../../assets/Events/pitchPerfect.png";
+import Tarang from "../../assets/Events/tarang.png";
+import Andholika from "../../assets/Events/andholika.png";
+import RapWars from "../../assets/Events/rapWars.png";
+import Axetacy from "../../assets/Events/axtacy.png";
+import DrumDuels from "../../assets/Events/drumDuels.png";
+import BeatBrawl from "../../assets/Events/beatBrawl.png";
+import FashP from "../../assets/Events/fashP.png";
+import Choreo from "../../assets/Events/choreo.jpg";
+import StreetDance from "../../assets/Events/streetDance.png";
+import DesertDuel from "../../assets/Events/desertDuel.png";
+import Razzmatazz from "../../assets/Events/razzmatazz.png";
+import Tandav from "../../assets/Events/tandav.png";
+import Sukhmanch from "../../assets/Events/sukhmanch.png";
+import StreetPlay from "../../assets/Events/streetPlay.png";
+import StagePlay from "../../assets/Events/stagePlay.png";
+import Metamorphosis from "../../assets/Events/metamorphosis.png";
+import Hypercut from "../../assets/Events/hypercut.png";
+
 
 interface EventData {
     id: string;
@@ -108,7 +125,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Celebrated for its deeply emotional and socially impactful plays that resonate with audiences long after the curtain falls. Their repertoire includes thought-provoking dramas such as Court Martial, and Seven Steps Around the Fire, among others. Experience storytelling that's as enlightening as it is entertaining. Join us for an unforgettable theatrical experience.",
-            image_url: null,
+            image_url: Sukhmanch,
             rulebook: null,
         },
         {
@@ -119,7 +136,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Right from the streets, a loud and larger-than-life exchange of ideologies, with drama full of humor and zeal. Street Plays aka Nukkad Natak, are carried out to propagate social and political messages among the masses, amidst the direct, intimate and effective means of theater by means of shouts, chants, drums and catchy songs.",
-            image_url: null,
+            image_url: StreetPlay,
             rulebook: "YOUR_STREET_PLAY_RULEBOOK_LINK",
         },
         {
@@ -130,7 +147,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "The stage, a neutral territory outside the jurisdiction of fate where stars may be crossed with impunity. A truer and more real place does not exist in the universe. The Stage Play event brings you a wholesome feat of drama to awaken and thrill your senses. It gives you a chance to captivate your audience with your actions and expressions and to watch and perform captivating plays.",
-            image_url: null,
+            image_url: StagePlay,
             rulebook: "YOUR_STAGE_PLAY_RULEBOOK_LINK",
         },
         {
@@ -141,7 +158,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Metamorphosis, our flagship short film competition, returns at Oasis. Create a captivating narrative around a theme, push your artistic boundaries, and compete for an exciting prize pool. Your masterpiece premieres at Oasis before a discerning audience and expert judges. Embrace the challenge!",
-            image_url: null,
+            image_url: Metamorphosis,
             rulebook: null,
         },
         {
@@ -152,7 +169,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "HyperCut is an exciting Ad making competition, where novel filmmakers will have to bring forth their love of film making and combine it with their knowledge of advertisements. Participants will have to make an advertisement on a well known brand and the best entries will be screened as well.",
-            image_url: null,
+            image_url: Hypercut,
             rulebook: null,
         },
     ],
@@ -168,7 +185,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: "Central Auditorium",
             description:
                 "This event is conducted in the central auditorium. After the initial elimination round, about six to eight teams are shortlisted for the final round. The final round features contemporary dance performances that are usually based on a certain theme.",
-            image_url: null,
+            image_url: Choreo,
             rulebook: "YOUR_CHOREO_RULEBOOK_LINK",
         },
         {
@@ -179,7 +196,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: "Rotunda",
             description:
                 "Street Dance is considered a crowd favorite and is held in the Rotunda, the open-air amphitheater of BITS. The first stage consists of 2 rounds; a performance and a battle round. From this, 4 teams are selected for the second stage. The second stage is a face-off challenge between pairs of teams. These pairs are allotted randomly.",
-            image_url: null,
+            image_url: StreetDance,
             rulebook: "YOUR_STREET_DANCE_RULEBOOK_LINK",
         },
         {
@@ -190,7 +207,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "It is a solo dance event in which dancers from every college participate and showcase their talent. Depending on the dancer, styles can vary from western to classical to hip-hop and even to the typical Bollywood style.",
-            image_url: null,
+            image_url: DesertDuel,
             rulebook: null,
         },
         {
@@ -201,7 +218,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "A group dance competition that tests finesse and artistry in showcasing coordinated group choreographies. With equal weightage in judgement given to execution, presentation and creativity, it is fashioned to test the esprit de corps of the participating teams. All forms of dance including fusions are allowed. So trip the light fantastic toe and let there be a dazzle-daze of sheer splendor.",
-            image_url: null,
+            image_url: Razzmatazz,
             rulebook: null,
         },
         {
@@ -212,7 +229,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Oasis' flagship Indian classical dance competition. Solo performers from across the nation gather to showcase the rich heritage of Indian classical dance, captivating audiences with their grace, rhythm, precision, and storytelling. The event not only highlights technical mastery but also celebrates the depth of expression and the spiritual essence embedded in classical forms.",
-            image_url: null,
+            image_url: Tandav,
             rulebook: null,
         },
     ],
@@ -225,7 +242,7 @@ const eventsData: Record<Category, EventData[]> = {
             club_name: null,
             venue: null,
             description: null,
-            image_url: null,
+            image_url: FashP,
             rulebook: "YOUR_FASHP_RULEBOOK_LINK",
         },
     ],
@@ -239,7 +256,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: "NAB Auditorium",
             description:
                 "With participants from over 10 institutions, Pitch Perfect is the platform for a growing crowd of Cappella enthusiasts to face off against each other. A battle of the bands with no instruments, this symphony of voices at the NAB Auditorium is establishing a new dimensionality of music vastly unexplored till date.",
-            image_url: null,
+            image_url: PitchPerfect,
             rulebook: "YOUR_PITCH_PERFECT_RULEBOOK_LINK",
         },
         {
@@ -250,7 +267,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Swaranjali is a classical music competition that invites participants trained in both the Carnatic and Hindustani styles, covering a range of vocal and instrumental forms. The instruments include violin, sitar, veena, flute, Hawaiian guitar, tabla, mridangam etc. The competition features four categories: Solo Vocals, Solo Wind and String, Solo Percussion, and Group.",
-            image_url: null,
+            image_url: Swaranjali,
             rulebook: null,
         },
         {
@@ -261,7 +278,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Tarang - a musical fusion extravaganza from the Indian heartland and its innumerably diverse facets. Cover an existing piece, or create your own. Come participate in our Indian fusion battle of bands to claim the title of the best band.",
-            image_url: null,
+            image_url: Tarang,
             rulebook: "YOUR_TARANG_RULEBOOK_LINK",
         },
         {
@@ -272,7 +289,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Andholika is a talent hunt for the most versatile singer among the participants. The event is split into two categories, Eastern and Western. The event consists of an audition round and a final round. 4 finalists will be selected from each category. A winner and runner up will be awarded from each category.",
-            image_url: null,
+            image_url: Andholika,
             rulebook: null,
         },
         {
@@ -283,7 +300,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "RapWars is a rap-battle event with a legacy of 13 years which includes names like Seedhe Maut, Divine, Brodha V, Wolf Cryman and many more. Shortlisted through preliminary rounds in 4 cities, the 8 finalists will do whatever it takes to spit bars par excellence and take the crown home.",
-            image_url: null,
+            image_url: RapWars,
             rulebook: null,
         },
         {
@@ -305,7 +322,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Solo Guitar Competition. A thrilling guitar showdown for both acoustic and electric players. Open to all individual participants who can play the guitar. The event features two rounds: Qualifier and Final, with judging criteria determined by the panel.",
-            image_url: null,
+            image_url: Axetacy,
             rulebook: null,
         },
         {
@@ -316,7 +333,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "A Solo Drumming Competition. A dynamic event for drummers showcasing their creativity and control. Participants are tested in two rounds: replicating a drum track and creating beats for a bass line. Shortlisted drummers then face off in duels.",
-            image_url: null,
+            image_url: DrumDuels,
             rulebook: null,
         },
         {
@@ -327,7 +344,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "An electrifying platform dedicated to beatboxing, the raw vocal art form known for its rhythmic intensity and limitless creativity. Designed to promote and elevate beatbox culture among the youth, BeatBrawl celebrates individuality and performance artistry.",
-            image_url: null,
+            image_url: BeatBrawl,
             rulebook: null,
         },
     ],

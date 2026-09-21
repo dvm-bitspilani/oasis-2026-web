@@ -737,9 +737,9 @@
 .eventInfo h2 {
     flex: 0 0 auto;
     font-family: "Syamsiah";
-    margin: 0 0 16px;
+    margin: 0 0 5px;
   
-    min-height: 2.4em;
+    min-height: 1.5em;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -862,9 +862,6 @@
 
     width: 100%;
     height: 100%;
-
-    border: 1px solid #e5ad2f;
-
     object-fit: cover;
 }
 
@@ -1103,7 +1100,7 @@
 
         align-items: stretch;
 
-        gap: 16px;
+        gap: -20px;
 
         flex: 1 1 auto;
         min-height: 0;
@@ -1165,7 +1162,7 @@
         min-height: 0;
 
         max-height: none;
-        margin-bottom: 12px;
+        margin-bottom: 16px;
 
         overflow-y: auto;
 
