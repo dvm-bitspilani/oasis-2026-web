@@ -1210,6 +1210,12 @@
 
 /* =========================================================
    SMOKE TRANSITION
+
+   Opacity transition lets the canvas fade out smoothly when
+   the modal closes, instead of disappearing instantly. See
+   SMOKE_FADE_OUT_MS / smokeClosing in EventsPage.tsx, which
+   toggles .smokeCanvasFadeOut and unmounts the canvas once
+   this transition should have finished.
 ========================================================= */
 
 .smokeCanvas {
@@ -1224,6 +1230,14 @@
     z-index: 10;
 
     pointer-events: none;
+
+    opacity: 1;
+
+    transition: opacity 1s ease;
+}
+
+.smokeCanvasFadeOut {
+    opacity: 0;
 }
 
 

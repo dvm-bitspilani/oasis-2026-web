@@ -52,6 +52,11 @@ const CATEGORY_COLORS: Record<Category, string> = {
 
 const DEFAULT_SMOKE_COLOR = "#5b5189";
 
+// How long the smoke's fade-out transition takes. Must match
+// the `transition: opacity ...` duration set on .smokeCanvas
+// (and its fade-out variant) in EventsPage.module.scss.
+const SMOKE_FADE_OUT_MS = 700;
+
 interface RgbColor {
     r: number;
     g: number;
@@ -336,12 +341,14 @@ interface SmokeCanvasProps {
     originX: number;
     originY: number;
     color: string;
+    fadingOut: boolean;
 }
 
 function SmokeCanvas({
     originX,
     originY,
     color,
+    fadingOut,
 }: SmokeCanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -1378,7 +1385,11 @@ const makeSoftSprite = (
     return (
         <canvas
             ref={canvasRef}
-            className={styles.smokeCanvas}
+            className={`${styles.smokeCanvas} ${
+                fadingOut
+                    ? styles.smokeCanvasFadeOut
+                    : ""
+            }`}
             aria-hidden="true"
         />
     );
@@ -1393,6 +1404,12 @@ export default function EventsPage() {
         useRef<HTMLDivElement>(null);
 
     const smokeTimerRef =
+        useRef<number | null>(null);
+
+    // Tracks the pending "fade the smoke out, then unmount it"
+    // timeout kicked off by closeModal, so it can be cancelled
+    // if the component unmounts or another close happens first.
+    const smokeFadeTimeoutRef =
         useRef<number | null>(null);
 
     const [
@@ -1415,6 +1432,15 @@ export default function EventsPage() {
         setSmokeCategory,
     ] =
         useState<Category | null>(null);
+
+    // When true, the smoke canvas is still mounted but is
+    // transitioning its opacity to 0 (see .smokeCanvasFadeOut
+    // in EventsPage.module.scss) rather than disappearing
+    // instantly.
+    const [
+        smokeClosing,
+        setSmokeClosing,
+    ] = useState(false);
 
     const [
         currentIndex,
@@ -1468,6 +1494,29 @@ export default function EventsPage() {
     }, []);
 
     /* =====================================================
+       CLEANUP PENDING TIMERS ON UNMOUNT
+    ===================================================== */
+
+    useEffect(() => {
+        return () => {
+            if (smokeTimerRef.current !== null) {
+                window.clearTimeout(
+                    smokeTimerRef.current
+                );
+            }
+
+            if (
+                smokeFadeTimeoutRef.current !==
+                null
+            ) {
+                window.clearTimeout(
+                    smokeFadeTimeoutRef.current
+                );
+            }
+        };
+    }, []);
+
+    /* =====================================================
        OPEN CATEGORY
     ===================================================== */
 
@@ -1483,6 +1532,22 @@ export default function EventsPage() {
                 smokeTimerRef.current
             );
         }
+
+        // Opening a new category cancels any smoke that was
+        // still fading out from a previous close.
+        if (
+            smokeFadeTimeoutRef.current !==
+            null
+        ) {
+            window.clearTimeout(
+                smokeFadeTimeoutRef.current
+            );
+
+            smokeFadeTimeoutRef.current =
+                null;
+        }
+
+        setSmokeClosing(false);
 
         const vase =
             e.currentTarget.querySelector(
@@ -1532,6 +1597,11 @@ export default function EventsPage() {
 
     /* =====================================================
        CLOSE MODAL
+
+       The modal itself closes immediately, but the smoke is
+       given a moment to fade its opacity to 0 (matching the
+       CSS transition on .smokeCanvasFadeOut) before it's
+       actually unmounted, instead of vanishing abruptly.
     ===================================================== */
 
     const closeModal = () => {
@@ -1549,8 +1619,33 @@ export default function EventsPage() {
 
         setSelectedCategory(null);
         setCurrentIndex(0);
-        setSmokeOrigin(null);
-        setSmokeCategory(null);
+
+        if (smokeOrigin) {
+            setSmokeClosing(true);
+
+            if (
+                smokeFadeTimeoutRef.current !==
+                null
+            ) {
+                window.clearTimeout(
+                    smokeFadeTimeoutRef.current
+                );
+            }
+
+            smokeFadeTimeoutRef.current =
+                window.setTimeout(() => {
+                    setSmokeOrigin(null);
+                    setSmokeCategory(null);
+                    setSmokeClosing(false);
+
+                    smokeFadeTimeoutRef.current =
+                        null;
+                }, SMOKE_FADE_OUT_MS);
+        } else {
+            setSmokeOrigin(null);
+            setSmokeCategory(null);
+            setSmokeClosing(false);
+        }
     };
 
     /* =====================================================
@@ -1805,6 +1900,7 @@ export default function EventsPage() {
                     color={
                         activeSmokeColor
                     }
+                    fadingOut={smokeClosing}
                 />
             )}
 
