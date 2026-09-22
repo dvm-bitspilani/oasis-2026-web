@@ -1,4 +1,5 @@
 import {
+    useCallback,
     useEffect,
     useRef,
     useState,
@@ -6,6 +7,7 @@ import {
 } from "react";
 
 import Nav from "../../components/Nav";
+import Preloader from "../Preloader";
 
 import styles from "./EventsPage.module.scss";
 
@@ -35,6 +37,43 @@ import StreetPlay from "../../assets/Events/streetPlay.png";
 import StagePlay from "../../assets/Events/stagePlay.png";
 import Metamorphosis from "../../assets/Events/metamorphosis.png";
 import Hypercut from "../../assets/Events/hypercut.png";
+
+/* =========================================================
+   PRELOADER ASSETS
+
+   Every image imported above — the five category vases, the
+   page title, and every event image used in eventsData below
+   — so the preloader waits for all of them before revealing
+   the page, the same way About.tsx does with ABOUT_ASSETS.
+========================================================= */
+
+const EVENTS_ASSETS = [
+    dramaVase,
+    photographyVase,
+    danceVase,
+    otherVase,
+    musicVase,
+    eventsTitle,
+    Swaranjali,
+    PitchPerfect,
+    Tarang,
+    Andholika,
+    RapWars,
+    Axetacy,
+    DrumDuels,
+    BeatBrawl,
+    FashP,
+    Choreo,
+    StreetDance,
+    DesertDuel,
+    Razzmatazz,
+    Tandav,
+    Sukhmanch,
+    StreetPlay,
+    StagePlay,
+    Metamorphosis,
+    Hypercut,
+];
 
 
 interface EventData {
@@ -1464,6 +1503,20 @@ export default function EventsPage() {
         setCurrentIndex,
     ] = useState(0);
 
+    // Mirrors About.tsx's aboutPreloaderDone: the Preloader
+    // stays mounted (blocking the page) until every asset in
+    // EVENTS_ASSETS has loaded, then this flips to true and
+    // it unmounts.
+    const [
+        eventsPreloaderDone,
+        setEventsPreloaderDone,
+    ] = useState(false);
+
+    const handleEventsPreloaderEnter =
+        useCallback(() => {
+            setEventsPreloaderDone(true);
+        }, []);
+
     /* =====================================================
        SPOTLIGHT
     ===================================================== */
@@ -2219,6 +2272,17 @@ export default function EventsPage() {
                         )}
                     </div>
                 </div>
+            )}
+
+            {/* =================================================
+                PRELOADER
+            ================================================= */}
+
+            {!eventsPreloaderDone && (
+                <Preloader
+                    assets={EVENTS_ASSETS}
+                    onEnter={handleEventsPreloaderEnter}
+                />
             )}
         </div>
     );
