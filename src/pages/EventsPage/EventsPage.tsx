@@ -1566,10 +1566,15 @@ export default function EventsPage() {
 
         setSmokeClosing(false);
 
+        // e.currentTarget is now the .hitArea overlay, which
+        // sits as a SIBLING of the <img> (both inside
+        // .imageWrap) rather than wrapping it, so we look the
+        // image up via the shared parent. The visual vase
+        // position/size is unaffected by the narrower hit area.
         const vase =
-            e.currentTarget.querySelector(
+            e.currentTarget.parentElement?.querySelector(
                 "img"
-            );
+            ) ?? null;
 
         if (!vase) {
             setSelectedCategory(
@@ -1799,107 +1804,125 @@ export default function EventsPage() {
 
             {/* =================================================
                 DRAMA
+
+                .imageWrap is sized purely by the <img> (as the
+                bare <img> was before), so the container's
+                absolute positioning/scaling is unchanged. The
+                .hitArea is an absolutely-positioned overlay,
+                centered inside .imageWrap and narrower than the
+                image, so it captures clicks/hover without
+                affecting the image's own size or position.
             ================================================= */}
 
-            <section
-                className={
-                    styles.dramaContainer
-                }
-                onClick={(e) =>
-                    openCategory(
-                        "drama",
-                        e
-                    )
-                }
-            >
-                <img
-                    src={dramaVase}
-                    alt="Drama and Theatre"
-                />
+            <section className={styles.dramaContainer}>
+                <span className={styles.imageWrap}>
+                    <img
+                        src={dramaVase}
+                        alt="Drama and Theatre"
+                    />
+
+                    <span
+                        className={styles.hitArea}
+                        onClick={(e) =>
+                            openCategory(
+                                "drama",
+                                e
+                            )
+                        }
+                    />
+                </span>
             </section>
 
             {/* =================================================
                 PHOTOGRAPHY
             ================================================= */}
 
-            <section
-                className={
-                    styles.photographyContainer
-                }
-                onClick={(e) =>
-                    openCategory(
-                        "photography",
-                        e
-                    )
-                }
-            >
-                <img
-                    src={photographyVase}
-                    alt="Photography"
-                />
+            <section className={styles.photographyContainer}>
+                <span className={styles.imageWrap}>
+                    <img
+                        src={photographyVase}
+                        alt="Photography"
+                    />
+
+                    <span
+                        className={styles.hitArea}
+                        onClick={(e) =>
+                            openCategory(
+                                "photography",
+                                e
+                            )
+                        }
+                    />
+                </span>
             </section>
 
             {/* =================================================
                 DANCE
             ================================================= */}
 
-            <section
-                className={
-                    styles.danceContainer
-                }
-                onClick={(e) =>
-                    openCategory(
-                        "dance",
-                        e
-                    )
-                }
-            >
-                <img
-                    src={danceVase}
-                    alt="Dance"
-                />
+            <section className={styles.danceContainer}>
+                <span className={styles.imageWrap}>
+                    <img
+                        src={danceVase}
+                        alt="Dance"
+                    />
+
+                    <span
+                        className={styles.hitArea}
+                        onClick={(e) =>
+                            openCategory(
+                                "dance",
+                                e
+                            )
+                        }
+                    />
+                </span>
             </section>
 
             {/* =================================================
                 MISC / FASHION
             ================================================= */}
 
-            <section
-                className={
-                    styles.otherContainer
-                }
-                onClick={(e) =>
-                    openCategory(
-                        "misc",
-                        e
-                    )
-                }
-            >
-                <img
-                    src={otherVase}
-                    alt="Miscellaneous"
-                />
+            <section className={styles.otherContainer}>
+                <span className={styles.imageWrap}>
+                    <img
+                        src={otherVase}
+                        alt="Miscellaneous"
+                    />
+
+                    <span
+                        className={styles.hitArea}
+                        onClick={(e) =>
+                            openCategory(
+                                "misc",
+                                e
+                            )
+                        }
+                    />
+                </span>
             </section>
 
             {/* =================================================
                 MUSIC
             ================================================= */}
 
-            <section
-                className={
-                    styles.musicContainer
-                }
-                onClick={(e) =>
-                    openCategory(
-                        "music",
-                        e
-                    )
-                }
-            >
-                <img
-                    src={musicVase}
-                    alt="Music"
-                />
+            <section className={styles.musicContainer}>
+                <span className={styles.imageWrap}>
+                    <img
+                        src={musicVase}
+                        alt="Music"
+                    />
+
+                    <span
+                        className={styles.hitArea}
+                        onClick={(e) =>
+                            openCategory(
+                                "music",
+                                e
+                            )
+                        }
+                    />
+                </span>
             </section>
 
             {/* =================================================
