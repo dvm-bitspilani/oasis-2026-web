@@ -35,7 +35,7 @@ export default function Nav() {
           <NavLink
             to="/"
             onClick={(e) => handleNavClick(e, "/")}
-            className={styles.mobileNavDecoration}
+            className={`${styles.navLink} ${styles.mobileNavDecoration}`}
             aria-label="Home"
           >
             {/* <img src={navMob} alt="" /> */}
@@ -44,7 +44,7 @@ export default function Nav() {
           <NavLink
             to="/"
             onClick={(e) => handleNavClick(e, "/")}
-            className={styles.homeLink}
+            className={`${styles.navLink} ${styles.homeLink}`}
           >
             Home
           </NavLink>
@@ -52,7 +52,7 @@ export default function Nav() {
           <NavLink
             to="/aboutUs"
             onClick={(e) => handleNavClick(e, "/aboutUs")}
-            className={styles.mobileNavDecoration}
+            className={`${styles.navLink} ${styles.mobileNavDecoration}`}
             aria-label="About Us"
           >
             {/* <img src={navMob} alt="" /> */}
@@ -65,6 +65,7 @@ export default function Nav() {
               key={link.label}
               to={link.to}
               onClick={(e) => handleNavClick(e, link.to)}
+              className={styles.navLink}
             >
               {link.label}
             </NavLink>

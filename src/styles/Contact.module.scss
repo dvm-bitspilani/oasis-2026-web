@@ -1,0 +1,175 @@
+$cross-size: 80px; // change cross size here
+$card-gap: -45px;   // extra space between the bottom of a card and the top of its cross
+
+.mapContainer {
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  position: relative;
+  background-color: #0b0b0b;
+  user-select: none;
+
+  /* Prevents browser OS from hijacking trackpad/touch gestures into single-axis locks */
+  touch-action: none;
+  overscroll-behavior: none;
+
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  /* Wraps the map image + crosses + cards. This is the element that gets translated. */
+  .mapLayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: max-content; /* layer is exactly as big as the map image */
+    will-change: transform;
+    transform-origin: 0 0;
+    pointer-events: none;
+  }
+
+  .mapImage {
+    display: block;
+    height: auto;
+    width: auto;
+    pointer-events: none; /* Prevents default image ghost-dragging */
+  }
+
+  /* Positioned relative to .mapLayer via inline left/top percentages */
+  .cross {
+    position: absolute;
+    width: $cross-size;
+    height: auto;
+    transform: translate(-50%, -50%); /* left/top = center of the cross */
+    pointer-events: none;
+  }
+
+  /* Same left/top as its cross; the transform lifts the card so its bottom edge
+     rests just above the cross (half the cross height + $card-gap). */
+  .cardAnchor {
+    position: absolute;
+    width: max-content;
+    transform: translate(-50%, calc(-100% - #{$cross-size * 0.5 + $card-gap}));
+  }
+
+  .cardContainer {
+    background-image: url(../assets/contact/card.png);
+    width: 411px;
+    aspect-ratio: 411/376;
+    height: auto;
+
+    position: relative; /* positioned by .cardAnchor now; also anchors the toast */
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 30px;
+
+    h1 {
+      font-family: 'Syamsiah', sans-serif;
+      color: #151C22;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px #E5DECE;
+    }
+
+    h2 {
+      transform: translateY(-10px);
+      color: #1E262C;
+      font-family: 'EB', sans-serif;
+      text-shadow: 0 0 20px #E5DECE;
+    }
+
+    /* Mail icon: clickable (the map layer has pointer-events: none) */
+    .mail {
+      pointer-events: auto;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+
+    .copiedToast {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 2px 12px;
+      border-radius: 4px;
+      background: #E5DECE;
+      color: #151C22;
+      font-family: 'EB', sans-serif;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+  }
+
+  .page {
+    height: 100vh;
+    width: auto;
+    aspect-ratio: 783/1080;
+    background-image: url(../assets/contact/page.png);
+    background-repeat: no-repeat;
+    background-position: left;
+    background-size: cover;
+
+    position: absolute;
+    inset: 0;
+
+    .pageStuff {
+      position: absolute;
+      top: 15%;
+      left: 10%;
+
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      text-align: center;
+
+      h1 {
+        font-family: 'Syamsiah', sans-serif;
+        color: #6C1700;
+        font-size: 6rem;
+      }
+
+      ul {
+        font-family: 'EB', sans-serif;
+        color: #36261A;
+        list-style: none;
+        font-size: 2rem;
+
+        li {
+          margin-top: 20px;
+          cursor: pointer;
+          transition: color 0.15s ease;
+
+          &:hover {
+            color: #6C1700;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1600px) {
+  .mapContainer {
+    .page {
+      .pageStuff {
+        h1 {
+          font-size: 4.5rem;
+        }
+
+        ul {
+          font-size: 1.5rem;
+        }
+      }
+    }
+  }
+}

@@ -58,6 +58,11 @@ import instructionsBG from "/instructionsBG.png";
    GOOGLE ANALYTICS
 ====================================================== */
 
+
+/* ======================================================
+   GOOGLE ANALYTICS
+====================================================== */
+
 const TRACKING_ID = "GT-PJRTJCBD";
 
 const isOasisDomain =
@@ -286,4 +291,4 @@ export default function App() {
       )}
     </>
   );
-}
+} 

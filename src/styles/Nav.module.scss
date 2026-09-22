@@ -51,7 +51,14 @@
   }
 }
 
-a {
+/* =========================================================
+   NAV LINK
+   Scoped to this module via a class (not a bare `a` selector)
+   so the text-shadow / transparent-text treatment only ever
+   applies to links rendered inside this Nav component.
+========================================================= */
+
+.navLink {
   text-decoration: none;
   color: transparent;
   font-size: clamp(0.55rem, 3vw, 1.3rem);
@@ -63,7 +70,7 @@ a {
   white-space: nowrap;
 }
 
-.rectangle a {
+.rectangle .navLink {
   display: inline-block;
   flex-shrink: 1;
   transition: transform 200ms ease;
@@ -155,100 +162,14 @@ a {
     min-width: 0;
   }
 
-  a {
+  .navLink {
     font-size: clamp(0.6rem, 3.2vw, 1.2rem);
     white-space: nowrap;
     margin-top: 1.5%;
   }
 
-  .rectangle a {
+  .rectangle .navLink {
     flex-shrink: 1;
     min-width: 0;
   }
 }
-
-@media (max-width: 650px) {
-  .container {
-    position: absolute;
-    top: 24px;
-    position: absolute;
-    top: 24px;
-    left: 50%;
-    right: auto;
-    transform: translateX(-55%);
-
-    width: 100%;
-    max-width: 624px;
-    height: clamp(36px, 10vw, 65px);
-
-    right: auto;
-    transform: translateX(-55%);
-
-    width: 100%;
-    max-width: 624px;
-    height: clamp(36px, 10vw, 65px);
-
-    margin-left: 0;
-    padding: 0;
-    box-sizing: border-box;
-    box-sizing: border-box;
-
-  }
-
-  .rectangle {
-    width: 96vw;
-    max-width: 624px;
-    height: 100%;
-
-    margin: 0;
-    padding: 0 clamp(0.25rem, 1.5vw, 1rem);
-
-    width: 96vw;
-    max-width: 624px;
-    height: 100%;
-
-    margin: 0;
-    padding: 0 clamp(0.25rem, 1.5vw, 1rem);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    box-sizing: border-box;
-  }
-
-  .desktopLinks {
-
-    box-sizing: border-box;
-  }
-
-  .desktopLinks {
-    width: 100%;
-    height: 100%;
-
-    height: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    gap: clamp(0.25rem, 1.5vw, 1rem);
-    justify-content: space-around;
-
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    gap: clamp(0.25rem, 1.5vw, 1rem);
-  }
-
-  a {
-    font-size: clamp(0.6rem, 3.2vw, 1.2rem);
-    white-space: nowrap;
-    margin-top: 1.5%;
-  a {
-    font-size: clamp(0.6rem, 3.2vw, 1.2rem);
-    white-space: nowrap;
-    margin-top: 1.5%;
-  }
-}}

@@ -1,4 +1,5 @@
 import {
+    useCallback,
     useEffect,
     useRef,
     useState,
@@ -6,6 +7,7 @@ import {
 } from "react";
 
 import Nav from "../../components/Nav";
+import Preloader from "../Preloader";
 
 import styles from "./EventsPage.module.scss";
 
@@ -16,9 +18,63 @@ import otherVase from "/otherVase.png";
 import musicVase from "/musicVase.png";
 import eventsTitle from "/eventsTitle.png";
 
+import Swaranjali from "../../assets/Events/swaranjali.png";
+import PitchPerfect from "../../assets/Events/pitchPerfect.png";
+import Tarang from "../../assets/Events/tarang.png";
+import Andholika from "../../assets/Events/andholika.png";
+import RapWars from "../../assets/Events/rapWars.png";
+import Axetacy from "../../assets/Events/axtacy.png";
+import DrumDuels from "../../assets/Events/drumDuels.png";
+import BeatBrawl from "../../assets/Events/beatBrawl.png";
+import FashP from "../../assets/Events/fashP.png";
+import Choreo from "../../assets/Events/choreo.jpg";
+import StreetDance from "../../assets/Events/streetDance.png";
+import DesertDuel from "../../assets/Events/desertDuel.png";
+import Razzmatazz from "../../assets/Events/razzmatazz.png";
+import Tandav from "../../assets/Events/tandav.png";
+import Sukhmanch from "../../assets/Events/sukhmanch.png";
+import StreetPlay from "../../assets/Events/streetPlay.png";
+import StagePlay from "../../assets/Events/stagePlay.png";
+import Metamorphosis from "../../assets/Events/metamorphosis.png";
+import Hypercut from "../../assets/Events/hypercut.png";
+
 /* =========================================================
-   EVENT TYPES
+   PRELOADER ASSETS
+
+   Every image imported above — the five category vases, the
+   page title, and every event image used in eventsData below
+   — so the preloader waits for all of them before revealing
+   the page, the same way About.tsx does with ABOUT_ASSETS.
 ========================================================= */
+
+const EVENTS_ASSETS = [
+    dramaVase,
+    photographyVase,
+    danceVase,
+    otherVase,
+    musicVase,
+    eventsTitle,
+    Swaranjali,
+    PitchPerfect,
+    Tarang,
+    Andholika,
+    RapWars,
+    Axetacy,
+    DrumDuels,
+    BeatBrawl,
+    FashP,
+    Choreo,
+    StreetDance,
+    DesertDuel,
+    Razzmatazz,
+    Tandav,
+    Sukhmanch,
+    StreetPlay,
+    StagePlay,
+    Metamorphosis,
+    Hypercut,
+];
+
 
 interface EventData {
     id: string;
@@ -39,6 +95,62 @@ type Category =
     | "music";
 
 /* =========================================================
+   CATEGORY SMOKE COLORS
+========================================================= */
+
+const CATEGORY_COLORS: Record<Category, string> = {
+    drama: "#4d2b63",
+    photography: "#342875",
+    dance: "#50041d",
+    misc: "#3b0c3c",
+    music: "#03176b",
+};
+
+const DEFAULT_SMOKE_COLOR = "#5b5189";
+
+// How long the smoke's fade-out transition takes. Must match
+// the `transition: opacity ...` duration set on .smokeCanvas
+// (and its fade-out variant) in EventsPage.module.scss.
+const SMOKE_FADE_OUT_MS = 700;
+
+interface RgbColor {
+    r: number;
+    g: number;
+    b: number;
+}
+
+function hexToRgb(hex: string): RgbColor {
+    const sanitized = hex.replace("#", "");
+
+    const bigint = parseInt(sanitized, 16);
+
+    return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255,
+    };
+}
+
+function clampChannel(value: number) {
+    return Math.max(0, Math.min(255, value));
+}
+
+function adjustColor(
+    color: RgbColor,
+    amount: number
+): RgbColor {
+    return {
+        r: clampChannel(color.r + amount),
+        g: clampChannel(color.g + amount),
+        b: clampChannel(color.b + amount),
+    };
+}
+
+function rgbString(color: RgbColor) {
+    return `${color.r}, ${color.g}, ${color.b}`;
+}
+
+/* =========================================================
    EVENT DATA
 ========================================================= */
 
@@ -52,7 +164,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Celebrated for its deeply emotional and socially impactful plays that resonate with audiences long after the curtain falls. Their repertoire includes thought-provoking dramas such as Court Martial, and Seven Steps Around the Fire, among others. Experience storytelling that's as enlightening as it is entertaining. Join us for an unforgettable theatrical experience.",
-            image_url: null,
+            image_url: Sukhmanch,
             rulebook: null,
         },
         {
@@ -63,7 +175,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Right from the streets, a loud and larger-than-life exchange of ideologies, with drama full of humor and zeal. Street Plays aka Nukkad Natak, are carried out to propagate social and political messages among the masses, amidst the direct, intimate and effective means of theater by means of shouts, chants, drums and catchy songs.",
-            image_url: null,
+            image_url: StreetPlay,
             rulebook: "YOUR_STREET_PLAY_RULEBOOK_LINK",
         },
         {
@@ -74,7 +186,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "The stage, a neutral territory outside the jurisdiction of fate where stars may be crossed with impunity. A truer and more real place does not exist in the universe. The Stage Play event brings you a wholesome feat of drama to awaken and thrill your senses. It gives you a chance to captivate your audience with your actions and expressions and to watch and perform captivating plays.",
-            image_url: null,
+            image_url: StagePlay,
             rulebook: "YOUR_STAGE_PLAY_RULEBOOK_LINK",
         },
         {
@@ -85,7 +197,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Metamorphosis, our flagship short film competition, returns at Oasis. Create a captivating narrative around a theme, push your artistic boundaries, and compete for an exciting prize pool. Your masterpiece premieres at Oasis before a discerning audience and expert judges. Embrace the challenge!",
-            image_url: null,
+            image_url: Metamorphosis,
             rulebook: null,
         },
         {
@@ -96,7 +208,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "HyperCut is an exciting Ad making competition, where novel filmmakers will have to bring forth their love of film making and combine it with their knowledge of advertisements. Participants will have to make an advertisement on a well known brand and the best entries will be screened as well.",
-            image_url: null,
+            image_url: Hypercut,
             rulebook: null,
         },
     ],
@@ -112,7 +224,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: "Central Auditorium",
             description:
                 "This event is conducted in the central auditorium. After the initial elimination round, about six to eight teams are shortlisted for the final round. The final round features contemporary dance performances that are usually based on a certain theme.",
-            image_url: null,
+            image_url: Choreo,
             rulebook: "YOUR_CHOREO_RULEBOOK_LINK",
         },
         {
@@ -123,7 +235,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: "Rotunda",
             description:
                 "Street Dance is considered a crowd favorite and is held in the Rotunda, the open-air amphitheater of BITS. The first stage consists of 2 rounds; a performance and a battle round. From this, 4 teams are selected for the second stage. The second stage is a face-off challenge between pairs of teams. These pairs are allotted randomly.",
-            image_url: null,
+            image_url: StreetDance,
             rulebook: "YOUR_STREET_DANCE_RULEBOOK_LINK",
         },
         {
@@ -134,7 +246,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "It is a solo dance event in which dancers from every college participate and showcase their talent. Depending on the dancer, styles can vary from western to classical to hip-hop and even to the typical Bollywood style.",
-            image_url: null,
+            image_url: DesertDuel,
             rulebook: null,
         },
         {
@@ -145,7 +257,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "A group dance competition that tests finesse and artistry in showcasing coordinated group choreographies. With equal weightage in judgement given to execution, presentation and creativity, it is fashioned to test the esprit de corps of the participating teams. All forms of dance including fusions are allowed. So trip the light fantastic toe and let there be a dazzle-daze of sheer splendor.",
-            image_url: null,
+            image_url: Razzmatazz,
             rulebook: null,
         },
         {
@@ -156,7 +268,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Oasis' flagship Indian classical dance competition. Solo performers from across the nation gather to showcase the rich heritage of Indian classical dance, captivating audiences with their grace, rhythm, precision, and storytelling. The event not only highlights technical mastery but also celebrates the depth of expression and the spiritual essence embedded in classical forms.",
-            image_url: null,
+            image_url: Tandav,
             rulebook: null,
         },
     ],
@@ -169,7 +281,7 @@ const eventsData: Record<Category, EventData[]> = {
             club_name: null,
             venue: null,
             description: null,
-            image_url: null,
+            image_url: FashP,
             rulebook: "YOUR_FASHP_RULEBOOK_LINK",
         },
     ],
@@ -183,7 +295,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: "NAB Auditorium",
             description:
                 "With participants from over 10 institutions, Pitch Perfect is the platform for a growing crowd of Cappella enthusiasts to face off against each other. A battle of the bands with no instruments, this symphony of voices at the NAB Auditorium is establishing a new dimensionality of music vastly unexplored till date.",
-            image_url: null,
+            image_url: PitchPerfect,
             rulebook: "YOUR_PITCH_PERFECT_RULEBOOK_LINK",
         },
         {
@@ -194,7 +306,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Swaranjali is a classical music competition that invites participants trained in both the Carnatic and Hindustani styles, covering a range of vocal and instrumental forms. The instruments include violin, sitar, veena, flute, Hawaiian guitar, tabla, mridangam etc. The competition features four categories: Solo Vocals, Solo Wind and String, Solo Percussion, and Group.",
-            image_url: null,
+            image_url: Swaranjali,
             rulebook: null,
         },
         {
@@ -205,7 +317,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Tarang - a musical fusion extravaganza from the Indian heartland and its innumerably diverse facets. Cover an existing piece, or create your own. Come participate in our Indian fusion battle of bands to claim the title of the best band.",
-            image_url: null,
+            image_url: Tarang,
             rulebook: "YOUR_TARANG_RULEBOOK_LINK",
         },
         {
@@ -216,7 +328,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Andholika is a talent hunt for the most versatile singer among the participants. The event is split into two categories, Eastern and Western. The event consists of an audition round and a final round. 4 finalists will be selected from each category. A winner and runner up will be awarded from each category.",
-            image_url: null,
+            image_url: Andholika,
             rulebook: null,
         },
         {
@@ -227,7 +339,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "RapWars is a rap-battle event with a legacy of 13 years which includes names like Seedhe Maut, Divine, Brodha V, Wolf Cryman and many more. Shortlisted through preliminary rounds in 4 cities, the 8 finalists will do whatever it takes to spit bars par excellence and take the crown home.",
-            image_url: null,
+            image_url: RapWars,
             rulebook: null,
         },
         {
@@ -249,7 +361,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "Solo Guitar Competition. A thrilling guitar showdown for both acoustic and electric players. Open to all individual participants who can play the guitar. The event features two rounds: Qualifier and Final, with judging criteria determined by the panel.",
-            image_url: null,
+            image_url: Axetacy,
             rulebook: null,
         },
         {
@@ -260,7 +372,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "A Solo Drumming Competition. A dynamic event for drummers showcasing their creativity and control. Participants are tested in two rounds: replicating a drum track and creating beats for a bass line. Shortlisted drummers then face off in duels.",
-            image_url: null,
+            image_url: DrumDuels,
             rulebook: null,
         },
         {
@@ -271,7 +383,7 @@ const eventsData: Record<Category, EventData[]> = {
             venue: null,
             description:
                 "An electrifying platform dedicated to beatboxing, the raw vocal art form known for its rhythmic intensity and limitless creativity. Designed to promote and elevate beatbox culture among the youth, BeatBrawl celebrates individuality and performance artistry.",
-            image_url: null,
+            image_url: BeatBrawl,
             rulebook: null,
         },
     ],
@@ -284,11 +396,15 @@ const eventsData: Record<Category, EventData[]> = {
 interface SmokeCanvasProps {
     originX: number;
     originY: number;
+    color: string;
+    fadingOut: boolean;
 }
 
 function SmokeCanvas({
     originX,
     originY,
+    color,
+    fadingOut,
 }: SmokeCanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -300,6 +416,26 @@ function SmokeCanvas({
         const ctx = canvas.getContext("2d");
 
         if (!ctx) return;
+
+        /* =====================================================
+           COLOR SETUP
+           Base smoke color comes from the active category. Speck
+           highlights/shadows are derived from it so the grain
+           texture always matches the category tint instead of a
+           fixed purple.
+        ===================================================== */
+
+        const baseColor = hexToRgb(color);
+
+        const baseColorStr = rgbString(baseColor);
+
+        const lightSpeckColor = rgbString(
+            adjustColor(baseColor, 70)
+        );
+
+        const darkSpeckColor = rgbString(
+            adjustColor(baseColor, -45)
+        );
 
         let animationFrame = 0;
 
@@ -410,22 +546,22 @@ const makeSoftSprite = (
 
     gradient.addColorStop(
         0,
-        "rgba(91, 81, 137, 1)"
+        `rgba(${baseColorStr}, 1)`
     );
 
     gradient.addColorStop(
         0.5,
-        "rgba(91, 81, 137, 0.62)"
+        `rgba(${baseColorStr}, 0.62)`
     );
 
     gradient.addColorStop(
         0.8,
-        "rgba(91, 81, 137, 0.22)"
+        `rgba(${baseColorStr}, 0.22)`
     );
 
     gradient.addColorStop(
         1,
-        "rgba(91, 81, 137, 0)"
+        `rgba(${baseColorStr}, 0)`
     );
 
     sctx.fillStyle = gradient;
@@ -446,7 +582,8 @@ const makeSoftSprite = (
        TEXTURE PASS
        Scatter uneven light/dark specks over the base gradient
        with a lighter blur than the base, so the sprite reads
-       as grainy smoke instead of a flat soft disc.
+       as grainy smoke instead of a flat soft disc. Speck colors
+       are derived from the category's base color.
     ===================================================== */
 
     sctx.filter =
@@ -491,8 +628,8 @@ const makeSoftSprite = (
             Math.random() * 0.16;
 
         sctx.fillStyle = isLight
-            ? "rgba(160, 150, 200, 1)"
-            : "rgba(50, 44, 78, 1)";
+            ? `rgba(${lightSpeckColor}, 1)`
+            : `rgba(${darkSpeckColor}, 1)`;
 
         sctx.beginPath();
 
@@ -696,12 +833,12 @@ const makeSoftSprite = (
             2,
 
         speed:
-            0.7 +
+            0.1 +
             Math.random() *
                 0.45,
 
         delay:
-            Math.random() * 0.2,
+            Math.random() * 0.8,
 
         opacity:
             0.55 +
@@ -819,7 +956,7 @@ const makeSoftSprite = (
                 const riseAmount =
                     Math.min(
                         window.innerHeight *
-                            0.2,
+                            0.4,
                         390
                     );
 
@@ -827,7 +964,7 @@ const makeSoftSprite = (
                     Math.sin(
                         progress *
                             Math.PI *
-                            0.72
+                            0.9
                     ) * riseAmount;
 
                 const spread =
@@ -1095,7 +1232,7 @@ const makeSoftSprite = (
 
                 coreGradient.addColorStop(
                     0,
-                    `rgba(91, 81, 137, ${
+                    `rgba(${baseColorStr}, ${
                         0.14 *
                         coreProgress
                     })`
@@ -1103,7 +1240,7 @@ const makeSoftSprite = (
 
                 coreGradient.addColorStop(
                     0.38,
-                    `rgba(91, 81, 137, ${
+                    `rgba(${baseColorStr}, ${
                         0.10 *
                         coreProgress
                     })`
@@ -1111,7 +1248,7 @@ const makeSoftSprite = (
 
                 coreGradient.addColorStop(
                     0.72,
-                    `rgba(91, 81, 137, ${
+                    `rgba(${baseColorStr}, ${
                         0.04 *
                         coreProgress
                     })`
@@ -1119,7 +1256,7 @@ const makeSoftSprite = (
 
                 coreGradient.addColorStop(
                     1,
-                    "rgba(91, 81, 137, 0)"
+                    `rgba(${baseColorStr}, 0)`
                 );
 
                 ctx.fillStyle =
@@ -1145,6 +1282,8 @@ const makeSoftSprite = (
 
             /* =================================================
                READABILITY VIGNETTE
+               (kept neutral/dark regardless of category so text
+               stays legible over any smoke color)
             ================================================= */
 
             if (elapsed > 0.5) {
@@ -1229,7 +1368,7 @@ const makeSoftSprite = (
 
                 baseGradient.addColorStop(
                     0,
-                    `rgba(91, 81, 137, ${
+                    `rgba(${baseColorStr}, ${
                         0.30 *
                         baseProgress
                     })`
@@ -1237,7 +1376,7 @@ const makeSoftSprite = (
 
                 baseGradient.addColorStop(
                     0.38,
-                    `rgba(91, 81, 137, ${
+                    `rgba(${baseColorStr}, ${
                         0.18 *
                         baseProgress
                     })`
@@ -1245,7 +1384,7 @@ const makeSoftSprite = (
 
                 baseGradient.addColorStop(
                     0.7,
-                    `rgba(91, 81, 137, ${
+                    `rgba(${baseColorStr}, ${
                         0.06 *
                         baseProgress
                     })`
@@ -1253,7 +1392,7 @@ const makeSoftSprite = (
 
                 baseGradient.addColorStop(
                     1,
-                    "rgba(91, 81, 137, 0)"
+                    `rgba(${baseColorStr}, 0)`
                 );
 
                 ctx.fillStyle =
@@ -1297,12 +1436,16 @@ const makeSoftSprite = (
                 resize
             );
         };
-    }, [originX, originY]);
+    }, [originX, originY, color]);
 
     return (
         <canvas
             ref={canvasRef}
-            className={styles.smokeCanvas}
+            className={`${styles.smokeCanvas} ${
+                fadingOut
+                    ? styles.smokeCanvasFadeOut
+                    : ""
+            }`}
             aria-hidden="true"
         />
     );
@@ -1317,6 +1460,12 @@ export default function EventsPage() {
         useRef<HTMLDivElement>(null);
 
     const smokeTimerRef =
+        useRef<number | null>(null);
+
+    // Tracks the pending "fade the smoke out, then unmount it"
+    // timeout kicked off by closeModal, so it can be cancelled
+    // if the component unmounts or another close happens first.
+    const smokeFadeTimeoutRef =
         useRef<number | null>(null);
 
     const [
@@ -1335,9 +1484,38 @@ export default function EventsPage() {
         } | null>(null);
 
     const [
+        smokeCategory,
+        setSmokeCategory,
+    ] =
+        useState<Category | null>(null);
+
+    // When true, the smoke canvas is still mounted but is
+    // transitioning its opacity to 0 (see .smokeCanvasFadeOut
+    // in EventsPage.module.scss) rather than disappearing
+    // instantly.
+    const [
+        smokeClosing,
+        setSmokeClosing,
+    ] = useState(false);
+
+    const [
         currentIndex,
         setCurrentIndex,
     ] = useState(0);
+
+    // Mirrors About.tsx's aboutPreloaderDone: the Preloader
+    // stays mounted (blocking the page) until every asset in
+    // EVENTS_ASSETS has loaded, then this flips to true and
+    // it unmounts.
+    const [
+        eventsPreloaderDone,
+        setEventsPreloaderDone,
+    ] = useState(false);
+
+    const handleEventsPreloaderEnter =
+        useCallback(() => {
+            setEventsPreloaderDone(true);
+        }, []);
 
     /* =====================================================
        SPOTLIGHT
@@ -1386,6 +1564,29 @@ export default function EventsPage() {
     }, []);
 
     /* =====================================================
+       CLEANUP PENDING TIMERS ON UNMOUNT
+    ===================================================== */
+
+    useEffect(() => {
+        return () => {
+            if (smokeTimerRef.current !== null) {
+                window.clearTimeout(
+                    smokeTimerRef.current
+                );
+            }
+
+            if (
+                smokeFadeTimeoutRef.current !==
+                null
+            ) {
+                window.clearTimeout(
+                    smokeFadeTimeoutRef.current
+                );
+            }
+        };
+    }, []);
+
+    /* =====================================================
        OPEN CATEGORY
     ===================================================== */
 
@@ -1402,10 +1603,31 @@ export default function EventsPage() {
             );
         }
 
-        const vase =
-            e.currentTarget.querySelector(
-                "img"
+        // Opening a new category cancels any smoke that was
+        // still fading out from a previous close.
+        if (
+            smokeFadeTimeoutRef.current !==
+            null
+        ) {
+            window.clearTimeout(
+                smokeFadeTimeoutRef.current
             );
+
+            smokeFadeTimeoutRef.current =
+                null;
+        }
+
+        setSmokeClosing(false);
+
+        // e.currentTarget is now the .hitArea overlay, which
+        // sits as a SIBLING of the <img> (both inside
+        // .imageWrap) rather than wrapping it, so we look the
+        // image up via the shared parent. The visual vase
+        // position/size is unaffected by the narrower hit area.
+        const vase =
+            e.currentTarget.parentElement?.querySelector(
+                "img"
+            ) ?? null;
 
         if (!vase) {
             setSelectedCategory(
@@ -1426,12 +1648,14 @@ export default function EventsPage() {
 
         const originY =
             rect.top +
-            rect.height * 0.05;
+            rect.height *(- 0.15);
 
         setSmokeOrigin({
             x: originX,
             y: originY,
         });
+
+        setSmokeCategory(category);
 
         smokeTimerRef.current =
             window.setTimeout(() => {
@@ -1443,11 +1667,16 @@ export default function EventsPage() {
 
                 smokeTimerRef.current =
                     null;
-            }, 1100);
+            }, 2100);
     };
 
     /* =====================================================
        CLOSE MODAL
+
+       The modal itself closes immediately, but the smoke is
+       given a moment to fade its opacity to 0 (matching the
+       CSS transition on .smokeCanvasFadeOut) before it's
+       actually unmounted, instead of vanishing abruptly.
     ===================================================== */
 
     const closeModal = () => {
@@ -1465,7 +1694,33 @@ export default function EventsPage() {
 
         setSelectedCategory(null);
         setCurrentIndex(0);
-        setSmokeOrigin(null);
+
+        if (smokeOrigin) {
+            setSmokeClosing(true);
+
+            if (
+                smokeFadeTimeoutRef.current !==
+                null
+            ) {
+                window.clearTimeout(
+                    smokeFadeTimeoutRef.current
+                );
+            }
+
+            smokeFadeTimeoutRef.current =
+                window.setTimeout(() => {
+                    setSmokeOrigin(null);
+                    setSmokeCategory(null);
+                    setSmokeClosing(false);
+
+                    smokeFadeTimeoutRef.current =
+                        null;
+                }, SMOKE_FADE_OUT_MS);
+        } else {
+            setSmokeOrigin(null);
+            setSmokeCategory(null);
+            setSmokeClosing(false);
+        }
     };
 
     /* =====================================================
@@ -1568,6 +1823,11 @@ export default function EventsPage() {
     const currentEvent =
         currentEvents[currentIndex];
 
+    const activeSmokeColor =
+        smokeCategory
+            ? CATEGORY_COLORS[smokeCategory]
+            : DEFAULT_SMOKE_COLOR;
+
     return (
         <div
             className={
@@ -1597,107 +1857,125 @@ export default function EventsPage() {
 
             {/* =================================================
                 DRAMA
+
+                .imageWrap is sized purely by the <img> (as the
+                bare <img> was before), so the container's
+                absolute positioning/scaling is unchanged. The
+                .hitArea is an absolutely-positioned overlay,
+                centered inside .imageWrap and narrower than the
+                image, so it captures clicks/hover without
+                affecting the image's own size or position.
             ================================================= */}
 
-            <section
-                className={
-                    styles.dramaContainer
-                }
-                onClick={(e) =>
-                    openCategory(
-                        "drama",
-                        e
-                    )
-                }
-            >
-                <img
-                    src={dramaVase}
-                    alt="Drama and Theatre"
-                />
+            <section className={styles.dramaContainer}>
+                <span className={styles.imageWrap}>
+                    <img
+                        src={dramaVase}
+                        alt="Drama and Theatre"
+                    />
+
+                    <span
+                        className={styles.hitArea}
+                        onClick={(e) =>
+                            openCategory(
+                                "drama",
+                                e
+                            )
+                        }
+                    />
+                </span>
             </section>
 
             {/* =================================================
                 PHOTOGRAPHY
             ================================================= */}
 
-            <section
-                className={
-                    styles.photographyContainer
-                }
-                onClick={(e) =>
-                    openCategory(
-                        "photography",
-                        e
-                    )
-                }
-            >
-                <img
-                    src={photographyVase}
-                    alt="Photography"
-                />
+            <section className={styles.photographyContainer}>
+                <span className={styles.imageWrap}>
+                    <img
+                        src={photographyVase}
+                        alt="Photography"
+                    />
+
+                    <span
+                        className={styles.hitArea}
+                        onClick={(e) =>
+                            openCategory(
+                                "photography",
+                                e
+                            )
+                        }
+                    />
+                </span>
             </section>
 
             {/* =================================================
                 DANCE
             ================================================= */}
 
-            <section
-                className={
-                    styles.danceContainer
-                }
-                onClick={(e) =>
-                    openCategory(
-                        "dance",
-                        e
-                    )
-                }
-            >
-                <img
-                    src={danceVase}
-                    alt="Dance"
-                />
+            <section className={styles.danceContainer}>
+                <span className={styles.imageWrap}>
+                    <img
+                        src={danceVase}
+                        alt="Dance"
+                    />
+
+                    <span
+                        className={styles.hitArea}
+                        onClick={(e) =>
+                            openCategory(
+                                "dance",
+                                e
+                            )
+                        }
+                    />
+                </span>
             </section>
 
             {/* =================================================
                 MISC / FASHION
             ================================================= */}
 
-            <section
-                className={
-                    styles.otherContainer
-                }
-                onClick={(e) =>
-                    openCategory(
-                        "misc",
-                        e
-                    )
-                }
-            >
-                <img
-                    src={otherVase}
-                    alt="Miscellaneous"
-                />
+            <section className={styles.otherContainer}>
+                <span className={styles.imageWrap}>
+                    <img
+                        src={otherVase}
+                        alt="Miscellaneous"
+                    />
+
+                    <span
+                        className={styles.hitArea}
+                        onClick={(e) =>
+                            openCategory(
+                                "misc",
+                                e
+                            )
+                        }
+                    />
+                </span>
             </section>
 
             {/* =================================================
                 MUSIC
             ================================================= */}
 
-            <section
-                className={
-                    styles.musicContainer
-                }
-                onClick={(e) =>
-                    openCategory(
-                        "music",
-                        e
-                    )
-                }
-            >
-                <img
-                    src={musicVase}
-                    alt="Music"
-                />
+            <section className={styles.musicContainer}>
+                <span className={styles.imageWrap}>
+                    <img
+                        src={musicVase}
+                        alt="Music"
+                    />
+
+                    <span
+                        className={styles.hitArea}
+                        onClick={(e) =>
+                            openCategory(
+                                "music",
+                                e
+                            )
+                        }
+                    />
+                </span>
             </section>
 
             {/* =================================================
@@ -1712,6 +1990,10 @@ export default function EventsPage() {
                     originY={
                         smokeOrigin.y
                     }
+                    color={
+                        activeSmokeColor
+                    }
+                    fadingOut={smokeClosing}
                 />
             )}
 
@@ -1990,6 +2272,17 @@ export default function EventsPage() {
                         )}
                     </div>
                 </div>
+            )}
+
+            {/* =================================================
+                PRELOADER
+            ================================================= */}
+
+            {!eventsPreloaderDone && (
+                <Preloader
+                    assets={EVENTS_ASSETS}
+                    onEnter={handleEventsPreloaderEnter}
+                />
             )}
         </div>
     );
