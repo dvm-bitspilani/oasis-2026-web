@@ -298,8 +298,36 @@ function PreloaderContent({ assets = [], onEnter, onExitStart }: PreloaderProps)
     const canvas = canvasRef.current;
     const path = pathRef.current;
     if (!canvas || !path || pathD === null) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+
+    let rendererWorker: Worker | null = null;
+    let workerMode = false;
+
+    try {
+      if (
+        typeof Worker !== "undefined" &&
+        typeof canvas.transferControlToOffscreen === "function"
+      ) {
+        rendererWorker = new Worker(
+          new URL("../workers/preloader.worker.ts", import.meta.url),
+          { type: "module" },
+        );
+
+        const offscreen = canvas.transferControlToOffscreen();
+        rendererWorker.postMessage({ type: "init", canvas: offscreen }, [offscreen]);
+        workerMode = true;
+      }
+    } catch {
+      rendererWorker?.terminate();
+      rendererWorker = null;
+      workerMode = false;
+    }
+
+    const ctx = workerMode ? null : canvas.getContext("2d");
+
+    if (!workerMode && !ctx) {
+      rendererWorker?.terminate();
+      return;
+    }
 
     let width = 0;
     let height = 0;
@@ -619,16 +647,30 @@ function PreloaderContent({ assets = [], onEnter, onExitStart }: PreloaderProps)
       const pixelDpr = Math.sqrt(MAX_CANVAS_PIXELS / Math.max(1, width * height));
       dpr = Math.min(nativeDpr, MAX_DPR, Math.max(1, pixelDpr));
 
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.fillStyle = LOGO_FILL; // context state is reset when width/height are assigned
-      ctx.strokeStyle = LOGO_FILL;
+
+      if (!workerMode && ctx) {
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.fillStyle = LOGO_FILL;
+        ctx.strokeStyle = LOGO_FILL;
+      }
 
       makeShooting();
       makeLogo();
+
+      if (workerMode && rendererWorker) {
+        rendererWorker.postMessage({
+          type: "resize",
+          width,
+          height,
+          dpr,
+          logoDots,
+          gapClusters,
+        });
+      }
     };
 
     const resize = () => {
@@ -651,13 +693,16 @@ function PreloaderContent({ assets = [], onEnter, onExitStart }: PreloaderProps)
     let pageHidden = document.visibilityState === "hidden";
 
     const stopAnimation = () => {
-      if (!rafRunning) return;
-      rafRunning = false;
-      cancelAnimationFrame(frame);
+      if (rafRunning) {
+        rafRunning = false;
+        cancelAnimationFrame(frame);
+      }
+      rendererWorker?.postMessage({ type: "pause" });
     };
 
     const startAnimation = () => {
       if (dead || pageHidden || exitingRef.current || rafRunning) return;
+      rendererWorker?.postMessage({ type: "resume" });
       lastFrameTime = performance.now();
       rafRunning = true;
       frame = requestAnimationFrame(animate);
@@ -692,39 +737,35 @@ function PreloaderContent({ assets = [], onEnter, onExitStart }: PreloaderProps)
       const assetP = progressRef.current;
       const ambientTimeP = Math.min(1, elapsed / AMBIENT_REVEAL_TIME);
 
+      // IMPORTANT: these simulations stay on the main thread because they
+      // update DOM elements. They must run in both worker and fallback modes.
       for (let i = 0; i < gapClusters.length; i++) {
         const cluster = gapClusters[i];
         if (cluster.launched || cluster.filled) continue;
-        if (assetP >= cluster.threshold && elapsed - lastLaunchElapsed >= FILLER_MIN_LAUNCH_GAP) {
+        if (
+          assetP >= cluster.threshold &&
+          elapsed - lastLaunchElapsed >= FILLER_MIN_LAUNCH_GAP
+        ) {
           cluster.launched = true;
           lastLaunchElapsed = elapsed;
         }
       }
 
-      ctx.clearRect(clearX, clearY, clearW, clearH);
-
-      // 1 draw call for every dot that has already finished animating
-      if (hasSettled) {
-        ctx.drawImage(
-          settledCanvas,
-          settledX,
-          settledY,
-          settledCanvas.width / dpr,
-          settledCanvas.height / dpr,
-        );
-      }
-
-      /* ---- ambient shooting stars: transform only, no per-frame style churn ---- */
+      /* ---- ambient DOM shooting stars ---- */
       for (let i = 0; i < shootingStars.length; i++) {
         const star = shootingStars[i];
         const el = starRefs.current[i];
-        if (!el) continue;
-        if (time < star.nextSpawn) continue; // already hidden (opacity 0 written once)
+        if (!el || time < star.nextSpawn) continue;
 
         star.x += star.vx * dt;
         star.y += star.vy * dt;
 
-        if (star.x > width + 450 || star.y > height + 450 || star.x < -450 || star.y < -450) {
+        if (
+          star.x > width + 450 ||
+          star.y > height + 450 ||
+          star.x < -450 ||
+          star.y < -450
+        ) {
           randomizeShootingStar(star, time, false);
           el.style.opacity = "0";
           continue;
@@ -734,14 +775,17 @@ function PreloaderContent({ assets = [], onEnter, onExitStart }: PreloaderProps)
           applyAmbientStyle(el, star);
           star.dirty = false;
         }
+
         if (!star.visible) {
           el.style.opacity = String(star.opacity);
           star.visible = true;
         }
-        el.style.transform = `translate3d(${star.x}px, ${star.y}px, 0)${star.tf}`;
+
+        el.style.transform =
+          `translate3d(${star.x}px, ${star.y}px, 0)` + star.tf;
       }
 
-      /* ---- filler stars ---- */
+      /* ---- filler DOM stars ---- */
       for (let i = 0; i < fillerStars.length; i++) {
         const star = fillerStars[i];
         const el = fillerRefs.current[i];
@@ -750,11 +794,14 @@ function PreloaderContent({ assets = [], onEnter, onExitStart }: PreloaderProps)
 
         if (star.phase === 2) {
           const age = elapsed - (cluster.fillTime ?? elapsed);
+
           if (age >= FILLER_FADE_START + FILLER_FADE_MS) {
             el.style.opacity = "0";
             star.phase = 3;
           } else if (age >= FILLER_FADE_START) {
-            el.style.opacity = String(1 - (age - FILLER_FADE_START) / FILLER_FADE_MS);
+            el.style.opacity = String(
+              1 - (age - FILLER_FADE_START) / FILLER_FADE_MS,
+            );
           }
           continue;
         }
@@ -769,8 +816,11 @@ function PreloaderContent({ assets = [], onEnter, onExitStart }: PreloaderProps)
         star.x += star.vx * dt;
         star.y += star.vy * dt;
 
+        const dx = cluster.cx - star.x;
+        const dy = cluster.cy - star.y;
+
         if (
-          Math.hypot(cluster.cx - star.x, cluster.cy - star.y) <= FILLER_ARRIVAL_RADIUS ||
+          dx * dx + dy * dy <= FILLER_ARRIVAL_RADIUS * FILLER_ARRIVAL_RADIUS ||
           star.x >= cluster.cx
         ) {
           star.phase = 2;
@@ -778,89 +828,153 @@ function PreloaderContent({ assets = [], onEnter, onExitStart }: PreloaderProps)
           cluster.fillTime = elapsed;
           cluster.impactX = star.x;
           cluster.impactY = star.y;
-          if (gapClusters.every((c) => c.filled)) logoCompleteRef.current = true;
+
+          if (gapClusters.every((c) => c.filled)) {
+            logoCompleteRef.current = true;
+          }
 
           el.style.setProperty(
             "--head-size",
-            `${Math.min(FILLER_HEAD_MAX, Math.max(FILLER_HEAD_MIN, star.size * 16))}px`,
+            `${Math.min(
+              FILLER_HEAD_MAX,
+              Math.max(FILLER_HEAD_MIN, star.size * 16),
+            )}px`,
           );
           el.style.opacity = "1";
-          el.style.transform = `translate3d(${star.x}px, ${star.y}px, 0)${star.tf}`;
+          el.style.transform =
+            `translate3d(${star.x}px, ${star.y}px, 0)` + star.tf;
+
+          // Tell the worker about the impact so its canvas animation stays
+          // synchronized with the DOM-side filler star.
+          rendererWorker?.postMessage({
+            type: "fillCluster",
+            id: cluster.id,
+            impactX: star.x,
+            impactY: star.y,
+          });
           continue;
         }
 
-        el.style.transform = `translate3d(${star.x}px, ${star.y}px, 0)${star.tf}`;
+        el.style.transform =
+          `translate3d(${star.x}px, ${star.y}px, 0)` + star.tf;
       }
 
-      /* ---- strike flash + shockwave ---- */
-      for (let i = 0; i < gapClusters.length; i++) {
-        const cluster = gapClusters[i];
-        if (!cluster.filled || cluster.fillTime === null) continue;
-        const age = elapsed - cluster.fillTime;
-        if (age >= SHOCKWAVE_DURATION) continue;
+      // The worker owns the expensive logo canvas renderer. In fallback mode,
+      // the same rendering code remains on this thread.
+      if (!workerMode && ctx) {
+        ctx.clearRect(clearX, clearY, clearW, clearH);
 
-        const ix = cluster.impactX ?? cluster.originX;
-        const iy = cluster.impactY ?? cluster.originY;
-
-        if (age < STRIKE_FLASH_DURATION) {
-          const eased = ease(age / STRIKE_FLASH_DURATION);
-          const size = 7 + eased * (STRIKE_FLASH_MAX_SIZE + 5);
-          ctx.globalAlpha = (1 - eased) * 0.75;
-          ctx.drawImage(glowSprite, ix - size / 2, iy - size / 2, size, size);
-        }
-
-        const eased = ease(age / SHOCKWAVE_DURATION);
-        ctx.globalAlpha = (1 - eased) * 0.35;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.arc(ix, iy, 2 + eased * SHOCKWAVE_MAX_RADIUS, 0, TAU);
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-      }
-
-      /* ---- only dots that are still animating (or twinkling) are drawn live ---- */
-      for (let i = 0; i < logoDots.length; i++) {
-        const dot = logoDots[i];
-        if (dot.settled) continue;
-
-        let local: number;
-        let cluster: GapCluster | undefined;
-
-        if (dot.isGap) {
-          cluster = gapClusters[dot.clusterId];
-          if (!cluster || !cluster.filled || cluster.fillTime === null) continue;
-          const rankDist = Math.abs(dot.rankInCluster - cluster.originRank);
-          const speedFactor = 1 - GROWTH_SPEED_JITTER / 2 + dot.growthJitter * GROWTH_SPEED_JITTER;
-          const arrivalTime =
-            rankDist === 0 ? 0 : IMPACT_LOCK_MS + rankDist * GROWTH_STEP_MS * speedFactor;
-          local = ease(
-            Math.min(1, Math.max(0, (elapsed - cluster.fillTime - arrivalTime) / GROWTH_DOT_FADE_MS)),
-          );
-        } else {
-          local = ease(
-            Math.min(
-              1,
-              Math.max(0, (ambientTimeP - dot.order * AMBIENT_ORDER_STAGGER) / AMBIENT_REVEAL_WINDOW),
-            ),
+        if (hasSettled) {
+          ctx.drawImage(
+            settledCanvas,
+            settledX,
+            settledY,
+            settledCanvas.width / dpr,
+            settledCanvas.height / dpr,
           );
         }
-        if (local <= 0.001) continue;
 
-        const isImpact = !!cluster && dot.rankInCluster === cluster.originRank;
-        const lockAge = cluster && cluster.fillTime !== null ? elapsed - cluster.fillTime : Infinity;
-        const locking = isImpact && lockAge < IMPACT_LOCK_MS;
-        const lockPulse = locking ? 1 + Math.sin((lockAge / IMPACT_LOCK_MS) * Math.PI) * 0.45 : 1;
-        const pulse = dot.twinkle
-          ? 0.9 + 0.1 * ((Math.sin(elapsed * 0.002 + dot.phase) + 1) / 2)
-          : SETTLED_PULSE;
+        /* ---- strike flash + shockwave ---- */
+        for (let i = 0; i < gapClusters.length; i++) {
+          const cluster = gapClusters[i];
+          if (!cluster.filled || cluster.fillTime === null) continue;
 
-        drawDot(ctx, dot, local, pulse, lockPulse);
+          const age = elapsed - cluster.fillTime;
+          if (age >= SHOCKWAVE_DURATION) continue;
 
-        // finished fading in -> bake into the static layer, never touch it again
-        if (!dot.twinkle && local >= 1 && !locking) {
-          drawDot(settledCtx, dot, 1, SETTLED_PULSE, 1);
-          dot.settled = true;
-          hasSettled = true;
+          const ix = cluster.impactX ?? cluster.originX;
+          const iy = cluster.impactY ?? cluster.originY;
+
+          if (age < STRIKE_FLASH_DURATION) {
+            const eased = ease(age / STRIKE_FLASH_DURATION);
+            const size = 7 + eased * (STRIKE_FLASH_MAX_SIZE + 5);
+            ctx.globalAlpha = (1 - eased) * 0.75;
+            ctx.drawImage(
+              glowSprite,
+              ix - size / 2,
+              iy - size / 2,
+              size,
+              size,
+            );
+          }
+
+          const eased = ease(age / SHOCKWAVE_DURATION);
+          ctx.globalAlpha = (1 - eased) * 0.35;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(ix, iy, 2 + eased * SHOCKWAVE_MAX_RADIUS, 0, TAU);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+
+        /* ---- only dots still animating/twinkling are drawn live ---- */
+        for (let i = 0; i < logoDots.length; i++) {
+          const dot = logoDots[i];
+          if (dot.settled) continue;
+
+          let local: number;
+          let cluster: GapCluster | undefined;
+
+          if (dot.isGap) {
+            cluster = gapClusters[dot.clusterId];
+            if (!cluster || !cluster.filled || cluster.fillTime === null) continue;
+
+            const rankDist = Math.abs(dot.rankInCluster - cluster.originRank);
+            const speedFactor =
+              1 - GROWTH_SPEED_JITTER / 2 +
+              dot.growthJitter * GROWTH_SPEED_JITTER;
+            const arrivalTime =
+              rankDist === 0
+                ? 0
+                : IMPACT_LOCK_MS + rankDist * GROWTH_STEP_MS * speedFactor;
+
+            local = ease(
+              Math.min(
+                1,
+                Math.max(
+                  0,
+                  (elapsed - cluster.fillTime - arrivalTime) /
+                    GROWTH_DOT_FADE_MS,
+                ),
+              ),
+            );
+          } else {
+            local = ease(
+              Math.min(
+                1,
+                Math.max(
+                  0,
+                  (ambientTimeP - dot.order * AMBIENT_ORDER_STAGGER) /
+                    AMBIENT_REVEAL_WINDOW,
+                ),
+              ),
+            );
+          }
+
+          if (local <= 0.001) continue;
+
+          const isImpact =
+            !!cluster && dot.rankInCluster === cluster.originRank;
+          const lockAge =
+            cluster && cluster.fillTime !== null
+              ? elapsed - cluster.fillTime
+              : Infinity;
+          const locking = isImpact && lockAge < IMPACT_LOCK_MS;
+          const lockPulse = locking
+            ? 1 + Math.sin((lockAge / IMPACT_LOCK_MS) * Math.PI) * 0.45
+            : 1;
+          const pulse = dot.twinkle
+            ? 0.9 +
+              0.1 * ((Math.sin(elapsed * 0.002 + dot.phase) + 1) / 2)
+            : SETTLED_PULSE;
+
+          drawDot(ctx, dot, local, pulse, lockPulse);
+
+          if (!dot.twinkle && local >= 1 && !locking) {
+            drawDot(settledCtx, dot, 1, SETTLED_PULSE, 1);
+            dot.settled = true;
+            hasSettled = true;
+          }
         }
       }
 
@@ -881,7 +995,15 @@ function PreloaderContent({ assets = [], onEnter, onExitStart }: PreloaderProps)
       document.removeEventListener("visibilitychange", onVisibilityChange);
       if (resizeTimer !== null) window.clearTimeout(resizeTimer);
       stopAnimation();
-      if (stopAnimationRef.current === stopAnimation) stopAnimationRef.current = null;
+
+      if (rendererWorker) {
+        rendererWorker.postMessage({ type: "destroy" });
+        rendererWorker.terminate();
+      }
+
+      if (stopAnimationRef.current === stopAnimation) {
+        stopAnimationRef.current = null;
+      }
     };
   }, [pathD]);
 
