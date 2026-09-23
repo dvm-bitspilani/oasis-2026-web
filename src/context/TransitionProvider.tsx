@@ -4,6 +4,7 @@ import {
   useRef,
   useState,
   useCallback,
+  useMemo,
   type ReactNode,
 } from "react";
 
@@ -18,20 +19,18 @@ import PageTransition, {
 
 type TransitionContextValue = {
   transitioning: boolean;
-  navigateWithTransition: (
-    to: string,
-  ) => void;
+  navigateWithTransition: (to: string) => void;
   entered: boolean;
   markEntered: () => void;
 };
 
 const TransitionContext =
-  createContext<TransitionContextValue | null>(
-    null,
-  );
+  createContext<TransitionContextValue | null>(null);
 
-function waitForNextPaint() {
-  return new Promise<void>((resolve) => {
+const PRELOADER_KEY = "oasis_preloader_shown";
+
+function waitForNextPaint(): Promise<void> {
+  return new Promise((resolve) => {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         resolve();
@@ -40,8 +39,7 @@ function waitForNextPaint() {
   });
 }
 
-const PRELOADER_KEY =
-  "oasis_preloader_shown";
+type TransitionStage = "strings" | "curtain";
 
 export function TransitionProvider({
   children,
@@ -57,28 +55,28 @@ export function TransitionProvider({
   const [pendingPath, setPendingPath] =
     useState<string | null>(null);
 
+  const [entered, setEntered] = useState<boolean>(() => {
+    try {
+      return (
+        sessionStorage.getItem(PRELOADER_KEY) === "true"
+      );
+    } catch {
+      return false;
+    }
+  });
+
   const transitionRef =
     useRef<PageTransitionHandle>(null);
 
   const navigatingRef =
     useRef(false);
 
+  const transitionStageRef =
+    useRef<TransitionStage>("strings");
+
   // =========================================
   // PRELOADER STATE
   // =========================================
-
-  const [entered, setEntered] =
-    useState<boolean>(() => {
-      try {
-        return (
-          sessionStorage.getItem(
-            PRELOADER_KEY,
-          ) === "true"
-        );
-      } catch {
-        return false;
-      }
-    });
 
   const markEntered = useCallback(() => {
     setEntered(true);
@@ -89,7 +87,7 @@ export function TransitionProvider({
         "true",
       );
     } catch {
-      // Ignore storage errors
+      // Ignore storage errors.
     }
   }, []);
 
@@ -97,40 +95,49 @@ export function TransitionProvider({
   // NAVIGATION
   // =========================================
 
-  const navigateWithTransition = (to: string) => {
-    if (
-      to === location.pathname ||
-      navigatingRef.current
-    ) {
-      return;
-    }
+  const navigateWithTransition = useCallback(
+    (to: string) => {
+      const currentPath = location.pathname;
 
-    // Skip transition when entering or leaving About Us
-    if (
-      to === "/aboutUs" ||
-      location.pathname === "/aboutUs"
-    ) {
+      if (
+        to === currentPath ||
+        navigatingRef.current
+      ) {
+        return;
+      }
+
+      // Skip transition when entering or leaving About Us.
+      if (
+        to === "/aboutUs" ||
+        currentPath === "/aboutUs"
+      ) {
+        markEntered();
+        navigate(to);
+        return;
+      }
+
       markEntered();
-      navigate(to);
-      return;
-    }
 
-    markEntered();
+      navigatingRef.current = true;
+      transitionStageRef.current = "strings";
 
-    navigatingRef.current = true;
-
-    setPendingPath(to);
-    setTransitioning(true);
-  };
+      setPendingPath(to);
+      setTransitioning(true);
+    },
+    [
+      location.pathname,
+      markEntered,
+      navigate,
+    ],
+  );
 
   // =========================================
-  // STRING + CURTAIN TRANSITION COMPLETE
+  // FIRST TRANSITION COMPLETE
   // =========================================
 
   const handleTransitionComplete =
-    async () => {
-      const destination =
-        pendingPath;
+    useCallback(async () => {
+      const destination = pendingPath;
 
       if (!destination) {
         navigatingRef.current = false;
@@ -139,64 +146,39 @@ export function TransitionProvider({
       }
 
       /*
-       * At this point:
-       *
        * Strings have finished.
-       * Curtain has reached 2 seconds.
-       * Curtain is currently PAUSED.
-       *
-       * The curtain is still covering
-       * the screen.
+       * Curtain is paused while covering the screen.
        */
 
       navigate(destination);
 
       /*
-       * Give React time to mount the new page.
+       * Allow the new route to mount and paint.
        */
+      await waitForNextPaint();
       await waitForNextPaint();
 
       /*
-       * Make absolutely sure the new page
-       * has rendered.
-       */
-      await waitForNextPaint();
-
-      /*
-       * Continue the SAME curtain video
-       * from exactly where it paused (2s).
+       * Resume the same curtain animation.
        */
       transitionRef.current?.resumeCurtain();
-    };
+    }, [
+      navigate,
+      pendingPath,
+    ]);
 
   // =========================================
-  // CURTAIN FINISHED
+  // TRANSITION HANDLER
   // =========================================
-
-  /*
-   * PageTransition calls onComplete again
-   * after resumeCurtain() finishes the video.
-   *
-   * We need to distinguish that second
-   * completion from the first completion
-   * at 2 seconds.
-   */
-
-  const transitionStageRef =
-    useRef<
-      "strings" | "curtain"
-    >("strings");
 
   const handleTransition =
-    async () => {
+    useCallback(async () => {
       /*
-       * First completion:
-       *
-       * strings → curtain paused at 2s
+       * FIRST completion:
+       * strings have finished.
        */
       if (
-        transitionStageRef.current ===
-        "strings"
+        transitionStageRef.current === "strings"
       ) {
         transitionStageRef.current =
           "curtain";
@@ -207,26 +189,39 @@ export function TransitionProvider({
       }
 
       /*
-       * Second completion:
-       *
-       * curtain has completely finished.
+       * SECOND completion:
+       * curtain has finished.
        */
-      transitionStageRef.current =
-        "strings";
+      transitionStageRef.current = "strings";
 
       setPendingPath(null);
       setTransitioning(false);
       navigatingRef.current = false;
-    };
+    }, [handleTransitionComplete]);
 
-  return (
-    <TransitionContext.Provider
-      value={{
+  // =========================================
+  // MEMOIZED CONTEXT VALUE
+  // =========================================
+
+  const contextValue =
+    useMemo<TransitionContextValue>(
+      () => ({
         transitioning,
         navigateWithTransition,
         entered,
         markEntered,
-      }}
+      }),
+      [
+        transitioning,
+        navigateWithTransition,
+        entered,
+        markEntered,
+      ],
+    );
+
+  return (
+    <TransitionContext.Provider
+      value={contextValue}
     >
       {children}
 
@@ -241,14 +236,14 @@ export function TransitionProvider({
 }
 
 export function useTransition() {
-  const ctx =
+  const context =
     useContext(TransitionContext);
 
-  if (!ctx) {
+  if (!context) {
     throw new Error(
       "useTransition must be used within a TransitionProvider",
     );
   }
 
-  return ctx;
+  return context;
 }

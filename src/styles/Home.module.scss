@@ -32,8 +32,6 @@
 .cloud {
   position: absolute;
   z-index: 4;
-  will-change: transform;
-
   img {
     display: block;
     width: 100%;
@@ -140,10 +138,6 @@
   z-index: 10;
 
   opacity: 0;
-
-  will-change: transform, opacity;
-
-
   pointer-events: none;
 
   img {
@@ -167,7 +161,6 @@
 
   z-index: 10;
   opacity: 0;
-  will-change: transform, opacity;
   pointer-events: none;
 
   img {
@@ -422,7 +415,6 @@
     height: 100%;
     object-fit: contain;
     display: block;
-    will-change: filter;
     pointer-events: none;
 
     transition: filter 0.25s ease;
@@ -753,9 +745,6 @@
     z-index: 4;
 
     height: auto;
-
-    will-change: transform;
-
     img {
       display: block;
 

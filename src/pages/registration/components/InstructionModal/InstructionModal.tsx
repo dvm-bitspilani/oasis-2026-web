@@ -1,13 +1,16 @@
-import { useEffect, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import styles from "./InstructionModal.module.scss";
 
-import scrollBar from "../../../../assets/registration/reg/line.png"
-import scrollHead from "../../../../assets/registration/reg/wheel.png"
-import modalFrame from "/modalFrame.png"
-import modalFrameMobile from "/modalFrameMobile.png"
-
-// import thumb from "/svgs/registration/scrollThumb.svg";
-// import ScrollBar from "/svgs/registration/scroll-bar.svg";
+import scrollBar from "../../../../assets/registration/reg/line.png";
+import scrollHead from "../../../../assets/registration/reg/wheel.png";
+import modalFrame from "/modalFrame.png";
+import modalFrameMobile from "/modalFrameMobile.png";
 
 import ReactDOM from "react-dom";
 
@@ -15,119 +18,185 @@ type PropsType = {
   onCancel: () => void;
 };
 
-const Backdrop = (props: PropsType) => {
-  return <div className={styles.backdrop} onClick={props.onCancel} />;
+const Backdrop = ({ onCancel }: PropsType) => {
+  return (
+    <div
+      className={styles.backdrop}
+      onClick={onCancel}
+      role="presentation"
+    />
+  );
 };
 
-const Confirmation = (props: PropsType) => {
-  const { onCancel } = props;
-
+const Confirmation = ({ onCancel }: PropsType) => {
   const mainContainerRef = useRef<HTMLUListElement>(null);
   const scrollBarRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLImageElement>(null);
-  // Distance between the pointer's Y position and the thumb's current
-  // center Y at the moment the drag starts. Used so the thumb keeps its
-  // position relative to the pointer instead of snapping to the cursor.
+
+  // Prevents the thumb from jumping when dragging starts.
   const dragOffsetRef = useRef(0);
 
-  function handleScroll() {
-    if (!mainContainerRef.current || !thumbRef.current) return;
-    const maxScrollTopValue =
-      mainContainerRef.current.scrollHeight -
-      mainContainerRef.current.clientHeight;
-    const percentage =
-      14 + (mainContainerRef.current.scrollTop / maxScrollTopValue) * 72;
+  // Stores the pending animation frame used for scroll updates.
+  const scrollFrameRef = useRef<number | null>(null);
 
-    percentage > 86.5
-      ? (thumbRef.current.style.top = "86.5%")
-      : (thumbRef.current.style.top = `${percentage}%`);
-  }
+  /**
+   * Update the custom scrollbar thumb position.
+   *
+   * Direct DOM manipulation is used here intentionally because
+   * this value changes frequently and does not need a React render.
+   */
+  const updateThumbPosition = useCallback(() => {
+    const container = mainContainerRef.current;
+    const thumb = thumbRef.current;
 
-  useEffect(() => {
-    if (!mainContainerRef.current) return;
-    mainContainerRef.current.addEventListener("scroll", handleScroll);
+    if (!container || !thumb) return;
 
-    return () => {
-      document.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+    const maxScrollTop =
+      container.scrollHeight - container.clientHeight;
 
-  const handlewheelMouseDown = (
-    e: React.MouseEvent<HTMLImageElement> | React.TouchEvent<HTMLImageElement>
-  ) => {
-    e.preventDefault();
-
-    if (thumbRef.current) {
-      const thumbRect = thumbRef.current.getBoundingClientRect();
-      const clientY =
-        "touches" in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
-      // Remember where inside/around the thumb the user actually grabbed it,
-      // so the first move doesn't teleport the thumb to the cursor.
-      dragOffsetRef.current = clientY - (thumbRect.top + thumbRect.height / 2);
+    if (maxScrollTop <= 0) {
+      thumb.style.top = "14%";
+      return;
     }
 
-    document.addEventListener("mousemove", handlewheelDragMove);
-    document.addEventListener("touchmove", handlewheelDragMove);
+    const scrollProgress = container.scrollTop / maxScrollTop;
 
-    document.addEventListener("mouseup", handlewheelDragEnd);
-    document.addEventListener("touchend", handlewheelDragEnd);
+    const percentage = Math.min(
+      86.5,
+      14 + scrollProgress * 72
+    );
+
+    thumb.style.top = `${percentage}%`;
+  }, []);
+
+  /**
+   * Subscribe to the actual scroll container.
+   *
+   * The listener is passive because it never calls preventDefault().
+   */
+  useEffect(() => {
+    const container = mainContainerRef.current;
+
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (scrollFrameRef.current !== null) return;
+
+      scrollFrameRef.current = window.requestAnimationFrame(() => {
+        scrollFrameRef.current = null;
+        updateThumbPosition();
+      });
+    };
+
+    container.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    // Set initial scrollbar position.
+    updateThumbPosition();
+
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+
+      if (scrollFrameRef.current !== null) {
+        window.cancelAnimationFrame(scrollFrameRef.current);
+        scrollFrameRef.current = null;
+      }
+    };
+  }, [updateThumbPosition]);
+
+  /**
+   * Start dragging the scrollbar thumb.
+   *
+   * Pointer events handle mouse, touch and pen using one API.
+   */
+  const handleThumbPointerDown = (
+    e: ReactPointerEvent<HTMLImageElement>
+  ) => {
+    const thumb = thumbRef.current;
+
+    if (!thumb) return;
+
+    e.preventDefault();
+
+    const thumbRect = thumb.getBoundingClientRect();
+
+    dragOffsetRef.current =
+      e.clientY -
+      (thumbRect.top + thumbRect.height / 2);
+
+    // Continue receiving pointer events even when the pointer
+    // moves outside the thumb.
+    thumb.setPointerCapture(e.pointerId);
   };
 
-  const handlewheelDragMove = (e: MouseEvent | TouchEvent) => {
-    if (!mainContainerRef.current || !scrollBarRef.current) return;
+  /**
+   * Move the thumb and update the actual scroll position.
+   */
+  const handleThumbPointerMove = (
+    e: ReactPointerEvent<HTMLImageElement>
+  ) => {
+    const container = mainContainerRef.current;
+    const scrollbar = scrollBarRef.current;
+    const thumb = thumbRef.current;
 
-    const maxScrollTopValue =
-      mainContainerRef.current.scrollHeight -
-      mainContainerRef.current.clientHeight;
+    if (!container || !scrollbar || !thumb) return;
 
-    const clientY = e instanceof TouchEvent ? e.touches[0].clientY : e.clientY;
+    if (!thumb.hasPointerCapture(e.pointerId)) {
+      return;
+    }
 
-    // Apply the original grab offset so the thumb tracks the pointer
-    // relative to where it was picked up, instead of snapping under it.
-    const adjustedY = clientY - dragOffsetRef.current;
+    e.preventDefault();
 
-    const percentage =
-      ((adjustedY - scrollBarRef.current.offsetTop) /
-        scrollBarRef.current.clientHeight) *
+    const maxScrollTop =
+      container.scrollHeight - container.clientHeight;
+
+    if (maxScrollTop <= 0) return;
+
+    const trackRect =
+      scrollbar.getBoundingClientRect();
+
+    const adjustedY =
+      e.clientY - dragOffsetRef.current;
+
+    let percentage =
+      ((adjustedY - trackRect.top) /
+        trackRect.height) *
       100;
 
-    mainContainerRef.current.scrollTop = (percentage / 100) * maxScrollTopValue;
+    percentage = Math.max(
+      0,
+      Math.min(100, percentage)
+    );
+
+    container.scrollTop =
+      (percentage / 100) * maxScrollTop;
   };
 
-  const handlewheelDragEnd = () => {
-    document.removeEventListener("mousemove", handlewheelDragMove);
-    document.removeEventListener("mouseup", handlewheelDragEnd);
-    document.removeEventListener("touchmove", handlewheelDragMove);
-    document.removeEventListener("touchend", handlewheelDragEnd);
+  /**
+   * End dragging.
+   */
+  const handleThumbPointerUp = (
+    e: ReactPointerEvent<HTMLImageElement>
+  ) => {
+    const thumb = thumbRef.current;
+
+    if (!thumb) return;
+
+    if (thumb.hasPointerCapture(e.pointerId)) {
+      thumb.releasePointerCapture(e.pointerId);
+    }
   };
 
-  // const handleTrackSnap = (e: React.MouseEvent | React.TouchEvent) => {
-  //   if (!mainContainerRef.current || !scrollBarRef.current) return;
-  //   const mainWrapperElement = mainContainerRef.current;
-  //   const scrollBarContainer = scrollBarRef.current;
-
-  //   const percentage =
-  //     (("touches" in e ? e.touches[0].clientY : e.clientY) /
-  //       scrollBarContainer.clientHeight) *
-  //     100;
-  //   const maxScrollTopValue =
-  //     mainWrapperElement.scrollHeight - mainWrapperElement.clientHeight;
-
-  //   mainWrapperElement.scrollTo({
-  //     top: (percentage / 100) * maxScrollTopValue,
-  //     behavior: "smooth",
-  //   });
-  // };
+  const modalStyle: CSSProperties = {
+    "--modal-bg-desktop": `url(${modalFrame})`,
+    "--modal-bg-mobile": `url(${modalFrameMobile})`,
+  } as CSSProperties;
 
   return (
     <div
       className={styles.selectedEvents}
-      style={
-        {
-          "--modal-bg-desktop": `url(${modalFrame})`,
-          "--modal-bg-mobile": `url(${modalFrameMobile})`,
-        } as React.CSSProperties
-      }
+      style={modalStyle}
     >
       <svg
         viewBox="0 0 20 20"
@@ -135,52 +204,79 @@ const Confirmation = (props: PropsType) => {
         xmlns="http://www.w3.org/2000/svg"
         className={styles.close}
         onClick={onCancel}
-        aria-label="Selected Events"
+        aria-label="Close instructions"
+        role="button"
+        tabIndex={0}
       >
         <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M19.7334 1.5537C19.8179 1.46918 19.885 1.36885 19.9307 1.25843C19.9765 1.14801 20 1.02966 20 0.910135C20 0.790614 19.9765 0.672264 19.9307 0.561841C19.885 0.451419 19.8179 0.351086 19.7334 0.266572C19.6489 0.182058 19.5486 0.115019 19.4382 0.06928C19.3277 0.0235414 19.2094 0 19.0899 0C18.9703 0 18.852 0.0235414 18.7416 0.06928C18.6311 0.115019 18.5308 0.182058 18.4463 0.266572L10 8.71469L1.5537 0.266572C1.46918 0.182058 1.36885 0.115019 1.25843 0.06928C1.14801 0.0235414 1.02966 8.90498e-10 0.910135 0C0.790614 -8.90498e-10 0.672264 0.0235414 0.561841 0.06928C0.451419 0.115019 0.351086 0.182058 0.266572 0.266572C0.182058 0.351086 0.115019 0.451419 0.06928 0.561841C0.0235414 0.672264 -8.90498e-10 0.790614 0 0.910135C8.90498e-10 1.02966 0.0235414 1.14801 0.06928 1.25843C0.115019 1.36885 0.182058 1.46918 0.266572 1.5537L8.71469 10L0.266572 18.4463C0.0958887 18.617 0 18.8485 0 19.0899C0 19.3312 0.0958887 19.5627 0.266572 19.7334C0.437255 19.9041 0.668752 20 0.910135 20C1.15152 20 1.38301 19.9041 1.5537 19.7334L10 11.2853L18.4463 19.7334C18.617 19.9041 18.8485 20 19.0899 20C19.3312 20 19.5627 19.9041 19.7334 19.7334C19.9041 19.5627 20 19.3312 20 19.0899C20 18.8485 19.9041 18.617 19.7334 18.4463L11.2853 10L19.7334 1.5537Z"
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M19.7334 1.5537C19.8179 1.46918 19.885 1.36885 19.9307 1.25843C19.9765 1.14801 20 1.02966 20 0.910135C20 0.790614 19.9765 0.672264 19.9307 0.561841C19.885 0.451419 19.8179 0.351086 19.6489 0.182058C19.5486 0.115019 19.4382 0.06928 19.3277 0.0235414C19.2094 0 19.0899 0 18.9703 0C18.852 0.0235414 18.7416 0.06928 18.6311 0.115019C18.5308 0.182058 18.4463 0.266572L10 8.71469L1.5537 0.266572C1.46918 0.182058 1.36885 0.115019 1.25843 0.06928C1.14801 0.0235414 1.02966 8.90498e-10 0.910135 0C0.790614 -8.90498e-10 0.672264 0.0235414 0.561841 0.06928C0.451419 0.115019 0.351086 0.182058 0.266572 0.266572C0.182058 0.351086 0.115019 0.451419 0.06928 0.561841C0.0235414 0.672264 -8.90498e-10 0.790614 0 0.910135C8.90498e-10 1.02966 0.0235414 1.14801 0.06928 1.25843C0.115019 1.36885 0.182058 1.46918 0.266572 1.5537L8.71469 10L0.266572 18.4463C0.0958887 18.617 0 18.8485 0 19.0899C0 19.3312 0.0958887 19.5627 0.266572 19.7334C0.437255 19.9041 0.668752 20 0.910135 20C1.15152 20 1.38301 19.9041 1.5537 19.7334L10 11.2853L18.4463 19.7334C18.617 19.9041 18.8485 19.9041 19.7334 19.7334C19.9041 19.5627 20 19.3312 20 19.0899C20 18.8485 19.9041 18.617 19.7334 18.4463L11.2853 10L19.7334 1.5537Z"
         />
       </svg>
-      <h2 className={styles.heading}>Detailed Instructions</h2>
+
+      <h2 className={styles.heading}>
+        Detailed Instructions
+      </h2>
+
       <div className={styles.content}>
         <ul ref={mainContainerRef}>
           <li>
-            ⁠Complete the registration form with all required details. You'll be
-            able to login through your registered email id when required. All
-            team members are required to register separately.
+            Complete the registration form with all required
+            details. You'll be able to login through your
+            registered email id when required. All team members
+            are required to register separately.
           </li>
+
           <li>
-            A College Representative (CR) will be appointed for each college
-            who'll be responsible for allotting heads for all the societies the
-            college will be participating for.
+            A College Representative (CR) will be appointed
+            for each college who'll be responsible for
+            allotting heads for all the societies the college
+            will be participating for.
           </li>
+
           <li>
-            The heads and CR will be responsible for approving the other
-            participating members.
+            The heads and CR will be responsible for approving
+            the other participating members.
           </li>
+
           <li>
-            After this, an approval email will be sent from the Department of
-            Publication and Correspondence.
+            After this, an approval email will be sent from
+            the Department of Publication and Correspondence.
           </li>
-          <li>Make the required payment as instructed.</li>
-          <li>Upon successful payment, a confirmation email will be sent.</li>
+
+          <li>
+            Make the required payment as instructed.
+          </li>
+
+          <li>
+            Upon successful payment, a confirmation email will
+            be sent.
+          </li>
         </ul>
+
         <div
           className={styles.scrollBarContainer}
           ref={scrollBarRef}
-          // onClick={handleTrackSnap}
         >
-          <img src={scrollBar} alt="scrollbar" className={styles.scrollBar} />
           <img
+            src={scrollBar}
+            alt=""
+            aria-hidden="true"
+            className={styles.scrollBar}
+            draggable={false}
+          />
+
+          <img
+            ref={thumbRef}
             className={styles.scrollBarThumb}
             src={scrollHead}
-            alt="thumb"
+            alt="Scroll instructions"
             draggable={false}
-            onMouseDown={handlewheelMouseDown}
-            onTouchStart={handlewheelMouseDown}
-            ref={thumbRef}
+            onPointerDown={handleThumbPointerDown}
+            onPointerMove={handleThumbPointerMove}
+            onPointerUp={handleThumbPointerUp}
+            onPointerCancel={handleThumbPointerUp}
           />
         </div>
       </div>
@@ -188,16 +284,29 @@ const Confirmation = (props: PropsType) => {
   );
 };
 
-function InstructionModal(props: PropsType) {
+function InstructionModal({
+  onCancel,
+}: PropsType) {
+  const backdropRoot =
+    document.getElementById("backdrop-root");
+
+  const modalRoot =
+    document.getElementById("modal-root");
+
+  if (!backdropRoot || !modalRoot) {
+    return null;
+  }
+
   return (
     <>
       {ReactDOM.createPortal(
-        <Backdrop onCancel={props.onCancel} />,
-        document.getElementById("backdrop-root")!
+        <Backdrop onCancel={onCancel} />,
+        backdropRoot
       )}
+
       {ReactDOM.createPortal(
-        <Confirmation onCancel={props.onCancel} />,
-        document.getElementById("modal-root")!
+        <Confirmation onCancel={onCancel} />,
+        modalRoot
       )}
     </>
   );

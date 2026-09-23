@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -159,11 +160,7 @@ export default function Home({
 
   const cloudsRef = useRef<HTMLDivElement>(null);
 
-  const cloudRefs = useRef<(HTMLDivElement | null)[]>([]);
-
   const castleRef = useRef<HTMLDivElement>(null);
-
-  const sandRef = useRef<HTMLDivElement>(null);
 
   const introStringLayerRef = useRef<SVGSVGElement>(null);
 
@@ -172,8 +169,6 @@ export default function Home({
   const portholeRef = useRef<HTMLDivElement>(null);
 
   const portholeInnerRef = useRef<HTMLDivElement>(null);
-
-  const overlayCloudRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const [isMobile, setIsMobile] = useState(
     () => window.innerWidth <= MOBILE_BREAKPOINT,
@@ -185,11 +180,11 @@ export default function Home({
   const pendingRetractionsRef = useRef(0);
   const mainTimelineDoneRef = useRef(false);
 
-  const maybeFinishIntro = () => {
+  const maybeFinishIntro = useCallback(() => {
     if (mainTimelineDoneRef.current && pendingRetractionsRef.current <= 0) {
       setIntroComplete(true);
     }
-  };
+  }, []);
 
   const { navigateWithTransition } = useTransition();
 
@@ -214,6 +209,9 @@ export default function Home({
     h: number;
   } | null>(null);
   const [overCarpet, setOverCarpet] = useState(false);
+  const overCarpetRef = useRef(false);
+  const pointerRafRef = useRef<number | null>(null);
+  const pointerPositionRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const img = new Image();
@@ -237,7 +235,7 @@ export default function Home({
     return () => img.removeEventListener("load", onLoad);
   }, []);
 
-  const isOverCarpet = (clientX: number, clientY: number) => {
+  const isOverCarpet = useCallback((clientX: number, clientY: number) => {
     const el = carpetImgRef.current;
     const alpha = carpetAlphaRef.current;
 
@@ -270,7 +268,7 @@ export default function Home({
          throw. Fall back to the old whole-button behaviour. */
       return true;
     }
-  };
+  }, []);
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
@@ -303,6 +301,32 @@ export default function Home({
       castleEl?.getBoundingClientRect().height || window.innerHeight * 0.4;
 
     const castleBuriedY = castleHeight * CASTLE_PEEK_RATIO;
+
+    const syncPorthole = () => {
+      if (!containerEl || !moonEl || !portholeEl || !portholeInnerRef.current) {
+        return;
+      }
+
+      const containerBox = containerEl.getBoundingClientRect();
+      const moonBox = moonEl.getBoundingClientRect();
+
+      const top = moonBox.top - containerBox.top;
+      const left = moonBox.left - containerBox.left;
+
+      gsap.set(portholeEl, {
+        top,
+        left,
+        width: moonBox.width,
+        height: moonBox.height,
+      });
+
+      gsap.set(portholeInnerRef.current, {
+        top: -top,
+        left: -left,
+        width: containerBox.width,
+        height: containerBox.height,
+      });
+    };
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
@@ -341,30 +365,35 @@ export default function Home({
       /* ======================================================
          CLOUD RIGS + STRINGS
 
-         Clouds start above the viewport.
-         Their horizontal animation is handled separately
-         and NEVER stops.
+         Clouds stay completely stationary during the intro.
+         Only the strings animate. Each string uses one fixed
+         attachment point on its cloud, so the endpoint never
+         moves while the string is dropping or retracting.
       ====================================================== */
 
       const containerRect = containerEl.getBoundingClientRect();
 
-      const cloudRigs = cloudRefs.current
-        .map((el) => {
-          if (!el) return null;
+      const cloudElements = Array.from(
+        cloudsRef.current?.querySelectorAll<HTMLDivElement>(
+          "[data-cloud]",
+        ) ?? [],
+      );
 
-          const rect = el.getBoundingClientRect();
+      const overlayElements = Array.from(
+        portholeInnerRef.current?.querySelectorAll<HTMLDivElement>(
+          "[data-overlay-cloud]",
+        ) ?? [],
+      );
 
-          return {
-            el,
-            anchorX: rect.left - containerRect.left + rect.width / 2,
-            hookY: rect.top - containerRect.top + rect.height / 2,
-          };
-        })
-        .filter(Boolean) as {
-        el: HTMLDivElement;
-        anchorX: number;
-        hookY: number;
-      }[];
+      const cloudRigs = cloudElements.map((el) => {
+        const rect = el.getBoundingClientRect();
+
+        return {
+          el,
+          anchorX: rect.left - containerRect.left + rect.width / 2,
+          hookY: rect.top - containerRect.top + rect.height / 2,
+        };
+      });
 
       /* Reset the retraction gate for this run of the effect. */
       mainTimelineDoneRef.current = false;
@@ -441,33 +470,46 @@ export default function Home({
 
       /* ======================================================
          INITIAL CLOUD + STRING POSITION
+
+         The cloud DOES fall during this animation, but there is
+         no horizontal cloud movement and no layout measurement
+         inside the animation loop.
+
+         The string and cloud share the exact same progress value.
+         That means the string always stays attached to the same
+         physical point on the cloud while the cloud is falling.
       ====================================================== */
 
       cloudRigs.forEach((rig, index) => {
         const path = paths[index];
+        const overlay = overlayElements[index];
 
-        gsap.set(rig.el, {
+        // Start clouds above their final position.
+        // Their X position is never changed during this sequence.
+        gsap.set(overlay ? [rig.el, overlay] : rig.el, {
           y: -liftDistance,
+          x: 0,
           opacity: 1,
         });
 
         if (!path) return;
 
+        // Normalize the SVG path so we NEVER need getTotalLength()
+        // during the animation. This removes an expensive geometry read.
+        path.setAttribute("pathLength", "1");
+        path.style.strokeDasharray = "1";
+        path.style.strokeDashoffset = "1";
+        path.style.opacity = "1";
+
+        // Initial string is attached to the cloud's current position.
         path.setAttribute(
           "d",
           buildPath(
             rig.anchorX,
-            START_LEN,
+            rig.hookY - liftDistance,
             START_SAG,
           ),
         );
-
-        path.style.opacity = "1";
-
-        const length = path.getTotalLength();
-
-        path.style.strokeDasharray = `${length}`;
-        path.style.strokeDashoffset = `${length}`;
       });
 
       /* ======================================================
@@ -551,6 +593,8 @@ export default function Home({
             scale: 1,
             duration: MOON_RISE_DURATION,
             ease: "power3.out",
+            onUpdate: syncPorthole,
+            onComplete: syncPorthole,
           },
           MOON_RISE_START,
         );
@@ -573,241 +617,148 @@ export default function Home({
       }
 
       /* ======================================================
-         CLOUD + STRING DROP
+         CLOUD FALL + STRING DROP
 
-         The cloud and its string use the SAME progress.
+         The important part:
 
-         Cloud:
-           -liftDistance -> 0
+         - Cloud starts above the screen.
+         - Cloud falls vertically to y = 0.
+         - String endpoint follows the cloud using the SAME `p`.
+         - X / attachment point never changes.
+         - No getBoundingClientRect() or getTotalLength() runs
+           during the animation.
 
-         String:
-           top -> cloud
+         Visually this is one connected object falling down:
 
-         The string NEVER fades out.
+                    string
+                      |
+                      |
+                    [cloud]
+
+         The string then retracts from that SAME cloud point.
       ====================================================== */
 
       cloudRigs.forEach((rig, index) => {
         const path = paths[index];
+        const overlay = overlayElements[index];
 
         if (!path) return;
 
-        const state = {
-          p: 0,
-        };
+        const setCloudY = gsap.quickSetter(
+          rig.el,
+          "y",
+          "px",
+        );
+
+        const setOverlayY = overlay
+          ? gsap.quickSetter(overlay, "y", "px")
+          : null;
+
+        const state = { p: 0 };
 
         tl.to(
           state,
           {
             p: 1,
-
-            duration: 0.75,
-
+            duration: 0.9,
             ease: "power2.out",
-
             delay: index * 0.045,
 
             onUpdate: () => {
               const p = state.p;
 
-              /* ==============================================
-                 CLOUD DROPS DOWN
-              ============================================== */
-
+              // Cloud moves vertically only.
               const cloudY = gsap.utils.interpolate(
                 -liftDistance,
                 0,
                 p,
               );
 
-              gsap.set(rig.el, {
-                y: cloudY,
-                opacity: 1,
-              });
+              setCloudY(cloudY);
+              setOverlayY?.(cloudY);
 
-              /* ==============================================
-                 GET CURRENT CLOUD X
-
-                 The clouds are ALSO moving horizontally.
-                 This keeps the string attached to the cloud.
-              ============================================== */
-
-              const currentRect =
-                rig.el.getBoundingClientRect();
-
-              const currentContainerRect =
-                containerEl.getBoundingClientRect();
-
-              const currentAnchorX =
-                currentRect.left -
-                currentContainerRect.left +
-                currentRect.width / 2;
-
-              /* ==============================================
-                 CURRENT STRING END
-              ============================================== */
-
-              const currentY =
+              // EXACT SAME physical point on the cloud.
+              const attachmentY =
                 rig.hookY + cloudY;
 
-              const endY =
-                gsap.utils.interpolate(
-                  START_LEN,
-                  currentY,
-                  p,
-                );
-
-              /* ==============================================
-                 CURVE -> TAUT
-              ============================================== */
-
-              const sag =
-                gsap.utils.interpolate(
-                  START_SAG,
-                  0,
-                  Math.pow(p, 0.75),
-                );
+              // Slight initial sag; becomes taut as the cloud lands.
+              const sag = gsap.utils.interpolate(
+                START_SAG,
+                0,
+                p,
+              );
 
               path.setAttribute(
                 "d",
                 buildPath(
-                  currentAnchorX,
-                  endY,
+                  rig.anchorX,
+                  attachmentY,
                   sag,
                 ),
               );
 
-              /* ==============================================
-                 DRAW STRING
-
-                 opacity ALWAYS = 1
-              ============================================== */
-
-              const currentLength =
-                path.getTotalLength();
-
-              const drawProgress =
-                Math.min(p / 0.65, 1);
-
-              path.style.strokeDasharray =
-                `${currentLength}`;
-
-              path.style.strokeDashoffset =
-                `${currentLength * (1 - drawProgress)}`;
-
-              path.style.opacity = "1";
+              // Reveal the string while the cloud falls.
+              path.style.strokeDashoffset = `${
+                1 - p
+              }`;
             },
 
             onComplete: () => {
-  /* ================================================
-     CLOUD STAYS AT FINAL POSITION
-     ================================================ */
+              // Guarantee exact final state.
+              setCloudY(0);
+              setOverlayY?.(0);
 
-  gsap.set(rig.el, {
-    y: 0,
-    opacity: 1,
-  });
+              path.setAttribute(
+                "d",
+                buildPath(
+                  rig.anchorX,
+                  rig.hookY,
+                  0,
+                ),
+              );
 
-  /* ================================================
-     STRING IS NOW FULLY TAUT
-     ================================================ */
+              path.style.strokeDashoffset = "0";
 
-  path.setAttribute(
-    "d",
-    buildPath(
-      rig.anchorX,
-      rig.hookY,
-      0
-    )
-  );
+              /* ==============================================
+                 HOLD — STRING REMAINS ATTACHED
+              ============================================== */
 
-  path.style.strokeDasharray = "none";
-  path.style.strokeDashoffset = "0";
-  path.style.opacity = "1";
+              gsap.delayedCall(0.8, () => {
+                /* ============================================
+                   STRING GOES BACK UP
 
-  /* ================================================
-     HOLD STRING FOR A MOMENT
-     ================================================ */
+                   Cloud stays exactly where it landed.
+                   The attachment point is unchanged.
+                ============================================ */
 
-  gsap.delayedCall(0.8, () => {
-    const retractState = {
-      p: 0,
-    };
+                const retractState = { p: 0 };
 
-    gsap.to(retractState, {
-      p: 1,
+                gsap.to(retractState, {
+                  p: 1,
+                  duration: 0.6,
+                  ease: "power2.in",
 
-      duration: 0.55,
+                  onUpdate: () => {
+                    const p = retractState.p;
 
-      ease: "power2.in",
+                    // Same final path, revealed backwards.
+                    path.style.strokeDashoffset = `${p}`;
+                  },
 
-      onUpdate: () => {
-        const p = retractState.p;
+                  onComplete: () => {
+                    path.style.opacity = "0";
+                    path.style.strokeDashoffset = "1";
 
-        /*
-          hookY -> START_LEN
+                    pendingRetractionsRef.current = Math.max(
+                      0,
+                      pendingRetractionsRef.current - 1,
+                    );
 
-          The bottom of the string travels
-          upward toward the top.
-        */
-        const endY = gsap.utils.interpolate(
-          rig.hookY,
-          START_LEN,
-          p
-        );
-
-        /*
-          String becomes more curved while
-          retracting upward.
-        */
-        const sag = gsap.utils.interpolate(
-          0,
-          START_SAG,
-          p
-        );
-
-        path.setAttribute(
-          "d",
-          buildPath(
-            rig.anchorX,
-            endY,
-            sag
-          )
-        );
-
-        /*
-          Draw direction is reversed so the
-          visible string retracts toward the top.
-        */
-        const length = path.getTotalLength();
-
-        path.style.strokeDasharray =
-          `${length}`;
-
-        path.style.strokeDashoffset =
-          `${length * p}`;
-
-        path.style.opacity = "1";
-      },
-
-      onComplete: () => {
-        /*
-          Completely gone after retracting.
-        */
-        path.style.opacity = "0";
-        path.style.strokeDasharray = "none";
-        path.style.strokeDashoffset = "0";
-
-        /* This cloud's string is fully retracted — count it toward
-           the intro-complete gate for Nav / Register. */
-        pendingRetractionsRef.current = Math.max(
-          0,
-          pendingRetractionsRef.current - 1,
-        );
-        maybeFinishIntro();
-      },
-    });
-  });
-},
+                    maybeFinishIntro();
+                  },
+                });
+              });
+            },
           },
           CLOUD_DROP_START +
             index * CLOUD_DROP_STAGGER,
@@ -839,9 +790,9 @@ export default function Home({
         );
       }
 
-      /* Main timeline (castle/moon/clouds/content fade) has now finished
-         playing. Combined with all cloud-string retractions completing,
-         this unlocks Nav + Register. */
+      /* Main timeline (castle/moon/content fade + string animation) has now
+         finished playing. Combined with all string retractions completing,
+         this unlocks Nav + Register and only then allows cloud drift to start. */
       tl.eventCallback("onComplete", () => {
         mainTimelineDoneRef.current = true;
         maybeFinishIntro();
@@ -873,21 +824,37 @@ export default function Home({
 }, []);
   
   useEffect(() => {
+    // Keep clouds completely still while the strings are falling/retracting.
+    if (!introComplete) return;
+
+    const container = cloudsRef.current;
+    if (!container) return;
+
+    const cloudElements = Array.from(
+      container.querySelectorAll<HTMLDivElement>("[data-cloud]"),
+    );
+
+    const overlayElements = Array.from(
+      portholeInnerRef.current?.querySelectorAll<HTMLDivElement>(
+        "[data-overlay-cloud]",
+      ) ?? [],
+    );
+
     const ctx = gsap.context(() => {
-      cloudRefs.current.forEach((cloud, i) => {
-        if (!cloud) return;
+      cloudElements.forEach((cloud, i) => {
+        const overlay = overlayElements[i];
 
         const width = cloud.offsetWidth;
-
         const left = cloud.offsetLeft;
 
         const min = -left - width;
-
         const max = window.innerWidth - left;
 
-        gsap.to(cloud, {
+        gsap.to(overlay ? [cloud, overlay] : cloud, {
           x: `+=${max - min}`,
-          duration: CLOUDS[i].duration,
+          duration: (isMobile
+            ? CLOUDS_MOBILE
+            : CLOUDS_DESKTOP)[i].duration,
           ease: "none",
           repeat: -1,
           modifiers: {
@@ -897,53 +864,10 @@ export default function Home({
           },
         });
       });
-    }, cloudsRef);
+    }, container);
 
     return () => ctx.revert();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMobile]);
-
-  useEffect(() => {
-    let raf: number;
-
-    const tick = () => {
-      const containerEl = containerRef.current;
-      const moonEl = moonRef.current;
-      const porthole = portholeRef.current;
-      const portholeInner = portholeInnerRef.current;
-      if (containerEl && moonEl && porthole && portholeInner) {
-        const containerBox = containerEl.getBoundingClientRect();
-        const moonBox = moonEl.getBoundingClientRect();
-        const top = moonBox.top - containerBox.top;
-        const left = moonBox.left - containerBox.left;
-        porthole.style.top = `${top}px`;
-        porthole.style.left = `${left}px`;
-        porthole.style.width = `${moonBox.width}px`;
-        porthole.style.height = `${moonBox.height}px`;
-        portholeInner.style.top = `${-top}px`;
-        portholeInner.style.left = `${-left}px`;
-        portholeInner.style.width = `${containerBox.width}px`;
-        portholeInner.style.height = `${containerBox.height}px`;
-            }
-
-      cloudRefs.current.forEach((real, i) => {
-        const overlay = overlayCloudRefs.current[i];
-
-        if (real && overlay) {
-          overlay.style.transform = real.style.transform;
-        }
-      });
-
-      raf = requestAnimationFrame(tick);
-    };
-
-    raf = requestAnimationFrame(tick);
-
-    return () => cancelAnimationFrame(raf);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMobile]);
+  }, [isMobile, introComplete]);
 
   useEffect(() => {
     if (window.innerWidth <= 650) {
@@ -1082,6 +1006,55 @@ export default function Home({
     return () => ctx.revert();
   }, [isMobile]);
 
+  const handleCarpetPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (!introComplete) return;
+
+      pointerPositionRef.current.x = e.clientX;
+      pointerPositionRef.current.y = e.clientY;
+
+      if (pointerRafRef.current !== null) return;
+
+      pointerRafRef.current = window.requestAnimationFrame(() => {
+        pointerRafRef.current = null;
+
+        const next = isOverCarpet(
+          pointerPositionRef.current.x,
+          pointerPositionRef.current.y,
+        );
+
+        if (next !== overCarpetRef.current) {
+          overCarpetRef.current = next;
+          setOverCarpet(next);
+        }
+      });
+    },
+    [introComplete, isOverCarpet],
+  );
+
+  const handleCarpetPointerLeave = useCallback(() => {
+    if (pointerRafRef.current !== null) {
+      window.cancelAnimationFrame(pointerRafRef.current);
+      pointerRafRef.current = null;
+    }
+
+    pointerPositionRef.current.x = 0;
+    pointerPositionRef.current.y = 0;
+
+    if (overCarpetRef.current) {
+      overCarpetRef.current = false;
+      setOverCarpet(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (pointerRafRef.current !== null) {
+        window.cancelAnimationFrame(pointerRafRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className={styles.container} ref={containerRef}>
       <div
@@ -1102,7 +1075,7 @@ export default function Home({
 
       <ShootingStars />
 
-      <div className={styles.sand} data-sand-parallax ref={sandRef}>
+      <div className={styles.sand} data-sand-parallax>
         <img src={bgImg} className={styles.sandImg} alt="" />
       </div>
 
@@ -1122,10 +1095,11 @@ export default function Home({
       </div>
 
       <div className={styles.clouds} ref={cloudsRef}>
-        {CLOUDS.map((c, i) => (
+        {CLOUDS.map((c) => (
           <div
-            key={i}
+            key={`${c.src}-${c.top}-${c.left}`}
             className={styles.cloud}
+            data-cloud
             data-cloud-string
             style={{
               top: c.top,
@@ -1136,9 +1110,6 @@ export default function Home({
                   // preloaderExiting
                   "visible"
                 : "hidden",
-            }}
-            ref={(el) => {
-              cloudRefs.current[i] = el;
             }}
           >
             <img src={c.src} alt="" />
@@ -1185,18 +1156,16 @@ export default function Home({
         }}
       >
         <div className={styles.moonCloudOverlayInner} ref={portholeInnerRef}>
-          {CLOUDS.map((c, i) => (
+          {CLOUDS.map((c) => (
             <div
-              key={i}
+              key={`${c.src}-${c.top}-${c.left}-overlay`}
               className={styles.cloud}
+              data-overlay-cloud
               style={{
                 top: c.top,
                 left: c.left,
                 width: c.width,
                 filter: MOON_CLOUD_TINT,
-              }}
-              ref={(el) => {
-                overlayCloudRefs.current[i] = el;
               }}
             >
               <img src={c.src} alt="" />
@@ -1224,16 +1193,18 @@ export default function Home({
             pointerEvents: introComplete ? "auto" : "none",
           } as CSSProperties
         }
-        onPointerMove={(e) => {
-          if (!introComplete) return;
-          setOverCarpet(isOverCarpet(e.clientX, e.clientY));
-        }}
-        onPointerLeave={() => setOverCarpet(false)}
+        onPointerMove={handleCarpetPointerMove}
+        onPointerLeave={handleCarpetPointerLeave}
         onClick={(e) => {
           if (!introComplete) return;
           /* detail === 0 means keyboard activation (Enter/Space), where there
              is no cursor position to test — always allow those through. */
-          if (e.detail !== 0 && !isOverCarpet(e.clientX, e.clientY)) return;
+          if (
+            e.detail !== 0 &&
+            !isOverCarpet(e.clientX, e.clientY)
+          ) {
+            return;
+          }
           navigateWithTransition("/register");
         }}
       >
