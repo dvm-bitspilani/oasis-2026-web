@@ -166,7 +166,7 @@ function samplePath(path: SVGPathElement): Point[] {
   return out;
 }
 
-export default function Preloader({ assets = [], onEnter, onExitStart }: PreloaderProps) {
+function PreloaderContent({ assets = [], onEnter, onExitStart }: PreloaderProps) {
   const [logosReady, setLogosReady] = useState(false);
   const [exiting, setExiting] = useState(false);
 
@@ -208,11 +208,19 @@ export default function Preloader({ assets = [], onEnter, onExitStart }: Preload
    */
   useEffect(() => {
     startRef.current = performance.now();
+
     const showPercent = (p: number) => {
-      if (percentRef.current) percentRef.current.textContent = `${Math.round(p * 100)}%`;
+      if (percentRef.current) {
+        percentRef.current.textContent = `${Math.round(p * 100)}%`;
+      }
     };
 
-    if (!assets.length) {
+    // Deduplicate URLs. This avoids downloading/decoding the same image twice.
+    const uniqueAssets = Array.from(
+      new Set(assets.filter((src): src is string => Boolean(src))),
+    );
+
+    if (uniqueAssets.length === 0) {
       progressRef.current = 1;
       showPercent(1);
       return;
@@ -220,29 +228,36 @@ export default function Preloader({ assets = [], onEnter, onExitStart }: Preload
 
     let cancelled = false;
     let loaded = 0;
+
     const done = () => {
-      loaded++;
       if (cancelled) return;
-      const p = loaded / assets.length;
+
+      loaded += 1;
+      const p = Math.min(1, loaded / uniqueAssets.length);
       progressRef.current = p;
       showPercent(p);
     };
 
-    assets.forEach((src) => {
+    // Start all requests immediately after Preloader mounts. The browser
+    // handles connection prioritisation/concurrency for us.
+    for (const src of uniqueAssets) {
       const img = new Image();
       img.decoding = "async";
+      img.loading = "eager";
       img.src = src;
+
       if (typeof img.decode === "function") {
         img.decode().then(done, done);
       } else {
         img.onload = done;
         img.onerror = done;
       }
-    });
+    }
 
     return () => {
       cancelled = true;
     };
+    // assets.join keeps this effect stable without depending on array identity.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assets.join("|")]);
 
@@ -585,7 +600,22 @@ export default function Preloader({ assets = [], onEnter, onExitStart }: Preload
     };
 
     /* ---------------- main loop ---------------- */
+    let pageHidden = document.visibilityState === "hidden";
+
+    const onVisibilityChange = () => {
+      pageHidden = document.visibilityState === "hidden";
+      // Reset the frame clock when returning so a hidden tab cannot create a
+      // huge artificial dt and jump the animation.
+      lastFrameTime = performance.now();
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange, { passive: true });
+
     const animate = (time: number) => {
+      if (pageHidden) {
+        frame = requestAnimationFrame(animate);
+        return;
+      }
       if (dead) return;
 
       const rawDt = time - lastFrameTime;
@@ -779,6 +809,7 @@ export default function Preloader({ assets = [], onEnter, onExitStart }: Preload
     return () => {
       dead = true;
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       if (resizeTimer !== null) window.clearTimeout(resizeTimer);
       cancelAnimationFrame(frame);
     };
@@ -788,35 +819,50 @@ export default function Preloader({ assets = [], onEnter, onExitStart }: Preload
    * EXIT HANDLING (timers are cleaned up, callbacks read via refs)
    */
   useEffect(() => {
-    const timers: number[] = [];
-    const poll = window.setInterval(() => {
-      if (
-        !exitRef.current &&
+    let checkTimer = 0;
+    let holdTimer = 0;
+    let enterTimer = 0;
+    let cancelled = false;
+
+    const checkReady = () => {
+      if (cancelled || exitRef.current) return;
+
+      const ready =
         progressRef.current >= 1 &&
         logoCompleteRef.current &&
-        performance.now() - startRef.current >= MIN_LOGO_TIME
-      ) {
+        performance.now() - startRef.current >= MIN_LOGO_TIME;
+
+      if (ready) {
         exitRef.current = true;
-        window.clearInterval(poll);
-        timers.push(
-          window.setTimeout(() => {
-            setExiting(true);
-            onExitStartRef.current?.();
-            timers.push(
-              window.setTimeout(() => {
-                if (!enteredRef.current) {
-                  enteredRef.current = true;
-                  onEnterRef.current();
-                }
-              }, EXIT_DURATION),
-            );
-          }, LOGO_HOLD),
-        );
+
+        holdTimer = window.setTimeout(() => {
+          if (cancelled) return;
+
+          setExiting(true);
+          onExitStartRef.current?.();
+
+          enterTimer = window.setTimeout(() => {
+            if (cancelled || enteredRef.current) return;
+            enteredRef.current = true;
+            onEnterRef.current();
+          }, EXIT_DURATION);
+        }, LOGO_HOLD);
+
+        return;
       }
-    }, 100);
+
+      // A timeout is cheaper than a permanent interval and stops immediately
+      // once the preloader is ready.
+      checkTimer = window.setTimeout(checkReady, 120);
+    };
+
+    checkReady();
+
     return () => {
-      window.clearInterval(poll);
-      timers.forEach((t) => window.clearTimeout(t));
+      cancelled = true;
+      window.clearTimeout(checkTimer);
+      window.clearTimeout(holdTimer);
+      window.clearTimeout(enterTimer);
     };
   }, []);
 
@@ -936,4 +982,47 @@ export default function Preloader({ assets = [], onEnter, onExitStart }: Preload
       </div>
     </div>
   );
+}
+
+/**
+ * Critical loading gate:
+ * 1. Load/decode ONLY bg_star.webp.
+ * 2. Mount the actual preloader immediately after it is ready.
+ * 3. The preloader then starts loading all remaining assets from its own effect.
+ */
+export default function Preloader(props: PreloaderProps) {
+  const [backgroundReady, setBackgroundReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const image = new Image();
+    image.decoding = "async";
+    image.src = bg;
+
+    const ready = () => {
+      if (!cancelled) setBackgroundReady(true);
+    };
+
+    if (image.complete) {
+      if (typeof image.decode === "function") {
+        image.decode().then(ready, ready);
+      } else {
+        ready();
+      }
+    } else {
+      image.onload = ready;
+      image.onerror = ready;
+    }
+
+    return () => {
+      cancelled = true;
+      image.onload = null;
+      image.onerror = null;
+    };
+  }, []);
+
+  // Do not mount the heavy preloader tree until the critical background is ready.
+  if (!backgroundReady) return null;
+
+  return <PreloaderContent {...props} />;
 }
