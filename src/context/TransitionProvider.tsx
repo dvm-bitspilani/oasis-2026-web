@@ -52,8 +52,10 @@ export function TransitionProvider({
   const [transitioning, setTransitioning] =
     useState(false);
 
-  const [pendingPath, setPendingPath] =
-    useState<string | null>(null);
+  // pendingPath is only read by transition callbacks and
+  // is never rendered, so it belongs in a ref rather than state.
+  const pendingPathRef =
+    useRef<string | null>(null);
 
   const [entered, setEntered] = useState<boolean>(() => {
     try {
@@ -121,7 +123,9 @@ export function TransitionProvider({
       navigatingRef.current = true;
       transitionStageRef.current = "strings";
 
-      setPendingPath(to);
+      // This value does not need to trigger a render.
+      pendingPathRef.current = to;
+
       setTransitioning(true);
     },
     [
@@ -137,7 +141,8 @@ export function TransitionProvider({
 
   const handleTransitionComplete =
     useCallback(async () => {
-      const destination = pendingPath;
+      const destination =
+        pendingPathRef.current;
 
       if (!destination) {
         navigatingRef.current = false;
@@ -164,7 +169,6 @@ export function TransitionProvider({
       transitionRef.current?.resumeCurtain();
     }, [
       navigate,
-      pendingPath,
     ]);
 
   // =========================================
@@ -194,7 +198,7 @@ export function TransitionProvider({
        */
       transitionStageRef.current = "strings";
 
-      setPendingPath(null);
+      pendingPathRef.current = null;
       setTransitioning(false);
       navigatingRef.current = false;
     }, [handleTransitionComplete]);

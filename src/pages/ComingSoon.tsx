@@ -14,6 +14,7 @@ import { useTransition } from "../context/TransitionProvider";
 import goHomeIcon from "../assets/goHome.svg";
 
 type Cloud = {
+  id: string;
   src: string;
   top: string;
   left: string;
@@ -22,11 +23,46 @@ type Cloud = {
 };
 
 const CLOUDS: Cloud[] = [
-  { src: cloudSmall, top: "35%", left: "-20%", width: "20%", duration: 240 },
-  { src: cloudBig, top: "12%", left: "10%", width: "24%", duration: 320 },
-  { src: cloudThree, top: "22%", left: "40%", width: "18%", duration: 200 },
-  { src: cloudSmall, top: "42%", left: "65%", width: "15%", duration: 180 },
-  { src: cloudBig, top: "8%", left: "90%", width: "22%", duration: 380 },
+  {
+    id: "small-1",
+    src: cloudSmall,
+    top: "35%",
+    left: "-20%",
+    width: "20%",
+    duration: 240,
+  },
+  {
+    id: "big-1",
+    src: cloudBig,
+    top: "12%",
+    left: "10%",
+    width: "24%",
+    duration: 320,
+  },
+  {
+    id: "three-1",
+    src: cloudThree,
+    top: "22%",
+    left: "40%",
+    width: "18%",
+    duration: 200,
+  },
+  {
+    id: "small-2",
+    src: cloudSmall,
+    top: "42%",
+    left: "65%",
+    width: "15%",
+    duration: 180,
+  },
+  {
+    id: "big-2",
+    src: cloudBig,
+    top: "8%",
+    left: "90%",
+    width: "22%",
+    duration: 380,
+  },
 ];
 
 export default function ComingSoon() {
@@ -41,6 +77,7 @@ export default function ComingSoon() {
 
         const width = cloud.offsetWidth;
         const left = cloud.offsetLeft;
+
         const min = -left - width;
         const max = window.innerWidth - left;
 
@@ -57,14 +94,18 @@ export default function ComingSoon() {
         });
       });
     }, cloudsRef);
+
     return () => ctx.revert();
   }, []);
 
-  const handleGoHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleGoHomeClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+  ) => {
     e.preventDefault();
-    // navigateWithTransition internally calls markEntered() before
-    // navigating, so Home will never show the intro preloader here —
-    // only the page transition plays.
+
+    // navigateWithTransition internally calls markEntered()
+    // before navigating, so Home will never show the intro
+    // preloader here — only the page transition plays.
     navigateWithTransition("/");
   };
 
@@ -78,36 +119,57 @@ export default function ComingSoon() {
       <ShootingStars />
 
       <div className={styles.sand} data-sand-parallax>
-        <img src={sandImg} className={styles.sandImg} alt="" />
+        <img
+          src={sandImg}
+          className={styles.sandImg}
+          alt=""
+        />
       </div>
 
       <div className={styles.clouds} ref={cloudsRef}>
-        {CLOUDS.map((c, i) => (
+        {CLOUDS.map((cloud, i) => (
           <div
-            key={i}
+            key={cloud.id}
             className={styles.cloud}
             data-cloud-string
-            style={{ top: c.top, left: c.left, width: c.width }}
+            style={{
+              top: cloud.top,
+              left: cloud.left,
+              width: cloud.width,
+            }}
             ref={(el) => {
               cloudRefs.current[i] = el;
             }}
           >
-            <img src={c.src} alt="" />
+            <img src={cloud.src} alt="" />
           </div>
         ))}
       </div>
 
       <div className={styles.moon} data-moon-shrink>
-        <img src={Moon} className={styles.moonImg} alt="" />
+        <img
+          src={Moon}
+          className={styles.moonImg}
+          alt=""
+        />
       </div>
 
       <div className={styles.tint} />
 
       <div className={styles.centerBox}>
         <h1>COMING SOON...</h1>
+
         <h3>This page is still under construction</h3>
-        <a href="/" className={styles.goHome} onClick={handleGoHomeClick}>
-          <img src={goHomeIcon} alt="Go Home" />
+
+        <a
+          href="/"
+          className={styles.goHome}
+          onClick={handleGoHomeClick}
+        >
+          <img
+            src={goHomeIcon}
+            alt="Go Home"
+          />
         </a>
       </div>
     </div>

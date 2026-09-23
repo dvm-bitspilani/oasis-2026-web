@@ -186,7 +186,7 @@ function PreloaderContent({ assets = [], onEnter, onExitStart }: PreloaderProps)
   const starRefs = useRef<(HTMLDivElement | null)[]>([]);
   const fillerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const percentRef = useRef<HTMLSpanElement>(null);
-  const startRef = useRef(performance.now());
+  const startRef = useRef<number | null>(null);
   const enteredRef = useRef(false);
   const exitRef = useRef(false);
   const progressRef = useRef(assets.length === 0 ? 1 : 0);
@@ -827,10 +827,12 @@ function PreloaderContent({ assets = [], onEnter, onExitStart }: PreloaderProps)
     const checkReady = () => {
       if (cancelled || exitRef.current) return;
 
+      const startTime = startRef.current;
       const ready =
         progressRef.current >= 1 &&
         logoCompleteRef.current &&
-        performance.now() - startRef.current >= MIN_LOGO_TIME;
+        startTime !== null &&
+        performance.now() - startTime >= MIN_LOGO_TIME;
 
       if (ready) {
         exitRef.current = true;
@@ -884,7 +886,7 @@ function PreloaderContent({ assets = [], onEnter, onExitStart }: PreloaderProps)
             : "perspective(1100px) rotateX(0deg) translateY(0px) scale(1)",
           opacity: exiting ? 0 : 1,
           transition: `transform ${EXIT_DURATION}ms cubic-bezier(0.55, 0, 0.15, 1), opacity ${EXIT_DURATION}ms ease`,
-          willChange: "transform, opacity",
+          willChange: exiting ? "transform, opacity" : undefined,
         }}
       >
         <canvas ref={canvasRef} className={styles.canvas} />

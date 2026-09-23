@@ -43,7 +43,11 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     const onCompleteRef = useRef(onComplete);
-    onCompleteRef.current = onComplete;
+
+    // Keep the latest callback without mutating a ref during render.
+    useEffect(() => {
+      onCompleteRef.current = onComplete;
+    }, [onComplete]);
 
     const curtainPausedRef = useRef(false);
 
@@ -423,10 +427,19 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         tl.call(startVideo, [], totalDuration * VIDEO_START_PERCENT);
       });
 
+      // Capture the nodes for this effect instance. Refs can point to a
+      // different node by the time React runs the cleanup.
+      const transitionVideo = videoRef.current;
+      const transitionCanvas = canvasRef.current;
+      const transitionLayer = layer;
+
       return () => {
         ctx.revert();
-        const transitionVideo = videoRef.current;
-        const transitionCanvas = canvasRef.current;
+
+        // Release GPU promotion after the transition so will-change
+        // does not remain permanently active on animated elements.
+        if (castleEl) gsap.set(castleEl, { clearProps: "willChange" });
+        if (moonEl) gsap.set(moonEl, { clearProps: "willChange" });
 
         if (transitionVideo) {
           transitionVideo.pause();
@@ -437,8 +450,8 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           transitionCanvas.style.visibility = "hidden";
         }
 
-        while (layer.firstChild) {
-          layer.removeChild(layer.firstChild);
+        while (transitionLayer.firstChild) {
+          transitionLayer.removeChild(transitionLayer.firstChild);
         }
       };
     }, []);

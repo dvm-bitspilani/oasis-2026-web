@@ -302,7 +302,7 @@ const Confirmation = (props: PropsType) => {
   const { onCancel, selectedEvents, userData } = props;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [id_token, setId_token] = useState("");
+  const idTokenRef = useRef("");
 
   const [notification, setNotification] = useState({
     showSelection: true,
@@ -392,7 +392,7 @@ const Confirmation = (props: PropsType) => {
           response.data.tokens?.access ??
           response.data.id_token;
 
-        setId_token(token || "");
+        idTokenRef.current = token || "";
 
         sessionStorage.removeItem("selectedEvents");
 
@@ -516,7 +516,8 @@ const Confirmation = (props: PropsType) => {
 
     document.addEventListener(
       "touchmove",
-      handlewheelDragMove
+      handlewheelDragMove,
+      {passive:true}
     );
 
     document.addEventListener(
@@ -740,7 +741,7 @@ const Confirmation = (props: PropsType) => {
                   redirectWithPost(
                     "https://bits-oasis.org/2026/main/registrations/",
                     {
-                      token: id_token,
+                      token: idTokenRef.current,
                     }
                   );
                 }
