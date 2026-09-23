@@ -442,7 +442,6 @@ export default function Home({
       ====================================================== */
 
       const TOP_Y = 0;
-      const START_LEN = 30;
       const START_SAG = 120;
 
       const STRAIGHT_T = 0.55;
