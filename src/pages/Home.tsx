@@ -187,21 +187,6 @@ export default function Home({
   }, []);
 
   const { navigateWithTransition } = useTransition();
-
-  /* ---------------------------------------------------------------
-     CARPET HIT-TESTING
-
-     The sweep animation gets the carpet's exact shape for free: its
-     ::after layer is masked with regCarpet.png, so the browser clips
-     the light using the file's alpha channel.
-
-     Hover and click can't use a mask — masks change what is painted,
-     not what is hoverable, and clip-path would mean hand-tracing the
-     drape. So we read the same alpha channel ourselves: the PNG is
-     drawn once into an offscreen canvas, and each pointer event looks
-     up the alpha of the single pixel under the cursor. Same source of
-     truth as the sweep, no shape to keep in sync.
-     --------------------------------------------------------------- */
   const carpetImgRef = useRef<HTMLImageElement>(null);
   const carpetAlphaRef = useRef<{
     ctx: CanvasRenderingContext2D;
