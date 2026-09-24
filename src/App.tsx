@@ -244,10 +244,13 @@ export default function App() {
         style={
           introActive
             ? {
-                position: "fixed",
-                inset: 0,
-                overflow: "hidden",
-              }
+              position: "fixed",
+              inset: 0,
+              width: "100vw",
+              height: "100dvh",
+              overflow: "hidden",
+              background: "#080a18",
+            }
             : undefined
         }
       >
@@ -255,19 +258,19 @@ export default function App() {
           style={
             introActive
               ? {
-                  width: "100%",
-                  minHeight: "100%",
+                width: "100%",
+                minHeight: "100%",
 
-                  transform: homeExiting
-                    ? "translate3d(0, 0, 0)"
-                    : "translate3d(0, 100%, 0)",
+                transform: homeExiting
+                  ? "translate3d(0, 0, 0)"
+                  : "translate3d(0, 100%, 0)",
 
-                  transition: homeExiting
-                    ? `transform ${TRANSITION_DURATION}ms cubic-bezier(0.76, 0, 0.24, 1)`
-                    : "none",
+                transition: homeExiting
+                  ? `transform ${TRANSITION_DURATION}ms cubic-bezier(0.76, 0, 0.24, 1)`
+                  : "none",
 
-                  willChange: "transform",
-                }
+                willChange: "transform",
+              }
               : undefined
           }
         >
