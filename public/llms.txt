@@ -1,0 +1,13 @@
+# BITS Oasis
+
+> Oasis is the annual cultural festival of BITS Pilani.
+> It is one of the largest student-run fests in India, with a huge footfall.
+> The fest runs continuously for 96 hours.
+
+## Main Pages
+
+- [Home](https://bits-oasis.org/)
+- [Events](https://bits-oasis.org/events)
+- [About](https://bits-oasis.org/aboutUs)
+- [Contact](https://bits-oasis.org/contactus)
+- [Registration](https://bits-oasis.org/register)
