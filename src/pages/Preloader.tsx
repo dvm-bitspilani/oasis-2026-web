@@ -175,7 +175,7 @@
     const pathRef = useRef<SVGPathElement>(null);
     const starRefs = useRef<(HTMLDivElement | null)[]>([]);
     const fillerRefs = useRef<(HTMLDivElement | null)[]>([]);
-    const startRef = useRef(performance.now());
+    const startRef = useRef<number>(0);
     const enteredRef = useRef(false);
     const exitRef = useRef(false);
 
@@ -1163,7 +1163,7 @@
               : "perspective(1100px) rotateX(0deg) translateY(0px) scale(1)",
             opacity: exiting ? 0 : 1,
             transition: `transform ${EXIT_DURATION}ms cubic-bezier(0.55, 0, 0.15, 1), opacity ${EXIT_DURATION}ms ease`,
-            willChange: "transform, opacity",
+            willChange: exiting ? "transform, opacity" : "auto",
           }}
         >
           <canvas ref={canvasRef} className={styles.canvas} />
@@ -1188,7 +1188,7 @@
                 style={{
                   opacity: 0,
                   zIndex: 20,
-                  willChange: "transform, opacity",
+                  willChange: exiting ? "transform, opacity" : "auto",
                   left: 0,
                   top: 0,
                 }}
@@ -1204,7 +1204,7 @@
                 style={{
                   opacity: 0,
                   zIndex: 45,
-                  willChange: "transform, opacity",
+                  willChange: exiting ? "transform, opacity" : "auto",
                   left: 0,
                   top: 0,
                   filter: "brightness(1.35)",
@@ -1271,7 +1271,7 @@
 
           </div> */}
           <div className={`${styles.light2} ${logosReady ? styles.logoStart : ""}`}>
-            <img src={light2} />
+            <img src={light2} alt="an image of shooting star"/>
 
           </div>
           {/* <div className={`${styles.light3} ${logosReady ? styles.logoStart : ""}`}>

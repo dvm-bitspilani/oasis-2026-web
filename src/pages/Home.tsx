@@ -145,7 +145,7 @@ const MOON_RISE_DURATION = 2.0;
 const CLOUD_DROP_START = 0.25;
 const CLOUD_DROP_STAGGER = 0.22;
 
-const FADE_ELEMENTS_START = 0.45  ;
+const FADE_ELEMENTS_START = 0.45;
 const FADE_ELEMENTS_DURATION = 1.15;
 const FADE_ELEMENTS_STAGGER = 0.12;
 
@@ -445,9 +445,8 @@ export default function Home({
           TOP_Y +
           (endY - TOP_Y) * HOOK_T;
 
-        return `M ${anchorX} ${TOP_Y} C ${anchorX} ${control1Y} ${
-          anchorX + sag
-        } ${control2Y} ${anchorX} ${endY}`;
+        return `M ${anchorX} ${TOP_Y} C ${anchorX} ${control1Y} ${anchorX + sag
+          } ${control2Y} ${anchorX} ${endY}`;
       };
 
       const liftDistance = window.innerHeight * 1.3;
@@ -682,9 +681,8 @@ export default function Home({
               );
 
               // Reveal the string while the cloud falls.
-              path.style.strokeDashoffset = `${
-                1 - p
-              }`;
+              path.style.strokeDashoffset = `${1 - p
+                }`;
             },
 
             onComplete: () => {
@@ -745,7 +743,7 @@ export default function Home({
             },
           },
           CLOUD_DROP_START +
-            index * CLOUD_DROP_STAGGER,
+          index * CLOUD_DROP_STAGGER,
         );
       });
 
@@ -787,26 +785,26 @@ export default function Home({
   }, [preloaderDone]);
 
   useEffect(() => {
-  if (window.innerWidth > 650) return;
+    if (window.innerWidth > 650) return;
 
-  let resizeTimer: ReturnType<typeof setTimeout>;
+    let resizeTimer: ReturnType<typeof setTimeout>;
 
-  const handleResize = () => {
-    clearTimeout(resizeTimer);
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
 
-    resizeTimer = setTimeout(() => {
-      window.location.reload();
-    }, 300);
-  };
+      resizeTimer = setTimeout(() => {
+        window.location.reload();
+      }, 300);
+    };
 
-  window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize);
 
-  return () => {
-    clearTimeout(resizeTimer);
-    window.removeEventListener("resize", handleResize);
-  };
-}, []);
-  
+    return () => {
+      clearTimeout(resizeTimer);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   useEffect(() => {
     // Keep clouds completely still while the strings are falling/retracting.
     if (!introComplete) return;
@@ -1070,8 +1068,8 @@ export default function Home({
         style={{
           visibility: preloaderDone
             ? // ||
-              // preloaderExiting
-              "visible"
+            // preloaderExiting
+            "visible"
             : "hidden",
         }}
       >
@@ -1091,8 +1089,8 @@ export default function Home({
               width: c.width,
               visibility: preloaderDone
                 ? //  ||
-                  // preloaderExiting
-                  "visible"
+                // preloaderExiting
+                "visible"
                 : "hidden",
             }}
           >
@@ -1120,8 +1118,8 @@ export default function Home({
         style={{
           visibility: preloaderDone
             ? // ||
-              // preloaderExiting
-              "visible"
+            // preloaderExiting
+            "visible"
             : "hidden",
         }}
       >
@@ -1134,8 +1132,8 @@ export default function Home({
         style={{
           visibility: preloaderDone
             ? // ||
-              // preloaderExiting
-              "visible"
+            // preloaderExiting
+            "visible"
             : "hidden",
         }}
       >
@@ -1226,8 +1224,8 @@ export default function Home({
         style={{
           visibility: preloaderDone
             ? // ||
-              // preloaderExiting
-              "visible"
+            // preloaderExiting
+            "visible"
             : "hidden",
         }}
       >
@@ -1255,9 +1253,10 @@ export default function Home({
           />
 
           <a
+            aria-label="Link to BITS Oasis Instagram"
             href="https://www.instagram.com/bitsoasis/"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
           >
             <image
               href={instagramIcon}
@@ -1270,9 +1269,10 @@ export default function Home({
           </a>
 
           <a
+            aria-label="Link to BITS Oasis LinkedIn"
             href="https://www.linkedin.com/company/oasis24-bits-pilani/"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
           >
             <image
               href={LinkdinIcon}
@@ -1285,6 +1285,7 @@ export default function Home({
           </a>
 
           <a
+            aria-label="Link to BITS Oasis Youtube Account"
             href="https://www.youtube.com/@oasisbitspilani6375"
             target="_blank"
             rel="noreferrer"
@@ -1300,6 +1301,7 @@ export default function Home({
           </a>
 
           <a
+            aria-label="Link To BITS Oasis X/Twitter Account"
             href="https://x.com/bitsoasis"
             target="_blank"
             rel="noreferrer"
