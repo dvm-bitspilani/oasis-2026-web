@@ -2,9 +2,12 @@ import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { TransitionProvider } from "../context/TransitionProvider";
 
-import Home from "../pages/Home";
+// ======================================================
+// LAZY LOADED PAGES
+// ======================================================
 
-// Lazy-loaded routes
+const Home = lazy(() => import("../pages/Home"));
+
 const Registration = lazy(
   () => import("../pages/registration/Registration")
 );
@@ -25,10 +28,18 @@ const EventsPage = lazy(
   () => import("../pages/EventsPage/EventsPage")
 );
 
+// ======================================================
+// TYPES
+// ======================================================
+
 interface AppRoutesProps {
   preloaderDone: boolean;
   preloaderExiting: boolean;
 }
+
+// ======================================================
+// APP ROUTES
+// ======================================================
 
 export default function AppRoutes({
   preloaderDone,
@@ -38,6 +49,11 @@ export default function AppRoutes({
     <TransitionProvider>
       <Suspense fallback={null}>
         <Routes>
+
+          {/* ==================================================
+              HOME
+          ================================================== */}
+
           <Route
             path="/"
             element={
@@ -48,35 +64,51 @@ export default function AppRoutes({
             }
           />
 
+          {/* ==================================================
+              COMING SOON
+          ================================================== */}
+
           <Route
             path="/comingsoon"
             element={<ComingSoon />}
           />
+
+          {/* ==================================================
+              CONTACT
+          ================================================== */}
 
           <Route
             path="/contactus"
             element={<Contact />}
           />
 
+          {/* ==================================================
+              REGISTRATION
+          ================================================== */}
+
           <Route
             path="/register"
             element={<Registration />}
           />
 
-          {/* <Route
-            path="/eventReg"
-            element={<Events />}
-          /> */}
+          {/* ==================================================
+              ABOUT
+          ================================================== */}
 
           <Route
             path="/aboutUs"
             element={<About />}
           />
 
+          {/* ==================================================
+              EVENTS
+          ================================================== */}
+
           <Route
             path="/events"
             element={<EventsPage />}
           />
+
         </Routes>
       </Suspense>
     </TransitionProvider>
