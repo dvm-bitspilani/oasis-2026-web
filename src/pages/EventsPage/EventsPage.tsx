@@ -18,25 +18,25 @@ import otherVase from "/otherVase.png";
 import musicVase from "/musicVase.png";
 import eventsTitle from "/eventsTitle.png";
 
-import Swaranjali from "../../assets/Events/swaranjali.png";
-import PitchPerfect from "../../assets/Events/pitchPerfect.png";
-import Tarang from "../../assets/Events/tarang.png";
-import Andholika from "../../assets/Events/andholika.png";
-import RapWars from "../../assets/Events/rapWars.png";
-import Axetacy from "../../assets/Events/axtacy.png";
-import DrumDuels from "../../assets/Events/drumDuels.png";
-import BeatBrawl from "../../assets/Events/beatBrawl.png";
-import FashP from "../../assets/Events/fashP.png";
+import Swaranjali from "../../assets/Events/swaranjali.jpg";
+import PitchPerfect from "../../assets/Events/pitchPerfect.jpg";
+import Tarang from "../../assets/Events/tarang.jpg";
+import Andholika from "../../assets/Events/andholika.jpg";
+import RapWars from "../../assets/Events/rapWars.jpg";
+import Axetacy from "../../assets/Events/axtacy.jpg";
+import DrumDuels from "../../assets/Events/drumDuels.jpg";
+import BeatBrawl from "../../assets/Events/beatBrawl.jpg";
+import FashP from "../../assets/Events/fashP.jpg";
 import Choreo from "../../assets/Events/choreo.jpg";
-import StreetDance from "../../assets/Events/streetDance.png";
-import DesertDuel from "../../assets/Events/desertDuel.png";
-import Razzmatazz from "../../assets/Events/razzmatazz.png";
-import Tandav from "../../assets/Events/tandav.png";
-import Sukhmanch from "../../assets/Events/sukhmanch.png";
-import StreetPlay from "../../assets/Events/streetPlay.png";
-import StagePlay from "../../assets/Events/stagePlay.png";
-import Metamorphosis from "../../assets/Events/metamorphosis.png";
-import Hypercut from "../../assets/Events/hypercut.png";
+import StreetDance from "../../assets/Events/streetDance.jpg";
+import DesertDuel from "../../assets/Events/desertDuel.jpg";
+import Razzmatazz from "../../assets/Events/razzmatazz.jpg";
+import Tandav from "../../assets/Events/tandav.jpg";
+import Sukhmanch from "../../assets/Events/sukhmanch.jpg";
+import StreetPlay from "../../assets/Events/streetPlay.jpg";
+import StagePlay from "../../assets/Events/stagePlay.jpg";
+import Metamorphosis from "../../assets/Events/metamorphosis.jpg";
+import Hypercut from "../../assets/Events/hypercut.jpg";
 
 /* =========================================================
    PRELOADER ASSETS

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
@@ -66,22 +65,12 @@ import instructionsBG from "/instructionsBG.png";
 
 const TRACKING_ID = "GT-PJRTJCBD";
 
-if (
-  window.location.hostname.includes("bits-oasis.org")
-) {
+const isOasisDomain =
+  window.location.hostname.includes("bits-oasis.org");
 
-  ReactGA.initialize(TRACKING_ID, {
-    gtagOptions: {
-      debug_mode: true,
-    },
-  });
-
-
+if (isOasisDomain) {
+  ReactGA.initialize(TRACKING_ID);
 }
-
-/* ======================================================
-   PRELOADER ASSETS
-====================================================== */
 /* ======================================================
    PRELOADER ASSETS
 ====================================================== */
@@ -179,6 +168,7 @@ const desktopAssets = [
 ];
 
 const assets = isMobile ? mobileAssets : desktopAssets;
+
 /* ======================================================
    TRANSITION SETTINGS
 ====================================================== */
@@ -201,14 +191,14 @@ export default function App() {
   ====================================================== */
 
   useEffect(() => {
-
-
-  ReactGA.send({
-    hitType: "pageview",
-    page: location.pathname + location.search,
-    title: document.title,
-  });
-}, [location]);
+    if (isOasisDomain) {
+      ReactGA.send({
+        hitType: "pageview",
+        page: location.pathname + location.search,
+        title: document.title,
+      });
+    }
+  }, [location]);
 
   /* ======================================================
      PRELOADER STATE
