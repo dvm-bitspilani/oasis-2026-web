@@ -10,14 +10,14 @@ import gsap from "gsap";
 
 import styles from "../styles/Home.module.scss";
 import bg from "../assets/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg";
-import sandImg from "../assets/sandfinal.png";
-import sandMob from "../assets/maybefinalsorry.png";
+import sandImg from "../assets/sandfinal.webp";
+import sandMob from "../assets/maybefinalsorry.webp";
 import cloudSmall from "../assets/cloudSmall.svg";
 import cloudBig from "../assets/cloudBig.svg";
 import cloudThree from "../assets/cloudThree.svg";
 import Castle from "../assets/castlefinal2.png";
-import Moon from "../assets/Moon.png";
-import LogoOasis from "../assets/LogoOasisi.png";
+import Moon from "../assets/Moon.webp";
+import LogoOasis from "../assets/LogoOasisi.webp";
 /* The register button artwork is split into two layers so the shine can be
    masked to the carpet alone. Both files are expected to be exported on the
    SAME canvas as the old cactuschange.png — that is what lets them stack at

@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import styles from "./Booktransition.module.scss";
 
-import closedBook from "/closedBook.png";
+import closedBook from "/closedBook.webp";
 import openBook from "../../assets/registration/reg/book.png";
 
 /* =====================================================
@@ -59,7 +59,7 @@ const TURN_FROM = 108;
    while the scroll is still leaving. */
 const TURN_FADE = 260;
 
-/* closedBook.png has the book drawn ~11deg clockwise inside its own
+/* closedBook.webp has the book drawn ~11deg clockwise inside its own
    frame, with transparent padding around it. Frame one of the
    overlay has to match that raw, uncorrected look exactly (it's
    standing in for the plain <img> on the Instructions page), so the
@@ -379,7 +379,7 @@ export default function Booktransition({ onOpened, onDone }: Props) {
 
             IMPORTANT: this element's transform is reserved for
             the open/close rotateY animation only. Do not add any
-            correction here for closedBook.png's tilted artwork —
+            correction here for closedBook.webp's tilted artwork —
             it would rotate .leftPage's back face too. That
             correction lives on .coverImage below instead. */}
         <div
@@ -391,7 +391,7 @@ export default function Booktransition({ onOpened, onDone }: Props) {
         >
           <div className={styles.cover}>
             {/* The counter-rotation + scale that corrects
-                closedBook.png's tilt live on this inner layer,
+                closedBook.webp's tilt live on this inner layer,
                 clipped by .cover's overflow: hidden, so they never
                 touch .flap's transform. Starts at identity (frame
                 one matches the plain source <img>, no pop) and

@@ -40,16 +40,16 @@ import searchBg from "./assets/registration/reg/searchBg.png";
 import line from "./assets/registration/reg/line.png";
 import wheel from "./assets/registration/reg/wheel.png";
 
-import modalFrame from "/modalFrame.png";
-import modalFrameMobile from "/modalFrameMobile.png";
-import closedBook from "/closedBook.png";
+import modalFrame from "/modalFrame.webp";
+import modalFrameMobile from "/modalFrameMobile.webp";
+import closedBook from "/closedBook.webp";
 
 import Syamsiah from "./assets/fonts/Syamsiah Arabic.ttf";
 import EB from "./assets/fonts/EBGaramond-Medium.ttf";
 import Cinzel from "./assets/fonts/Cinzel-VariableFont_wght.ttf";
 
-import Scroll1 from "/instructionsScroll.png";
-import Scroll2 from "/instructionsScrollLong.png";
+import Scroll1 from "/instructionsScroll.webp";
+import Scroll2 from "/instructionsScrollLong.webp";
 import googleButton from "/googleReg.svg";
 // import lamps from "/game-icons_magic-lamp.svg";
 import instructionsBG from "/instructionsBG.png";

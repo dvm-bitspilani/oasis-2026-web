@@ -9,8 +9,8 @@ import styles from "./InstructionModal.module.scss";
 
 import scrollBar from "../../../../assets/registration/reg/line.png";
 import scrollHead from "../../../../assets/registration/reg/wheel.png";
-import modalFrame from "/modalFrame.png";
-import modalFrameMobile from "/modalFrameMobile.png";
+import modalFrame from "/modalFrame.webp";
+import modalFrameMobile from "/modalFrameMobile.webp";
 
 import ReactDOM from "react-dom";
 

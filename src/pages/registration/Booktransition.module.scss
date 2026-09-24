@@ -68,7 +68,7 @@
    left page.
 
    NOTE: nothing here should ever carry a rotation to correct
-   for the closedBook.png artwork being tilted — that would
+   for the closedBook.webp artwork being tilted — that would
    also tilt .leftPage's back face, since both faces are
    children of this same rotateY'd element. Any artwork
    correction belongs entirely inside .cover's own subtree
@@ -101,7 +101,7 @@
   -webkit-backface-visibility: hidden;
 }
 
-/* Front face — closedBook.png, shown for the flight and the
+/* Front face — closedBook.webp, shown for the flight and the
    first half of the swing.
 
    This is now just a clipping box sized to the flap's rect.
@@ -111,7 +111,7 @@
   overflow: hidden;
 }
 
-/* closedBook.png has the book drawn ~11deg clockwise inside
+/* closedBook.webp has the book drawn ~11deg clockwise inside
    its own frame, with transparent padding around it. Rotating
    it back straight would normally expose that transparent
    padding at the corners of .cover's rect, so this layer is

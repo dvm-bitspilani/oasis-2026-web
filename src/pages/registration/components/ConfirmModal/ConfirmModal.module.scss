@@ -354,7 +354,7 @@
 
 @media screen and (max-width: 1200px) and (max-aspect-ratio: 1.45) {
   .selectedEvents {
-    // 0.4702 = 860 / 1829, the actual width:height ratio of modalFrameMobile.png.
+    // 0.4702 = 860 / 1829, the actual width:height ratio of modalFrameMobile.webp.
     // min() picks whichever of "88% of viewport width" or "the width that
     // makes the frame exactly 82svh tall" is smaller, so the frame always
     // fits inside the screen on both axes instead of overflowing it.

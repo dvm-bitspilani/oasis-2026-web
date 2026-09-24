@@ -9,7 +9,7 @@ import rightbottom from "../../../../assets/registration/reg/rightbottom.png";
 import lefttop from "../../../../assets/registration/reg/lefttop.png";
 import righttop from "../../../../assets/registration/reg/righttop.png";
 import rightmid from "../../../../assets/registration/reg/rightmid.png";
-import book from "/closedBook.png";
+import book from "/closedBook.webp";
 
 /* Scroll slide-out. Runs at t=0 of the book timeline, so the
    scroll is on its way off screen while the book lifts off

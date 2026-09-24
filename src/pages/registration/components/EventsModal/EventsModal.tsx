@@ -2,7 +2,7 @@
 
   import ReactDOM from "react-dom";
 
-  import modalFrameMobile from "/modalFrameMobile.png";
+  import modalFrameMobile from "/modalFrameMobile.webp";
   import bannerBg from "../../../../assets/registration/reg/inputBg.png";
 
   type PropsType = {
