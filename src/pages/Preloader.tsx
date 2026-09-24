@@ -1168,7 +1168,7 @@
         >
           <canvas ref={canvasRef} className={styles.canvas} />
           <div className={styles.bg}></div>
-          <img src={bg} className={styles.img} style={{ opacity: "0.6" }} alt="" />
+          <img src={bg} className={styles.img} style={{ opacity: "0.6" }} alt="preloader background" />
           <svg
             className={styles.sourceSvg}
             viewBox={`0 0 ${SVG_VIEWBOX_WIDTH} ${SVG_VIEWBOX_HEIGHT}`}

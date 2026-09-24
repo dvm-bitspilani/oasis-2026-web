@@ -122,7 +122,7 @@ export default function ComingSoon() {
         <img
           src={sandImg}
           className={styles.sandImg}
-          alt=""
+          alt="Sand Background"
         />
       </div>
 
@@ -150,7 +150,7 @@ export default function ComingSoon() {
         <img
           src={Moon}
           className={styles.moonImg}
-          alt=""
+          alt="Moon"
         />
       </div>
 

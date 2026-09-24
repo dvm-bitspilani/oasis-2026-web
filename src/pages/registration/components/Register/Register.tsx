@@ -3842,15 +3842,15 @@ export default function Reg({
     >
       {/* BACKGROUND DECORATIONS */}
 
-      <img src={leftbottom} className={styles.leftbottom} alt="" />
+      <img src={leftbottom} className={styles.leftbottom} alt="Left Bottom" />
 
-      <img src={lefttop} className={styles.lefttop} alt="" />
-      <img src={leftmiddle} className={styles.leftmiddle} alt="" />
-      <img src={rightmid} className={styles.rightmid} alt="" />
+      <img src={lefttop} className={styles.lefttop} alt="Left Top" />
+      <img src={leftmiddle} className={styles.leftmiddle} alt="Left Middle" />
+      <img src={rightmid} className={styles.rightmid} alt="Right Middle" />
 
       <img src={rightbottom} className={styles.rightbottom} alt="" />
 
-      <img src={righttop} className={styles.righttop} alt="" />
+      <img src={righttop} className={styles.righttop} alt="Right Top" />
 
       <Link className={styles.backButton} to="/">
         <img src="/regBackButton.png" alt="Go back to Home Page" />
@@ -3866,7 +3866,7 @@ export default function Reg({
       >
         {/* TAJ MAHAL */}
 
-        <img src={tajmahal} className={styles.tajmahal} alt="" />
+        <img src={tajmahal} className={styles.tajmahal} alt="Taj Mahal" />
 
         <form
           className={styles.formContainer}

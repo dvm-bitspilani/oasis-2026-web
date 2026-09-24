@@ -1364,7 +1364,7 @@ const About = () => {
         >
           <img
             src={ff}
-            alt=""
+            alt="Rewind"
           />
         </button>
 
@@ -1392,7 +1392,7 @@ const About = () => {
         >
           <img
             src={ff}
-            alt=""
+            alt="Fast Forward"
           />
         </button>
       </div>
@@ -1407,7 +1407,7 @@ const About = () => {
       >
         <img
           src={backBg}
-          alt=""
+          alt="Background"
           loading="eager"
           decoding="async"
         />

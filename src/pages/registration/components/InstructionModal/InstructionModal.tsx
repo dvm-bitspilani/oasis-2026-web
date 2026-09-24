@@ -261,7 +261,7 @@ const Confirmation = ({ onCancel }: PropsType) => {
         >
           <img
             src={scrollBar}
-            alt=""
+            alt="Scroll Bar"
             aria-hidden="true"
             className={styles.scrollBar}
             draggable={false}

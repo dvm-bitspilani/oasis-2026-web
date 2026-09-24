@@ -291,7 +291,7 @@ export default function Contact() {
           <img
             key={`cross-${i}`}
             src={cross}
-            alt=""
+            alt="Cross"
             className={styles.cross}
             style={{ left: `${c.x}%`, top: `${c.y}%` }}
           />

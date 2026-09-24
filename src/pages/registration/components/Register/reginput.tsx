@@ -180,9 +180,9 @@ export default function Reginput({
 
           {showLine && (
             <div className={styles.fieldLine}>
-              <img src={inputLine} className={styles.lineImage} alt="" />
+              <img src={inputLine} className={styles.lineImage} alt="Line" />
 
-              <img src={Leaf} className={styles.leaf} alt="" />
+              <img src={Leaf} className={styles.leaf} alt="Leaf" />
             </div>
           )}
         </div>

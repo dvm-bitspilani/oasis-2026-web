@@ -25,9 +25,9 @@ export default function Nav() {
   return (
     <div className={styles.container}>
       <div className={styles.circle}>
-        <img src={navLine} alt="" />
-        <img src={navLine} alt="" />
-        <img src={navLine} alt="" />
+        <img src={navLine} alt="Ham" />
+        <img src={navLine} alt="Ham" />
+        <img src={navLine} alt="Ham" />
       </div>
 
       <div className={styles.rectangle}>

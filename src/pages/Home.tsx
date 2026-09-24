@@ -1058,7 +1058,7 @@ export default function Home({
       <ShootingStars />
 
       <div className={styles.sand} data-sand-parallax>
-        <img src={bgImg} className={styles.sandImg} alt="" />
+        <img src={bgImg} className={styles.sandImg} alt="Sand Background" />
       </div>
 
       <div
@@ -1073,7 +1073,7 @@ export default function Home({
             : "hidden",
         }}
       >
-        <img src={Castle} className={styles.castleImg} alt="" />
+        <img src={Castle} className={styles.castleImg} alt="Castle" />
       </div>
 
       <div className={styles.clouds} ref={cloudsRef}>
@@ -1094,7 +1094,7 @@ export default function Home({
                 : "hidden",
             }}
           >
-            <img src={c.src} alt="" />
+            <img src={c.src} alt="Cloud" />
           </div>
         ))}
       </div>
@@ -1123,7 +1123,7 @@ export default function Home({
             : "hidden",
         }}
       >
-        <img src={Moon} className={styles.moonImg} alt="" />
+        <img src={Moon} className={styles.moonImg} alt="Moon" />
       </div>
 
       <div
@@ -1150,7 +1150,7 @@ export default function Home({
                 filter: MOON_CLOUD_TINT,
               }}
             >
-              <img src={c.src} alt="" />
+              <img src={c.src} alt="Cloud" />
             </div>
           ))}
         </div>
@@ -1193,12 +1193,12 @@ export default function Home({
         {/* Cacti sit behind. The carpet's tied ends drape in front of the arms
             in the original artwork, so the carpet paints second. Swap the two
             lines if your export has the overlap the other way round. */}
-        <img className={styles.regCactusLayer} src={RegCactus} alt="" />
+        <img className={styles.regCactusLayer} src={RegCactus} alt="Cactus" />
         <img
           ref={carpetImgRef}
           className={styles.regCarpetLayer}
           src={RegCarpet}
-          alt=""
+          alt="Carpet"
         />
 
         <svg
@@ -1229,10 +1229,10 @@ export default function Home({
             : "hidden",
         }}
       >
-        <img src={camelLand} alt="" />
+        <img src={camelLand} alt="Camel 1" />
       </div>
       <div ref={camel2Ref} className={styles.camelLand2}>
-        <img src={camelLand2} alt="" />
+        <img src={camelLand2} alt="Camel 2" />
       </div>
 
       {/* SOCIAL LINKS */}

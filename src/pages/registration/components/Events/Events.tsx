@@ -1276,7 +1276,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
             className={
               styles.leftbottom
             }
-            alt=""
+            alt="Left Bottom Decoration"
           />
 
           <img
@@ -1284,7 +1284,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
             className={
               styles.lefttop
             }
-            alt=""
+            alt="Left Top Decoration"
           />
 
           <img
@@ -1292,7 +1292,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
             className={
               styles.rightbottom
             }
-            alt=""
+            alt="Right Bottom Decoration"
           />
 
           <img
@@ -1300,13 +1300,13 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
             className={
               styles.righttop
             }
-            alt=""
+            alt="Right Top Decoration"
           />
 
           <img
            src={rightmid}
            className={styles.rightmid}
-           alt=""
+           alt="Right Middle Decoration"
           />
 
           <button
@@ -1315,7 +1315,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
             className={styles.backButton}
             aria-label="Go back to Registration"
           >
-            <img src="/regBackButton.png" alt="" />
+            <img src="/regBackButton.png" alt="Go Back to Registration" />
           </button>
 
           {/* ================================= */}
@@ -1527,7 +1527,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                           className={
                             styles.scrollbarLine
                           }
-                          alt=""
+                          alt="Scroll Bar Line"
                           draggable={false}
                         />
 
@@ -1689,7 +1689,7 @@ const Events = forwardRef<HTMLDivElement, EventsProps>(
                                   className={
                                     styles.scrollbarLine
                                   }
-                                  alt=""
+                                  alt="Scroll Bar Line"
                                   draggable={false}
                                 />
 
