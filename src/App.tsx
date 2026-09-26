@@ -54,14 +54,6 @@ import googleButton from "/googleReg.svg";
 // import lamps from "/game-icons_magic-lamp.svg";
 import instructionsBG from "/instructionsBG.png";
 
-/* ======================================================
-   GOOGLE ANALYTICS
-====================================================== */
-
-
-/* ======================================================
-   GOOGLE ANALYTICS
-====================================================== */
 
 const TRACKING_ID = "GT-PJRTJCBD";
 
@@ -71,9 +63,7 @@ const isOasisDomain =
 if (isOasisDomain) {
   ReactGA.initialize(TRACKING_ID);
 }
-/* ======================================================
-   PRELOADER ASSETS
-====================================================== */
+
 
 const isMobile = window.innerWidth <= 768;
 

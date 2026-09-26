@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
-import map from "../assets/contact/mapbg.png";
-import cross from "../assets/contact/cross.png";
+import map from "../assets/contact/mapbg.webp";
+import cross from "../assets/contact/cross.webp";
 import styles from "../styles/Contact.module.scss";
-import emma from "../assets/contact/emma.png";
+import emma from "../assets/contact/emma.webp";
 
 import ContactCard from "../components/ContactCard";
 

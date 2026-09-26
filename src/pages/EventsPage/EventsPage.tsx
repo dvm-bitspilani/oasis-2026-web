@@ -11,32 +11,32 @@ import Preloader from "../Preloader";
 
 import styles from "./EventsPage.module.scss";
 
-import dramaVase from "/dramaVase.png";
-import photographyVase from "/photographyVase.png";
-import danceVase from "/danceVase.png";
-import otherVase from "/otherVase.png";
-import musicVase from "/musicVase.png";
-import eventsTitle from "/eventsTitle.png";
+import dramaVase from "/dramaVase.webp";
+import photographyVase from "/photographyVase.webp";
+import danceVase from "/danceVase.webp";
+import otherVase from "/otherVase.webp";
+import musicVase from "/musicVase.webp";
+import eventsTitle from "/eventsTitle.webp";
 
-import Swaranjali from "../../assets/Events/swaranjali.jpg";
-import PitchPerfect from "../../assets/Events/pitchPerfect.jpg";
-import Tarang from "../../assets/Events/tarang.jpg";
-import Andholika from "../../assets/Events/andholika.jpg";
-import RapWars from "../../assets/Events/rapWars.jpg";
-import Axetacy from "../../assets/Events/axtacy.jpg";
-import DrumDuels from "../../assets/Events/drumDuels.jpg";
-import BeatBrawl from "../../assets/Events/beatBrawl.jpg";
-import FashP from "../../assets/Events/fashP.jpg";
-import Choreo from "../../assets/Events/choreo.jpg";
-import StreetDance from "../../assets/Events/streetDance.jpg";
-import DesertDuel from "../../assets/Events/desertDuel.jpg";
-import Razzmatazz from "../../assets/Events/razzmatazz.jpg";
-import Tandav from "../../assets/Events/tandav.jpg";
-import Sukhmanch from "../../assets/Events/sukhmanch.jpg";
-import StreetPlay from "../../assets/Events/streetPlay.jpg";
-import StagePlay from "../../assets/Events/stagePlay.jpg";
-import Metamorphosis from "../../assets/Events/metamorphosis.jpg";
-import Hypercut from "../../assets/Events/hypercut.jpg";
+import Swaranjali from "../../assets/Events/swaranjali.webp";
+import PitchPerfect from "../../assets/Events/pitchPerfect.webp";
+import Tarang from "../../assets/Events/tarang.webp";
+import Andholika from "../../assets/Events/andholika.webp";
+import RapWars from "../../assets/Events/rapWars.webp";
+import Axetacy from "../../assets/Events/axtacy.webp";
+import DrumDuels from "../../assets/Events/drumDuels.webp";
+import BeatBrawl from "../../assets/Events/beatBrawl.webp";
+import FashP from "../../assets/Events/fashP.webp";
+import Choreo from "../../assets/Events/choreo.webp";
+import StreetDance from "../../assets/Events/streetDance.webp";
+import DesertDuel from "../../assets/Events/desertDuel.webp";
+import Razzmatazz from "../../assets/Events/razzmatazz.webp";
+import Tandav from "../../assets/Events/tandav.webp";
+import Sukhmanch from "../../assets/Events/sukhmanch.webp";
+import StreetPlay from "../../assets/Events/streetPlay.webp";
+import StagePlay from "../../assets/Events/stagePlay.webp";
+import Metamorphosis from "../../assets/Events/metamorphosis.webp";
+import Hypercut from "../../assets/Events/hypercut.webp";
 
 /* =========================================================
    PRELOADER ASSETS
