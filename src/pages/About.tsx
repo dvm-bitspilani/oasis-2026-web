@@ -1541,22 +1541,22 @@ import styles from "../styles/About.module.scss";
 
 import Preloader from "./Preloader";
 
-import bgback from "../assets/about/bgBack.webp";
-import cloud from "../assets/about/cloud.webp";
-import backBg from "../assets/about/bgBottom.webp";
-import leftCloud from "../assets/about/leftClouds.webp";
-import leftTop from "../assets/about/pillarTop-trimmed.webp";
-import leftTopMob from "../assets/about/leftTop-trimmed.webp";
-import head from "../assets/about/head.webp";
-import lamp from "../assets/about/lamp.webp";
-import bgCon from "../assets/about/bgCont.webp";
-import play from "../assets/about/play.webp";
-import ff from "../assets/about/ffControl.webp";
-import playBtn from "../assets/about/playBtn.webp";
-import bgVid from "../assets/about/bgVideo.webp";
-import cover from "../assets/about/cover.webp";
-import backBtn from "../assets/about/backBtn.webp";
-import scrollVid from "../assets/about/scrollVid.webp";
+const bgback = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418120/bgback.webp";
+const cloud = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418122/cloud.webp";
+const backBg = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418120/bgBottom.webp";
+const leftCloud = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418215/leftCloud.webp";//
+const leftTop = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418356/pillarTop-trimmed.webp"; //
+const leftTopMob = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418222/leftTop-trimmed.webp";//
+const head = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418214/head.png";
+const lamp = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418215/lamp.webp";//
+const bgCon = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790412288/bgCont.png";
+const play = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418372/play.webp";//
+const ff = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418213/ffControl.png";//
+const playBtn = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418372/playBtn.webp";  //
+const bgVid = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790412288/bgVideo.png";
+const cover = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418147/cover.webp";//
+const backBtn = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418122/bgVideo.webp";//
+const scrollVid = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418373/scrollVid.png";//
 
 import { useTransition } from "../context/TransitionProvider";
 
