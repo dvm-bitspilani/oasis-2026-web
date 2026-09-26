@@ -7,7 +7,9 @@ import {
   type CSSProperties,
 } from "react";
 import gsap from "gsap";
-
+import { useTransition } from "../context/TransitionProvider";
+import Nav from "../components/Nav";
+import ShootingStars from "../components/ShootingStars";
 import styles from "../styles/Home.module.scss";
 const bg = "https://res.cloudinary.com/bhfhuzru/image/upload/bg.jpg";
 const sandImg = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454105/sandfinal.webp";
@@ -24,8 +26,7 @@ const LogoOasis = "https://res.cloudinary.com/bhfhuzru/image/upload/LogoOasisi.w
    inset: 0 and line back up into the original composition. */
 const RegCactus = "https://res.cloudinary.com/bhfhuzru/image/upload/regCactus.png";
 const RegCarpet = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454104/regCarpet.png";
-import Nav from "../components/Nav";
-import ShootingStars from "../components/ShootingStars";
+
 const camelLand = "https://res.cloudinary.com/bhfhuzru/image/upload/camel1.svg";
 const camelLand2 = "https://res.cloudinary.com/bhfhuzru/image/upload/camel2.svg";
 
@@ -35,7 +36,7 @@ import LinkdinIcon from "../assets/links/linkdin.png";
 import youtubeIcon from "../assets/links/youtube.png";
 import bgPath from "../assets/links/bg.png";
 
-import { useTransition } from "../context/TransitionProvider";
+
 
 type HomeProps = {
   preloaderDone: boolean;
