@@ -16,7 +16,7 @@ import twitterIcon from "../assets/links/twitter.png";
 import LinkdinIcon from "../assets/links/linkdin.png";
 import youtubeIcon from "../assets/links/youtube.png";
 import bgPath from "../assets/links/bg.png";
-const bg = "https://res.cloudinary.com/bhfhuzru/image/upload/bg.jpg";
+const bg = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790465230/bg.jpg";
 const sandImg = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454105/sandfinal.webp";
 const sandMob = "https://res.cloudinary.com/bhfhuzru/image/upload/maybefinalsorry.webp";
 const cloudSmall = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudSmall.svg";
