@@ -845,7 +845,7 @@ body {
 
 .light {
   position: absolute;
-  top:   20%;
+  bottom:   0%;
   left: 0%;
 
   // transform: translate(-50%, -50%);
@@ -865,8 +865,8 @@ body {
 }
 .light2 {
   position: absolute;
-  top:   20%;
-  right:  10%;
+  bottom:    0%;
+  right:  15%;
 
   // transform: translate(-50%, -50%);
   width: 20vw;
@@ -885,14 +885,16 @@ body {
 }
 .light3 {
   position: absolute;
-  bottom:   0%;
-  left:  0%;
+  top:   20%;
+  left:  20%;
 
   // transform: translate(-50%, -50%);
   // width: 30vw;
   // height: 30vh;
   z-index: 1000;
   opacity: 1;
+  height: 5vh;
+  width: 5vh;
   visibility: visible;
   display: block;
   pointer-events: none;
