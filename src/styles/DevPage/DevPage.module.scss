@@ -111,6 +111,7 @@
     top: 5%;
     left: 3%;
     width: 5%;
+    z-index: 6; // stays above the curtains so it's clickable to reset
 
     .BackButton {
       width: 100%;
@@ -126,22 +127,125 @@
     }
   }
 }
-.curtainOverlay{
-    position: fixed;
-    inset:0;
+
+.curtainOverlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 110vh;
+  z-index: 4;
+  overflow: hidden;
+  pointer-events: none;
+
+  // All three curtains are 100vw wide now (not 110vw). That matters: it's what makes
+  // the "landed" x of -20% in DevPage.tsx leave a real 20vw gap on the right instead
+  // of the curtain overshooting and covering the entire viewport with nothing left
+  // over for the other two curtains to peek through.
+  .pinkCurtain,
+  .purpleCurtain,
+  .blueCurtain {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100vw;
     height: 110vh;
-    z-index: 4;
-    overflow: hidden;
-    pointer-events: none;
+    object-fit: cover;
+  }
 
-    .pinkCurtain{
-        position: absolute;
-        top: 0;
-        left: 0;
-        width:110vw;
-        height: 110vh;
-        object-fit: cover;
-       transform: translateX(80%) rotateZ(+5deg);
-    }
+  // resting (parked) positions — these match verticalConfig's restX/restZ in DevPage.tsx.
+  // Keep them in sync if you tweak one side, tweak the other.
+  .pinkCurtain {
+    z-index: 1;
+    transform: translateX(74%) rotateZ(5deg);
+  }
+  .blueCurtain {
+    z-index: 2;
+    transform: translateX(84%) rotateZ(5deg);
+  }
+  .purpleCurtain {
+    z-index: 3;
+    transform: translateX(92%) rotateZ(5deg);
+  }
 }
+
+// Nav labels sit above everything (curtainOverlay tops out at z-index 4, the active
+// curtain at z-index 10) so they're always visible once JS fades them in. Positioned
+// to roughly line up with each curtain's peeking sliver — see restX in DevPage.tsx.
+.verticalLabels {
+  position: fixed;
+  inset: 0;
+  z-index: 11;
+  pointer-events: none; // individual buttons opt back in via inline/gsap when visible
+}
+
+.verticalLabel {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) rotate(180deg);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  color: #f3e6c8; // warm gold, matches the tassel/embroidery tones in the curtains
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  opacity: 0; // GSAP fades this in once its curtain has landed
+  pointer-events: none;
+  // no fixed `left` here on purpose — DevPage.tsx sets it per click (LABEL_FAR_LEFT /
+  // LABEL_NEAR_LEFT) since which slot each label ends up in changes depending on
+  // which vertical is currently active
+
+  &:hover {
+    color: #ffffff;
+  }
+}
+
+// Groups just gate pointer-events; visibility is handled per-character below
+// so the stagger fade-in has something to animate from.
+.frontendCharacters,
+.backendCharacters,
+.uiCharacters {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.character {
+  position: absolute;
+  opacity: 0; // each character starts hidden, GSAP fades it in individually
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+// Character positions are kept inside roughly 0–84vw on purpose: the active curtain
+// only covers up to 88vw (see ACTIVE_X in DevPage.tsx), so anything placed further
+// right than that would visually spill off the "stage" and sit on top of the parked
+// curtain behind it. If you widen/narrow ACTIVE_X later, rescale these to match.
+
+// Frontend — 4 people
+.frontend1 { left: 4%; top: 30%; width: 18%; }
+.frontend2 { left: 25%; top: 35%; width: 18%; }
+.frontend3 { left: 46%; top: 30%; width: 18%; }
+.frontend4 { left: 65%; top: 35%; width: 18%; }
+
+// Backend — 4 people
+.backend1 { left: 4%; top: 30%; width: 18%; }
+.backend2 { left: 25%; top: 35%; width: 18%; }
+.backend3 { left: 46%; top: 30%; width: 18%; }
+.backend4 { left: 65%; top: 35%; width: 18%; }
+
+// UI/UX — 5 people
+.ui1 { left: 2%; top: 35%; width: 14%; }
+.ui2 { left: 19%; top: 30%; width: 14%; }
+.ui3 { left: 36%; top: 35%; width: 14%; }
+.ui4 { left: 53%; top: 30%; width: 14%; }
+.ui5 { left: 70%; top: 35%; width: 14%; }
