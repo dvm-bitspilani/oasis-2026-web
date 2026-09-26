@@ -11,12 +11,12 @@ import Preloader from "../Preloader";
 
 import styles from "./EventsPage.module.scss";
 
-import dramaVase from "/dramaVase.webp";
-import photographyVase from "/photographyVase.webp";
-import danceVase from "/danceVase.webp";
-import otherVase from "/otherVase.webp";
-import musicVase from "/musicVase.webp";
-import eventsTitle from "/eventsTitle.webp";
+import dramaVase from "../../assets/Events/dramaVase.webp";
+import photographyVase from "../../assets/Events/photographyVase.webp";
+import danceVase from "../../assets/Events/danceVase.webp";
+import otherVase from "../../assets/Events/otherVase.webp";
+import musicVase from "../../assets/Events/musicVase.webp";
+import eventsTitle from "../../assets/Events/eventsTitle.webp";
 
 import Swaranjali from "../../assets/Events/swaranjali.webp";
 import PitchPerfect from "../../assets/Events/pitchPerfect.webp";

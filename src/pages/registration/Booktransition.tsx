@@ -1,9 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import styles from "./Booktransition.module.scss";
+const closedBook =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/closedBook.webp";
 
-import closedBook from "/closedBook.webp";
-import openBook from "../../assets/registration/reg/book.png";
-
+const openBook =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/book.png";
 /* =====================================================
    DESKTOP TIMELINE (ms)   —   width >= FLIGHT_MIN_WIDTH
 

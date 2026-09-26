@@ -9,25 +9,25 @@ import {
 import gsap from "gsap";
 
 import styles from "../styles/Home.module.scss";
-const bg = "https://res.cloudinary.com/bhfhuzru/image/upload/bg.jpg";
-const sandImg = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454105/sandfinal.webp";
-const sandMob = "https://res.cloudinary.com/bhfhuzru/image/upload/maybefinalsorry.webp";
-const cloudSmall = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudSmall.svg";
-const cloudBig = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudBig.svg";
-const cloudThree = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudThree.svg";
-const Castle = "https://res.cloudinary.com/bhfhuzru/image/upload/castlefinal2.png";
-const Moon = "https://res.cloudinary.com/bhfhuzru/image/upload/Moon.webp";
-const LogoOasis = "https://res.cloudinary.com/bhfhuzru/image/upload/LogoOasisi.webp";
+import bg from "../assets/home/bg.jpg";
+import sandImg from "../assets/home/sandfinal.webp";
+import sandMob from "../assets/home/maybefinalsorry.webp";
+import cloudSmall from "../assets/home/cloudSmall.svg";
+import cloudBig from "../assets/home/cloudBig.svg";
+import cloudThree from "../assets/home/cloudThree.svg";
+import Castle from "../assets/home/castlefinal2.png";
+import Moon from "../assets/home/Moon.webp";
+import LogoOasis from "../assets/home/LogoOasisi.webp";
 /* The register button artwork is split into two layers so the shine can be
    masked to the carpet alone. Both files are expected to be exported on the
    SAME canvas as the old cactuschange.png — that is what lets them stack at
    inset: 0 and line back up into the original composition. */
-const RegCactus = "https://res.cloudinary.com/bhfhuzru/image/upload/regCactus.png";
-const RegCarpet = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454104/regCarpet.png";
+import RegCactus from "../assets/regCactus.png";
+import RegCarpet from "../assets/regCarpet.png";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
-const camelLand = "https://res.cloudinary.com/bhfhuzru/image/upload/camel1.svg";
-const camelLand2 = "https://res.cloudinary.com/bhfhuzru/image/upload/camel2.svg";
+import camelLand from "../assets/camel1.svg";
+import camelLand2 from "../assets/camel2.svg";
 
 import instagramIcon from "../assets/links/instagram.png";
 import twitterIcon from "../assets/links/twitter.png";

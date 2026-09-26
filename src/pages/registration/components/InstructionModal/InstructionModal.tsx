@@ -7,10 +7,17 @@ import {
 } from "react";
 import styles from "./InstructionModal.module.scss";
 
-import scrollBar from "../../../../assets/registration/reg/line.png";
-import scrollHead from "../../../../assets/registration/reg/wheel.png";
-import modalFrame from "/modalFrame.webp";
-import modalFrameMobile from "/modalFrameMobile.webp";
+const scrollBar =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/line.png";
+
+const scrollHead =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/v1790459176/wheel.png";
+
+const modalFrame =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/modalFrame.webp";
+
+const modalFrameMobile =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/modalFrameMobile.webp";
 
 import ReactDOM from "react-dom";
 

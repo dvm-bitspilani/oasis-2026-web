@@ -1,84 +1,472 @@
+// // @use "/src/assets/global.scss" as *;
+
+// .content {
+//   z-index: 2;
+//   position: absolute;
+//   top: 0;
+//   left: 15%;
+//   display: flex;
+//   align-items: center;
+//   flex-direction: column;
+//   gap: 5px;
+//   height: 100svh;
+//   width: 50vw;
+//   // margin-bottom: 5vw;
+//   background-image: url(../../../../assets/registration/reg/instructionsScroll.webp);
+//   //background-position: center;
+//   background-repeat: no-repeat;
+//   background-size: cover;
+
+//   .headingCont {
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+  
+//     .heading {
+//       margin: 3vw 0 0;
+//       font-family: "Syamsiah", sans-serif;
+//       font-weight: 500;
+//       color: transparent;
+//       font-size: 6rem;
+//       margin: 15vh 0 0;
+//       text-shadow: 0 1.5px 0 #6C1700;
+//       -webkit-background-clip: text;
+//       background-clip: text;
+//       background-color: #000;
+//     }
+//   }
+
+//   h5 {
+//     align-self: flex-start;
+//     font-family: "Cinzel", sans-serif;
+//     font-size: 1.75rem;
+//     font-weight: 700;
+//     color: #38170B;
+//     padding: 0 150px;
+//   }
+
+//   .instr {
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: center;
+//     gap: 12px;
+//     list-style: none;
+//     padding: 0 150px;
+
+//     li {
+//       position: relative;
+//       padding-left: 34px;
+//       color: #432611;
+//       text-align: left;
+//       font-family: "EB", sans-serif;
+//       font-size: 1.25rem;
+//       font-weight: 500;
+
+//       &::before {
+//         content: "";
+//         position: absolute;
+//         left: 0;
+//         top: 0.25em;
+//         width: 22px;
+//         height: 22px;
+//         background: url("/game-icons_magic-lamp.svg") center / contain no-repeat;
+//       }
+
+//       a {
+//         color: #432611;
+//         font-family: "EB", sans-serif;
+//       }
+
+//       span {
+//         cursor: pointer;
+//         text-decoration: underline;
+//       }
+//     }
+//   }
+
+//   .googleButton {
+//     cursor: pointer;
+//     background: center / cover no-repeat url(../../../../assets/registration/reg/googleReg.svg);
+//     border: none;
+//     z-index: 999;
+//     transition: filter 0.3s;
+//     width: 22vw;
+//     height: 3.216vw;
+//     margin-top: 20px;
+//     position: relative;
+//     overflow: hidden; // clip the iframe to your button's box
+//     scale: 1.25;
+
+//     &:hover {
+//       cursor: default;
+//     }
+
+//     &:has(div:hover) {
+//       filter: brightness(1.2);
+//     }
+
+//     div {
+//       position: absolute;
+//       top: 50%;
+//       left: 50%;
+//       transform: translate(-50%, -50%);
+//       opacity: 0.01;
+//     }
+//   }
+// }  
+
+// .leftbottom{
+//     position: absolute;
+//     left: 4%;
+//     bottom: 6%;
+//     scale: 1.4;
+//     width: 20%;
+//     z-index: 1;
+//     clip-path: polygon(0);
+//     box-sizing: border-box;
+// }
+
+
+// .rightbottom{
+//     position: absolute;
+//     right: -7%;
+//     bottom: -30%;
+//     width: 30%;
+//     object-fit: contain;
+// }
+
+// .lefttop{
+//     position: absolute;
+//     left: -8%;
+//     top: -28%;
+//     scale: 0.7;
+// }
+
+// .righttop{
+//     position: absolute;
+//     right: -6%;
+//     top: -8%;
+//     scale: 0.8;
+// }
+
+// .rightmid{
+//   position: absolute;
+//   right: -18%;
+//   top: 22%;
+//   scale: 0.8;
+// }
+
+// .book {
+//   position: absolute;
+//   top: -20%;
+//   right: 3%;
+//   scale: 0.7;
+//   z-index: 20;
+// }
+
+// .backButton {
+//   position: absolute;
+//   top: 0;
+//   left: 0;
+//   scale: 0.8;
+//   transition: all 0.3s ease;
+//   z-index: 100;
+
+//   &:hover {
+//     scale: 0.9;
+//     filter: brightness(1.2);
+//   }
+// }
+
+// @media screen and (max-width: 1501px) {
+//   .content {
+//     width: 65vw;
+
+//     .googleButton {
+//       scale: 1.5;
+//     }
+//   }
+
+//   .book {
+//     scale: 0.5;
+//     top: -10%;
+//     right: -7%;
+//   }
+
+//   .rightbottom {
+//     right: -3%;
+//     bottom: -20%;
+//   }
+// }
+
+// @media screen and (max-width: 1401px) {
+//   .book {
+//     display: none;
+//   }
+
+//   .leftbottom {
+//     bottom: 3%;
+//   }
+// }
+
+// @media screen and (max-width: 1075px) {
+//   .content {
+//     left: 15%;
+//     background-image: url(../../../../assets/registration/reg/instructionsScrollLong.webp);
+//   }
+
+//   /*.lefttop {
+//     left: -30%;
+//     top: -10%;
+//     scale: 0.6;
+//   }*/
+
+//   .righttop {
+//     scale: 0.6;
+//   }
+
+//   .content {
+//     .googleButton {
+//       scale: 2;
+//     }
+//   }
+// }
+
+// @media screen and (max-width: 769px) {
+//   .content {
+//     width: 90vw;
+//     left: 5%;
+//   }
+// }
+
+// @media screen and (max-width: 577px) {
+//   .content {
+//     width: 95vw;
+//     left: 3%;
+//     gap: 2vh;
+
+//     .headingCont {
+//       padding-top: 60px;
+
+//       .heading {
+//         margin: 0;
+//         font-size: 4rem;
+//       }
+//     }
+
+//     h5 {
+//       padding: 0;
+//       align-self: center;
+//       font-size: 1.5rem;
+//     }
+
+//     .instr {
+//       padding: 0;
+//       margin: 0 50px;
+
+//       li {
+//         font-size: 1rem;
+//       }
+//     }
+
+//     .googleButton {
+//       scale: 3.25;
+//       background: center / cover no-repeat url(../../../../assets/registration/reg/googleRegMob.svg);
+//       height: 15px;
+//     }
+//   }
+
+//   .righttop {
+//     right: -22%;
+//     top: -5%;
+//     scale: 0.3;
+//   }
+
+//   .backButton {
+//     scale: 0.5;
+//     top: 2%;
+//     left: -3%;
+//   }
+
+//   .leftbottom {
+//     left: 10%;
+//     bottom: 4%;
+//     scale: 2;
+//   }
+
+//   .lefttop{
+//     left: -45%;
+//     top: 25%;
+//     scale: 0.4;
+//   }
+
+//   .rightbottom{
+//     right: -5%;
+//     bottom: 30%;
+//     scale: 2.5;
+//   }
+
+//   .rightmid{
+//     right: -57%;
+//     top: 8%;
+//     scale: 0.4;
+//   }
+// }
+
+// @media (max-width: 991px) and (min-height: 750px) {
+//   .content {
+//     .headingCont {
+//       .heading {
+//         font-size: 4.75rem;
+//       }
+//     }
+
+//     h5 {
+//       font-size: 1.75rem;
+//     }
+
+//     .instr {
+//       //padding: 20px;
+
+//       li {
+//         font-size: 1.35rem;
+//       }
+//     }
+//   }
+// }
+
+
+
 // @use "/src/assets/global.scss" as *;
 
 .content {
   z-index: 2;
+
   position: absolute;
+
   top: 0;
+
   left: 15%;
+
   display: flex;
+
   align-items: center;
+
   flex-direction: column;
+
   gap: 5px;
+
   height: 100svh;
+
   width: 50vw;
+
   // margin-bottom: 5vw;
-  background-image: url(/instructionsScroll.webp);
+
+  background-image: url("https://res.cloudinary.com/bhfhuzru/image/upload/instructionsScroll.webp");
+
   //background-position: center;
+
   background-repeat: no-repeat;
+
   background-size: cover;
 
   .headingCont {
     display: flex;
+
     align-items: center;
+
     justify-content: center;
-  
+
     .heading {
       margin: 3vw 0 0;
+
       font-family: "Syamsiah", sans-serif;
+
       font-weight: 500;
+
       color: transparent;
+
       font-size: 6rem;
+
       margin: 15vh 0 0;
+
       text-shadow: 0 1.5px 0 #6C1700;
+
       -webkit-background-clip: text;
+
       background-clip: text;
+
       background-color: #000;
     }
   }
 
   h5 {
     align-self: flex-start;
+
     font-family: "Cinzel", sans-serif;
+
     font-size: 1.75rem;
+
     font-weight: 700;
+
     color: #38170B;
+
     padding: 0 150px;
   }
 
   .instr {
     display: flex;
+
     flex-direction: column;
+
     justify-content: center;
+
     gap: 12px;
+
     list-style: none;
+
     padding: 0 150px;
 
     li {
       position: relative;
+
       padding-left: 34px;
+
       color: #432611;
+
       text-align: left;
+
       font-family: "EB", sans-serif;
+
       font-size: 1.25rem;
+
       font-weight: 500;
 
       &::before {
         content: "";
+
         position: absolute;
+
         left: 0;
+
         top: 0.25em;
+
         width: 22px;
+
         height: 22px;
+
         background: url("/game-icons_magic-lamp.svg") center / contain no-repeat;
       }
 
       a {
         color: #432611;
+
         font-family: "EB", sans-serif;
       }
 
       span {
         cursor: pointer;
+
         text-decoration: underline;
       }
     }
@@ -86,15 +474,26 @@
 
   .googleButton {
     cursor: pointer;
-    background: center / cover no-repeat url(/googleReg.svg);
+
+    background: center / cover no-repeat
+      url("https://res.cloudinary.com/bhfhuzru/image/upload/googleReg.svg");
+
     border: none;
+
     z-index: 999;
+
     transition: filter 0.3s;
+
     width: 22vw;
+
     height: 3.216vw;
+
     margin-top: 20px;
+
     position: relative;
+
     overflow: hidden; // clip the iframe to your button's box
+
     scale: 1.25;
 
     &:hover {
@@ -107,73 +506,106 @@
 
     div {
       position: absolute;
+
       top: 50%;
+
       left: 50%;
+
       transform: translate(-50%, -50%);
+
       opacity: 0.01;
     }
   }
-}  
-
-.leftbottom{
-    position: absolute;
-    left: 4%;
-    bottom: 6%;
-    scale: 1.4;
-    width: 20%;
-    z-index: 1;
-    clip-path: polygon(0);
-    box-sizing: border-box;
 }
 
-
-.rightbottom{
-    position: absolute;
-    right: -7%;
-    bottom: -30%;
-    width: 30%;
-    object-fit: contain;
-}
-
-.lefttop{
-    position: absolute;
-    left: -8%;
-    top: -28%;
-    scale: 0.7;
-}
-
-.righttop{
-    position: absolute;
-    right: -6%;
-    top: -8%;
-    scale: 0.8;
-}
-
-.rightmid{
+.leftbottom {
   position: absolute;
+
+  left: 4%;
+
+  bottom: 6%;
+
+  scale: 1.4;
+
+  width: 20%;
+
+  z-index: 1;
+
+  clip-path: polygon(0);
+
+  box-sizing: border-box;
+}
+
+.rightbottom {
+  position: absolute;
+
+  right: -7%;
+
+  bottom: -30%;
+
+  width: 30%;
+
+  object-fit: contain;
+}
+
+.lefttop {
+  position: absolute;
+
+  left: -8%;
+
+  top: -28%;
+
+  scale: 0.7;
+}
+
+.righttop {
+  position: absolute;
+
+  right: -6%;
+
+  top: -8%;
+
+  scale: 0.8;
+}
+
+.rightmid {
+  position: absolute;
+
   right: -18%;
+
   top: 22%;
+
   scale: 0.8;
 }
 
 .book {
   position: absolute;
+
   top: -20%;
+
   right: 3%;
+
   scale: 0.7;
+
   z-index: 20;
 }
 
 .backButton {
   position: absolute;
+
   top: 0;
+
   left: 0;
+
   scale: 0.8;
+
   transition: all 0.3s ease;
+
   z-index: 100;
 
   &:hover {
     scale: 0.9;
+
     filter: brightness(1.2);
   }
 }
@@ -189,12 +621,15 @@
 
   .book {
     scale: 0.5;
+
     top: -10%;
+
     right: -7%;
   }
 
   .rightbottom {
     right: -3%;
+
     bottom: -20%;
   }
 }
@@ -212,7 +647,8 @@
 @media screen and (max-width: 1075px) {
   .content {
     left: 15%;
-    background-image: url(/instructionsScrollLong.webp);
+
+    background-image: url("https://res.cloudinary.com/bhfhuzru/image/upload/instructionsScrollLong.webp");
   }
 
   /*.lefttop {
@@ -235,6 +671,7 @@
 @media screen and (max-width: 769px) {
   .content {
     width: 90vw;
+
     left: 5%;
   }
 }
@@ -242,7 +679,9 @@
 @media screen and (max-width: 577px) {
   .content {
     width: 95vw;
+
     left: 3%;
+
     gap: 2vh;
 
     .headingCont {
@@ -250,18 +689,22 @@
 
       .heading {
         margin: 0;
+
         font-size: 4rem;
       }
     }
 
     h5 {
       padding: 0;
+
       align-self: center;
+
       font-size: 1.5rem;
     }
 
     .instr {
       padding: 0;
+
       margin: 0 50px;
 
       li {
@@ -271,44 +714,59 @@
 
     .googleButton {
       scale: 3.25;
-      background: center / cover no-repeat url(/googleRegMob.svg);
+
+      background: center / cover no-repeat
+        url("https://res.cloudinary.com/bhfhuzru/image/upload/googleRegMob.svg");
+
       height: 15px;
     }
   }
 
   .righttop {
     right: -22%;
+
     top: -5%;
+
     scale: 0.3;
   }
 
   .backButton {
     scale: 0.5;
+
     top: 2%;
+
     left: -3%;
   }
 
   .leftbottom {
     left: 10%;
+
     bottom: 4%;
+
     scale: 2;
   }
 
-  .lefttop{
+  .lefttop {
     left: -45%;
+
     top: 25%;
+
     scale: 0.4;
   }
 
-  .rightbottom{
+  .rightbottom {
     right: -5%;
+
     bottom: 30%;
+
     scale: 2.5;
   }
 
-  .rightmid{
+  .rightmid {
     right: -57%;
+
     top: 8%;
+
     scale: 0.4;
   }
 }

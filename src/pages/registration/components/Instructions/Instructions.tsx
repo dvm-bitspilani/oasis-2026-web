@@ -3,14 +3,26 @@ import { Link } from "react-router-dom";
 import styles from "./Instructions.module.scss";
 import { GoogleLogin } from "@react-oauth/google";
 import InstructionModal from "../InstructionModal/InstructionModal";
+const leftbottom =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/leftbottom.png";
 
-import leftbottom from "../../../../assets/registration/reg/leftbottom.png";
-import rightbottom from "../../../../assets/registration/reg/rightbottom.png";
-import lefttop from "../../../../assets/registration/reg/lefttop.png";
-import righttop from "../../../../assets/registration/reg/righttop.png";
-import rightmid from "../../../../assets/registration/reg/rightmid.png";
-import book from "/closedBook.webp";
+const rightbottom =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/rightbottom.png";
 
+const lefttop =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/lefttop.png";
+
+const righttop =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/righttop.png";
+
+const rightmid =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/rightmid.png";
+
+const book =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/closedBook.webp";
+
+const backBtn =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/regBackButton.webp";
 /* Scroll slide-out. Runs at t=0 of the book timeline, so the
    scroll is on its way off screen while the book lifts off
    (Booktransition's FLY_DELAY is 350ms). */
@@ -92,7 +104,7 @@ const Instructions = ({
       />
 
       <Link to="/" className={styles.backButton}>
-        <img src="/regBackButton.png" alt="Go to Home Page" />
+        <img src={backBtn} alt="Go to Home Page" />
       </Link>
 
       <div className={styles.content} style={leaveStyle}>

@@ -4,56 +4,131 @@ import AppRoutes from "./routes/AppRoutes";
 import Preloader from "./pages/Preloader";
 import { useTransition } from "./context/TransitionProvider";
 import ReactGA from "react-ga4";
-
-import video from "./assets/video/curtain.mp4";
-import camel from "./assets/camelLand.png";
-import camel1 from "./assets/camel1.svg";
-import camel2 from "./assets/camel2.svg";
-import camel3 from "./assets/camel3.svg";
-import camel4 from "./assets/camel4.svg";
-import camelLand from "./assets/camelLand.png";
-import Castle from "./assets/Castle.png";
-import cloudBig from "./assets/cloudBig.svg";
-import cloudSmall from "./assets/cloudSmall.svg";
-import cloudThree from "./assets/cloudThree.svg";
-import hamLine from "./assets/hamLine.svg";
-import LogoOasis from "./assets/LogoOasisi.png";
-import Moon from "./assets/Moon.png";
-import navCircle from "./assets/navCircle.svg";
-import navSan from "./assets/navSan.svg";
-
-import regBtn from "./assets/regBtn.png";
-import registerBtn from "./assets/registerBtn.png";
-import sand from "./assets/sand.png";
-import sandImg from "./assets/sandImg.png";
-
-import RegBg from "./assets/registration/reg/RegBg.png";
-import leftbottom from "./assets/registration/reg/leftbottom.png";
-import rightbottom from "./assets/registration/reg/rightbottom.png";
-import lefttop from "./assets/registration/reg/lefttop.png";
-import righttop from "./assets/registration/reg/righttop.png";
-import book from "./assets/registration/reg/book.png";
-import buttonBg from "./assets/registration/reg/buttonbg.png";
-import inputBg from "./assets/registration/reg/inputBg.png";
-import btn from "./assets/registration/reg/btn.png";
-import searchBg from "./assets/registration/reg/searchBg.png";
-import line from "./assets/registration/reg/line.png";
-import wheel from "./assets/registration/reg/wheel.png";
-
-import modalFrame from "/modalFrame.webp";
-import modalFrameMobile from "/modalFrameMobile.webp";
-import closedBook from "/closedBook.webp";
-
+// import video from "./assets/video/curtain.mp4";
+// const camel1 = "https://res.cloudinary.com/bhfhuzru/image/upload/camel1.svg";
+// const camel2 = "https://res.cloudinary.com/bhfhuzru/image/upload/camel2.svg";
+// const Castle = "https://res.cloudinary.com/bhfhuzru/image/upload/castlefinal2.png";
+// const cloudBig = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudBig.svg";
+// const cloudSmall = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudSmall.svg";
+// const cloudThree = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudThree.svg";
+// import hamLine from "./assets/hamLine.svg";
+// const LogoOasis = "https://res.cloudinary.com/bhfhuzru/image/upload/LogoOasisi.webp";
+// const Moon = "https://res.cloudinary.com/bhfhuzru/image/upload/Moon.webp";
+// import navCircle from "./assets/navCircle.svg";
+// import navSan from "./assets/navSan.svg";
+// const sandImg = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454105/sandfinal.webp";
+// import RegBg from "./assets/registration/reg/RegBg.png";
+// import leftbottom from "./assets/registration/reg/leftbottom.png";
+// import rightbottom from "./assets/registration/reg/rightbottom.png";
+// import lefttop from "./assets/registration/reg/lefttop.png";
+// import righttop from "./assets/registration/reg/righttop.png";
+// import book from "./assets/registration/reg/book.png";
+// import buttonBg from "./assets/registration/reg/buttonbg.png";
+// import inputBg from "./assets/registration/reg/inputBg.png";
+// import btn from "./assets/registration/reg/btn.png";
+// import searchBg from "./assets/registration/reg/searchBg.png";
+// import line from "./assets/registration/reg/line.png";
+// import wheel from "./assets/registration/reg/wheel.png";
+// import modalFrame from "./assets/registration/reg/modalFrame.webp";
+// import modalFrameMobile from "./assets/registration/reg/modalFrameMobile.webp";
+// import closedBook from "./assets/registration/reg/closedBook.webp";
 import Syamsiah from "./assets/fonts/Syamsiah Arabic.ttf";
 import EB from "./assets/fonts/EBGaramond-Medium.ttf";
 import Cinzel from "./assets/fonts/Cinzel-VariableFont_wght.ttf";
+// import Scroll1 from "./assets/registration/reg/instructionsScroll.webp";
+// import Scroll2 from "./assets/registration/reg/instructionsScrollLong.webp";
+// import googleButton from "./assets/registration/reg/googleReg.svg";
 
-import Scroll1 from "/instructionsScroll.webp";
-import Scroll2 from "/instructionsScrollLong.webp";
-import googleButton from "/googleReg.svg";
 // import lamps from "/game-icons_magic-lamp.svg";
-import instructionsBG from "/instructionsBG.png";
 
+import video from "./assets/video/curtain.mp4";
+
+const camel1 =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/camel1.svg";
+
+const camel2 =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/camel2.svg";
+
+const Castle =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/castlefinal2.png";
+
+const cloudBig =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudBig.svg";
+
+const cloudSmall =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudSmall.svg";
+
+const cloudThree =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudThree.svg";
+
+import hamLine from "./assets/hamLine.svg";
+
+const LogoOasis =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/LogoOasisi.webp";
+
+const Moon =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/Moon.webp";
+
+import navCircle from "./assets/navCircle.svg";
+import navSan from "./assets/navSan.svg";
+
+const sandImg =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454105/sandfinal.webp";
+
+const RegBg =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/RegBg.png";
+
+const leftbottom =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/leftbottom.png";
+
+const rightbottom =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/rightbottom.png";
+
+const lefttop =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/lefttop.png";
+
+const righttop =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/righttop.png";
+
+const book =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/book.png";
+  
+
+const buttonBg =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/buttonbg.png";
+
+const inputBg =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/inputBg.png";
+
+const btn =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/btn.png";
+
+const searchBg =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/searchBg.png";
+
+const line =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/line.png";
+
+const wheel =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/v1790459176/wheel.png";
+
+const modalFrame =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/modalFrame.webp";
+
+const modalFrameMobile =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/modalFrameMobile.webp";
+
+const closedBook =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/closedBook.webp";
+
+const Scroll1 =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/instructionsScroll.webp";
+
+const Scroll2 =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/instructionsScrollLong.webp";
+
+const googleButton =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/googleReg.svg";
 
 const TRACKING_ID = "GT-PJRTJCBD";
 
@@ -64,16 +139,12 @@ if (isOasisDomain) {
   ReactGA.initialize(TRACKING_ID);
 }
 
-
 const isMobile = window.innerWidth <= 768;
 
 const mobileAssets = [
   video,
-  camel,
   // camel1,
   // camel2,
-  // camel3,
-  // camel4,
   // camelLand,
   Castle,
   cloudBig,
@@ -84,9 +155,6 @@ const mobileAssets = [
   Moon,
   navCircle,
   // navSan,
-  regBtn,
-  registerBtn,
-  sand,
   sandImg,
   RegBg,
   leftbottom,
@@ -109,17 +177,13 @@ const mobileAssets = [
   Scroll2,
   googleButton,
   // lamps,
-  instructionsBG,
+
 ];
 
 const desktopAssets = [
   video,
-  camel,
   camel1,
   camel2,
-  camel3,
-  camel4,
-  camelLand,
   Castle,
   cloudBig,
   cloudSmall,
@@ -129,9 +193,6 @@ const desktopAssets = [
   Moon,
   navCircle,
   navSan,
-  regBtn,
-  registerBtn,
-  sand,
   sandImg,
   RegBg,
   leftbottom,
@@ -154,7 +215,7 @@ const desktopAssets = [
   Scroll2,
   googleButton,
   // lamps,
-  instructionsBG,
+
 ];
 
 const assets = isMobile ? mobileAssets : desktopAssets;
@@ -212,9 +273,7 @@ export default function App() {
 
   const handleEnter = () => {
     markEntered();
-
     setPreloaderDone(true);
-
     setHomeExiting(true);
   };
 
@@ -234,13 +293,13 @@ export default function App() {
         style={
           introActive
             ? {
-              position: "fixed",
-              inset: 0,
-              width: "100vw",
-              height: "100dvh",
-              overflow: "hidden",
-              background: "#080a18",
-            }
+                position: "fixed",
+                inset: 0,
+                width: "100vw",
+                height: "100dvh",
+                overflow: "hidden",
+                background: "#080a18",
+              }
             : undefined
         }
       >
@@ -248,19 +307,16 @@ export default function App() {
           style={
             introActive
               ? {
-                width: "100%",
-                minHeight: "100%",
-
-                transform: homeExiting
-                  ? "translate3d(0, 0, 0)"
-                  : "translate3d(0, 100%, 0)",
-
-                transition: homeExiting
-                  ? `transform ${TRANSITION_DURATION}ms cubic-bezier(0.76, 0, 0.24, 1)`
-                  : "none",
-
-                willChange: "transform",
-              }
+                  width: "100%",
+                  minHeight: "100%",
+                  transform: homeExiting
+                    ? "translate3d(0, 0, 0)"
+                    : "translate3d(0, 100%, 0)",
+                  transition: homeExiting
+                    ? `transform ${TRANSITION_DURATION}ms cubic-bezier(0.76, 0, 0.24, 1)`
+                    : "none",
+                  willChange: "transform",
+                }
               : undefined
           }
         >
@@ -284,4 +340,4 @@ export default function App() {
       )}
     </>
   );
-} 
+}

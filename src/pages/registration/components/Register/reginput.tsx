@@ -127,8 +127,12 @@
 
 import styles from "./Reginput.module.scss";
 
-import inputLine from "../../../../assets/registration/reg/inputLine.png";
-import Leaf from "../../../../assets/registration/reg/leaf.png";
+
+const inputLine =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/inputLine.png";
+
+const Leaf =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/leaf.png";
 
 import type { ReactNode } from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";

@@ -2,8 +2,11 @@
 
   import ReactDOM from "react-dom";
 
-  import modalFrameMobile from "/modalFrameMobile.webp";
-  import bannerBg from "../../../../assets/registration/reg/inputBg.png";
+const modalFrameMobile =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/modalFrameMobile.webp";
+
+const bannerBg =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/inputBg.png";
 
   type PropsType = {
     handleEvent: () => void;

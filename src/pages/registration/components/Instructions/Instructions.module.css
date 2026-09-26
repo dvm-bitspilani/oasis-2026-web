@@ -70,7 +70,7 @@
 }
 .content .googleButton {
   cursor: pointer;
-  background: center/cover no-repeat url(/googleReg.svg);
+  background: center/cover no-repeat url(../../../../assets/registration//reg/googleReg.svg);
   border: none;
   z-index: 4;
   transition: filter 0.3s;
