@@ -1,18 +1,33 @@
 import { useEffect, useRef } from "react";
+
 import gsap from "gsap";
 
 import styles from "../styles/ComingSoon.module.scss";
 
-import bg from "../assets/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg";
-import sandImg from "../assets/Sand2.png";
-import cloudSmall from "../assets/cloudSmall.svg";
-import cloudBig from "../assets/cloudBig.svg";
-import cloudThree from "../assets/cloudThree.svg";
-import Moon from "../assets/Moon.png";
-import ShootingStars from "../components/ShootingStars";
-import { useTransition } from "../context/TransitionProvider";
-import goHomeIcon from "../assets/goHome.svg";
+const bg =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg";
 
+const sandImg =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/Sand2.png";
+
+const cloudSmall =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudSmall.svg";
+
+const cloudBig =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudBig.svg";
+
+const cloudThree =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudThree.svg";
+
+const Moon =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/Moon.png";
+
+import ShootingStars from "../components/ShootingStars";
+
+import { useTransition } from "../context/TransitionProvider";
+
+const goHomeIcon =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/goHome.svg";
 type Cloud = {
   id: string;
   src: string;
