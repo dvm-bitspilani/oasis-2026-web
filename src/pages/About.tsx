@@ -2,22 +2,22 @@ import styles from "../styles/About.module.scss";
 
 import Preloader from "./Preloader";
 
-import bgback from "../assets/about/bgBack.png";
-import cloud from "../assets/about/cloud.png";
-import backBg from "../assets/about/bgBottom.png";
-import leftCloud from "../assets/about/leftClouds.png";
-import leftTop from "../assets/about/pillarTop-trimmed.png";
-import leftTopMob from "../assets/about/leftTop-trimmed.png";
-import head from "../assets/about/head.png";
-import lamp from "../assets/about/lamp.png";
-import bgCon from "../assets/about/bgCont.png";
-import play from "../assets/about/play.png";
-import ff from "../assets/about/ffControl.png";
-import playBtn from "../assets/about/playBtn.png";
-import bgVid from "../assets/about/bgVideo.png";
-import cover from "../assets/about/cover.png";
-import backBtn from "../assets/about/backBtn.png";
-import scrollVid from "../assets/about/scrollVid.png";
+import bgback from "../assets/about/bgBack.webp";
+import cloud from "../assets/about/cloud.webp";
+import backBg from "../assets/about/bgBottom.webp";
+import leftCloud from "../assets/about/leftClouds.webp";
+import leftTop from "../assets/about/pillarTop-trimmed.webp";
+import leftTopMob from "../assets/about/leftTop-trimmed.webp";
+import head from "../assets/about/head.webp";
+import lamp from "../assets/about/lamp.webp";
+import bgCon from "../assets/about/bgCont.webp";
+import play from "../assets/about/play.webp";
+import ff from "../assets/about/ffControl.webp";
+import playBtn from "../assets/about/playBtn.webp";
+import bgVid from "../assets/about/bgVideo.webp";
+import cover from "../assets/about/cover.webp";
+import backBtn from "../assets/about/backBtn.webp";
+import scrollVid from "../assets/about/scrollVid.webp";
 
 import { useTransition } from "../context/TransitionProvider";
 
