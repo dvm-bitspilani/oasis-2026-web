@@ -11,6 +11,14 @@ import { useTransition } from "../context/TransitionProvider";
 import Nav from "../components/Nav";
 import ShootingStars from "../components/ShootingStars";
 import styles from "../styles/Home.module.scss";
+import instagramIcon from "../assets/links/instagram.png";
+import twitterIcon from "../assets/links/twitter.png";
+import LinkdinIcon from "../assets/links/linkdin.png";
+import youtubeIcon from "../assets/links/youtube.png";
+import bgPath from "../assets/links/bg.png";
+
+
+
 const bg = "https://res.cloudinary.com/bhfhuzru/image/upload/bg.jpg";
 const sandImg = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454105/sandfinal.webp";
 const sandMob = "https://res.cloudinary.com/bhfhuzru/image/upload/maybefinalsorry.webp";
@@ -30,11 +38,7 @@ const RegCarpet = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454104/
 const camelLand = "https://res.cloudinary.com/bhfhuzru/image/upload/camel1.svg";
 const camelLand2 = "https://res.cloudinary.com/bhfhuzru/image/upload/camel2.svg";
 
-import instagramIcon from "../assets/links/instagram.png";
-import twitterIcon from "../assets/links/twitter.png";
-import LinkdinIcon from "../assets/links/linkdin.png";
-import youtubeIcon from "../assets/links/youtube.png";
-import bgPath from "../assets/links/bg.png";
+
 
 
 
