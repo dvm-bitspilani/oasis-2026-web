@@ -1,8 +1,12 @@
   import { useEffect, useRef, useState } from "react";
   import styles from "../styles/Preloader.module.scss";
-  import bg from "../assets/preloader/bg_star.webp"
+
   // import light from "../assets/preloader/light1.svg"
-  import light2 from "../assets/preloader/light2.png"
+const bg =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/bg_star.png";
+
+const light2 =
+  "https://res.cloudinary.com/bhfhuzru/image/upload/light2.png";
   // import light3 from "../assets/preloader/light3.svg"
   interface PreloaderProps {
     assets?: string[];
