@@ -61,3 +61,21 @@ a {
   font-family: "EBGaramond";
   src: url(./assets/fonts/EBGaramond-Medium.ttf);
 }
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  background: #080a18;
+}
+
+html {
+  background: #080a18;
+}
+
+body {
+  overflow-x: hidden;
+  background: #080a18;
+} 
