@@ -6,7 +6,7 @@ import Home from "../pages/Home";
 import Events from "../pages/registration/components/Events/Events";
 import ComingSoon from "../pages/ComingSoon";
 import About from "../pages/About";
-import DevPage from "../pages/DevPage/DevPage";
+import Devpageresponsive from "../pages/DevPage/Devpageresponsive.tsx";
 
 interface AppRoutesProps {
   preloaderDone: boolean;
@@ -36,7 +36,7 @@ export default function AppRoutes({
         />
          <Route
           path="/DevPage"
-          element={<DevPage />}
+          element={<Devpageresponsive />}
         />
         <Route
           path="/register"

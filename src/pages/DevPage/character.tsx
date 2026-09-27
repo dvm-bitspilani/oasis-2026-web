@@ -59,10 +59,8 @@ const Character = forwardRef<HTMLDivElement, CharacterProps>(
     return (
       <div ref={ref} className={`${styles.character} ${className ?? ""}`}>
         <img className={styles.characterImage} src={image} alt={name} />
-
         <div className={styles.characterInfo}>
           <p>{name}</p>
-
           <div className={styles.socials}>
             {instagram && (
               <a href={instagram} target="_blank" rel="noreferrer">
@@ -79,7 +77,7 @@ const Character = forwardRef<HTMLDivElement, CharacterProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 Character.displayName = "Character";

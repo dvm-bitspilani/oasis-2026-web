@@ -155,17 +155,27 @@
   // resting (parked) positions — these match verticalConfig's restX/restZ in DevPage.tsx.
   // Keep them in sync if you tweak one side, tweak the other.
   .pinkCurtain {
+    // width: 110vw;
     z-index: 1;
     transform: translateX(74%) rotateZ(5deg);
   }
   .blueCurtain {
+    // width: 110vw;
     z-index: 2;
     transform: translateX(84%) rotateZ(5deg);
   }
   .purpleCurtain {
+    // width: 110vw;
     z-index: 3;
     transform: translateX(92%) rotateZ(5deg);
   }
+}
+.rightTop{
+  position: absolute;
+  top: -10%;
+  right: -4%;
+  transform: rotateZ(5deg);
+  z-index: 1000;
 }
 
 // Nav labels sit above everything (curtainOverlay tops out at z-index 4, the active
@@ -216,36 +226,49 @@
 }
 
 .character {
+  display: flex;
+  flex-direction: column;
+align-items: center;
+margin-left: 6%;
   position: absolute;
   opacity: 0; // each character starts hidden, GSAP fades it in individually
 
   img {
     display: block;
-    width: 100%;
+    width: 30vw;
+    object-fit: contain;
     height: auto;
   }
 }
-
+.characterInfo{
+display: flex;
+flex-direction: column;
+align-items: center;
+p{
+  font-size: 40px;
+  color: white;
+}
+}
 // Character positions are kept inside roughly 0–84vw on purpose: the active curtain
 // only covers up to 88vw (see ACTIVE_X in DevPage.tsx), so anything placed further
 // right than that would visually spill off the "stage" and sit on top of the parked
 // curtain behind it. If you widen/narrow ACTIVE_X later, rescale these to match.
 
 // Frontend — 4 people
-.frontend1 { left: 4%; top: 30%; width: 18%; }
-.frontend2 { left: 25%; top: 35%; width: 18%; }
-.frontend3 { left: 46%; top: 30%; width: 18%; }
-.frontend4 { left: 65%; top: 35%; width: 18%; }
+.frontend1 { left: 0%; top: 12%; width: 18%; }
+.frontend2 { left: 20%; top: 25%; width: 18%; }
+.frontend3 { left: 40%; top: 12%; width: 18%; }
+.frontend4 { left: 60%; top: 25%; width: 18%; }
 
 // Backend — 4 people
-.backend1 { left: 4%; top: 30%; width: 18%; }
-.backend2 { left: 25%; top: 35%; width: 18%; }
-.backend3 { left: 46%; top: 30%; width: 18%; }
-.backend4 { left: 65%; top: 35%; width: 18%; }
+.backend1 { left: 0%; top: 12%; width: 18%; }
+.backend2 { left: 20%; top: 25%; width: 18%; }
+.backend3 { left: 40%; top: 12%; width: 18%; }
+.backend4 { left: 60%; top: 25%; width: 18%; }
 
 // UI/UX — 5 people
-.ui1 { left: 2%; top: 35%; width: 14%; }
-.ui2 { left: 19%; top: 30%; width: 14%; }
-.ui3 { left: 36%; top: 35%; width: 14%; }
-.ui4 { left: 53%; top: 30%; width: 14%; }
-.ui5 { left: 70%; top: 35%; width: 14%; }
+.ui1 { left: 0%; top: 12%; width: 14%; }
+.ui2 { left: 16%; top: 35%; width: 14%; }
+.ui3 { left: 32%; top: 12%; width: 14%; }
+.ui4 { left: 48%; top: 35%; width: 14%; }
+.ui5 { left: 64%; top: 12%; width: 14%; }

@@ -1,0 +1,19 @@
+// Adjust this single breakpoint if you want the switch to happen at a different
+// width — it's the only place the desktop/mobile line is drawn.
+$mobile-breakpoint: 768px;
+
+.desktopOnly {
+  display: block;
+
+  @media (max-width: $mobile-breakpoint) {
+    display: none;
+  }
+}
+
+.mobileOnly {
+  display: none;
+
+  @media (max-width: $mobile-breakpoint) {
+    display: block;
+  }
+}

@@ -12,7 +12,7 @@ import bgPink from "../../assets/DevPage/bpPink.png"
 import bgPurple from "../../assets/DevPage/bgPurple.png"
 import bgBlue from "../../assets/DevPage/bgBlue.png"
 import image from "../../assets/DevPage/profile.png"
-
+import rightTop from "../../assets/DevPage/rightTop.png"
 type Vertical = "Frontend" | "Backend" | "Ui";
 
 export default function DevPage() {
@@ -50,23 +50,23 @@ export default function DevPage() {
   const REST_HEIGHT = "110vh";
   const ACTIVE_HEIGHT = "100vh";
 
-  const ACTIVE_X = "-12%";
-  const ACTIVE_Z = 10; // whichever curtain is active always paints above the parked ones
+  const ACTIVE_X = "-8%";
+  const ACTIVE_Z = 1; // whichever curtain is active always paints above the parked ones
 
   // the two parked curtains always sit in these two slots, snug against each other —
   // FAR is further back (lower z, partly tucked behind), NEAR sits right in front of
   // it, closer to the edge. Which vertical goes into which slot is decided per click.
-  const PARK_FAR_X = "83%";
-  const PARK_FAR_Z = 1;
-  const PARK_NEAR_X = "92%";
-  const PARK_NEAR_Z = 2;
+  const PARK_FAR_X = "84%";
+  const PARK_FAR_Z = 3;
+  const PARK_NEAR_X = "91%";
+  const PARK_NEAR_Z = 5;
 
   // matching left-offsets for the nav labels riding on top of the FAR/NEAR curtains
   const LABEL_FAR_LEFT = "90%";
   const LABEL_NEAR_LEFT = "96%";
 
   // resting spots used only when nobody is active (back at the home cushions)
-  const HOME_X: Record<Vertical, string> = { Frontend: "74%", Backend: "84%", Ui: "92%" };
+  const HOME_X: Record<Vertical, string> = { Frontend: "75%", Backend: "84%", Ui: "92%" };
   const HOME_Z: Record<Vertical, number> = { Frontend: 1, Backend: 2, Ui: 3 };
 
   // single source of truth: which curtain + which character group + which nav label
@@ -111,8 +111,8 @@ export default function DevPage() {
 
     tl.set(farCfg.curtainRef.current, { zIndex: PARK_FAR_Z }, 0);
     tl.set(nearCfg.curtainRef.current, { zIndex: PARK_NEAR_Z }, 0);
-    tl.to(farCfg.curtainRef.current, { x: PARK_FAR_X, rotation: 0, height: REST_HEIGHT, duration: 0.9, ease: "power3.inOut" }, 0);
-    tl.to(nearCfg.curtainRef.current, { x: PARK_NEAR_X, rotation: 0, height: REST_HEIGHT, duration: 0.9, ease: "power3.inOut" }, 0);
+    tl.to(farCfg.curtainRef.current, { x: PARK_FAR_X, rotation: 5, height: REST_HEIGHT, duration: 0.9, ease: "power3.inOut" }, 0);
+    tl.to(nearCfg.curtainRef.current, { x: PARK_NEAR_X, rotation:5, height: REST_HEIGHT, duration: 0.9, ease: "power3.inOut" }, 0);
     if (farCfg.labelRef.current) tl.set(farCfg.labelRef.current, { left: LABEL_FAR_LEFT }, 0);
     if (nearCfg.labelRef.current) tl.set(nearCfg.labelRef.current, { left: LABEL_NEAR_LEFT }, 0);
 
@@ -158,7 +158,7 @@ export default function DevPage() {
     allVerticals.forEach((key) => {
       const cfg = verticalConfig[key];
       tl.set(cfg.curtainRef.current, { zIndex: HOME_Z[key] }, 0);
-      tl.to(cfg.curtainRef.current, { x: HOME_X[key], rotation: 0, height: REST_HEIGHT, duration: 0.9, ease: "power3.inOut" }, 0);
+      tl.to(cfg.curtainRef.current, { x: HOME_X[key], rotation: 5, height: REST_HEIGHT, duration: 0.9, ease: "power3.inOut" }, 0);
     });
 
     const allLabelEls = allVerticals
@@ -205,6 +205,7 @@ export default function DevPage() {
       </div>
 
       <div className={styles.curtainOverlay}>
+        <img src={rightTop} alt="rightTop" className={styles.rightTop} />
         <img ref={curtainRefPink} className={styles.pinkCurtain} src={bgPink} alt="curtainPink" />
         <img ref={curtainRefPurple} className={styles.purpleCurtain} src={bgPurple} alt="curtainPurple" />
         <img ref={curtainRefBlue} className={styles.blueCurtain} src={bgBlue} alt="curtainBlue" />
