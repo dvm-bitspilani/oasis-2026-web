@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 import styles from "../styles/Nav.module.scss";
 import navLine from "../assets/hamLine.svg";
-// import navMob from "../assets/about/arrow.png";
 import { useTransition } from "../context/TransitionProvider";
 
 const LINKS = [
@@ -14,31 +13,37 @@ const LINKS = [
 export default function Nav() {
   const { navigateWithTransition } = useTransition();
 
-  const handleNavClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    to: string
-  ) => {
+  const handleNavClick = (e, to) => {
     e.preventDefault();
     navigateWithTransition(to);
   };
 
   return (
     <div className={styles.container}>
-      <div className={styles.circle}>
-        <img src={navLine} alt="Ham" />
-        <img src={navLine} alt="Ham" />
-        <img src={navLine} alt="Ham" />
-      </div>
+
+      {/* Hamburger / Ham button */}
+      <NavLink
+        to="/ham"
+        onClick={(e) => handleNavClick(e, "/ham")}
+        className={styles.circle}
+        aria-label="Open menu"
+      >
+        <img src={navLine} alt="" />
+        <img src={navLine} alt="" />
+        <img src={navLine} alt="" />
+      </NavLink>
 
       <div className={styles.rectangle}>
+
+        {/* Mobile navigation */}
         <div className={styles.mobileHomeNav}>
+
           <NavLink
             to="/"
             onClick={(e) => handleNavClick(e, "/")}
             className={`${styles.navLink} ${styles.mobileNavDecoration}`}
             aria-label="Home"
           >
-            {/* <img src={navMob} alt="" /> */}
           </NavLink>
 
           <NavLink
@@ -55,10 +60,11 @@ export default function Nav() {
             className={`${styles.navLink} ${styles.mobileNavDecoration}`}
             aria-label="About Us"
           >
-            {/* <img src={navMob} alt="" /> */}
           </NavLink>
+
         </div>
 
+        {/* Desktop navigation */}
         <div className={styles.desktopLinks}>
           {LINKS.map((link) => (
             <NavLink
@@ -71,6 +77,7 @@ export default function Nav() {
             </NavLink>
           ))}
         </div>
+
       </div>
     </div>
   );

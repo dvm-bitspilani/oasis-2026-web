@@ -11,6 +11,9 @@ const Home = lazy(() => import("../pages/Home"));
 const Registration = lazy(
   () => import("../pages/registration/Registration")
 );
+const Ham = lazy(
+  () => import("../pages/Ham/Ham")
+);
 
 const ComingSoon = lazy(
   () => import("../pages/ComingSoon")
@@ -107,6 +110,10 @@ export default function AppRoutes({
           <Route
             path="/events"
             element={<EventsPage />}
+          />
+          <Route
+            path="/Ham"
+            element={<Ham />}
           />
 
         </Routes>

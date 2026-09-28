@@ -1,0 +1,175 @@
+@font-face {
+  font-family: "Aladin";
+  src: url("../assets/fonts/Aladin-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+.container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  // also fix this, even though we won't rely on it
+  perspective: 1200px;
+  perspective-origin: 50% 40%;
+}
+
+.bgWrapper {
+  position: absolute;
+  top: -8%;
+  left: -3%;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+    z-index: 3;
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+
+.sandBottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+
+  width: 100vw;
+    z-index:6;
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+.sandAbove {
+  position: absolute;
+  bottom: 10%; // adjust this depending on sandBottom's height
+  left: 0;
+
+  width: 100vw;
+
+  z-index: 2;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+.bg{
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  img{
+    display: block;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.board {
+  position: absolute;
+  bottom: 34%; // adjust this depending on sandBottom's height
+  left:26%;
+
+  width: 20vw;
+
+  z-index: 20;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+.board1 {
+  position: absolute;
+  bottom: 34%; // adjust this depending on sandBottom's height
+  right:26%;
+
+  width: 20vw;
+
+  z-index: 20;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+.board2 {
+  position: absolute;
+  bottom: 25%; // adjust this depending on sandBottom's height
+  right:30%;
+
+  width: 20vw;
+
+  z-index: 20;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+.board3 {
+  position: absolute;
+  bottom: 25%; // adjust this depending on sandBottom's height
+  left:30%;
+
+  width: 20vw;
+
+  z-index: 20;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+.board4 {
+  position: absolute;
+  bottom: 15%; // adjust this depending on sandBottom's height
+  left:40%;
+
+  width: 20vw;
+
+  z-index: 20;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+.board,
+.board1,
+.board2,
+.board3,
+.board4 {
+  position: absolute;
+
+  span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    z-index: 2;
+
+    width: 100%;
+    text-align: center;
+
+    font-family: "Aladin", cursive;
+    font-size: clamp(12px, 3vw, 28px);
+    font-weight: 400;
+
+    color: #490101;
+    white-space: nowrap;
+  }
+}
