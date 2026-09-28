@@ -146,6 +146,10 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
     position: absolute;
     inset: 0;
 
+    /* The panel doesn't drag the map, so don't show the grab / grabbing cursor
+       inherited from .mapContainer. */
+    cursor: default;
+
     .pageStuff {
       position: absolute;
       top: 5%;
@@ -183,6 +187,7 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
         list-style: none;
         font-size: 2rem;
         padding: 0;
+        position: relative; /* li.offsetTop is measured from the list (Contact.tsx) */
 
         li {
           margin-bottom: 20px;
@@ -198,6 +203,10 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
             scale: 1.05;
           }
         }
+      }
+
+      h2 {
+        display: none;
       }
     }
   }
@@ -233,19 +242,41 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
 @media screen and (max-width: $mobile-breakpoint) {
   .mapContainer {
     .page {
-      background-image: url(../assets//contact/pageMob.png);
+      /* The parchment is drawn by ::before so it can slide up/down on its own
+         while the back button + heading (in .pageStuff) never move. */
+      background-image: none;
       width: 100vw;
       aspect-ratio: 402/503;
       height: auto;
-      background-position: top;
 
       top: 0;
 
-      //transform: translateY(-50%);
+      /* The box keeps its full height, so its transparent lower part must not
+         swallow map drags while collapsed. Only the parchment and the content
+         (below) take pointer events. */
+      pointer-events: none;
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: url(../assets//contact/pageMob.png) top / cover no-repeat;
+        transform: translateY(-50%); /* collapsed: only half the parchment shows */
+        transition: transform 0.4s ease;
+        will-change: transform;
+        pointer-events: auto;
+      }
+
+      /* "See Less": parchment back at its original position */
+      &.expanded::before {
+        transform: translateY(0);
+      }
 
       .pageStuff {
         top: 0;
         left: 12%;
+        z-index: 1;
+        pointer-events: auto;
 
         a {
           .backBtn {
@@ -260,14 +291,71 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
 
         h1 {
           font-size: 4rem;
+
+          /* Collapsed: nudged up (expanded resets it, see below) */
+          transform: translateY(-30%);
+          transition: transform 0.4s ease;
         }
 
         ul {
           font-size: 1.2rem;
 
+          /* Collapsed: only the first 2 entries show, the rest scroll.
+             --list-collapsed / --list-expanded are measured in Contact.tsx. */
+          box-sizing: border-box;
+          overflow-y: auto;
+          max-height: var(--list-collapsed);
+          /* Collapsed: nudged up by 70% of the COLLAPSED height. Deliberately not
+             translateY(-70%): a % is resolved against the list's current height,
+             which is animating during expand/collapse, so the offset would
+             swell mid-transition and the list would dip up into the h1. This
+             stays a fixed px amount and eases cleanly to 0. */
+          transform: translateY(calc(var(--list-collapsed) * -0.7));
+          transition: max-height 0.4s ease, transform 0.4s ease;
+          touch-action: pan-y; /* lets a finger scroll the list, not the map */
+          overscroll-behavior: contain;
+          scrollbar-width: thin;
+          scrollbar-color: #866D52 transparent;
+
           li {
             margin-bottom: 12px;
           }
+        }
+
+        h2 {
+          display: inline-block;
+          font-family: 'Dancing Script', sans-serif;
+          color: #D3C6C6;
+          text-shadow: 0 0 40px #D3C6C6;
+          cursor: pointer;
+          user-select: none;
+
+          align-self: flex-end;
+          margin: 0;
+          transform: translateY(-200%);
+          transition: transform 0.4s ease;
+        }
+      }
+
+      /* Expanded: everything back to its normal position, every entry
+         visible, no scrollbar */
+      &.expanded .pageStuff {
+        h1 {
+          transform: translateY(0);
+        }
+
+        ul {
+          max-height: var(--list-expanded);
+          transform: translateY(0);
+          scrollbar-width: none;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
+        }
+
+        h2 {
+          transform: translateY(-70%);
         }
       }
     }
