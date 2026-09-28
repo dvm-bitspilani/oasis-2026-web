@@ -1,4 +1,4 @@
-import React from "react";
+
 import DevPage from "./DevPage.tsx";
 import DevPageMobile from "./DevPageMobile.tsx";
 import styles from "../../styles/DevPage/DevPageResponsive.module.scss";

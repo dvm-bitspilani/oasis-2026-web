@@ -1,4 +1,4 @@
-import React from "react";
+
 import styles from "../../styles/DevPage/DevPageMobile.module.scss";
 
 interface CharacterMobileProps {

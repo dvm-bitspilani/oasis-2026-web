@@ -43,7 +43,7 @@
 // Character.displayName = "Character";
 
 // export default Character;
-import React, { forwardRef } from "react";
+import { forwardRef } from "react";
 import styles from "../../styles/DevPage/DevPage.module.scss";
 
 interface CharacterProps {

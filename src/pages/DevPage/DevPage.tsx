@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import gsap from "gsap";
 import Character from "./character";
 import bg from "../../assets/DevPage/bg.png"

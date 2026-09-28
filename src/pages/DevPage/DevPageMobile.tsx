@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import CharacterMobile from "./CharacterMobile";
 import styles from "../../styles/DevPage/Devpagemobile.module.scss";
