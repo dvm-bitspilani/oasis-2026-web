@@ -218,6 +218,14 @@ const desktopAssets = [
 
 ];
 
+
+const fonts = [
+  "Ramadhan",
+  "Syamsiah",
+  "EB",
+  "EB Garamond",
+  "Cinzel",
+];
 const assets = isMobile ? mobileAssets : desktopAssets;
 
 /* ======================================================
@@ -334,6 +342,7 @@ export default function App() {
       {isHome && !preloaderDone && (
         <Preloader
           assets={assets}
+              fonts={fonts}
           onExitStart={handlePreloaderExit}
           onEnter={handleEnter}
         />

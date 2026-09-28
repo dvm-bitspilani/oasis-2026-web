@@ -2281,6 +2281,7 @@ export default function EventsPage() {
             {!eventsPreloaderDone && (
                 <Preloader
                     assets={EVENTS_ASSETS}
+                       fonts={["Syamsiah", "EBGaramond"]}
                     onEnter={handleEventsPreloaderEnter}
                 />
             )}

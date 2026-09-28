@@ -3063,6 +3063,7 @@ const About = () => {
       {!aboutPreloaderDone && (
         <Preloader
           assets={ABOUT_ASSETS}
+           fonts={["EBGaramond"]}
           onEnter={
             handleAboutPreloaderEnter
           }
