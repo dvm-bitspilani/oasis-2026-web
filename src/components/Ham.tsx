@@ -7,7 +7,7 @@ import board from "../assets/ham/board.png";
 import styles from "../styles/Ham.module.scss";
 import guitarBook from "../assets/ham/guitarBook.png";
 import trunkStuff from "../assets/ham/trunkStuff.png";
-
+import bgHome from "../assets/home/bg.jpg"
 const BOARDS = [
     { label: "DEVELOPERS", pos: "board", to: "/comingSoon" },
     { label: "WALL MAG", pos: "board1", to: "/comingSoon" },
@@ -51,6 +51,9 @@ export default function Ham() {
 
             <div className={styles.sandBottom}>
                 <img src={sandBottom} alt="" />
+            </div>
+            <div className={styles.bgHome}>
+                <img src={bgHome} alt="" />
             </div>
 
             <div className={styles.sandAbove}>

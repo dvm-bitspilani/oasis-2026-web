@@ -71,7 +71,7 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
 
 @keyframes lidOpen {
   0% {
-    transform: perspective(1400px) rotateX(-95deg) scale(0.8);
+    transform: perspective(1400px) rotateX(-95deg) scale(0.6);
     filter: brightness(0.6);
   }
 
@@ -83,7 +83,7 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
 
 @keyframes open {
   0% {
-    transform: scale(0.8);
+    transform: scale(0.6);
     filter: brightness(0.6);
   }
 
@@ -99,8 +99,9 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   left: 0;
   width: 100vw;
   z-index: 2;
-  transform-origin: 50% 100%;
-  animation: sandRise $sandTime cubic-bezier(0.22, 1, 0.36, 1)  backwards;
+
+  // back layer: slower, smaller movement
+  animation: sandRevealBack 1.6s cubic-bezier(0.16, 1, 0.3, 1) $sandDelay backwards;
 
   img {
     display: block;
@@ -115,8 +116,9 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   left: 0;
   width: 100vw;
   z-index: 6;
-  transform-origin: 50% 100%;
-  // animation: sandRise $sandTime cubic-bezier(0.22, 1, 0.36, 1) $sandDelay backwards;
+
+  // front layer: faster, bigger movement
+  animation: sandRiseFront 1.1s cubic-bezier(0.16, 1, 0.3, 1) $sandDelay backwards;
 
   img {
     display: block;
@@ -125,16 +127,30 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   }
 }
 
-// grows upward from the bottom edge, 0% -> 100% height
-@keyframes sandRise {
-  from {
-    transform: scaleY(0);
+@keyframes sandRevealBack {
+  0% {
+    // clip-path: inset(0 100% 0 0);
+    transform: translateY(30%);
   }
 
-  to {
-    transform: scaleY(1);
+  100% {
+    // clip-path: inset(0 0 0 0);
+    transform: translateY(0);
   }
 }
+
+@keyframes sandRiseFront {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 
 // no fade-in here anymore, each sign animates itself
 .boards {
@@ -150,11 +166,8 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   text-decoration: none;
   pointer-events: auto;
   transition: filter 0.3s ease;
-  animation:
-    popOut $popTime cubic-bezier(0.3, 0.6, 0.3, 1)
-      calc(#{$popDelay} + (#{$lastIndex} - var(--i, 0)) * #{$popStagger}) backwards,
-    popLift $popTime linear
-      calc(#{$popDelay} + (#{$lastIndex} - var(--i, 0)) * #{$popStagger}) backwards;
+  animation: popOut $popTime cubic-bezier(0.3, 0.6, 0.3, 1)
+    calc(#{$popDelay} + (#{$lastIndex} - var(--i, 0)) * #{$popStagger}) backwards;
 
   &:focus-visible {
     outline: none;
@@ -180,24 +193,6 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
     // one smooth move to the final spot, growing the whole way
     transform: translate(0, 0) scale(1) rotate(0deg);
     opacity: 1;
-  }
-}
-
-// runs at the same time as popOut on the separate `translate` property,
-// so the board arcs up then down as part of the same single motion
-@keyframes popLift {
-  0% {
-    translate: 0 0;
-    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
-  }
-
-  35% {
-    translate: 0 -9vh;
-    animation-timing-function: cubic-bezier(0.5, 0, 0.8, 0.6);
-  }
-
-  100% {
-    translate: 0 0;
   }
 }
 
@@ -340,7 +335,6 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
     transition: none;
   }
 }
-
 .guitarBook {
   position: absolute;
   left: -2%;
@@ -349,7 +343,7 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   overflow: hidden;
   z-index: 3;
 
-  animation: guitarScale 1.5s ease-out forwards;
+  animation: revealFromBottom 1.5s ease-out 0.5s backwards;
 
   img {
     display: block;
@@ -360,15 +354,17 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   }
 }
 
-@keyframes guitarScale {
+@keyframes revealFromBottom {
   from {
-    transform: scale(0.8);
+    clip-path: inset(100% 0 0 0);
   }
 
   to {
-    transform: scale(1);
+    clip-path: inset(0 0 0 0);
   }
 }
+
+
 
 .trunkStuff {
   position: absolute;
