@@ -180,11 +180,11 @@ const mobileAssets = [
 
 ];
 
-import sandBottom from "../assets/ham/sandBottom.png";
-import sandAbove from "../assets/ham/sandAbove.png";
-import board from "../assets/ham/board.png";
-import guitarBook from "../assets/ham/guitarBook.png";
-import trunkStuff from "../assets/ham/trunkStuff.png";
+import sandBottom from "./assets/ham/sandBottom.png";
+import sandAbove from "./assets/ham/sandAbove.png";
+import board from "./assets/ham/board.png";
+import guitarBook from "./assets/ham/guitarBook.png";
+import trunkStuff from "./assets/ham/trunkStuff.png";
 
 const desktopAssets = [
   trunkStuff,
