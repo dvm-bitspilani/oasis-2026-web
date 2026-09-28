@@ -1,70 +1,61 @@
 import { NavLink } from "react-router-dom";
-import bg from "../assets/ham/trunkBg.png";
+import type { CSSProperties } from "react";
+import bg from "../assets/ham/trunkOnly.png";
 import sandBottom from "../assets/ham/sandBottom.png";
 import sandAbove from "../assets/ham/sandAbove.png";
-import styles from "../styles/Ham.module.scss";
-// import homeBg from "../assets/home/bg.jpg";
 import board from "../assets/ham/board.png";
-export default function Ham(){
-  return (
-    <div className={styles.container}>
+import styles from "../styles/Ham.module.scss";
+import guitarBook from "../assets/ham/guitarBook.png";
+import trunkStuff from "../assets/ham/trunkStuff.png";
 
-      <div className={styles.bgWrapper}>
-        <img src={bg} alt="image of a chest" />
-      </div>
+const BOARDS = [
+    { label: "DEVELOPERS", pos: "board", to: "/comingSoon" },
+    { label: "WALL MAG", pos: "board1", to: "/comingSoon" },
+    { label: "SPONSORS", pos: "board3", to: "/comingSoon" },
+    { label: "GALLERY", pos: "board2", to: "/comingSoon" },
+    { label: "MEDIA PARTNERS", pos: "board4", to: "/comingSoon" },
+];
 
-      <NavLink
-        to="/comingSoon"
-        className={styles.board}
-      >
-        <img src={board} alt="board" />
-        <span>DEVELOPERS</span>
-      </NavLink>
+export default function Ham() {
+    return (
+        <div className={styles.container}>
+            {/* chest front stays put, chest top (lid + contents) swings open */}
+            <div className={styles.chestBase} aria-hidden="true">
+                <img src={bg} alt="" />
+            </div>
+            <div className={styles.chestTop}>
+                <img src={bg} alt="An open treasure chest full of scrolls, a lantern and a book" />
+            </div>
+            <div className={styles.guitarBook}>
+                <img src={guitarBook} alt="" />
+            </div>
+            <div className={styles.trunkStuff}>
+                <img src={trunkStuff} alt="" />
+            </div>
 
-      <NavLink
-        to="/comingSoon"
-        className={styles.board1}
-      >
-        <img src={board} alt="board" />
-        <span>WALL MAG</span>
-      </NavLink>
+            <nav className={styles.boards} aria-label="Sections">
+                {BOARDS.map((b, i) => (
+                    <NavLink
+                        key={b.label}
+                        to={b.to}
+                        className={`${styles.sign} ${styles[b.pos]}`}
+                        style={{ "--i": i } as CSSProperties}
+                    >
+                        <div className={styles.plank}>
+                            <img src={board} alt="" />
+                            <span>{b.label}</span>
+                        </div>
+                    </NavLink>
+                ))}
+            </nav>
 
-      <NavLink
-        to="/comingSoon"
-        className={styles.board2}
-      >
-        <img src={board} alt="board" />
-        <span>GALLERY</span>
-      </NavLink>
+            <div className={styles.sandBottom}>
+                <img src={sandBottom} alt="" />
+            </div>
 
-      <NavLink
-        to="/comingSoon"
-        className={styles.board3}
-      >
-        <img src={board} alt="board" />
-        <span>SPONSORS</span>
-      </NavLink>
-
-      <NavLink
-        to="/comingSoon"
-        className={styles.board4}
-      >
-        <img src={board} alt="board" />
-        <span>MEDIA PARTNERS</span>
-      </NavLink>
-
-      <div className={styles.sandBottom}>
-        <img src={sandBottom} alt="sand beneath the chest" />
-      </div>
-
-      <div className={styles.sandAbove}>
-        <img src={sandAbove} alt="sand above the chest" />
-      </div>
-
-      {/* <div className={styles.bg}>
-        <img src={homeBg} alt="background" />
-      </div> */}
-
-    </div>
-  );
-};
+            <div className={styles.sandAbove}>
+                <img src={sandAbove} alt="" />
+            </div>
+        </div>
+    );
+}

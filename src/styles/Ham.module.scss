@@ -3,25 +3,49 @@
   src: url("../assets/fonts/Aladin-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
+
+$split: 51%;
+$openDelay: 0.1s;
+$openTime: 2.5s;
+
+// board pop-out timing
+$popDelay: 1.2s;   // when the first board starts (lid is mostly open by then)
+$popStagger: 0.15s;
+$popTime: 0.9s;
+$sandTime: 1.2s;
+$sandDelay: 0.1s;
+$lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
+
 .container {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
   position: relative;
-  // also fix this, even though we won't rely on it
-  perspective: 1200px;
-  perspective-origin: 50% 40%;
+  animation: fadeIn 0.6s ease-out;
 }
 
-.bgWrapper {
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.chestBase,
+.chestTop {
   position: absolute;
   top: -8%;
-  left: -3%;
+  // left: -3%;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-    z-index: 3;
+  z-index: 3;
+
   img {
     display: block;
     width: 100%;
@@ -31,28 +55,68 @@
   }
 }
 
+.chestBase {
+  z-index: 4;
+  clip-path: inset(calc(#{$split} - 0.3%) 0 0 0);
+  animation: open $openTime cubic-bezier(0.22, 1, 0.36, 1) $openDelay backwards;
+}
+
+.chestTop {
+  clip-path: inset(0 0 #{100% - $split} 0);
+  transform-origin: 50% $split;
+  backface-visibility: hidden;
+  will-change: transform, filter;
+  animation: lidOpen $openTime cubic-bezier(0.22, 1, 0.36, 1) $openDelay backwards;
+}
+
+@keyframes lidOpen {
+  0% {
+    transform: perspective(1400px) rotateX(-95deg) scale(0.8);
+    filter: brightness(0.6);
+  }
+
+  100% {
+    transform: perspective(1400px) rotateX(0deg);
+    filter: brightness(1);
+  }
+}
+
+@keyframes open {
+  0% {
+    transform: scale(0.8);
+    filter: brightness(0.6);
+  }
+
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+.sandAbove {
+  position: absolute;
+  bottom: 10%;
+  left: 0;
+  width: 100vw;
+  z-index: 2;
+  transform-origin: 50% 100%;
+  animation: sandRise $sandTime cubic-bezier(0.22, 1, 0.36, 1)  backwards;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
 
 .sandBottom {
   position: absolute;
   bottom: 0;
   left: 0;
-
   width: 100vw;
-    z-index:6;
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-}
-.sandAbove {
-  position: absolute;
-  bottom: 10%; // adjust this depending on sandBottom's height
-  left: 0;
-
-  width: 100vw;
-
-  z-index: 2;
+  z-index: 6;
+  transform-origin: 50% 100%;
+  // animation: sandRise $sandTime cubic-bezier(0.22, 1, 0.36, 1) $sandDelay backwards;
 
   img {
     display: block;
@@ -60,116 +124,278 @@
     height: auto;
   }
 }
-.bg{
-  width: 100vw;
-  height: 100vh;
-  z-index: 1;
-  img{
-    display: block;
-    height: 100%;
-    width: 100%;
+
+// grows upward from the bottom edge, 0% -> 100% height
+@keyframes sandRise {
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
   }
 }
 
-.board {
+// no fade-in here anymore, each sign animates itself
+.boards {
   position: absolute;
-  bottom: 34%; // adjust this depending on sandBottom's height
-  left:26%;
-
-  width: 20vw;
-
+  inset: 0;
   z-index: 20;
-
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
+  pointer-events: none;
 }
-.board1 {
-  position: absolute;
-  bottom: 34%; // adjust this depending on sandBottom's height
-  right:26%;
 
+.sign {
+  position: absolute;
   width: 20vw;
+  text-decoration: none;
+  pointer-events: auto;
+  transition: filter 0.3s ease;
+  animation:
+    popOut $popTime cubic-bezier(0.3, 0.6, 0.3, 1)
+      calc(#{$popDelay} + (#{$lastIndex} - var(--i, 0)) * #{$popStagger}) backwards,
+    popLift $popTime linear
+      calc(#{$popDelay} + (#{$lastIndex} - var(--i, 0)) * #{$popStagger}) backwards;
 
-  z-index: 20;
+  &:focus-visible {
+    outline: none;
+
+    .plank img {
+      filter: brightness(1.15) drop-shadow(0 0 0.8vw rgba(255, 190, 80, 0.85));
+    }
+  }
+}
+
+@keyframes popOut {
+  0% {
+    // start small, inside the chest
+    transform: translate(var(--dx), var(--dy)) scale(0.1) rotate(var(--rot));
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    // one smooth move to the final spot, growing the whole way
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+// runs at the same time as popOut on the separate `translate` property,
+// so the board arcs up then down as part of the same single motion
+@keyframes popLift {
+  0% {
+    translate: 0 0;
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+
+  35% {
+    translate: 0 -9vh;
+    animation-timing-function: cubic-bezier(0.5, 0, 0.8, 0.6);
+  }
+
+  100% {
+    translate: 0 0;
+  }
+}
+
+.plank {
+  position: relative;
+  transform-origin: 50% 0;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 
   img {
     display: block;
     width: 100%;
     height: auto;
+    transition: filter 0.3s ease;
   }
-}
-.board2 {
-  position: absolute;
-  bottom: 25%; // adjust this depending on sandBottom's height
-  right:30%;
-
-  width: 20vw;
-
-  z-index: 20;
-
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-}
-.board3 {
-  position: absolute;
-  bottom: 25%; // adjust this depending on sandBottom's height
-  left:30%;
-
-  width: 20vw;
-
-  z-index: 20;
-
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-}
-.board4 {
-  position: absolute;
-  bottom: 15%; // adjust this depending on sandBottom's height
-  left:40%;
-
-  width: 20vw;
-
-  z-index: 20;
-
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-}
-.board,
-.board1,
-.board2,
-.board3,
-.board4 {
-  position: absolute;
 
   span {
     position: absolute;
     top: 50%;
     left: 50%;
-
     transform: translate(-50%, -50%);
-
     z-index: 2;
-
     width: 100%;
     text-align: center;
-
     font-family: "Aladin", cursive;
     font-size: clamp(12px, 3vw, 28px);
     font-weight: 400;
-
     color: #490101;
     white-space: nowrap;
+    pointer-events: none;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+  }
+}
+
+@media (hover: hover) {
+  .sign:hover {
+    z-index: 30;
+
+    .plank {
+      transform: translateY(-6px);
+      animation: swing 0.9s ease-in-out;
+
+      img {
+        filter: brightness(1.15) drop-shadow(0 0 0.8vw rgba(255, 190, 80, 0.85));
+      }
+
+      span {
+        color: #2a0000;
+        text-shadow: 0 0 8px rgba(255, 220, 140, 0.9);
+      }
+    }
+  }
+
+  .boards:has(.sign:hover) .sign:not(:hover) {
+    filter: brightness(0.7) saturate(0.8);
+  }
+}
+
+.sign:active .plank {
+  transform: translateY(0) scale(0.97);
+}
+
+@keyframes swing {
+  0% {
+    transform: translateY(-6px) rotate(0);
+  }
+
+  20% {
+    transform: translateY(-6px) rotate(3deg);
+  }
+
+  40% {
+    transform: translateY(-6px) rotate(-2deg);
+  }
+
+  60% {
+    transform: translateY(-6px) rotate(1deg);
+  }
+
+  100% {
+    transform: translateY(-6px) rotate(0);
+  }
+}
+
+// --dx / --dy: offset from final spot back to the chest opening
+// --rot: starting tilt
+.board {
+  bottom: 34%;
+  left: 26%;
+  --dx: 14vw;
+  --dy: -12vh;
+  --rot: -25deg;
+}
+
+.board1 {
+  bottom: 34%;
+  right: 26%;
+  --dx: -14vw;
+  --dy: -12vh;
+  --rot: 25deg;
+}
+
+.board2 {
+  bottom: 25%;
+  right: 30%;
+  --dx: -10vw;
+  --dy: -22vh;
+  --rot: 18deg;
+}
+
+.board3 {
+  bottom: 25%;
+  left: 30%;
+  --dx: 10vw;
+  --dy: -22vh;
+  --rot: -18deg;
+}
+
+.board4 {
+  bottom: 15%;
+  left: 40%;
+  --dx: 0;
+  --dy: -32vh;
+  --rot: 10deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .container,
+  .chestTop,
+  .chestBase,
+  .sandAbove,
+  .sandBottom,
+  .sign {
+    animation: none;
+  }
+
+  .plank,
+  .sign:hover .plank {
+    animation: none;
+    transition: none;
+  }
+}
+
+.guitarBook {
+  position: absolute;
+  left: -2%;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 3;
+
+  animation: guitarScale 1.5s ease-out forwards;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+@keyframes guitarScale {
+  from {
+    transform: scale(0.8);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+.trunkStuff {
+  position: absolute;
+  left: 12%;
+  bottom: 15%;
+  width: 70vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 3;
+
+  animation: trunkUp 1.5s ease-out forwards;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+@keyframes trunkUp {
+  from {
+    transform: translateY(8%) scale(0.6);
+  }
+
+  to {
+    transform: translateY(0) scale(1);
   }
 }
