@@ -181,7 +181,8 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
 @keyframes popOut {
   0% {
     // start small, inside the chest
-    transform: translate(var(--dx), var(--dy)) scale(0.1) rotate(var(--rot));
+    // transform: translate(var(--dx), var(--dy)) scale(0.1) rotate(var(--rot));
+    transform: scale(0.6);
     opacity: 0;
   }
 
@@ -191,7 +192,8 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
 
   100% {
     // one smooth move to the final spot, growing the whole way
-    transform: translate(0, 0) scale(1) rotate(0deg);
+    // transform: translate(0, 0) scale(1) rotate(0deg);
+    transform: scale(1);
     opacity: 1;
   }
 }
@@ -281,41 +283,41 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
 .board {
   bottom: 34%;
   left: 26%;
-  --dx: 14vw;
-  --dy: -12vh;
-  --rot: -25deg;
+  // --dx: 14vw;
+  // --dy: -12vh;
+  // --rot: -25deg;
 }
 
 .board1 {
   bottom: 34%;
   right: 26%;
-  --dx: -14vw;
-  --dy: -12vh;
-  --rot: 25deg;
+  // --dx: -14vw;
+  // --dy: -12vh;
+  // --rot: 25deg;
 }
 
 .board2 {
   bottom: 25%;
   right: 30%;
-  --dx: -10vw;
-  --dy: -22vh;
-  --rot: 18deg;
+  // --dx: -10vw;
+  // --dy: -22vh;
+  // --rot: 18deg;
 }
 
 .board3 {
   bottom: 25%;
   left: 30%;
-  --dx: 10vw;
-  --dy: -22vh;
-  --rot: -18deg;
+  // --dx: 10vw;
+  // --dy: -22vh;
+  // --rot: -18deg;
 }
 
 .board4 {
   bottom: 15%;
   left: 40%;
-  --dx: 0;
-  --dy: -32vh;
-  --rot: 10deg;
+  // --dx: 0;
+  // --dy: -32vh;
+  // --rot: 10deg;
 }
 
 @media (prefers-reduced-motion: reduce) {
