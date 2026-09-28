@@ -7,12 +7,9 @@ import { TransitionProvider } from "../context/TransitionProvider";
 // ======================================================
 
 const Home = lazy(() => import("../pages/Home"));
-
+// import Ham from "../pages/Ham/Ham.jsx"
 const Registration = lazy(
   () => import("../pages/registration/Registration")
-);
-const Ham = lazy(
-  () => import("../pages/Ham/Ham")
 );
 
 const ComingSoon = lazy(
@@ -111,10 +108,7 @@ export default function AppRoutes({
             path="/events"
             element={<EventsPage />}
           />
-          <Route
-            path="/Ham"
-            element={<Ham />}
-          />
+          
 
         </Routes>
       </Suspense>

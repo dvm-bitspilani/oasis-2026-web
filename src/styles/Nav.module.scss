@@ -2,78 +2,165 @@
   position: absolute;
   top: 24px;
   left: -2%;
+
   width: 100vw;
   height: 10vh;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 0 24px;
   margin-left: 5%;
+
   z-index: 5000;
 }
 
-.rectangle {
-  height: 100%;
-  width: 40%;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  gap: 1.5rem;
-  padding: 0.75rem 1.5rem;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-image: url("../assets/navSan.svg");
-  font-family: "Lentera Ramadhan", sans-serif;
-  color: #eed8af;
-  margin-right: 5%;
-  box-sizing: border-box;
-}
+/* =========================================================
+   CIRCLE
+========================================================= */
 
 .circle {
   height: 100%;
   aspect-ratio: 1 / 1;
+
   background-image: url("../assets/navCircle.svg");
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-color: transparent;
   gap: 6px;
-  // opacity: 0;
+
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  cursor: pointer;
+
+  position: relative;
+  z-index: 5002;
+
+  appearance: none;
+
+  transition: transform 200ms ease;
 
   img {
     width: 40%;
     height: auto;
     display: block;
+
+    pointer-events: none;
+
+    transition:
+      transform 350ms ease,
+      opacity 250ms ease;
   }
 }
 
 /* =========================================================
-   NAV LINK
-   Scoped to this module via a class (not a bare `a` selector)
-   so the text-shadow / transparent-text treatment only ever
-   applies to links rendered inside this Nav component.
+   THREE LINES → X
+========================================================= */
+
+.circleOpen {
+  gap: 0;
+
+  img {
+    position: absolute;
+  }
+
+  /* TOP LINE */
+  img:nth-child(1) {
+    transform: rotate(45deg);
+  }
+
+  /* MIDDLE LINE */
+  img:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  /* BOTTOM LINE */
+  img:nth-child(3) {
+    transform: rotate(-45deg);
+  }
+}
+
+/* =========================================================
+   NORMAL NAVBAR
+========================================================= */
+
+.rectangle {
+  height: 100%;
+  width: 40%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  gap: 1.5rem;
+  padding: 0.75rem 1.5rem;
+
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url("../assets/navSan.svg");
+
+  font-family: "Lentera Ramadhan", sans-serif;
+  color: #eed8af;
+
+  margin-right: 5%;
+
+  box-sizing: border-box;
+
+  transition:
+    opacity 300ms ease,
+    visibility 300ms ease,
+    transform 300ms ease;
+}
+
+/* Hide navbar when Ham is open */
+.rectangleHidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform: translateY(-20px);
+}
+
+/* =========================================================
+   NAV LINKS
 ========================================================= */
 
 .navLink {
   text-decoration: none;
+
   color: transparent;
+
   font-size: clamp(0.55rem, 3vw, 1.3rem);
+
   font-family: "Ramadhan", sans-serif;
+
   -webkit-background-clip: text;
   background-clip: text;
+
   background-color: #000;
+
   text-shadow: 0 -2.5px 0 #eed8af;
+
   white-space: nowrap;
 }
 
 .rectangle .navLink {
   display: inline-block;
   flex-shrink: 1;
+
   transition: transform 200ms ease;
+
   transform-origin: center;
 
   &:hover,
@@ -89,55 +176,102 @@
 
 .desktopLinks {
   width: 100%;
+
   display: flex;
   align-items: center;
   justify-content: space-around;
+
   gap: 1.5rem;
+
   flex-wrap: nowrap;
   white-space: nowrap;
 }
 
-/* Tablet */
+/* =========================================================
+   HAM OVERLAY
+========================================================= */
+
+.hamOverlay {
+  position: fixed;
+  inset: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  overflow: hidden;
+
+  z-index: 4000;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
 @media (min-width: 751px) and (max-width: 1100px) {
   .container {
     position: absolute;
     top: 24px;
     left: -50%;
+
     width: 150vw;
     height: 10vh;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     padding: 0 24px;
     margin-left: 5%;
+
     z-index: 5000;
   }
 }
 
-/* Mobile */
+/* =========================================================
+   MOBILE
+========================================================= */
+
 @media (max-width: 650px) {
   .container {
     position: absolute;
+
     top: 24px;
+
     left: 50%;
     right: auto;
+
     transform: translateX(-55%);
 
     width: 100%;
     max-width: 624px;
+
     height: clamp(36px, 10vw, 65px);
 
     margin-left: 0;
     padding: 0;
+
     box-sizing: border-box;
+
+    z-index: 5000;
+  }
+
+  .circle {
+    height: 100%;
+    aspect-ratio: 1 / 1;
+
+    flex-shrink: 0;
+
+    z-index: 5002;
   }
 
   .rectangle {
     width: 96vw;
     max-width: 624px;
+
     height: 100%;
 
     margin: 0;
+
     padding: 0 clamp(0.25rem, 1.5vw, 1rem);
 
     display: flex;
@@ -145,6 +279,7 @@
     justify-content: center;
 
     box-sizing: border-box;
+
     overflow: visible;
   }
 
@@ -158,13 +293,17 @@
 
     flex-wrap: nowrap;
     white-space: nowrap;
+
     gap: clamp(0.25rem, 1.5vw, 1rem);
+
     min-width: 0;
   }
 
   .navLink {
     font-size: clamp(0.6rem, 3.2vw, 1.2rem);
+
     white-space: nowrap;
+
     margin-top: 1.5%;
   }
 
