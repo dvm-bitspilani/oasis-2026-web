@@ -5,7 +5,7 @@ import sandAbove from "../assets/ham/sandAbove.png";
 import styles from "../styles/Ham.module.scss";
 // import homeBg from "../assets/home/bg.jpg";
 import board from "../assets/ham/board.png";
-export default function Ham  (){
+export default function Ham(){
   return (
     <div className={styles.container}>
 

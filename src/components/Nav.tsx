@@ -4,7 +4,7 @@ import { useState } from "react";
 import styles from "../styles/Nav.module.scss";
 import navLine from "../assets/hamLine.svg";
 import { useTransition } from "../context/TransitionProvider";
-import Ham from "./Ham";
+import Ham from "./Ham"
 
 const LINKS = [
   { label: "Home", to: "/" },
