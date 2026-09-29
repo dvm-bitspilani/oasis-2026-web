@@ -7,16 +7,25 @@
 }
 
 $split: 51%;
-$openDelay: 0.1s;
-$openTime: 2.5s;
 
-// board pop-out timing
-$popDelay: 1.2s;   // when the first board starts (lid is mostly open by then)
+// Background reveal
+$bgTime: 2.4s;
+$bgDelay: 1.2s;
+
+// 1) Sand plays first
+$sandDelay: 0.1s;
+$sandBackTime: 1.6s;
+$sandFrontTime: 1.1s;
+
+// 2) Chest rises from the bottom (starts before the sand fully finishes)
+$openDelay: $sandDelay + $sandBackTime - 1.5s; // 0.7s
+$openTime: 4s;
+
+// 3) Signs pop while the chest is opening
+$popDelay: $openDelay + 1.1s; // 1.8s
 $popStagger: 0.15s;
 $popTime: 0.9s;
-$sandTime: 1.2s;
-$sandDelay: 0.1s;
-$lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
+$lastIndex: 4;
 
 .container {
   width: 100vw;
@@ -36,11 +45,64 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   }
 }
 
+/* ---------- Background ---------- */
+
+.bgHome {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  will-change: clip-path;
+  backface-visibility: hidden;
+  transform: translateZ(0); // keeps it on its own GPU layer
+  animation: bgIris $bgTime cubic-bezier(0.65, 0, 0.35, 1) $bgDelay both;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  // dimming via a cheap opacity overlay instead of animating filter
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #000;
+    pointer-events: none;
+    animation: bgDim $bgTime cubic-bezier(0.65, 0, 0.35, 1) $bgDelay both;
+  }
+}
+
+@keyframes bgIris {
+  from {
+    clip-path: circle(0% at 80% 80%);
+  }
+
+  to {
+    clip-path: circle(150% at 50% 50%); // comfortably past the corners
+  }
+}
+
+@keyframes bgDim {
+  from {
+    opacity: 0.5;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- Chest ---------- */
+
 .chestBase,
 .chestTop {
   position: absolute;
   top: -8%;
-  // left: -3%;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -69,29 +131,44 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   animation: lidOpen $openTime cubic-bezier(0.22, 1, 0.36, 1) $openDelay backwards;
 }
 
-@keyframes lidOpen {
-  0% {
-    transform: perspective(1400px) rotateX(-85deg) scale(0.6);
-    filter: brightness(0.6);
-  }
-
-  100% {
-    transform: perspective(1400px) rotateX(0deg);
-    filter: brightness(1);
-  }
-}
-
+// Both keyframes use the same transform function order so they interpolate cleanly
 @keyframes open {
   0% {
-    transform: scale(0.6);
+    transform: translateY(90%) scale(0.2);
     filter: brightness(0.6);
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
   }
 
   100% {
-    transform: scale(1);
+    transform: translateY(0) scale(1);
     filter: brightness(1);
+    opacity: 1;
   }
 }
+
+@keyframes lidOpen {
+  0% {
+    transform: translateY(90%) perspective(1400px) rotateX(-195deg) scale(0.2);
+    filter: brightness(0.6);
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(0) perspective(1400px) rotateX(0deg) scale(1);
+    filter: brightness(1);
+    opacity: 1;
+  }
+}
+
+/* ---------- Sand ---------- */
 
 .sandAbove {
   position: absolute;
@@ -99,9 +176,7 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   left: 0;
   width: 100vw;
   z-index: 2;
-
-  // back layer: slower, smaller movement
-  animation: sandRevealBack 1.6s cubic-bezier(0.16, 1, 0.3, 1) $sandDelay backwards;
+  animation: sandRevealBack $sandBackTime cubic-bezier(0.16, 1, 0.3, 1) $sandDelay backwards;
 
   img {
     display: block;
@@ -116,9 +191,7 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   left: 0;
   width: 100vw;
   z-index: 6;
-
-  // front layer: faster, bigger movement
-  animation: sandRiseFront 1.1s cubic-bezier(0.16, 1, 0.3, 1) $sandDelay backwards;
+  animation: sandRiseFront $sandFrontTime cubic-bezier(0.16, 1, 0.3, 1) $sandDelay backwards;
 
   img {
     display: block;
@@ -129,12 +202,10 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
 
 @keyframes sandRevealBack {
   0% {
-    // clip-path: inset(0 100% 0 0);
     transform: translateY(30%);
   }
 
   100% {
-    // clip-path: inset(0 0 0 0);
     transform: translateY(0);
   }
 }
@@ -151,8 +222,8 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   }
 }
 
+/* ---------- Signs ---------- */
 
-// no fade-in here anymore, each sign animates itself
 .boards {
   position: absolute;
   inset: 0;
@@ -180,8 +251,6 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
 
 @keyframes popOut {
   0% {
-    // start small, inside the chest
-    // transform: translate(var(--dx), var(--dy)) scale(0.1) rotate(var(--rot));
     transform: scale(0.6);
     opacity: 0;
   }
@@ -191,8 +260,6 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   }
 
   100% {
-    // one smooth move to the final spot, growing the whole way
-    // transform: translate(0, 0) scale(1) rotate(0deg);
     transform: scale(1);
     opacity: 1;
   }
@@ -278,65 +345,33 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   }
 }
 
-// --dx / --dy: offset from final spot back to the chest opening
-// --rot: starting tilt
 .board {
   bottom: 34%;
   left: 26%;
-  // --dx: 14vw;
-  // --dy: -12vh;
-  // --rot: -25deg;
 }
 
 .board1 {
   bottom: 34%;
   right: 26%;
-  // --dx: -14vw;
-  // --dy: -12vh;
-  // --rot: 25deg;
 }
 
 .board2 {
   bottom: 25%;
   right: 30%;
-  // --dx: -10vw;
-  // --dy: -22vh;
-  // --rot: 18deg;
 }
 
 .board3 {
   bottom: 25%;
   left: 30%;
-  // --dx: 10vw;
-  // --dy: -22vh;
-  // --rot: -18deg;
 }
 
 .board4 {
   bottom: 15%;
   left: 40%;
-  // --dx: 0;
-  // --dy: -32vh;
-  // --rot: 10deg;
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* ---------- Chest contents ---------- */
 
-  .container,
-  .chestTop,
-  .chestBase,
-  .sandAbove,
-  .sandBottom,
-  .sign {
-    animation: none;
-  }
-
-  .plank,
-  .sign:hover .plank {
-    animation: none;
-    transition: none;
-  }
-}
 .guitarBook {
   position: absolute;
   left: -2%;
@@ -344,8 +379,7 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   height: 100vh;
   overflow: hidden;
   z-index: 3;
-
-  animation: revealFromBottom 1.5s ease-out backwards;
+  animation: revealFromBottom 1.5s ease-out 1.3s backwards;
 
   img {
     display: block;
@@ -359,13 +393,14 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
 @keyframes revealFromBottom {
   from {
     transform: translateY(10%) scale(0.6);
+    opacity: 0;
   }
 
   to {
     transform: translateY(0) scale(1);
+    opacity: 1;
   }
 }
-
 
 .trunkStuff {
   position: absolute;
@@ -375,8 +410,7 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   height: 100vh;
   overflow: hidden;
   z-index: 3;
-
-  animation: trunkUp 1.5s ease-out forwards;
+  animation: trunkUp 1.5s ease-out ($openDelay + 0.6s) backwards;
 
   img {
     display: block;
@@ -389,10 +423,35 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
 
 @keyframes trunkUp {
   from {
-    transform: translateY(25%) scale(0.6);
+    transform: translateY(75%) scale(0.6);
+    opacity: 0;
   }
 
   to {
     transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .container,
+  .bgHome,
+  .bgHome::after,
+  .chestTop,
+  .chestBase,
+  .sandAbove,
+  .sandBottom,
+  .sign,
+  .guitarBook,
+  .trunkStuff {
+    animation: none;
+  }
+
+  .plank,
+  .sign:hover .plank {
+    animation: none;
+    transition: none;
   }
 }
