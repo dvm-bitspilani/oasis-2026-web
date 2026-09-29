@@ -615,9 +615,10 @@
   );
 }
 
-@media screen and (max-width: 1530px) {
+
+@media screen and (max-width: 1730px) {
   .regBtn {
-    --carpet-scale: 0.6;
+    --carpet-scale: 0.7;
   }
 }
 
@@ -633,28 +634,28 @@
   }
 }
 
-@media screen and (max-width: 577px) {
-  .regBtn {
-    scale: 1.2;
+@media screen and (min-width: 1000px) and (max-width: 1300px){
+// .castle{
+//   position: absolute;
+//   transform: translateX(-50%);
+//   left: 18%;
+//   width: 50%;
+  
+// }
+.regBtn {
+    scale: 1.0;
     --carpet-x: 1%;
     --carpet-y: -7%;
-    --carpet-scale: 0.75;
-
-    .regBtnText {
-      top: 21%;
-    }
+    --carpet-scale: 0.7;
   }
 }
-
-
-
 
 /* =========================================================
    TABLET = EXACT MOBILE LAYOUT
    ONLY 751px - 1100px
    ========================================================= */
 
-@media screen and (min-width: 751px) and (max-width: 1100px) {
+@media screen and (min-width: 651px) and (max-width: 1000px) {
 
   /* -------------------------------------------------------
      SCREEN
@@ -979,3 +980,133 @@ right: 8%;
     display: none;
   }
 }
+
+
+
+@media (max-width: 650px) {
+
+  .castle {
+    width: clamp(340px, 100vw, 480px);
+    left: 0;
+    transform: none;
+    bottom: 39%;
+    width: 100vw;
+  }
+  .camelLand2{
+    right:-3%;
+    bottom:23%;
+    opacity: 1;
+    left: auto;
+    
+    img{
+      width:80%;
+      height:80%;
+    }
+
+  }
+  .camelLand{
+    right:25%;
+    bottom: 20%;
+    left:auto;
+    opacity: 1;
+
+
+    img{
+      width:90%;
+      height:80%;
+    }
+  }
+
+
+  .sand {
+    height: 46%;
+    width: 100vw;
+  }
+
+  .moon {
+    width: clamp(320px, 100vw, 460px);
+    left: 50%;
+    bottom: 30%;
+  }
+
+  .oasisLogo {
+    position: absolute;
+    bottom: 12%;
+    left: 5%;
+
+    height: clamp(160px, 50vh, 320px);
+    width: clamp(160px, 50vw, 320px);
+
+    z-index: 10;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+  }
+
+  .regBtn {
+    position: absolute;
+
+    height: clamp(300px, 70vh, 480px);
+    width: clamp(260px, 70vw, 420px);
+
+    z-index: 10;
+     top :auto;
+    bottom: -20%;
+    left: 18%;
+    right: auto;
+
+    img {
+      width: 90%;
+      height: 90%;
+      object-fit: contain;
+      display: block;
+    }
+  }
+
+  .regBtn:hover img {
+    animation: none;
+    filter: none;
+  }
+
+  .regBtn:active img {
+    animation: none;
+
+    filter: drop-shadow(
+      0 0 6px rgba(254, 213, 155, 0.4)
+    );
+  }
+
+  /* =====================================================
+     MOBILE CAMELS
+     ===================================================== */
+
+
+
+  .links {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .regBtn {
+    scale: 1.2;
+    --carpet-x: 1%;
+    --carpet-y: -7%;
+    --carpet-scale: 0.75;
+&::after{
+  left: -4%;
+  top: -8%;
+  width: 93%;
+}
+    .regBtnText {
+      top: 17%;
+      left: 10%;
+    }
+  }
+}
+
+
