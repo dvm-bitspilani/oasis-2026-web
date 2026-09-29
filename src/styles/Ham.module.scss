@@ -71,7 +71,7 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
 
 @keyframes lidOpen {
   0% {
-    transform: perspective(1400px) rotateX(-95deg) scale(0.6);
+    transform: perspective(1400px) rotateX(-85deg) scale(0.6);
     filter: brightness(0.6);
   }
 
@@ -345,7 +345,7 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
   overflow: hidden;
   z-index: 3;
 
-  animation: revealFromBottom 1.5s ease-out 0.5s backwards;
+  animation: revealFromBottom 1.5s ease-out backwards;
 
   img {
     display: block;
@@ -358,14 +358,13 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
 
 @keyframes revealFromBottom {
   from {
-    clip-path: inset(100% 0 0 0);
+    transform: translateY(10%) scale(0.6);
   }
 
   to {
-    clip-path: inset(0 0 0 0);
+    transform: translateY(0) scale(1);
   }
 }
-
 
 
 .trunkStuff {
@@ -390,7 +389,7 @@ $lastIndex: 4;     // number of boards minus 1 (5 boards -> 4)
 
 @keyframes trunkUp {
   from {
-    transform: translateY(8%) scale(0.6);
+    transform: translateY(25%) scale(0.6);
   }
 
   to {
