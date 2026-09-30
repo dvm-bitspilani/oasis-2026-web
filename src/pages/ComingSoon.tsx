@@ -5,10 +5,9 @@ import gsap from "gsap";
 import styles from "../styles/ComingSoon.module.scss";
 
 const bg =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/086ee623dc5facfe1545894c42f50d8ec74859c9.jpg";
+  "https://res.cloudinary.com/bhfhuzru/image/upload/v1790465230/bg.jpg";
 
-const sandImg =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/Sand2.png";
+import sandImg from "../assets/Sand2.png" 
 
 const cloudSmall =
   "https://res.cloudinary.com/bhfhuzru/image/upload/cloudSmall.svg";
@@ -26,8 +25,7 @@ import ShootingStars from "../components/ShootingStars";
 
 import { useTransition } from "../context/TransitionProvider";
 
-const goHomeIcon =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/goHome.svg";
+import goHomeIcon from "../assets/goHome.svg";
 type Cloud = {
   id: string;
   src: string;

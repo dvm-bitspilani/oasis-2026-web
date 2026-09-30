@@ -180,7 +180,18 @@ const mobileAssets = [
 
 ];
 
+import sandBottom from "./assets/ham/sandBottom.png";
+import sandAbove from "./assets/ham/sandAbove.png";
+import board from "./assets/ham/board.png";
+import guitarBook from "./assets/ham/guitarBook.png";
+import trunkStuff from "./assets/ham/trunkStuff.png";
+
 const desktopAssets = [
+  trunkStuff,
+  guitarBook,
+  sandAbove,
+  board,
+  sandBottom,
   video,
   camel1,
   camel2,
@@ -218,6 +229,14 @@ const desktopAssets = [
 
 ];
 
+
+const fonts = [
+  "Ramadhan",
+  "Syamsiah",
+  "EB",
+  "EB Garamond",
+  "Cinzel",
+];
 const assets = isMobile ? mobileAssets : desktopAssets;
 
 /* ======================================================
@@ -334,6 +353,7 @@ export default function App() {
       {isHome && !preloaderDone && (
         <Preloader
           assets={assets}
+              fonts={fonts}
           onExitStart={handlePreloaderExit}
           onEnter={handleEnter}
         />

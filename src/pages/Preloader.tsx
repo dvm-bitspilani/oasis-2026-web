@@ -5,6 +5,7 @@ import bg from "../assets/preloader/bg_star.webp"
 // import light3 from "../assets/preloader/light3.svg"
 interface PreloaderProps {
   assets?: string[];
+  fonts?: string[]; // NEW, optional
   onEnter: () => void;
   onExitStart?: () => void;
 }
@@ -152,8 +153,18 @@ function makeGlowSprite(size = 64) {
   return c;
 }
 
+function loadFont(spec: string, timeoutMs = 8000): Promise<void> {
+  if (typeof document === "undefined" || !("fonts" in document)) {
+    return Promise.resolve();
+  }
+  return Promise.race([
+    document.fonts.load(spec).then(() => undefined),
+    new Promise<void>((resolve) => setTimeout(resolve, timeoutMs)),
+  ]).catch(() => undefined);
+}
 export default function Preloader({
   assets = [],
+  fonts = [],
   onEnter,
   onExitStart,
 }: PreloaderProps) {
@@ -178,21 +189,26 @@ export default function Preloader({
   const enteredRef = useRef(false);
   const exitRef = useRef(false);
 
-  const progressRef = useRef(assets.length === 0 ? 1 : 0);
+  // images + fonts both count toward progress
+  const totalItems = assets.length + fonts.length;
+
+  const progressRef = useRef(totalItems === 0 ? 1 : 0);
   const logoCompleteRef = useRef(false);
   const [assetProgress, setAssetProgress] = useState(
-    assets.length === 0 ? 1 : 0,
+    totalItems === 0 ? 1 : 0,
   );
 
   const [exiting, setExiting] = useState(false);
 
   /*
-  * LOAD ASSETS
+  * LOAD ASSETS + FONTS
   */
   useEffect(() => {
     startRef.current = performance.now();
 
-    if (!assets.length) {
+    const total = assets.length + fonts.length;
+
+    if (!total) {
       progressRef.current = 1;
       setAssetProgress(1);
       return;
@@ -205,33 +221,39 @@ export default function Preloader({
       loaded++;
 
       if (!cancelled) {
-        const p = loaded / assets.length;
+        const p = loaded / total;
 
         progressRef.current = p;
         setAssetProgress(p);
       }
     };
 
-    Promise.all(
-      assets.map(
-        (src) =>
-          new Promise<void>((resolve) => {
-            const img = new Image();
+    const imagePromises = assets.map(
+      (src) =>
+        new Promise<void>((resolve) => {
+          const img = new Image();
 
-            img.onload = () => {
-              mark();
-              resolve();
-            };
+          img.onload = () => {
+            mark();
+            resolve();
+          };
 
-            img.onerror = () => {
-              mark();
-              resolve();
-            };
+          img.onerror = () => {
+            mark();
+            resolve();
+          };
 
-            img.src = src;
-          }),
-      ),
-    ).then(() => {
+          img.src = src;
+        }),
+    );
+
+    const fontPromises = fonts.map((spec) =>
+      loadFont(spec).then(() => {
+        mark();
+      }),
+    );
+
+    Promise.all([...imagePromises, ...fontPromises]).then(() => {
       if (!cancelled) {
         progressRef.current = 1;
         setAssetProgress(1);
@@ -241,7 +263,7 @@ export default function Preloader({
     return () => {
       cancelled = true;
     };
-  }, [assets.join("|")]);
+  }, [assets.join("|"), fonts.join("|")]);
 
   /*
   * CANVAS ANIMATION

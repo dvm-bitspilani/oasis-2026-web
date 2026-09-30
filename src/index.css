@@ -23,44 +23,72 @@ a {
 
 @font-face {
   font-family: "Montserrat";
-  src: url(./assets/fonts/Montserrat-VariableFont_wght.ttf);
+  src: url("/fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: "Almalik";
-  src: url(./assets/fonts/Almalik.otf);
+  src: url("/fonts/Almalik.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: "Ramadhan";
-  src: url(./assets/fonts/Lentera\ Ramadhan.ttf);
+  src: url("/fonts/Lentera-Ramadhan.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
-
 @font-face {
   font-family: "Syamsiah";
-  src: url(./assets/fonts/Syamsiah\ Arabic.ttf);
+  src: url("/fonts/Syamsiah-Arabic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: "Cinzel";
-  src: url(./assets/fonts/Cinzel-VariableFont_wght.ttf);
+  src: url("/fonts/Cinzel-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: "EB";
-  src: url(./assets/fonts/EBGaramond-Medium.ttf);
+  src: url("/fonts/EBGaramond-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
-
-@font-face {
-  font-family: "Dancing Script";
-  src: url(./assets/fonts/DancingScript-VariableFont_wght.ttf);
-}
-
-
 @font-face {
   font-family: "EBGaramond";
-  src: url(./assets/fonts/EBGaramond-Medium.ttf);
+  src: url("/fonts/EBGaramond-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
+@font-face {
+  font-family: "Dancing Script";
+  src: url("/fonts/DancingScript-VariableFont_wght.ttf") format("truetype");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EBGaramondVariable";
+  src: url("/fonts/EBGaramond-VariableFont_wght.ttf") format("truetype");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 html,
 body,
 #root {

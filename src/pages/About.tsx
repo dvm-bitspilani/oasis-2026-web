@@ -1555,7 +1555,7 @@ const ff = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418213/ffContr
 const playBtn = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418372/playBtn.webp";  //
 const bgVid = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790412288/bgVideo.png";
 const cover = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418147/cover.webp";//
-const backBtn = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418122/bgVideo.webp";//
+const backBtn = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418120/backBtn.webp";//
 const scrollVid = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418373/scrollVid.png";//
 
 import { useTransition } from "../context/TransitionProvider";
@@ -3063,6 +3063,7 @@ const About = () => {
       {!aboutPreloaderDone && (
         <Preloader
           assets={ABOUT_ASSETS}
+           fonts={["EBGaramond"]}
           onEnter={
             handleAboutPreloaderEnter
           }
