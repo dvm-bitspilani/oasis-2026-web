@@ -22,56 +22,56 @@ import ContactCard from "../components/ContactCard";
 const CONTACTS = [
   {
     label: "Registrations and Correspondence",
-    x: 87, y: 42,
+    x: 72, y: 76,
     image: emma,
     name: "Name 1",
     email: "email1@bitsmail",
   },
   {
     label: "Website, App and Payments",
-    x: 79.5, y: 91,
+    x: 79.5, y: 45,
     image: emma, // TODO: replace
     name: "Avyakt Verma",
     email: "email2@bitsmail",
   },
   {
     label: "Sponsorships and Company Collaborations",
-    x: 58, y: 65,
+    x: 63, y: 40,
     image: emma, // TODO: replace
     name: "Name 3",
     email: "email3@bitsmail",
   },
   {
     label: "Logistics and Operations",
-    x: 49, y: 90,
+    x: 48, y: 54,
     image: emma, // TODO: replace
     name: "Name 4",
     email: "email4@bitsmail",
   },
   {
     label: "Reception and Accommodation",
-    x: 38, y: 67,
+    x: 33, y: 71,
     image: emma, // TODO: replace
     name: "Name 5",
     email: "email5@bitsmail",
   },
   {
     label: "Online Collaborations and Publicity",
-    x: 27, y: 40,
+    x: 34, y: 20,
     image: emma, // TODO: replace
     name: "Name 6",
     email: "email6@bitsmail",
   },
   {
     label: "President, Students' Union",
-    x: 45, y: 27,
+    x: 50, y: 15,
     image: emma, // TODO: replace
     name: "Pulkit Bhardwaj",
     email: "email7@bitsmail",
   },
   {
     label: "General Secretary, Students' Union",
-    x: 67, y: 32,
+    x: 68, y: 7,
     image: emma, // TODO: replace
     name: "Kushal Poosala",
     email: "email8@bitsmail",
@@ -98,6 +98,7 @@ const KEY_SPEED = 12;
 export default function Contact() {
   const containerRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
+  const mapScaleRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -149,28 +150,83 @@ export default function Contact() {
   const DRAG_THRESHOLD = 5;
   // Speed of the automatic scroll to a card (0.05 = slow/smooth, 0.2 = fast)
   const AUTO_SCROLL_EASING = 0.08;
-  // Below this width the map is rendered at MOBILE_MAP_SCALE (see the .mapScale
-  // rule in the SCSS) — kept in sync with that file's breakpoint.
-  const MOBILE_BREAKPOINT = 729;
-  const MOBILE_MAP_SCALE = 0.6;
+  // Nudges the map's INITIAL resting position up by this many px from the
+  // fully-revealed position getOffsetY() would otherwise use (see the "Start
+  // shifted down..." line below, inside the effect). Dragging can still reach
+  // the fully-revealed position — this only affects where the view opens.
+  const INITIAL_VIEW_NUDGE_UP = 100;
+  // Matches .page's collapse transition duration in the SCSS (0.4s) — see
+  // handleListClick, which retargets the card auto-scroll once .page has
+  // actually finished collapsing.
+  const COLLAPSE_TRANSITION_MS = 400;
 
   useEffect(() => {
     const container = containerRef.current;
     const layer = layerRef.current;
     if (!container || !layer) return;
 
-    // The map image itself is scaled down on small screens (crosses/cards are
-    // counter-scaled back to full size in CSS), so the draggable area shrinks
-    // by the same factor there — otherwise you could drag well past the
-    // image's visual edge.
-    const getMapScale = () =>
-      window.innerWidth <= MOBILE_BREAKPOINT ? MOBILE_MAP_SCALE : 1;
+    // The map image itself may be scaled down by CSS (see the .mapScale rule
+    // in the SCSS — currently only on small screens, but this reads the real
+    // rendered scale rather than assuming a breakpoint/value, so it can never
+    // drift out of sync with the stylesheet again). Crosses/cards counter-scale
+    // back to full size there, so only the image's own footprint shrinks.
+    const getMapScale = () => {
+      const el = mapScaleRef.current;
+      if (!el) return 1;
+      const transform = getComputedStyle(el).transform;
+      if (!transform || transform === "none") return 1; // not scaled (e.g. desktop)
+      const matrix = new DOMMatrixReadOnly(transform);
+      return matrix.a || 1; // matrix.a is scaleX; 0 would mean "not measurable"
+    };
+
+    // .page pins to the top of the screen on small screens and never moves,
+    // so whatever's directly under it is always hidden. But .page's own box
+    // is taller than what's actually drawn there: the parchment graphic lives
+    // on ::before, which slides up via a CSS transform when the list is
+    // collapsed (see "See More" in the SCSS) — so only PART of .page's box is
+    // opaque there, the rest is transparent and the map already shows through
+    // it. This measures ::before's real on-screen position (rather than
+    // assuming how far it slides), so it's correct both collapsed and
+    // expanded, and mid-animation between the two. Returns null when .page
+    // isn't a top bar at all (desktop side panel), where it doesn't obstruct
+    // the map vertically.
+    const getPageBottom = (): number | null => {
+      const c = container.getBoundingClientRect();
+      const p = pageRef.current?.getBoundingClientRect();
+      if (!p || p.height >= c.height * 0.9) return null; // not a top bar (desktop)
+
+      let slideY = 0;
+      if (pageRef.current) {
+        const beforeTransform = getComputedStyle(pageRef.current, "::before").transform;
+        if (beforeTransform && beforeTransform !== "none") {
+          slideY = new DOMMatrixReadOnly(beforeTransform).f; // translateY, in px
+        }
+      }
+
+      // ::before is `inset: 0` (same box as .page) then slid by slideY (<= 0).
+      // What's actually visible/opaque is the part of that box still inside
+      // .page's bounds after the slide.
+      const visibleHeight = Math.max(0, Math.min(p.height, p.height + slideY));
+      return p.top + visibleHeight;
+    };
+
+    const getOffsetY = () => {
+      const c = container.getBoundingClientRect();
+      const bottom = getPageBottom();
+      return bottom === null ? 0 : bottom - c.top;
+    };
 
     const getBounds = () => {
       const scale = getMapScale();
+      const offsetY = getOffsetY();
       const minX = Math.min(0, container.clientWidth - layer.offsetWidth * scale);
+      // Only maxY gets the offset — this EXTENDS how far down the map can go
+      // (to reveal what's hidden behind .page) without eating into how far up
+      // it can go (reaching the map's actual bottom edge). Adding offsetY to
+      // minY too would just shift the whole draggable range instead of
+      // growing it, making the bottom unreachable by the same amount.
       const minY = Math.min(0, container.clientHeight - layer.offsetHeight * scale);
-      return { minX, maxX: 0, minY, maxY: 0 };
+      return { minX, maxX: 0, minY, maxY: offsetY };
     };
 
     const clampPos = (p: { x: number; y: number }) => {
@@ -180,6 +236,14 @@ export default function Contact() {
         y: Math.max(minY, Math.min(maxY, p.y)),
       };
     };
+
+    // Start shifted down by .page's height where that applies (mobile) minus
+    // INITIAL_VIEW_NUDGE_UP, so the initial view isn't wasted on content
+    // hidden behind .page, but also isn't pinned to the very edge of it.
+    pos.current = clampPos({
+      x: pos.current.x,
+      y: getOffsetY() - INITIAL_VIEW_NUDGE_UP,
+    });
 
     // True when an event happened on (or inside) the .page panel. Pressing /
     // dragging there must not move the map (touchpad scrolling still works).
@@ -196,10 +260,16 @@ export default function Contact() {
       const r = card.getBoundingClientRect();
       const p = pageRef.current?.getBoundingClientRect();
 
-      // Visible map area = the part of the screen not covered by the left "page"
+      // Visible map area = the part of the screen not covered by .page,
+      // whichever side it's on: a side panel (desktop) narrows it from the
+      // left, a top bar (mobile) narrows it from the top — using the same
+      // real obstruction measurement as getOffsetY(), so a card is still
+      // centred correctly whether .page is collapsed or expanded.
+      const pageBottom = getPageBottom();
       const visibleLeft = p && p.width < c.width * 0.9 ? p.right : c.left;
+      const visibleTop = pageBottom ?? c.top;
       const centerX = (visibleLeft + c.right) / 2 - c.left;
-      const centerY = c.height / 2;
+      const centerY = (visibleTop + c.bottom) / 2 - c.top;
 
       // Card centre in the map layer's own coordinates
       const cardX = r.left + r.width / 2 - l.left;
@@ -395,9 +465,16 @@ export default function Contact() {
       animFrameId.current = requestAnimationFrame(render);
     };
 
-    // Re-clamp if the window is resized across MOBILE_BREAKPOINT, so the
-    // position stays valid whichever map scale is now in effect.
+    // Re-clamp on resize so the position stays valid whichever map scale is
+    // now in effect. Also nudge pos.y by however much getOffsetY() itself
+    // changed (e.g. crossing the mobile breakpoint, or .page's height
+    // changing with viewport width), so the view shifts with it instead of
+    // just getting clamped to a new edge.
+    let lastOffsetY = getOffsetY();
     const handleResize = () => {
+      const offsetY = getOffsetY();
+      pos.current.y += offsetY - lastOffsetY;
+      lastOffsetY = offsetY;
       pos.current = clampPos(pos.current);
     };
 
@@ -524,6 +601,15 @@ export default function Contact() {
   const handleListClick = (index: number) => {
     setActive(index);
     scrollToCard.current(index);
+
+    if (expanded) {
+      setExpanded(false);
+      // .page's collapse animates over COLLAPSE_TRANSITION_MS; the scroll
+      // above already starts moving toward the card, and this retargets it
+      // once .page has actually finished collapsing and more of the map is
+      // visible below it (see getPageBottom() / scrollToCard).
+      window.setTimeout(() => scrollToCard.current(index), COLLAPSE_TRANSITION_MS);
+    }
   };
 
   return (
@@ -532,7 +618,7 @@ export default function Contact() {
       <div ref={layerRef} className={styles.mapLayer}>
         {/* Scaled down on small screens via CSS; crosses/cards counter-scale
             back to full size (see Contact.module.scss) */}
-        <div className={styles.mapScale}>
+        <div ref={mapScaleRef} className={styles.mapScale}>
           <img src={map} alt="Map" className={styles.mapImage} />
 
           {CONTACTS.map((c, i) => (

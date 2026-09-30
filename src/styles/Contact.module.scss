@@ -1,5 +1,6 @@
 $cross-size: 80px; // change cross size here
 $card-gap: -75px;   // extra space between the bottom of a cross and the top of a card (negative = overlap)
+$mobile-card-gap: -125px; // same as $card-gap, but only for screens <= $mobile-breakpoint
 $mobile-breakpoint: 729px;
 $mobile-map-scale: 0.7;   // map image size on screens <= $mobile-breakpoint
 $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at full size
@@ -77,8 +78,8 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
 
     @media screen and (max-width: $mobile-breakpoint) {
       /* Counters .mapScale's shrink so the card stays full size, anchored
-         at the same top point. */
-      transform: translate(-50%, calc(#{$cross-size * 0.5} + #{$card-gap}))
+         at the same top point. Uses $mobile-card-gap, not $card-gap. */
+      transform: translate(-50%, calc(#{$cross-size * 0.5} + #{$mobile-card-gap}))
         scale($mobile-counter-scale);
     }
   }
