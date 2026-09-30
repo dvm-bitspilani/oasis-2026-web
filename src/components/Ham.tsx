@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
+import gsap from "gsap";
 import lidInner from "../assets/ham/lidInner.png";
 import lidDome from "../assets/ham/lidDome.png";
 import lidEdge from "../assets/ham/lidEdge.png";
@@ -52,6 +53,62 @@ const DOME_STRIPS = (() => {
     });
 })();
 
+// ---------- Easing ----------
+// CSS cubic-bezier() as a GSAP ease function
+const bezier = (x1: number, y1: number, x2: number, y2: number) => (x: number) => {
+    if (x <= 0 || x >= 1) return x;
+    const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+    const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+    let t = x;
+    for (let i = 0; i < 8; i++) {
+        const e = ((ax * t + bx) * t + cx) * t - x;
+        const d = (3 * ax * t + 2 * bx) * t + cx;
+        if (Math.abs(e) < 1e-5 || Math.abs(d) < 1e-6) break;
+        t -= e / d;
+    }
+    return ((ay * t + by) * t + cy) * t;
+};
+
+// CSS linear() as a GSAP ease function (handles the "value pos%" syntax)
+const linearEase = (spec: string) => {
+    const stops = spec.split(",").map((s) => s.trim().split(/\s+/));
+    const v = stops.map((s) => parseFloat(s[0]));
+    const p = stops.map((s) => (s[1] ? parseFloat(s[1]) / 100 : NaN));
+    if (isNaN(p[0])) p[0] = 0;
+    if (isNaN(p[p.length - 1])) p[p.length - 1] = 1;
+    for (let i = 1; i < p.length; i++) {
+        if (!isNaN(p[i])) continue;
+        let j = i;
+        while (isNaN(p[j])) j++;
+        for (let k = i; k < j; k++) p[k] = p[i - 1] + ((p[j] - p[i - 1]) * (k - i + 1)) / (j - i + 1);
+    }
+    return (t: number) => {
+        if (t <= 0) return v[0];
+        if (t >= 1) return v[v.length - 1];
+        let i = 1;
+        while (p[i] < t) i++;
+        const k = (t - p[i - 1]) / (p[i] - p[i - 1] || 1);
+        return v[i - 1] + (v[i] - v[i - 1]) * k;
+    };
+};
+
+const E = {
+    ease: bezier(0.25, 0.1, 0.25, 1),
+    out: bezier(0, 0, 0.58, 1),
+    inOut: bezier(0.42, 0, 0.58, 1),
+    iris: bezier(0.65, 0, 0.35, 1),
+    rise: bezier(0.3, 0, 0.2, 1),
+    sand: bezier(0.16, 1, 0.3, 1),
+    fly: bezier(0.2, 0.6, 0.3, 1),
+    zoom: bezier(0.4, 0, 0.2, 1),
+    lid1: bezier(0.4, 0, 0.6, 1),
+    lid2: bezier(0.35, 0.2, 0.55, 1),
+    lid3: bezier(0.3, 0, 0.5, 1),
+    spring: linearEase(
+        "0, 0.009, 0.035 2.1%, 0.141, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1.004 84.1%, 1"
+    ),
+};
+
 export default function Ham() {
     const rootRef = useRef<HTMLDivElement>(null);
 
@@ -87,6 +144,105 @@ export default function Ham() {
         };
     }, []);
 
+    // Entrance choreography: one master timeline (seconds).
+    useLayoutEffect(() => {
+        const root = rootRef.current;
+        if (!root) return;
+        // CSS defaults are the final pose, so reduced motion just skips the timeline
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+        const ctx = gsap.context(() => {
+            const q = (n: string) => `.${styles[n]}`;
+
+            // ---- timing knobs ----
+            const riseDelay = 0.35, riseTime = 0.9;
+            const lidDelay = riseDelay + 0.75, lidTime = 1.9;
+            const seg = (f: number) => f * lidTime; // fraction of the lid swing -> seconds
+            const popDelay = lidDelay + seg(0.55), popStagger = 0.14, popTime = 0.9;
+            const camStart = 0.6, camClosed = 0.7;
+
+            const tl = gsap.timeline();
+            const chestTop = q("chestTop");
+
+            gsap.set(chestTop, { zIndex: 5 }); // in front of the base while lying over it
+
+            // background iris + dim
+            tl.fromTo(root, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: E.out }, 0)
+              .fromTo(q("bgHome"),
+                { clipPath: "circle(0% at 80% 80%)", "--dim": 0.5 },
+                { clipPath: "circle(150% at 50% 50%)", "--dim": 0, duration: 2.5, ease: E.iris }, 0);
+
+            // sand
+            tl.fromTo(q("sandAbove"), { yPercent: 30 }, { yPercent: 0, duration: 1.6, ease: E.sand }, 0.1)
+              .fromTo(q("sandBottom"), { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 1.1, ease: E.sand }, 0.1);
+
+            // chest zoom (chest only, everything else stays at scale 1):
+            // 0.6 -> 0.7 while the lid is closed -> 1 during the swing
+            // The guitar lives inside the chest layer, so it would inherit the zoom. Every
+            // frame we set its scale to 1 / zoom, which cancels it exactly (its transform-origin
+            // in the SCSS sits on the same screen point as the chest layer's).
+            const chestLayer = root.querySelector<HTMLElement>(q("lChest"))!;
+            const guitar = root.querySelector<HTMLElement>(q("guitarBook"))!;
+            const cancelZoom = () => {
+                gsap.set(guitar, { scale: 1 / (gsap.getProperty(chestLayer, "scale") as number) });
+            };
+
+            tl.fromTo(q("lChest"), { scale: camStart },
+                { scale: camClosed, duration: lidDelay - riseDelay, ease: E.ease, onUpdate: cancelZoom }, riseDelay)
+              .to(q("lChest"), { scale: 1, duration: lidTime, ease: E.zoom, onUpdate: cancelZoom }, lidDelay);
+            cancelZoom(); // initial 1 / 0.6, before the first frame
+
+            // chest rises (no scale here, so the zoom above is the only scale)
+            tl.fromTo(q("chestRig"), { yPercent: 120 }, { yPercent: 0, duration: riseTime+1, ease: E.rise }, riseDelay)
+              .fromTo(q("chestRig"), { opacity: 0 }, { opacity: 1, duration: riseTime * 0.25, ease: E.rise }, riseDelay);
+
+            // lid swing (angle keyframes, each with its own easing)
+            const lid = gsap.timeline()
+              .fromTo(chestTop, { "--lid": -90 }, { "--lid": -84, duration: seg(0.12), ease: E.lid1 })
+              .to(chestTop, { "--lid": 5, duration: seg(0.46), ease: E.lid2 })
+              .to(chestTop, { "--lid": -2.5, duration: seg(0.16), ease: E.lid3 })
+              .to(chestTop, { "--lid": 1, duration: seg(0.14), ease: E.inOut })
+              .to(chestTop, { "--lid": 0, duration: seg(0.12), ease: E.inOut });
+            tl.add(lid, lidDelay);
+
+            // hinge fit: 12% -> 45% of the swing
+            tl.fromTo(chestTop, { "--fit": 0 }, { "--fit": 1, duration: seg(0.33), ease: E.lid1 }, lidDelay + seg(0.12));
+
+            // z-order swap at 50%, dome/lip hidden at 47%
+            tl.set(chestTop, { zIndex: 3 }, lidDelay + seg(0.5))
+              .set(`${q("strip")}, ${q("lip")}`, { visibility: "hidden" }, lidDelay + seg(0.47));
+
+            // lid shadow on the base + inner face lighting up
+            tl.fromTo(q("chestBase"), { "--shadow": 1 }, { "--shadow": 0, duration: seg(0.45), ease: E.out }, lidDelay)
+              .fromTo(q("inner"), { filter: "brightness(0.35)" },
+                { filter: "brightness(1)", duration: 0.8, ease: E.out, clearProps: "filter" }, lidDelay + seg(0.35));
+
+            // thud when the lid lands
+            tl.to(root, {
+                keyframes: [{ y: 5, duration: 0.05 }, { y: -3, duration: 0.05 }, { y: 1, duration: 0.05 }, { y: 0, duration: 0.05 }],
+                easeEach: "none",
+            }, lidDelay + seg(0.57));
+
+            // contents + lantern
+            tl
+              .fromTo(q("trunkStuff"), { opacity: 0 }, { opacity: 1, duration: 0.15, ease: E.out }, lidDelay + seg(0.2))
+              .fromTo(q("lantern"), { opacity: 0 }, { opacity: 1, duration: 1, ease: E.out }, lidDelay + 0.7);
+
+            // signs launch out of the chest
+            gsap.utils.toArray<HTMLElement>(q("sign")).forEach((sign, i) => {
+                const b = BOARDS[i];
+                const at = popDelay + (BOARDS.length - 1 - i) * popStagger;
+                tl.fromTo(sign, { x: b.dx, scale: 0.4 }, { x: "0vw", scale: 1, duration: popTime, ease: E.fly }, at)
+                  .fromTo(sign, { opacity: 0 }, { opacity: 1, duration: popTime * 0.15, ease: E.fly }, at)
+                  .fromTo(sign.firstElementChild, { y: b.dy, rotation: i * 12 - 24 },
+                    { y: "0vh", rotation: 0, duration: popTime, ease: E.spring }, at)
+                  .set(sign, { pointerEvents: "auto" }, at + popTime); // was `unlock`
+            });
+        }, root);
+
+        return () => ctx.revert();
+    }, []);
+
     return (
         <div ref={rootRef} className={styles.container}>
             {/* background iris */}
@@ -105,12 +261,12 @@ export default function Ham() {
             {/* chest rig: owns the perspective, so the lid is a real 3D rotation */}
             <div className={`${styles.layer} ${styles.lChest}`}>
                 <div className={styles.chestRig}>
-                    {/* one 3D object, two separate art files:
-                        inner = what you see when open, outer = darkened back side */}
                     {/* the chest's open top: fills the gap between the front rim and the hinge */}
                     <div className={styles.chestWell} aria-hidden="true">
                         <div className={styles.well} style={{ backgroundImage: `url(${chestWell})` }} />
                     </div>
+                    {/* one 3D object, two separate art files:
+                        inner = what you see when open, outer = darkened back side */}
                     <div className={styles.chestTop}>
                         <img
                             src={lidInner}
@@ -149,7 +305,7 @@ export default function Ham() {
                         key={b.label}
                         to={b.to}
                         className={`${styles.sign} ${styles[b.pos]}`}
-                        style={{ "--i": i, "--dx": b.dx, "--dy": b.dy } as CSSProperties}
+                        style={{ "--i": i } as CSSProperties}
                     >
                         <div className={styles.drop}>
                             <div className={styles.plank}>
