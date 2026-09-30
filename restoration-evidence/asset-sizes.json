@@ -8,7 +8,8 @@
     "public/": 4744498,
     "src/assets/": 73200670
   },
-  "dist_bytes": 36794137,
+  "dist_bytes": 36794812,
   "map_original_bytes": 14532511,
-  "map_webp_bytes": 1257158
+  "map_webp_bytes": 1257158,
+  "merged_origin_sha": "ebdf844"
 }

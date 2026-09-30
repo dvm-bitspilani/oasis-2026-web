@@ -12,7 +12,7 @@ Original font families and weight declarations remain. All 10 served fonts were 
 - Source assets: 108,484,846 → 73,200,670 bytes.
 - Contact map converted from the approximately 14 MB PNG to 1,257,158-byte WebP, preserving the original map design. Unused duplicate map background, duplicate GIFs and unused alternate curtain video removed; original transition video retained.
 - Both unused tracked `about/bgBack.png` and `about/bgback.png` removed to fix the macOS case collision. Used local `bgback.webp` remains.
-- Frozen deployment output: 36,794,137 bytes; every asset is below Pages' 25 MiB limit.
+- Frozen deployment output: 36,794,812 bytes; every asset is below Pages' 25 MiB limit.
 - Wrangler 4.145.0 pinned, project `dvm-portfolio-oasis-2026`, output `dist`, compatibility date 2026-09-30, account provided through deployment environment variable.
 - Native Pages SPA fallback used, with no looping catchall redirect or top-level 404. Unknown client routes show helpful navigation.
 - Secure CSP allows same-origin artwork/fonts/media and optional YouTube playback/API; no JavaScript unsafe-eval, remote font stylesheet or Cloudinary allowlist required.
@@ -26,3 +26,7 @@ Original font families and weight declarations remain. All 10 served fonts were 
 ## Limits
 
 The original animation/GSAP runtime still produces a large main JS chunk. Extended mobile UX/performance testing and exhaustive image/video optimization were skipped as requested in the narrowed user scope. Optional YouTube playback and external contact/social links still depend on those third-party sites. The coordinating agent performs desktop rendering/font/main-interaction review and publication from the frozen build.
+
+## Concurrent main integration
+
+Merged origin/main `ebdf844` normally after publication; it includes `584cc69` (Contact Us page almost made). Preserved the updated contact marker positions, map bounds computed from actual CSS transform, collapse/auto-scroll interaction and mobile card spacing. The merged contact page retains the optimized local map asset. Metadata preserves the upstream correction to the 54th edition while retaining one archive canonical and the restored portal structure. Local `.wrangler/` preview state is ignored. Build, fixture/asset checks and dependency audits were repeated for the merged result.
