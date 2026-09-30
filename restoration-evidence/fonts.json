@@ -1,0 +1,72 @@
+[
+  {
+    "source": "public/fonts/Montserrat-VariableFont_wght.ttf",
+    "output": "public/fonts/Montserrat-VariableFont_wght.woff2",
+    "before": 688600,
+    "after": 205980,
+    "glyphs": 1312
+  },
+  {
+    "source": "public/fonts/Almalik.otf",
+    "output": "public/fonts/Almalik.woff2",
+    "before": 24888,
+    "after": 11996,
+    "glyphs": 97
+  },
+  {
+    "source": "public/fonts/Lentera-Ramadhan.ttf",
+    "output": "public/fonts/Lentera-Ramadhan.woff2",
+    "before": 226624,
+    "after": 25816,
+    "glyphs": 298
+  },
+  {
+    "source": "public/fonts/Syamsiah-Arabic.ttf",
+    "output": "public/fonts/Syamsiah-Arabic.woff2",
+    "before": 335796,
+    "after": 37852,
+    "glyphs": 360
+  },
+  {
+    "source": "public/fonts/EBGaramond-Italic-VariableFont_wght.ttf",
+    "output": "public/fonts/EBGaramond-Italic-VariableFont_wght.woff2",
+    "before": 719832,
+    "after": 273348,
+    "glyphs": 1972
+  },
+  {
+    "source": "public/fonts/Cinzel-VariableFont_wght.ttf",
+    "output": "public/fonts/Cinzel-VariableFont_wght.woff2",
+    "before": 126348,
+    "after": 48980,
+    "glyphs": 367
+  },
+  {
+    "source": "public/fonts/EBGaramond-VariableFont_wght.ttf",
+    "output": "public/fonts/EBGaramond-VariableFont_wght.woff2",
+    "before": 808180,
+    "after": 284156,
+    "glyphs": 2091
+  },
+  {
+    "source": "public/fonts/DancingScript-VariableFont_wght.ttf",
+    "output": "public/fonts/DancingScript-VariableFont_wght.woff2",
+    "before": 130480,
+    "after": 59232,
+    "glyphs": 559
+  },
+  {
+    "source": "public/fonts/EBGaramond-Medium.ttf",
+    "output": "public/fonts/EBGaramond-Medium.woff2",
+    "before": 492308,
+    "after": 170012,
+    "glyphs": 2091
+  },
+  {
+    "source": "src/assets/fonts/Aladin-Regular.ttf",
+    "output": "src/assets/fonts/Aladin-Regular.woff2",
+    "before": 40444,
+    "after": 15580,
+    "glyphs": 232
+  }
+]

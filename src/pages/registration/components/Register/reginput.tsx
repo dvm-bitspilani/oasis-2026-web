@@ -129,10 +129,10 @@ import styles from "./Reginput.module.scss";
 
 
 const inputLine =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/inputLine.png";
+  new URL("../../../../assets/registration/reg/inputLine.png", import.meta.url).href;
 
 const Leaf =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/leaf.png";
+  new URL("../../../../assets/registration/reg/leaf.png", import.meta.url).href;
 
 import type { ReactNode } from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";

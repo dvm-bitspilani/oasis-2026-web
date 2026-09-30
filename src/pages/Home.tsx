@@ -16,24 +16,24 @@ import twitterIcon from "../assets/links/twitter.png";
 import LinkdinIcon from "../assets/links/linkdin.png";
 import youtubeIcon from "../assets/links/youtube.png";
 import bgPath from "../assets/links/bg.png";
-const bg = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790465230/bg.jpg";
-const sandImg = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454105/sandfinal.webp";
-const sandMob = "https://res.cloudinary.com/bhfhuzru/image/upload/maybefinalsorry.webp";
-const cloudSmall = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudSmall.svg";
-const cloudBig = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudBig.svg";
-const cloudThree = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudThree.svg";
-const Castle = "https://res.cloudinary.com/bhfhuzru/image/upload/castlefinal2.png";
-const Moon = "https://res.cloudinary.com/bhfhuzru/image/upload/Moon.webp";
-const LogoOasis = "https://res.cloudinary.com/bhfhuzru/image/upload/LogoOasisi.webp";
+const bg = new URL("../assets/home/bg.jpg", import.meta.url).href;
+const sandImg = new URL("../assets/home/sandfinal.webp", import.meta.url).href;
+const sandMob = new URL("../assets/home/maybefinalsorry.webp", import.meta.url).href;
+const cloudSmall = new URL("../assets/home/cloudSmall.svg", import.meta.url).href;
+const cloudBig = new URL("../assets/home/cloudBig.svg", import.meta.url).href;
+const cloudThree = new URL("../assets/home/cloudThree.svg", import.meta.url).href;
+const Castle = new URL("../assets/home/castlefinal2.png", import.meta.url).href;
+const Moon = new URL("../assets/home/Moon.webp", import.meta.url).href;
+const LogoOasis = new URL("../assets/home/LogoOasisi.webp", import.meta.url).href;
 /* The register button artwork is split into two layers so the shine can be
    masked to the carpet alone. Both files are expected to be exported on the
    SAME canvas as the old cactuschange.png — that is what lets them stack at
    inset: 0 and line back up into the original composition. */
-const RegCactus = "https://res.cloudinary.com/bhfhuzru/image/upload/regCactus.png";
-const RegCarpet = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454104/regCarpet.png";
+const RegCactus = new URL("../assets/home/regCactus.png", import.meta.url).href;
+const RegCarpet = new URL("../assets/home/regCarpet.png", import.meta.url).href;
 
-const camelLand = "https://res.cloudinary.com/bhfhuzru/image/upload/camel1.svg";
-const camelLand2 = "https://res.cloudinary.com/bhfhuzru/image/upload/camel2.svg";
+const camelLand = new URL("../assets/home/camel1.svg", import.meta.url).href;
+const camelLand2 = new URL("../assets/home/camel2.svg", import.meta.url).href;
 
 
 

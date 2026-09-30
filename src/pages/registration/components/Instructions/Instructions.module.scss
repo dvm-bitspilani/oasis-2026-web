@@ -362,7 +362,7 @@
 
   // margin-bottom: 5vw;
 
-  background-image: url("https://res.cloudinary.com/bhfhuzru/image/upload/instructionsScroll.webp");
+  background-image: url("../../../../assets/registration/reg/instructionsScroll.webp");
 
   //background-position: center;
 
@@ -476,7 +476,7 @@
     cursor: pointer;
 
     background: center / cover no-repeat
-      url("https://res.cloudinary.com/bhfhuzru/image/upload/googleReg.svg");
+      url("../../../../assets/registration/reg/googleReg.svg");
 
     border: none;
 
@@ -648,7 +648,7 @@
   .content {
     left: 15%;
 
-    background-image: url("https://res.cloudinary.com/bhfhuzru/image/upload/instructionsScrollLong.webp");
+    background-image: url("../../../../assets/registration/reg/instructionsScrollLong.webp");
   }
 
   /*.lefttop {
@@ -716,7 +716,7 @@
       scale: 3.25;
 
       background: center / cover no-repeat
-        url("https://res.cloudinary.com/bhfhuzru/image/upload/googleRegMob.svg");
+        url("../../../../assets/registration/reg/googleRegMob.svg");
 
       height: 15px;
     }

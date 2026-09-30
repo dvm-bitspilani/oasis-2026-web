@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import map from "../assets/contact/map.png";
+import map from "../assets/contact/map.webp";
 import cross from "../assets/contact/cross.png";
 import styles from "../styles/Contact.module.scss";
 import emma from "../assets/contact/emma.webp";

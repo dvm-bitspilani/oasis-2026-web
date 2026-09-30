@@ -7,19 +7,16 @@
     "dev": "vite --host",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview --host 127.0.0.1",
+    "deploy": "npm run build && CLOUDFLARE_ACCOUNT_ID=e6ad8a6f22a88b57a02e176325692373 wrangler pages deploy dist --project-name dvm-portfolio-oasis-2026",
+    "verify": "node scripts/verify.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.8.0",
-    "@react-oauth/google": "^0.13.5",
-    "axios": "^1.19.0",
     "gsap": "^3.15.0",
     "react": "^19.2.8",
-    "react-cookie": "^8.1.2",
-    "react-doctor": "^0.9.14",
     "react-dom": "^19.2.8",
-    "react-ga4": "^3.0.1",
     "react-helmet-async": "^3.0.0",
     "react-hook-form": "^7.85.0",
     "react-router-dom": "^7.18.2",
@@ -36,6 +33,7 @@
     "rollup-plugin-visualizer": "^7.1.1",
     "sass": "^1.102.0",
     "typescript": "~6.0.2",
-    "vite": "^8.2.0"
+    "vite": "^8.2.0",
+    "wrangler": "4.145.0"
   }
 }

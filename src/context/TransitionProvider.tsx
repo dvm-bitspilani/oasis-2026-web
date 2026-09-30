@@ -27,7 +27,7 @@ type TransitionContextValue = {
 const TransitionContext =
   createContext<TransitionContextValue | null>(null);
 
-const PRELOADER_KEY = "oasis_preloader_shown";
+
 
 function waitForNextPaint(): Promise<void> {
   return new Promise((resolve) => {
@@ -57,15 +57,7 @@ export function TransitionProvider({
   const pendingPathRef =
     useRef<string | null>(null);
 
-  const [entered, setEntered] = useState<boolean>(() => {
-    try {
-      return (
-        sessionStorage.getItem(PRELOADER_KEY) === "true"
-      );
-    } catch {
-      return false;
-    }
-  });
+  const [entered, setEntered] = useState(false);
 
   const transitionRef =
     useRef<PageTransitionHandle>(null);
@@ -80,18 +72,7 @@ export function TransitionProvider({
   // PRELOADER STATE
   // =========================================
 
-  const markEntered = useCallback(() => {
-    setEntered(true);
-
-    try {
-      sessionStorage.setItem(
-        PRELOADER_KEY,
-        "true",
-      );
-    } catch {
-      // Ignore storage errors.
-    }
-  }, []);
+  const markEntered = useCallback(() => { setEntered(true); }, []);
 
   // =========================================
   // NAVIGATION

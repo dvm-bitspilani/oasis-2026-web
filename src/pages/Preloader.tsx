@@ -158,7 +158,7 @@ function loadFont(spec: string, timeoutMs = 8000): Promise<void> {
     return Promise.resolve();
   }
   return Promise.race([
-    document.fonts.load(spec).then(() => undefined),
+    document.fonts.load(`16px "${spec}"`).then(() => undefined),
     new Promise<void>((resolve) => setTimeout(resolve, timeoutMs)),
   ]).catch(() => undefined);
 }
@@ -228,7 +228,7 @@ export default function Preloader({
       }
     };
 
-    const imagePromises = assets.map(
+    const imagePromises = assets.filter(src => !/\.(ttf|otf|woff2?|mp4|webm)(\?|$)/i.test(src)).map(
       (src) =>
         new Promise<void>((resolve) => {
           const img = new Image();
@@ -253,6 +253,7 @@ export default function Preloader({
       }),
     );
 
+    const deadline = window.setTimeout(() => { progressRef.current = 1; setAssetProgress(1); }, 5000);
     Promise.all([...imagePromises, ...fontPromises]).then(() => {
       if (!cancelled) {
         progressRef.current = 1;
@@ -262,6 +263,7 @@ export default function Preloader({
 
     return () => {
       cancelled = true;
+      window.clearTimeout(deadline);
     };
   }, [assets.join("|"), fonts.join("|")]);
 

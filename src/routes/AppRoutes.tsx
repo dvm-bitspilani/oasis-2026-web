@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import { TransitionProvider } from "../context/TransitionProvider";
+
 
 // ======================================================
 // LAZY LOADED PAGES
@@ -46,8 +46,8 @@ export default function AppRoutes({
   preloaderExiting,
 }: AppRoutesProps) {
   return (
-    <TransitionProvider>
-      <Suspense fallback={null}>
+    <>
+      <Suspense fallback={<p style={{padding:32,color:"#f5deb3"}}>Loading archive…</p>}>
         <Routes>
 
           {/* ==================================================
@@ -110,8 +110,9 @@ export default function AppRoutes({
           />
           
 
+          <Route path="*" element={<main style={{padding:40,color:"#f5deb3"}}><h1>Page not found</h1><a href="/">Explore OASIS 2026</a></main>} />
         </Routes>
       </Suspense>
-    </TransitionProvider>
+    </>
   );
 }
