@@ -9,7 +9,7 @@
 $split: 51%;
 
 // Background reveal
-$bgTime: 1s;
+$bgTime: 1.5s;
 $bgDelay: 0s;
 
 // 1) Sand plays first
@@ -152,7 +152,7 @@ $lastIndex: 4;
 
 @keyframes lidOpen {
   0% {
-    transform: translateY(0%) perspective(1400px) rotateX(-105deg) scale(0.2);
+    transform: translateY(0%) perspective(1400px) rotateX(-125deg) scale(0.2);
     filter: brightness(0.6);
     opacity: 0;
   }
@@ -423,7 +423,7 @@ $lastIndex: 4;
 
 @keyframes trunkUp {
   from {
-    transform: translateY(75%) scale(0.6);
+    transform: translateY(25%) scale(0.6);
     opacity: 0;
   }
 
