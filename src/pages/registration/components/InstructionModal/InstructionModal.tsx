@@ -8,16 +8,16 @@ import {
 import styles from "./InstructionModal.module.scss";
 
 const scrollBar =
-  new URL("../../../../assets/registration/reg/line.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/line.png";
 
 const scrollHead =
-  new URL("../../../../assets/registration/reg/wheel.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/v1790459176/wheel.png";
 
 const modalFrame =
-  new URL("../../../../assets/registration/reg/modalFrame.webp", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/modalFrame.webp";
 
 const modalFrameMobile =
-  new URL("../../../../assets/registration/reg/modalFrameMobile.webp", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/modalFrameMobile.webp";
 
 import ReactDOM from "react-dom";
 
@@ -227,7 +227,40 @@ const Confirmation = ({ onCancel }: PropsType) => {
       </h2>
 
       <div className={styles.content}>
-        <ul ref={mainContainerRef}><li>This portfolio archive preserves the original registration design.</li><li>Continue with the sample identity and keep sample details in the form.</li><li>Select sample events to explore the confirmation interface.</li><li>No account, booking, payment, approval or email is created.</li><li>Details and selections remain in memory. Refresh resets this local demo.</li></ul>
+        <ul ref={mainContainerRef}>
+          <li>
+            Complete the registration form with all required
+            details. You'll be able to login through your
+            registered email id when required. All team members
+            are required to register separately.
+          </li>
+
+          <li>
+            A College Representative (CR) will be appointed
+            for each college who'll be responsible for
+            allotting heads for all the societies the college
+            will be participating for.
+          </li>
+
+          <li>
+            The heads and CR will be responsible for approving
+            the other participating members.
+          </li>
+
+          <li>
+            After this, an approval email will be sent from
+            the Department of Publication and Correspondence.
+          </li>
+
+          <li>
+            Make the required payment as instructed.
+          </li>
+
+          <li>
+            Upon successful payment, a confirmation email will
+            be sent.
+          </li>
+        </ul>
 
         <div
           className={styles.scrollBarContainer}

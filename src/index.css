@@ -23,7 +23,7 @@ a {
 
 @font-face {
   font-family: "Montserrat";
-  src: url("/fonts/Montserrat-VariableFont_wght.woff2") format("woff2");
+  src: url("/fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -31,7 +31,7 @@ a {
 
 @font-face {
   font-family: "Almalik";
-  src: url("/fonts/Almalik.woff2") format("woff2");
+  src: url("/fonts/Almalik.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -39,14 +39,14 @@ a {
 
 @font-face {
   font-family: "Ramadhan";
-  src: url("/fonts/Lentera-Ramadhan.woff2") format("woff2");
+  src: url("/fonts/Lentera-Ramadhan.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Syamsiah";
-  src: url("/fonts/Syamsiah-Arabic.woff2") format("woff2");
+  src: url("/fonts/Syamsiah-Arabic.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -54,7 +54,7 @@ a {
 
 @font-face {
   font-family: "Cinzel";
-  src: url("/fonts/Cinzel-VariableFont_wght.woff2") format("woff2");
+  src: url("/fonts/Cinzel-VariableFont_wght.ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -62,28 +62,28 @@ a {
 
 @font-face {
   font-family: "EB";
-  src: url("/fonts/EBGaramond-Medium.woff2") format("woff2");
+  src: url("/fonts/EBGaramond-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "EBGaramond";
-  src: url("/fonts/EBGaramond-Medium.woff2") format("woff2");
+  src: url("/fonts/EBGaramond-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Dancing Script";
-  src: url("/fonts/DancingScript-VariableFont_wght.woff2") format("woff2");
+  src: url("/fonts/DancingScript-VariableFont_wght.ttf") format("truetype");
   font-weight: 400 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "EBGaramondVariable";
-  src: url("/fonts/EBGaramond-VariableFont_wght.woff2") format("woff2");
+  src: url("/fonts/EBGaramond-VariableFont_wght.ttf") format("truetype");
   font-weight: 400 800;
   font-style: normal;
   font-display: swap;
@@ -106,8 +106,4 @@ html {
 body {
   overflow-x: hidden;
   background: #080a18;
-}
-.archive-notice{position:fixed;bottom:8px;left:8px;z-index:10001;background:#080a18e8;color:#f5deb3;padding:7px 12px;border:1px solid #f5deb355;font:12px sans-serif;max-width:calc(100vw - 32px);pointer-events:none}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
-
-@font-face{font-family:"EB Garamond";src:url("/fonts/EBGaramond-VariableFont_wght.woff2") format("woff2");font-weight:400 800;font-style:normal;font-display:swap}
+} 

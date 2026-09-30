@@ -3,10 +3,10 @@
   import ReactDOM from "react-dom";
 
 const modalFrameMobile =
-  new URL("../../../../assets/registration/reg/modalFrameMobile.webp", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/modalFrameMobile.webp";
 
 const bannerBg =
-  new URL("../../../../assets/registration/reg/inputBg.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/inputBg.png";
 
   type PropsType = {
     handleEvent: () => void;

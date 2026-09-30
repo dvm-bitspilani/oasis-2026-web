@@ -1,4 +1,3 @@
-import { sampleIdentity } from "../../demoService";
 import { Helmet } from "react-helmet-async";
 import styles from "./Registration.module.scss";
 
@@ -9,7 +8,9 @@ import Booktransition from "./Booktransition";
 // import Preloader from "../Preloader";
 
 import { useCallback, useState } from "react";
+import { useCookies } from "react-cookie";
 
+import axios from "axios";
 import BreadCrumb from "../../components/breadCrumb/BreadCrumb";
 
 // =====================================================
@@ -75,8 +76,8 @@ import BreadCrumb from "../../components/breadCrumb/BreadCrumb";
 const Registration = () => {
   // const [entered, setEntered] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const userEmail = sampleIdentity.email_id;
-  const [userData, setUserData] = useState<any>(sampleIdentity);
+  const [userEmail, setUserEmail] = useState("");
+  const [userData, setUserData] = useState<any>(null);
 
   /* =====================================================
      BOOK TRANSITION
@@ -87,6 +88,12 @@ const Registration = () => {
      ===================================================== */
   const [transitioning, setTransitioning] = useState(false);
 
+  const [_cookies, setCookies] = useCookies([
+    "Authorization",
+    "user-auth",
+    "id_token",
+  ]);
+
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -95,13 +102,13 @@ const Registration = () => {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://oasis2026.bits-oasis.org/",
+        item: "https://www.bits-oasis.org/",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Registration",
-        item: "https://oasis2026.bits-oasis.org/register",
+        item: "https://www.bits-oasis.org/register",
       },
     ],
   };
@@ -138,9 +145,83 @@ const Registration = () => {
     setTransitioning(false);
   }, []);
 
-  const handleSuccess = () => startBookTransition();
+  function redirectWithPost(
+    url: string,
+    data: { [key: string]: string },
+  ) {
+    const form = document.createElement("form");
+
+    form.method = "POST";
+    form.action = url;
+
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        const input = document.createElement("input");
+
+        input.type = "hidden";
+        input.name = key;
+        input.value = data[key];
+
+        form.appendChild(input);
+      }
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  const handleSuccess = (response: any) => {
+    const idToken = response.credential;
 
 
+
+
+    axios
+      .post(
+        "https://bits-oasis.org/2026/main/registrations/google-reg/",
+        {
+          id_token: idToken,
+        },
+      )
+      .then((res) => {
+        setCookies("id_token", idToken);
+
+        if (res.data.exists) {
+          const accessToken = res.data.tokens.access;
+
+          console.log("ACCESS TOKEN:", accessToken);
+
+          setCookies("user-auth", res.data);
+          setCookies(
+            "Authorization",
+            res.data.tokens.access,
+          );
+
+          redirectWithPost(
+            "https://bits-oasis.org/2026/main/registrations/",
+            {
+              token: res.data.tokens.access,
+              dummy: "hello",
+            },
+          );
+
+          setUserEmail(res.data.email);
+        } else {
+          setCookies("user-auth", res.data);
+
+          setUserEmail(res.data.email);
+
+          if (res.data.email) {
+            startBookTransition();
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  console.log("CURRENT PAGE:", currentPage);
 
   return (
     <div>
@@ -149,12 +230,12 @@ const Registration = () => {
 
         <meta
           name="description"
-          content="Explore the local sample registration demo for the OASIS 2026 portfolio archive, the annual cultural festival of BITS Pilani."
+          content="Register for Oasis 2026, the annual cultural festival of BITS Pilani."
         />
 
         <link
           rel="canonical"
-          href="https://oasis2026.bits-oasis.org/register"
+          href="https://www.bits-oasis.org/register"
         />
 
         <meta
@@ -164,19 +245,19 @@ const Registration = () => {
 
         <meta
           property="og:description"
-          content="Explore the local sample registration demo for the OASIS 2026 portfolio archive, the annual cultural festival of BITS Pilani."
+          content="Register for Oasis 2026, the annual cultural festival of BITS Pilani."
         />
 
         <meta property="og:type" content="website" />
 
         <meta
           property="og:url"
-          content="https://oasis2026.bits-oasis.org/register"
+          content="https://www.bits-oasis.org/register"
         />
 
         <meta
           property="og:image"
-          content="https://oasis2026.bits-oasis.org/oasisIcon.webp"
+          content="https://www.bits-oasis.org/logo2.png"
         />
 
         <meta
@@ -196,12 +277,12 @@ const Registration = () => {
 
         <meta
           name="twitter:description"
-          content="Explore the local sample registration demo for the OASIS 2026 portfolio archive, the annual cultural festival of BITS Pilani."
+          content="Register for Oasis 2026, the annual cultural festival of BITS Pilani."
         />
 
         <meta
           name="twitter:image"
-          content="https://oasis2026.bits-oasis.org/oasisIcon.webp"
+          content="https://www.bits-oasis.org/logo2.png"
         />
       </Helmet>
 

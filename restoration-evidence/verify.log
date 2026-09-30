@@ -1,5 +1,0 @@
-
-> oasis-2026-web@0.0.0 verify
-> node scripts/verify.mjs
-
-PASS: sample form validation, empty/invalid/valid demo confirmation, 141 deployment assets below 25 MiB, fonts, local artwork, no legacy APIs/OAuth/storage, single canonical.

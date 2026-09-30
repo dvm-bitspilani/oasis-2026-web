@@ -5,21 +5,21 @@ import gsap from "gsap";
 import styles from "../styles/ComingSoon.module.scss";
 
 const bg =
-  new URL("../assets/home/bg.jpg", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/v1790465230/bg.jpg";
 
 import sandImg from "../assets/Sand2.png" 
 
 const cloudSmall =
-  new URL("../assets/home/cloudSmall.svg", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudSmall.svg";
 
 const cloudBig =
-  new URL("../assets/home/cloudBig.svg", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudBig.svg";
 
 const cloudThree =
-  new URL("../assets/home/cloudThree.svg", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudThree.svg";
 
 const Moon =
-  new URL("../assets/Moon.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/Moon.png";
 
 import ShootingStars from "../components/ShootingStars";
 

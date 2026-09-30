@@ -1,21 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import Preloader from "./pages/Preloader";
 import { useTransition } from "./context/TransitionProvider";
+import ReactGA from "react-ga4";
 // import video from "./assets/video/curtain.mp4";
-// const camel1 = new URL("./assets/home/camel1.svg", import.meta.url).href;
-// const camel2 = new URL("./assets/home/camel2.svg", import.meta.url).href;
-// const Castle = new URL("./assets/home/castlefinal2.png", import.meta.url).href;
-// const cloudBig = new URL("./assets/home/cloudBig.svg", import.meta.url).href;
-// const cloudSmall = new URL("./assets/home/cloudSmall.svg", import.meta.url).href;
-// const cloudThree = new URL("./assets/home/cloudThree.svg", import.meta.url).href;
+// const camel1 = "https://res.cloudinary.com/bhfhuzru/image/upload/camel1.svg";
+// const camel2 = "https://res.cloudinary.com/bhfhuzru/image/upload/camel2.svg";
+// const Castle = "https://res.cloudinary.com/bhfhuzru/image/upload/castlefinal2.png";
+// const cloudBig = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudBig.svg";
+// const cloudSmall = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudSmall.svg";
+// const cloudThree = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudThree.svg";
 // import hamLine from "./assets/hamLine.svg";
-// const LogoOasis = new URL("./assets/home/LogoOasisi.webp", import.meta.url).href;
-// const Moon = new URL("./assets/home/Moon.webp", import.meta.url).href;
+// const LogoOasis = "https://res.cloudinary.com/bhfhuzru/image/upload/LogoOasisi.webp";
+// const Moon = "https://res.cloudinary.com/bhfhuzru/image/upload/Moon.webp";
 // import navCircle from "./assets/navCircle.svg";
 // import navSan from "./assets/navSan.svg";
-// const sandImg = new URL("./assets/home/sandfinal.webp", import.meta.url).href;
+// const sandImg = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454105/sandfinal.webp";
 // import RegBg from "./assets/registration/reg/RegBg.png";
 // import leftbottom from "./assets/registration/reg/leftbottom.png";
 // import rightbottom from "./assets/registration/reg/rightbottom.png";
@@ -31,103 +32,117 @@ import { useTransition } from "./context/TransitionProvider";
 // import modalFrame from "./assets/registration/reg/modalFrame.webp";
 // import modalFrameMobile from "./assets/registration/reg/modalFrameMobile.webp";
 // import closedBook from "./assets/registration/reg/closedBook.webp";
+import Syamsiah from "./assets/fonts/Syamsiah Arabic.ttf";
+import EB from "./assets/fonts/EBGaramond-Medium.ttf";
+import Cinzel from "./assets/fonts/Cinzel-VariableFont_wght.ttf";
 // import Scroll1 from "./assets/registration/reg/instructionsScroll.webp";
 // import Scroll2 from "./assets/registration/reg/instructionsScrollLong.webp";
 // import googleButton from "./assets/registration/reg/googleReg.svg";
 
 // import lamps from "/game-icons_magic-lamp.svg";
 
+import video from "./assets/video/curtain.mp4";
 
 const camel1 =
-  new URL("./assets/home/camel1.svg", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/camel1.svg";
 
 const camel2 =
-  new URL("./assets/home/camel2.svg", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/camel2.svg";
 
 const Castle =
-  new URL("./assets/home/castlefinal2.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/castlefinal2.png";
 
 const cloudBig =
-  new URL("./assets/home/cloudBig.svg", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudBig.svg";
 
 const cloudSmall =
-  new URL("./assets/home/cloudSmall.svg", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudSmall.svg";
 
 const cloudThree =
-  new URL("./assets/home/cloudThree.svg", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudThree.svg";
 
 import hamLine from "./assets/hamLine.svg";
 
 const LogoOasis =
-  new URL("./assets/home/LogoOasisi.webp", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/LogoOasisi.webp";
 
 const Moon =
-  new URL("./assets/home/Moon.webp", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/Moon.webp";
 
 import navCircle from "./assets/navCircle.svg";
 import navSan from "./assets/navSan.svg";
 
 const sandImg =
-  new URL("./assets/home/sandfinal.webp", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454105/sandfinal.webp";
 
 const RegBg =
-  new URL("./assets/registration/reg/RegBg.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/RegBg.png";
 
 const leftbottom =
-  new URL("./assets/registration/reg/leftbottom.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/leftbottom.png";
 
 const rightbottom =
-  new URL("./assets/registration/reg/rightbottom.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/rightbottom.png";
 
 const lefttop =
-  new URL("./assets/registration/reg/lefttop.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/lefttop.png";
 
 const righttop =
-  new URL("./assets/registration/reg/righttop.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/righttop.png";
 
 const book =
-  new URL("./assets/registration/reg/book.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/book.png";
   
 
 const buttonBg =
-  new URL("./assets/registration/reg/buttonbg.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/buttonbg.png";
 
 const inputBg =
-  new URL("./assets/registration/reg/inputBg.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/inputBg.png";
 
 const btn =
-  new URL("./assets/registration/reg/btn.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/btn.png";
 
 const searchBg =
-  new URL("./assets/registration/reg/searchBg.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/searchBg.png";
 
 const line =
-  new URL("./assets/registration/reg/line.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/line.png";
 
 const wheel =
-  new URL("./assets/registration/reg/wheel.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/v1790459176/wheel.png";
 
 const modalFrame =
-  new URL("./assets/registration/reg/modalFrame.webp", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/modalFrame.webp";
 
 const modalFrameMobile =
-  new URL("./assets/registration/reg/modalFrameMobile.webp", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/modalFrameMobile.webp";
 
 const closedBook =
-  new URL("./assets/registration/reg/closedBook.webp", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/closedBook.webp";
 
 const Scroll1 =
-  new URL("./assets/registration/reg/instructionsScroll.webp", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/instructionsScroll.webp";
 
 const Scroll2 =
-  new URL("./assets/registration/reg/instructionsScrollLong.webp", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/instructionsScrollLong.webp";
 
 const googleButton =
-  new URL("./assets/registration/reg/googleReg.svg", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/googleReg.svg";
+
+const TRACKING_ID = "GT-PJRTJCBD";
+
+const isOasisDomain =
+  window.location.hostname.includes("bits-oasis.org");
+
+if (isOasisDomain) {
+  ReactGA.initialize(TRACKING_ID);
+}
 
 const isMobile = window.innerWidth <= 768;
 
 const mobileAssets = [
+  video,
   // camel1,
   // camel2,
   // camelLand,
@@ -155,6 +170,9 @@ const mobileAssets = [
   wheel,
   modalFrameMobile,
   closedBook,
+  Syamsiah,
+  EB,
+  Cinzel,
   Scroll1,
   Scroll2,
   googleButton,
@@ -174,6 +192,7 @@ const desktopAssets = [
   sandAbove,
   board,
   sandBottom,
+  video,
   camel1,
   camel2,
   Castle,
@@ -200,6 +219,9 @@ const desktopAssets = [
   wheel,
   modalFrame,
   closedBook,
+  Syamsiah,
+  EB,
+  Cinzel,
   Scroll1,
   Scroll2,
   googleButton,
@@ -212,7 +234,7 @@ const fonts = [
   "Ramadhan",
   "Syamsiah",
   "EB",
-  "EBGaramond",
+  "EB Garamond",
   "Cinzel",
 ];
 const assets = isMobile ? mobileAssets : desktopAssets;
@@ -238,6 +260,15 @@ export default function App() {
      GOOGLE ANALYTICS PAGEVIEW
   ====================================================== */
 
+  useEffect(() => {
+    if (isOasisDomain) {
+      ReactGA.send({
+        hitType: "pageview",
+        page: location.pathname + location.search,
+        title: document.title,
+      });
+    }
+  }, [location]);
 
   /* ======================================================
      PRELOADER STATE
@@ -273,7 +304,6 @@ export default function App() {
 
   return (
     <>
-      <aside className="archive-notice">Portfolio archive · OASIS 2026 · Registration is a local demo</aside>
       {/* ==================================================
           HOME PAGE TRANSITION WRAPPER
       ================================================== */}

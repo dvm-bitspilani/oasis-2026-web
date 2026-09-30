@@ -1,28 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styles from "./Instructions.module.scss";
-
+import { GoogleLogin } from "@react-oauth/google";
 import InstructionModal from "../InstructionModal/InstructionModal";
 const leftbottom =
-  new URL("../../../../assets/registration/reg/leftbottom.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/leftbottom.png";
 
 const rightbottom =
-  new URL("../../../../assets/registration/reg/rightbottom.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/rightbottom.png";
 
 const lefttop =
-  new URL("../../../../assets/registration/reg/lefttop.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/lefttop.png";
 
 const righttop =
-  new URL("../../../../assets/registration/reg/righttop.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/righttop.png";
 
 const rightmid =
-  new URL("../../../../assets/registration/reg/rightmid.png", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/rightmid.png";
 
 const book =
-  new URL("../../../../assets/registration/reg/closedBook.webp", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/closedBook.webp";
 
 const backBtn =
-  new URL("../../../../assets/registration/reg/regBackButton.webp", import.meta.url).href;
+  "https://res.cloudinary.com/bhfhuzru/image/upload/regBackButton.webp";
 /* Scroll slide-out. Runs at t=0 of the book timeline, so the
    scroll is on its way off screen while the book lifts off
    (Booktransition's FLY_DELAY is 350ms). */
@@ -45,6 +45,32 @@ const Instructions = ({
   leaving = false,
 }: InstructionsProps) => {
   const [detailInst, setdetailInst] = useState(false);
+
+  function useWindowWidth() {
+    // Initialize state with the current window width
+    const [windowWidth, setWindowWidth] = useState(
+      typeof window !== "undefined" ? window.innerWidth : 0
+    );
+
+    useEffect(() => {
+      // 1. Define the handler to update state
+      const handleResize = () => {
+        setWindowWidth(window.innerWidth);
+      };
+
+      // 2. Add the event listener when the component mounts
+      window.addEventListener("resize", handleResize);
+
+      // 3. Clean up the listener when the component unmounts
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }, []); // Empty array ensures this effect only runs once on mount
+
+    return windowWidth;
+  }
+
+  const isMobile = useWindowWidth() < 768;
 
   /* Neither .content nor .backButton set `transform` in the SCSS
      (the decorations use the standalone `scale:` property), so
@@ -90,15 +116,16 @@ const Instructions = ({
 
         <ul className={styles.instr}>
           <li>
-            Explore this local demo with prefilled sample details. Do not enter personal information. No account, payment, booking or email is created.
+            Complete the registration form with all required details. You'll
+            be able to login through your registered email id when required.
           </li>
           {/*<li>
             A College Representative (CR) will be appointed for
             each college who'll be responsible for allotting heads for
             all the societies the college will be participating for.
           </li>*/}
-          <li>This is a portfolio archive, not current registration.</li>
-          <li>Selections and details stay in memory; refresh resets the demo.</li>
+          <li>All prof shows are free. </li>
+          <li>All team members are required to register separately.</li>
           <li>
             For further details contact, Srihans:{" "}
             <a href="tel:+91 90003 69723">+91 90003 69723</a>, Sneha:{" "}
@@ -111,7 +138,15 @@ const Instructions = ({
         </ul>
 
         <div className={styles.googleButton}>
-          <button onClick={() => onGoogleSignIn({})}>Continue with sample identity</button>
+          <GoogleLogin
+            onSuccess={onGoogleSignIn}
+            onError={() => console.log("Login Failed")}
+            theme="filled_blue"
+            shape="pill"
+            size="large"
+            text="signin_with"
+            width={isMobile ? 100 : 300}
+          />
         </div>
       </div>
     </>
