@@ -71,7 +71,7 @@ const CONTACTS = [
   },
   {
     label: "General Secretary, Students' Union",
-    x: 68, y: 7,
+    x: 68, y: 12,
     image: emma, // TODO: replace
     name: "Kushal Poosala",
     email: "email8@bitsmail",
@@ -150,11 +150,15 @@ export default function Contact() {
   const DRAG_THRESHOLD = 5;
   // Speed of the automatic scroll to a card (0.05 = slow/smooth, 0.2 = fast)
   const AUTO_SCROLL_EASING = 0.08;
-  // Nudges the map's INITIAL resting position up by this many px from the
-  // fully-revealed position getOffsetY() would otherwise use (see the "Start
-  // shifted down..." line below, inside the effect). Dragging can still reach
-  // the fully-revealed position — this only affects where the view opens.
-  const INITIAL_VIEW_NUDGE_UP = 100;
+  // Reduces how far down the map can shift to reveal content hidden behind
+  // .page (see getOffsetY() below) — so BOTH the initial view AND the
+  // furthest-down drag position sit this many px higher than the "fully
+  // revealed" position. (A previous version only nudged the initial position;
+  // the very first drag/flick re-clamped against the un-nudged bound and
+  // undid it. Baking it into getOffsetY() itself means every bound derived
+  // from it — initial position, max drag extent, resize/collapse recalcs —
+  // is consistently nudged, so it can't be silently erased by any of them.)
+  const VIEW_NUDGE_UP = 20;
   // Matches .page's collapse transition duration in the SCSS (0.4s) — see
   // handleListClick, which retargets the card auto-scroll once .page has
   // actually finished collapsing.
@@ -213,7 +217,8 @@ export default function Contact() {
     const getOffsetY = () => {
       const c = container.getBoundingClientRect();
       const bottom = getPageBottom();
-      return bottom === null ? 0 : bottom - c.top;
+      if (bottom === null) return 0; // desktop: .page doesn't obstruct vertically
+      return Math.max(0, bottom - c.top - VIEW_NUDGE_UP);
     };
 
     const getBounds = () => {
@@ -237,12 +242,11 @@ export default function Contact() {
       };
     };
 
-    // Start shifted down by .page's height where that applies (mobile) minus
-    // INITIAL_VIEW_NUDGE_UP, so the initial view isn't wasted on content
-    // hidden behind .page, but also isn't pinned to the very edge of it.
+    // Start at the (already nudged, see VIEW_NUDGE_UP) fully-revealed position,
+    // so the initial view isn't wasted on content hidden behind .page.
     pos.current = clampPos({
       x: pos.current.x,
-      y: getOffsetY() - INITIAL_VIEW_NUDGE_UP,
+      y: getOffsetY(),
     });
 
     // True when an event happened on (or inside) the .page panel. Pressing /
@@ -600,15 +604,19 @@ export default function Contact() {
 
   const handleListClick = (index: number) => {
     setActive(index);
-    scrollToCard.current(index);
 
     if (expanded) {
+      // Collapse first. scrollToCard needs .page's post-collapse geometry to
+      // center the card correctly (see getPageBottom()); calling it now, while
+      // .page is still expanded, would send the view toward a target based on
+      // the OLD geometry and then immediately redirect it once the real
+      // (collapsed) geometry is known 400ms later — two different targets in
+      // quick succession, which looked like a jump. Waiting for the collapse
+      // to finish means there's only ever one target.
       setExpanded(false);
-      // .page's collapse animates over COLLAPSE_TRANSITION_MS; the scroll
-      // above already starts moving toward the card, and this retargets it
-      // once .page has actually finished collapsing and more of the map is
-      // visible below it (see getPageBottom() / scrollToCard).
       window.setTimeout(() => scrollToCard.current(index), COLLAPSE_TRANSITION_MS);
+    } else {
+      scrollToCard.current(index);
     }
   };
 
