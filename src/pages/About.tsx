@@ -1538,6 +1538,8 @@
 
 
 import styles from "../styles/About.module.scss";
+import { isResourcesReady } from "../loading/resources";
+import { aboutResources } from "../loading/manifests";
 
 import Preloader from "./Preloader";
 
@@ -1564,6 +1566,7 @@ import {
   useState,
   useRef,
   useEffect,
+  useLayoutEffect,
   useCallback,
 } from "react";
 
@@ -1595,12 +1598,6 @@ const ABOUT_ASSETS = [
   backBtn,
   scrollVid,
 ];
-
-gsap.registerPlugin(ScrollTrigger);
-
-ScrollTrigger.config({
-  ignoreMobileResize: true,
-});
 
 const SvgImg = ({
   src,
@@ -1648,7 +1645,7 @@ const About = () => {
   const [playerReady, setPlayerReady] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(false);
   const [aboutPreloaderDone, setAboutPreloaderDone] =
-    useState(false);
+    useState(() => isResourcesReady(aboutResources()));
   const [currentVideoIndex, setCurrentVideoIndex] =
     useState(0);
 
@@ -2144,7 +2141,18 @@ const About = () => {
    * -------------------------------------------------------
    */
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    // Pinning reparents this React-owned node. Revert before host deletion,
+    // including exits through browser history rather than the page back button.
+    gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.config({ ignoreMobileResize: true });
+
+    const pageClass = "oasis-about-page";
+    const htmlHadClass = document.documentElement.classList.contains(pageClass);
+    const bodyHadClass = document.body.classList.contains(pageClass);
+    document.documentElement.classList.add(pageClass);
+    document.body.classList.add(pageClass);
+
     const ctx = gsap.context(() => {
       /*
        * ---------------------------------------------------
@@ -2697,7 +2705,7 @@ const About = () => {
           }, 150);
       };
 
-      requestAnimationFrame(refresh);
+      const refreshFrame = requestAnimationFrame(refresh);
 
       window.addEventListener(
         "load",
@@ -2716,6 +2724,7 @@ const About = () => {
        */
 
       return () => {
+        cancelAnimationFrame(refreshFrame);
         if (resizeTimer !== null) {
           clearTimeout(resizeTimer);
         }
@@ -2746,6 +2755,8 @@ const About = () => {
 
     return () => {
       ctx.revert();
+      if (!htmlHadClass) document.documentElement.classList.remove(pageClass);
+      if (!bodyHadClass) document.body.classList.remove(pageClass);
     };
   }, []);
 
@@ -3063,7 +3074,7 @@ const About = () => {
       {!aboutPreloaderDone && (
         <Preloader
           assets={ABOUT_ASSETS}
-           fonts={["EBGaramond"]}
+           fonts={['700 16px "EB Garamond"']}
           onEnter={
             handleAboutPreloaderEnter
           }

@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap');
 
 
-html,
-body {
+:global(html.oasis-about-page),
+:global(body.oasis-about-page) {
   overscroll-behavior-y: contain;
   background-color: black;
   margin: 0;
@@ -15,7 +15,7 @@ body {
 
 
 
-body::-webkit-scrollbar {
+:global(body.oasis-about-page)::-webkit-scrollbar {
   display: none;
 }
 

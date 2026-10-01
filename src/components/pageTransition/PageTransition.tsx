@@ -27,6 +27,8 @@ export type PageTransitionHandle = {
 
 type PageTransitionProps = {
   onComplete?: () => void;
+  /** Reuses the original video bytes when a cached Blob URL is available. */
+  videoSrc?: string;
   /** Brightness threshold (0-255). Pixels darker than this become transparent. */
   blackThreshold?: number;
 };
@@ -36,7 +38,7 @@ const CURTAIN_PAUSE_TIME = 2;
 const VIDEO_START_PERCENT = 0.5;
 
 const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
-  function PageTransition({ onComplete, blackThreshold = 10 }, ref) {
+  function PageTransition({ onComplete, blackThreshold = 10, videoSrc = curtainVideo }, ref) {
     const rootRef = useRef<HTMLDivElement | null>(null);
     const layerRef = useRef<SVGSVGElement | null>(null);
     const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -62,43 +64,104 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (!ctx) return;
 
-      let animFrameId: number;
+      let animationFrameId: number | null = null;
+      let videoFrameId: number | null = null;
+      let disposed = false;
+      let lastFrame: number | null = null;
+      const supportsVideoFrames = typeof video.requestVideoFrameCallback === "function";
 
-      const renderFrame = () => {
-        if (!video.paused && !video.ended) {
-          if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-            canvas.width = video.videoWidth || 1920;
-            canvas.height = video.videoHeight || 1080;
-          }
-
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-          const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const data = frame.data;
-          const len = data.length;
-
-          // Key out dark background pixels
-          for (let i = 0; i < len; i += 4) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
-
-            if (r < blackThreshold && g < blackThreshold && b < blackThreshold) {
-              data[i + 3] = 0; // Alpha channel
-            }
-          }
-
-          ctx.putImageData(frame, 0, 0);
+      const drawFrame = () => {
+        if (disposed || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
+        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+          canvas.width = video.videoWidth || 1920;
+          canvas.height = video.videoHeight || 1080;
         }
-        animFrameId = requestAnimationFrame(renderFrame);
+
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = frame.data;
+        const len = data.length;
+
+        // Key out dark background pixels
+        for (let i = 0; i < len; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+
+          if (r < blackThreshold && g < blackThreshold && b < blackThreshold) {
+            data[i + 3] = 0; // Alpha channel
+          }
+        }
+
+        ctx.putImageData(frame, 0, 0);
       };
 
-      animFrameId = requestAnimationFrame(renderFrame);
+      const cancelFrame = () => {
+        if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
+        if (videoFrameId !== null) video.cancelVideoFrameCallback(videoFrameId);
+        animationFrameId = null;
+        videoFrameId = null;
+      };
+
+      const scheduleFrame = () => {
+        if (disposed || video.paused || video.ended || video.seeking) return;
+        if (animationFrameId !== null || videoFrameId !== null) return;
+
+        if (supportsVideoFrames) {
+          videoFrameId = video.requestVideoFrameCallback(() => {
+            videoFrameId = null;
+            if (disposed || video.paused || video.ended || video.seeking) return;
+            drawFrame();
+            scheduleFrame();
+          });
+        } else {
+          animationFrameId = requestAnimationFrame(() => {
+            animationFrameId = null;
+            if (disposed || video.paused || video.ended || video.seeking) return;
+            // Older browsers may expose decoded-frame counts without rVFC.
+            // Avoid chroma-keying the same frame at the display refresh rate.
+            const frame = typeof video.getVideoPlaybackQuality === "function"
+              ? video.getVideoPlaybackQuality().totalVideoFrames
+              : video.currentTime;
+            if (frame !== lastFrame) {
+              lastFrame = frame;
+              drawFrame();
+            }
+            scheduleFrame();
+          });
+        }
+      };
+
+      const handleSeeked = () => {
+        lastFrame = null;
+        // Preserve the exact held curtain frame, including a seek while paused.
+        drawFrame();
+        scheduleFrame();
+      };
+      const handleEnded = () => {
+        cancelFrame();
+        drawFrame();
+      };
+      video.addEventListener("playing", scheduleFrame);
+      video.addEventListener("pause", cancelFrame);
+      video.addEventListener("seeking", cancelFrame);
+      video.addEventListener("seeked", handleSeeked);
+      video.addEventListener("ended", handleEnded);
+      video.addEventListener("emptied", cancelFrame);
+      scheduleFrame();
 
       return () => {
-        cancelAnimationFrame(animFrameId);
+        disposed = true;
+        cancelFrame();
+        video.removeEventListener("playing", scheduleFrame);
+        video.removeEventListener("pause", cancelFrame);
+        video.removeEventListener("seeking", cancelFrame);
+        video.removeEventListener("seeked", handleSeeked);
+        video.removeEventListener("ended", handleEnded);
+        video.removeEventListener("emptied", cancelFrame);
       };
-    }, [blackThreshold]);
+    }, [blackThreshold, videoSrc]);
 
     // =========================================
     // RESUME CURTAIN
@@ -496,7 +559,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         {/* HIDDEN VIDEO SOURCE */}
         <video
           ref={videoRef}
-          src={curtainVideo}
+          src={videoSrc}
           muted
           playsInline
           preload="auto"

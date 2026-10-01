@@ -42,6 +42,7 @@ const camelLand2 = "https://res.cloudinary.com/bhfhuzru/image/upload/camel2.svg"
 type HomeProps = {
   preloaderDone: boolean;
   preloaderExiting: boolean;
+  onIntroComplete?: () => void;
 };
 
 type Cloud = {
@@ -154,6 +155,7 @@ const FADE_ELEMENTS_STAGGER = 0.12;
 export default function Home({
   preloaderDone,
   // preloaderExiting,
+  onIntroComplete,
 }: HomeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -179,6 +181,10 @@ export default function Home({
   /* Gates Nav + Register interactivity until the full intro sequence
      (main timeline + every cloud-string retraction) has finished. */
   const [introComplete, setIntroComplete] = useState(false);
+  useEffect(() => {
+    if (introComplete) onIntroComplete?.();
+  }, [introComplete, onIntroComplete]);
+
   const pendingRetractionsRef = useRef(0);
   const mainTimelineDoneRef = useRef(false);
 

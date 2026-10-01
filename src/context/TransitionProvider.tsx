@@ -1,253 +1,191 @@
 import {
   createContext,
+  lazy,
+  Suspense,
   useContext,
+  useEffect,
   useRef,
   useState,
   useCallback,
   useMemo,
   type ReactNode,
 } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import type { PageTransitionHandle } from "../components/pageTransition/PageTransition";
+import { loadPageTransition, loadRoute } from "../loading/routes";
+import { prepareRoute, setBackgroundNavigationBusy } from "../loading/background";
+import { abortCurtainWarmup, getCurtainVideoSource, warmCurtainVideo } from "../loading/resources";
 
-import {
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
-
-import PageTransition, {
-  type PageTransitionHandle,
-} from "../components/pageTransition/PageTransition";
-
+const PageTransition = lazy(loadPageTransition);
 type TransitionContextValue = {
   transitioning: boolean;
   navigateWithTransition: (to: string) => void;
   entered: boolean;
   markEntered: () => void;
 };
-
-const TransitionContext =
-  createContext<TransitionContextValue | null>(null);
-
+const TransitionContext = createContext<TransitionContextValue | null>(null);
 const PRELOADER_KEY = "oasis_preloader_shown";
 
 function waitForNextPaint(): Promise<void> {
-  return new Promise((resolve) => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        resolve();
-      });
-    });
-  });
+  return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
 }
 
-type TransitionStage = "strings" | "curtain";
+async function selectVideoSource(): Promise<string | undefined> {
+  const cached = getCurtainVideoSource();
+  if (cached) return cached;
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  if (connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType ?? "")) return undefined;
+  let timer: number | undefined;
+  try {
+    const source = await Promise.race([
+      warmCurtainVideo("high").catch(() => undefined),
+      new Promise<undefined>((resolve) => { timer = window.setTimeout(() => resolve(undefined), 1200); }),
+    ]);
+    if (!source) abortCurtainWarmup();
+    return source;
+  } finally {
+    if (timer !== undefined) window.clearTimeout(timer);
+  }
+}
 
-export function TransitionProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export function TransitionProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const [transitioning, setTransitioning] =
-    useState(false);
-
-  // pendingPath is only read by transition callbacks and
-  // is never rendered, so it belongs in a ref rather than state.
-  const pendingPathRef =
-    useRef<string | null>(null);
-
+  const [transitioning, setTransitioning] = useState(false);
+  const [videoSrc, setVideoSrc] = useState<string>();
+  const pendingPathRef = useRef<string | null>(null);
+  const transitionRef = useRef<PageTransitionHandle>(null);
+  const navigatingRef = useRef(false);
+  const generationRef = useRef(0);
+  const navigationTimerRef = useRef<number | undefined>(undefined);
+  const originKeyRef = useRef(location.key);
+  const routeCommittedRef = useRef(false);
+  const curtainMountedRef = useRef(false);
+  const transitionStageRef = useRef<"strings" | "curtain">("strings");
+  const routeReadyRef = useRef<Promise<boolean> | null>(null);
   const [entered, setEntered] = useState<boolean>(() => {
-    try {
-      return (
-        sessionStorage.getItem(PRELOADER_KEY) === "true"
-      );
-    } catch {
-      return false;
-    }
+    try { return sessionStorage.getItem(PRELOADER_KEY) === "true"; }
+    catch { return false; }
   });
-
-  const transitionRef =
-    useRef<PageTransitionHandle>(null);
-
-  const navigatingRef =
-    useRef(false);
-
-  const transitionStageRef =
-    useRef<TransitionStage>("strings");
-
-  // =========================================
-  // PRELOADER STATE
-  // =========================================
 
   const markEntered = useCallback(() => {
     setEntered(true);
-
-    try {
-      sessionStorage.setItem(
-        PRELOADER_KEY,
-        "true",
-      );
-    } catch {
-      // Ignore storage errors.
-    }
+    try { sessionStorage.setItem(PRELOADER_KEY, "true"); }
+    catch { /* Storage can be unavailable in private browsing. */ }
   }, []);
 
-  // =========================================
-  // NAVIGATION
-  // =========================================
+  const finish = useCallback(() => {
+    generationRef.current++;
+    if (navigationTimerRef.current !== undefined) window.clearTimeout(navigationTimerRef.current);
+    navigationTimerRef.current = undefined;
+    pendingPathRef.current = null;
+    routeReadyRef.current = null;
+    transitionStageRef.current = "strings";
+    navigatingRef.current = false;
+    routeCommittedRef.current = false;
+    curtainMountedRef.current = false;
+    setTransitioning(false);
+    abortCurtainWarmup();
+    setBackgroundNavigationBusy(false);
+  }, []);
 
-  const navigateWithTransition = useCallback(
-    (to: string) => {
-      const currentPath = location.pathname;
+  const navigateWithTransition = useCallback((to: string) => {
+    if (to.toLowerCase() === location.pathname.toLowerCase() || navigatingRef.current) return;
+    markEntered();
+    navigatingRef.current = true;
+    const generation = ++generationRef.current;
+    originKeyRef.current = location.key;
+    pendingPathRef.current = to;
+    setBackgroundNavigationBusy(true);
+    // Covers import preparation as well as playback, including an offline chunk.
+    navigationTimerRef.current = window.setTimeout(() => {
+      if (generationRef.current !== generation) return;
+      if (curtainMountedRef.current) navigate(to);
+      finish();
+    }, 20000);
 
-      if (
-        to === currentPath ||
-        navigatingRef.current
-      ) {
-        return;
+    void (async () => {
+      try {
+        // Share the same import promise as React.lazy before touching the route.
+        await loadRoute(to);
+        if (generationRef.current !== generation) return;
+        routeReadyRef.current = prepareRoute(to).then(() => true, () => false);
+        if (to.toLowerCase() === "/aboutus" || location.pathname.toLowerCase() === "/aboutus") {
+          const ready = await routeReadyRef.current;
+          if (generationRef.current !== generation) return;
+          if (!ready) { finish(); return; }
+          navigate(to);
+          finish();
+          return;
+        }
+        await loadPageTransition();
+        if (generationRef.current !== generation) return;
+        const source = await selectVideoSource();
+        if (generationRef.current !== generation) return;
+        setVideoSrc(source);
+        transitionStageRef.current = "strings";
+        curtainMountedRef.current = true;
+        setTransitioning(true);
+      } catch {
+        // Keep the current page usable if a route chunk fails to load.
+        if (generationRef.current === generation) finish();
       }
+    })();
+  }, [location.pathname, location.key, markEntered, navigate, finish]);
 
-      // Skip transition when entering or leaving About Us.
-      if (
-        to === "/aboutUs" ||
-        currentPath === "/aboutUs"
-      ) {
-        markEntered();
-        navigate(to);
-        return;
-      }
-
-      markEntered();
-
-      navigatingRef.current = true;
-      transitionStageRef.current = "strings";
-
-      // This value does not need to trigger a render.
-      pendingPathRef.current = to;
-
-      setTransitioning(true);
-    },
-    [
-      location.pathname,
-      markEntered,
-      navigate,
-    ],
-  );
-
-  // =========================================
-  // FIRST TRANSITION COMPLETE
-  // =========================================
-
-  const handleTransitionComplete =
-    useCallback(async () => {
-      const destination =
-        pendingPathRef.current;
-
-      if (!destination) {
-        navigatingRef.current = false;
-        setTransitioning(false);
-        return;
-      }
-
-      /*
-       * Strings have finished.
-       * Curtain is paused while covering the screen.
-       */
-
+  const handleTransition = useCallback(async () => {
+    const destination = pendingPathRef.current;
+    if (!destination) { finish(); return; }
+    if (transitionStageRef.current === "strings") {
+      transitionStageRef.current = "curtain";
+      const generation = generationRef.current;
+      const ready = await routeReadyRef.current;
+      if (generationRef.current !== generation) return;
+      if (!ready) { finish(); return; }
+      routeCommittedRef.current = true;
       navigate(destination);
-
-      /*
-       * Allow the new route to mount and paint.
-       */
       await waitForNextPaint();
       await waitForNextPaint();
-
-      /*
-       * Resume the same curtain animation.
-       */
-      transitionRef.current?.resumeCurtain();
-    }, [
-      navigate,
-    ]);
-
-  // =========================================
-  // TRANSITION HANDLER
-  // =========================================
-
-  const handleTransition =
-    useCallback(async () => {
-      /*
-       * FIRST completion:
-       * strings have finished.
-       */
-      if (
-        transitionStageRef.current === "strings"
-      ) {
-        transitionStageRef.current =
-          "curtain";
-
-        await handleTransitionComplete();
-
-        return;
+      if (generationRef.current === generation && pendingPathRef.current === destination) {
+        transitionRef.current?.resumeCurtain();
       }
+    } else {
+      finish();
+    }
+  }, [navigate, finish]);
 
-      /*
-       * SECOND completion:
-       * curtain has finished.
-       */
-      transitionStageRef.current = "strings";
+  useEffect(() => {
+    if (!navigatingRef.current) return;
+    const expected = pendingPathRef.current?.toLowerCase();
+    if (routeCommittedRef.current
+      ? location.pathname.toLowerCase() !== expected
+      : location.key !== originKeyRef.current) finish();
+  }, [location.key, location.pathname, finish]);
 
-      pendingPathRef.current = null;
-      setTransitioning(false);
-      navigatingRef.current = false;
-    }, [handleTransitionComplete]);
+  useEffect(() => () => {
+    generationRef.current++;
+    if (navigationTimerRef.current !== undefined) window.clearTimeout(navigationTimerRef.current);
+    if (navigatingRef.current) setBackgroundNavigationBusy(false);
+  }, []);
 
-  // =========================================
-  // MEMOIZED CONTEXT VALUE
-  // =========================================
-
-  const contextValue =
-    useMemo<TransitionContextValue>(
-      () => ({
-        transitioning,
-        navigateWithTransition,
-        entered,
-        markEntered,
-      }),
-      [
-        transitioning,
-        navigateWithTransition,
-        entered,
-        markEntered,
-      ],
-    );
+  const contextValue = useMemo<TransitionContextValue>(() => ({
+    transitioning, navigateWithTransition, entered, markEntered,
+  }), [transitioning, navigateWithTransition, entered, markEntered]);
 
   return (
-    <TransitionContext.Provider
-      value={contextValue}
-    >
+    <TransitionContext.Provider value={contextValue}>
       {children}
-
       {transitioning && (
-        <PageTransition
-          ref={transitionRef}
-          onComplete={handleTransition}
-        />
+        <Suspense fallback={null}>
+          <PageTransition ref={transitionRef} videoSrc={videoSrc} onComplete={handleTransition} />
+        </Suspense>
       )}
     </TransitionContext.Provider>
   );
 }
 
 export function useTransition() {
-  const context =
-    useContext(TransitionContext);
-
-  if (!context) {
-    throw new Error(
-      "useTransition must be used within a TransitionProvider",
-    );
-  }
-
+  const context = useContext(TransitionContext);
+  if (!context) throw new Error("useTransition must be used within a TransitionProvider");
   return context;
 }

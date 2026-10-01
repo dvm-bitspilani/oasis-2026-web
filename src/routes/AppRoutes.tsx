@@ -2,31 +2,14 @@ import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { TransitionProvider } from "../context/TransitionProvider";
 
-// ======================================================
-// LAZY LOADED PAGES
-// ======================================================
+import { loadHome, loadRegistration, loadComingSoon, loadAbout, loadContact, loadEvents } from "../loading/routes";
 
-const Home = lazy(() => import("../pages/Home"));
-// import Ham from "../pages/Ham/Ham.jsx"
-const Registration = lazy(
-  () => import("../pages/registration/Registration")
-);
-
-const ComingSoon = lazy(
-  () => import("../pages/ComingSoon")
-);
-
-const About = lazy(
-  () => import("../pages/About")
-);
-
-const Contact = lazy(
-  () => import("../pages/Contact")
-);
-
-const EventsPage = lazy(
-  () => import("../pages/EventsPage/EventsPage")
-);
+const Home = lazy(loadHome);
+const Registration = lazy(loadRegistration);
+const ComingSoon = lazy(loadComingSoon);
+const About = lazy(loadAbout);
+const Contact = lazy(loadContact);
+const EventsPage = lazy(loadEvents);
 
 // ======================================================
 // TYPES
@@ -35,6 +18,7 @@ const EventsPage = lazy(
 interface AppRoutesProps {
   preloaderDone: boolean;
   preloaderExiting: boolean;
+  onHomeIntroComplete: () => void;
 }
 
 // ======================================================
@@ -44,6 +28,7 @@ interface AppRoutesProps {
 export default function AppRoutes({
   preloaderDone,
   preloaderExiting,
+  onHomeIntroComplete,
 }: AppRoutesProps) {
   return (
     <TransitionProvider>
@@ -60,6 +45,7 @@ export default function AppRoutes({
               <Home
                 preloaderDone={preloaderDone}
                 preloaderExiting={preloaderExiting}
+                onIntroComplete={onHomeIntroComplete}
               />
             }
           />
