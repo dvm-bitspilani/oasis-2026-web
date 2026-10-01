@@ -98,6 +98,8 @@ const E = {
     inOut: bezier(0.42, 0, 0.58, 1),
     iris: bezier(0.65, 0, 0.35, 1),
     rise: bezier(0.3, 0, 0.2, 1),
+    emerge: bezier(0.45, 0.05, 0.3, 1), // gentle start, steady climb, soft stop (chest out of the sand)
+    lift: bezier(0.4, 0, 0.1, 1), // slow start, long weightless drift to a stop
     sand: bezier(0.16, 1, 0.3, 1),
     fly: bezier(0.2, 0.6, 0.3, 1),
     zoom: bezier(0.4, 0, 0.2, 1),
@@ -155,9 +157,13 @@ export default function Ham() {
             const q = (n: string) => `.${styles[n]}`;
 
             // ---- timing knobs ----
-            const riseDelay = 0.35, riseTime = 0.9;
-            const lidDelay = riseDelay + 0.75, lidTime = 1.9;
+            const riseDelay = 0.15, riseTime = 2;
+            const hold = 0;                                // chest hangs in the air before the lid opens
+            const lidDelay = riseDelay + riseTime + hold - 0.5, lidTime = 1.9;
             const seg = (f: number) => f * lidTime; // fraction of the lid swing -> seconds
+            const hoverLift = -3;                             // yPercent: how far above its resting spot it floats
+            const letGo = lidDelay + seg(0.3);                // the force releases...
+            const landAt = lidDelay + seg(0.57);              // ...and it lands exactly when the lid hits
             const popDelay = lidDelay + seg(0.55), popStagger = 0.14, popTime = 0.9;
             const camStart = 0.6, camClosed = 0.7;
 
@@ -166,55 +172,71 @@ export default function Ham() {
 
             gsap.set(chestTop, { zIndex: 5 }); // in front of the base while lying over it
 
-            // background iris + dim
-            tl.fromTo(root, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: E.out }, 0)
-              .fromTo(q("bgHome"),
-                { clipPath: "circle(0% at 80% 80%)", "--dim": 0.5 },
-                { clipPath: "circle(150% at 50% 50%)", "--dim": 0, duration: 2.5, ease: E.iris }, 0);
+            // background iris + dim// background iris + dim
+tl.fromTo(root, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: E.out }, 0)
+    .fromTo(q("bgHome"),
+        { clipPath: "circle(0% at 50% 50%)", "--dim": 0.5 },
+        { clipPath: "circle(150% at 50% 50%)", "--dim": 0, duration: 2.5, ease: E.iris }, 1);
 
             // sand
             tl.fromTo(q("sandAbove"), { yPercent: 30 }, { yPercent: 0, duration: 1.6, ease: E.sand }, 0.1)
-              .fromTo(q("sandBottom"), { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 1.1, ease: E.sand }, 0.1);
+                .fromTo(q("sandBottom"), { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.8, ease: E.sand }, 0.1);
 
             // chest zoom (chest only, everything else stays at scale 1):
             // 0.6 -> 0.7 while the lid is closed -> 1 during the swing
-            // The guitar lives inside the chest layer, so it would inherit the zoom. Every
-            // frame we set its scale to 1 / zoom, which cancels it exactly (its transform-origin
-            // in the SCSS sits on the same screen point as the chest layer's).
-            const chestLayer = root.querySelector<HTMLElement>(q("lChest"))!;
-            const guitar = root.querySelector<HTMLElement>(q("guitarBook"))!;
-            const cancelZoom = () => {
-                gsap.set(guitar, { scale: 1 / (gsap.getProperty(chestLayer, "scale") as number) });
-            };
+            tl.fromTo(q("lChest"), { scale: camStart }, { scale: camClosed, duration: lidDelay - riseDelay, ease: E.ease }, riseDelay)
+                .to(q("lChest"), { scale: 1, duration: lidTime, ease: E.zoom }, lidDelay);
 
-            tl.fromTo(q("lChest"), { scale: camStart },
-                { scale: camClosed, duration: lidDelay - riseDelay, ease: E.ease, onUpdate: cancelZoom }, riseDelay)
-              .to(q("lChest"), { scale: 1, duration: lidTime, ease: E.zoom, onUpdate: cancelZoom }, lidDelay);
-            cancelZoom(); // initial 1 / 0.6, before the first frame
+            // chest is LIFTED by an unseen force: slow start, long weightless drift up to a hover
+            // height, held there, then the force lets go and it sinks to rest as the lid lands.
+            // (no scale here, so the zoom above is the only scale)
+            tl.fromTo(q("chestRig"), { yPercent: 120 }, { yPercent: hoverLift, duration: riseTime, ease: E.emerge }, riseDelay)
+                .fromTo(q("chestRig"), { opacity: 0 }, { opacity: 1, duration: riseTime * 0.25, ease: E.rise }, riseDelay)
+                .to(q("chestRig"), { yPercent: 0, duration: landAt - letGo, ease: "power3.in" }, letGo);
 
-            // chest rises (no scale here, so the zoom above is the only scale)
-            tl.fromTo(q("chestRig"), { yPercent: 120 }, { yPercent: 0, duration: riseTime+1, ease: E.rise }, riseDelay)
-              .fromTo(q("chestRig"), { opacity: 0 }, { opacity: 1, duration: riseTime * 0.25, ease: E.rise }, riseDelay);
+            // Levitation drift, driven by one clock so it is scrubbable/reversible. Pure motion, no
+            // glow or particles: a slow bob, a lateral drift, and a tilt that starts leaning as it is
+            // lifted and levels out. All of it fades to zero right at the landing.
+            const rig = root.querySelector<HTMLElement>(q("chestRig"))!;
+            gsap.set(rig, { transformOrigin: "50% 65%" }); // sway around the chest, not the screen centre
+            const vh = window.innerHeight / 100;
+            const smooth = (x: number) => { const c = Math.min(1, Math.max(0, x)); return c * c * (3 - 2 * c); };
+            const floatDur = landAt - riseDelay;
+            const fade = 0.7;                                 // seconds over which the drift dies out
+            const fl = { t: 0 };
+            tl.to(fl, {
+                t: floatDur, duration: floatDur, ease: "none",
+                onUpdate: () => {
+                    const t = fl.t;
+                    const env = smooth(t / 0.5) * (1 - smooth((t - (floatDur - fade)) / fade));
+                    const lean = -5 * (1 - E.emerge(Math.min(1, t / riseTime))) * (1 - smooth((t - (floatDur - fade)) / fade));
+                    gsap.set(rig, {
+                        y: Math.sin(t * 2.0) * 0.9 * vh * env,
+                        x: Math.sin(t * 1.25 + 1) * 0.7 * vh * env,
+                        rotation: lean + Math.sin(t * 1.6 + 0.5) * 1.2 * env + Math.sin(t * 31) * 0.12 * env, // last term = faint tremor of effort
+                    });
+                },
+            }, riseDelay);
 
             // lid swing (angle keyframes, each with its own easing)
             const lid = gsap.timeline()
-              .fromTo(chestTop, { "--lid": -90 }, { "--lid": -84, duration: seg(0.12), ease: E.lid1 })
-              .to(chestTop, { "--lid": 5, duration: seg(0.46), ease: E.lid2 })
-              .to(chestTop, { "--lid": -2.5, duration: seg(0.16), ease: E.lid3 })
-              .to(chestTop, { "--lid": 1, duration: seg(0.14), ease: E.inOut })
-              .to(chestTop, { "--lid": 0, duration: seg(0.12), ease: E.inOut });
+                .fromTo(chestTop, { "--lid": -90 }, { "--lid": -84, duration: seg(0.12), ease: E.lid1 })
+                .to(chestTop, { "--lid": 5, duration: seg(0.46), ease: E.lid2 })
+                .to(chestTop, { "--lid": -2.5, duration: seg(0.16), ease: E.lid3 })
+                .to(chestTop, { "--lid": 1, duration: seg(0.14), ease: E.inOut })
+                .to(chestTop, { "--lid": 0, duration: seg(0.12), ease: E.inOut });
             tl.add(lid, lidDelay);
 
             // hinge fit: 12% -> 45% of the swing
             tl.fromTo(chestTop, { "--fit": 0 }, { "--fit": 1, duration: seg(0.33), ease: E.lid1 }, lidDelay + seg(0.12));
 
             // z-order swap at 50%, dome/lip hidden at 47%
-            tl.set(chestTop, { zIndex: 3 }, lidDelay + seg(0.5))
-              .set(`${q("strip")}, ${q("lip")}`, { visibility: "hidden" }, lidDelay + seg(0.47));
+            // z-order swap at 50%; dome, lip and well hidden at 47%
+tl.set(chestTop, { zIndex: 3 }, lidDelay + seg(0.5))
+    .set(`${q("strip")}, ${q("lip")}, ${q("chestWell")}`, { visibility: "hidden" }, lidDelay + seg(0.47));
 
             // lid shadow on the base + inner face lighting up
-            tl.fromTo(q("chestBase"), { "--shadow": 1 }, { "--shadow": 0, duration: seg(0.45), ease: E.out }, lidDelay)
-              .fromTo(q("inner"), { filter: "brightness(0.35)" },
+            tl.fromTo(q("inner"), { filter: "brightness(0.35)" },
                 { filter: "brightness(1)", duration: 0.8, ease: E.out, clearProps: "filter" }, lidDelay + seg(0.35));
 
             // thud when the lid lands
@@ -224,19 +246,25 @@ export default function Ham() {
             }, lidDelay + seg(0.57));
 
             // contents + lantern
-            tl
-              .fromTo(q("trunkStuff"), { opacity: 0 }, { opacity: 1, duration: 0.15, ease: E.out }, lidDelay + seg(0.2))
-              .fromTo(q("lantern"), { opacity: 0 }, { opacity: 1, duration: 1, ease: E.out }, lidDelay + 0.7);
+            // guitar + book: hidden until the lid starts to open, then scale up out of the chest mouth.
+            // transform-origin sits at the chest opening (in the element's own coords); they are
+            // below the chest base in z-order, so they grow out from behind it.
+            gsap.set(q("guitarBook"), { transformOrigin: "52% 62%" });
+            tl.fromTo(q("guitarBook"), { scale: 0.2 },
+                { scale: 1, duration: 1.3, ease: "back.out(1.2)" }, lidDelay)
+                .fromTo(q("guitarBook"), { opacity: 0 }, { opacity: 1, duration: 0.3, ease: E.out }, lidDelay)
+                .fromTo(q("trunkStuff"), { opacity: 0 }, { opacity: 1, duration: 0.15, ease: E.out }, lidDelay + seg(0.2))
+                .fromTo(q("lantern"), { opacity: 0 }, { opacity: 1, duration: 1, ease: E.out }, lidDelay + 0.7);
 
             // signs launch out of the chest
             gsap.utils.toArray<HTMLElement>(q("sign")).forEach((sign, i) => {
                 const b = BOARDS[i];
                 const at = popDelay + (BOARDS.length - 1 - i) * popStagger;
                 tl.fromTo(sign, { x: b.dx, scale: 0.4 }, { x: "0vw", scale: 1, duration: popTime, ease: E.fly }, at)
-                  .fromTo(sign, { opacity: 0 }, { opacity: 1, duration: popTime * 0.15, ease: E.fly }, at)
-                  .fromTo(sign.firstElementChild, { y: b.dy, rotation: i * 12 - 24 },
-                    { y: "0vh", rotation: 0, duration: popTime, ease: E.spring }, at)
-                  .set(sign, { pointerEvents: "auto" }, at + popTime); // was `unlock`
+                    .fromTo(sign, { opacity: 0 }, { opacity: 1, duration: popTime * 0.15, ease: E.fly }, at)
+                    .fromTo(sign.firstElementChild, { y: b.dy, rotation: i * 12 - 24 },
+                        { y: "0vh", rotation: 0, duration: popTime, ease: E.spring }, at)
+                    .set(sign, { pointerEvents: "auto" }, at + popTime); // was `unlock`
             });
         }, root);
 
