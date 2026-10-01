@@ -263,10 +263,6 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
   height: 100dvh;
   overflow: hidden;
   z-index: 3;
-  // Same screen point as .lChest's transform-origin (50% 65%), in this element's own
-  // coordinates (it starts at left: -2%), so the GSAP counter-scale cancels the chest zoom.
-  transform-origin: 52vw 65vh;
-  transform-origin: 52vw 65dvh;
 
   img {
     display: block;
