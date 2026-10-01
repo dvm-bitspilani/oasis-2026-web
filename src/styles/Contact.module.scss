@@ -124,12 +124,12 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
       .mail {
         pointer-events: auto;
         cursor: pointer;
-        scale: 0.35;
-        transform: translateX(100px);
+        //scale: 0.35;
+        transform: translateX(30px) scale(0.35);
         transition: transform 0.15s ease;
 
         &:hover {
-          transform: translateX(100px) scale(1.1);
+          transform: translateX(30px) scale(0.4);
         }
       }
     }

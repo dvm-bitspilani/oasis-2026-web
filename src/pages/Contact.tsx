@@ -4,7 +4,15 @@ import map from "../assets/contact/map.png";
 import cross from "../assets/contact/cross.png";
 import styles from "../styles/Contact.module.scss";
 import emma from "../assets/contact/emma.webp";
-import back from "../assets/contact/backButton.png"
+import back from "../assets/contact/backButton.png";
+
+import dvm from "../assets/contact/avyaktVerma.jpeg";
+import adp from "../assets/contact/devanshAgarwal.jpg";
+import spons from "../assets/contact/prafulMalik.jpg";
+import controls from "../assets/contact/shreyasAnand.jpg";
+import recnacc from "../assets/contact/prithviGowda.jpg";
+import prez from "../assets/contact/pulkitBhardwaj.png";
+import gensec from "../assets/contact/kushalPoosala.jpeg";
 
 import ContactCard from "../components/ContactCard";
 
@@ -30,49 +38,49 @@ const CONTACTS = [
   {
     label: "Website, App and Payments",
     x: 79.5, y: 45,
-    image: emma, // TODO: replace
+    image: dvm, // TODO: replace
     name: "Avyakt Verma",
     email: "email2@bitsmail",
   },
   {
     label: "Sponsorships and Company Collaborations",
     x: 63, y: 40,
-    image: emma, // TODO: replace
-    name: "Name 3",
+    image: spons, // TODO: replace
+    name: "Praful Malik",
     email: "email3@bitsmail",
   },
   {
     label: "Logistics and Operations",
     x: 48, y: 54,
-    image: emma, // TODO: replace
-    name: "Name 4",
+    image: controls, // TODO: replace
+    name: "Shreyas Anand",
     email: "email4@bitsmail",
   },
   {
     label: "Reception and Accommodation",
     x: 33, y: 71,
-    image: emma, // TODO: replace
-    name: "Name 5",
+    image: recnacc, // TODO: replace
+    name: "Prithvi Gowda C",
     email: "email5@bitsmail",
   },
   {
     label: "Online Collaborations and Publicity",
     x: 34, y: 20,
-    image: emma, // TODO: replace
-    name: "Name 6",
+    image: adp, // TODO: replace
+    name: "Devansh Agarwal",
     email: "email6@bitsmail",
   },
   {
     label: "President, Students' Union",
     x: 50, y: 15,
-    image: emma, // TODO: replace
+    image: prez, // TODO: replace
     name: "Pulkit Bhardwaj",
     email: "email7@bitsmail",
   },
   {
     label: "General Secretary, Students' Union",
     x: 68, y: 12,
-    image: emma, // TODO: replace
+    image: gensec, // TODO: replace
     name: "Kushal Poosala",
     email: "email8@bitsmail",
   },
