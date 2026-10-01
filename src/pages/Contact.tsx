@@ -1,20 +1,32 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import map from "../assets/contact/map.png";
-import cross from "../assets/contact/cross.png";
+import map from "../assets/contact/map.webp";
+import cross from "../assets/contact/cross.webp";
 import styles from "../styles/Contact.module.scss";
-import emma from "../assets/contact/emma.webp";
-import back from "../assets/contact/backButton.png";
+import back from "../assets/contact/backButton.webp";
 
-import dvm from "../assets/contact/avyaktVerma.jpeg";
+import dvm from "../assets/contact/avyaktVerma.webp";
+import pcr from "../assets/contact/snehaSrivastava.jpeg";
 import adp from "../assets/contact/devanshAgarwal.jpg";
 import spons from "../assets/contact/prafulMalik.jpg";
-import controls from "../assets/contact/shreyasAnand.jpg";
-import recnacc from "../assets/contact/prithviGowda.jpg";
-import prez from "../assets/contact/pulkitBhardwaj.png";
+import controls from "../assets/contact/shreyasAnand.webp";
+import recnacc from "../assets/contact/prithviGowda.webp";
+import prez from "../assets/contact/pulkitBhardwaj.webp";
 import gensec from "../assets/contact/kushalPoosala.jpeg";
 
+// ContactCard also imports this (for the on-card mail icon); imported again
+// here purely so its URL can go in CONTACT_ASSETS below.
+import mail from "../assets/contact/mail.webp";
+// These three are referenced only via CSS url() in Contact.module.scss, never
+// rendered from these bindings — imported here purely to get their
+// bundler-resolved URLs for CONTACT_ASSETS, so the Preloader warms them too.
+import cardBg from "../assets/contact/card.webp";
+import pageBg from "../assets/contact/page.webp";
+import pageMobBg from "../assets/contact/pageMob.webp";
+
 import ContactCard from "../components/ContactCard";
+import Preloader from "../pages/Preloader"; // ⚠️ verify this path — see chat
+import { useTransition } from "../context/TransitionProvider";
 
 // ─────────────────────────────────────────────────────────────
 // CONTACTS — one row per list item / cross / card.
@@ -31,59 +43,92 @@ const CONTACTS = [
   {
     label: "Registrations and Correspondence",
     x: 72, y: 76,
-    image: emma,
-    name: "Name 1",
-    email: "email1@bitsmail",
+    image: pcr,
+    name: "Sneha Srivastava",
+    email: "f20230855@pilani.bits-pilani.ac.in",
   },
   {
     label: "Website, App and Payments",
     x: 79.5, y: 45,
     image: dvm, // TODO: replace
     name: "Avyakt Verma",
-    email: "email2@bitsmail",
+    email: "f20231083@pilani.bits-pilani.ac.in",
   },
   {
     label: "Sponsorships and Company Collaborations",
     x: 63, y: 40,
     image: spons, // TODO: replace
     name: "Praful Malik",
-    email: "email3@bitsmail",
+    email: "f20240605@pilani.bits-pilani.ac.in",
   },
   {
     label: "Logistics and Operations",
     x: 48, y: 54,
     image: controls, // TODO: replace
     name: "Shreyas Anand",
-    email: "email4@bitsmail",
+    email: "f20230906@pilani.bits-pilani.ac.in",
   },
   {
     label: "Reception and Accommodation",
     x: 33, y: 71,
     image: recnacc, // TODO: replace
     name: "Prithvi Gowda C",
-    email: "email5@bitsmail",
+    email: "f20230327@pilani.bits-pilani.ac.in",
   },
   {
     label: "Online Collaborations and Publicity",
     x: 34, y: 20,
     image: adp, // TODO: replace
     name: "Devansh Agarwal",
-    email: "email6@bitsmail",
+    email: "f20230812@pilani.bits-pilani.ac.in",
   },
   {
     label: "President, Students' Union",
     x: 50, y: 15,
     image: prez, // TODO: replace
     name: "Pulkit Bhardwaj",
-    email: "email7@bitsmail",
+    email: "president@pilani.bits-pilani.ac.in",
   },
   {
     label: "General Secretary, Students' Union",
     x: 68, y: 12,
     image: gensec, // TODO: replace
     name: "Kushal Poosala",
-    email: "email8@bitsmail",
+    email: "gensec@pilani.bits-pilani.ac.in",
   },
+];
+
+// Card shown by default when the page loads (see getCardCenterTarget() and
+// the initial pos.current assignment inside the effect below). Looked up by
+// name rather than a hard-coded index, so reordering CONTACTS later doesn't
+// silently point this at someone else.
+const DEFAULT_CARD_NAME = "Avyakt Verma";
+const DEFAULT_CARD_INDEX = Math.max(
+  0,
+  CONTACTS.findIndex((c) => c.name === DEFAULT_CARD_NAME),
+);
+
+// ─────────────────────────────────────────────────────────────
+// Every image this page actually uses, for the <Preloader> below — so the
+// map, crosses, mail icon, backgrounds and every team photo are all already
+// cached by the time the page reveals, instead of popping in individually.
+// ─────────────────────────────────────────────────────────────
+const CONTACT_ASSETS = [
+  map,
+  cross,
+  back,
+  mail,
+  cardBg,
+  pageBg,
+  pageMobBg,
+  dvm,
+  pcr,
+  adp,
+  spons,
+  controls,
+  recnacc,
+  prez,
+  gensec
 ];
 
 // Keyboard controls. Uses e.code (physical keys), so W/A/S/D work on any
@@ -104,6 +149,8 @@ const LIST_PEEK_PADDING = 6;
 const KEY_SPEED = 12;
 
 export default function Contact() {
+  const { entered, markEntered } = useTransition();
+
   const containerRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
   const mapScaleRef = useRef<HTMLDivElement>(null);
@@ -250,33 +297,28 @@ export default function Contact() {
       };
     };
 
-    // Start at the (already nudged, see VIEW_NUDGE_UP) fully-revealed position,
-    // so the initial view isn't wasted on content hidden behind .page.
-    pos.current = clampPos({
-      x: pos.current.x,
-      y: getOffsetY(),
-    });
-
     // True when an event happened on (or inside) the .page panel. Pressing /
     // dragging there must not move the map (touchpad scrolling still works).
     const isOverPage = (e: Event) =>
       !!pageRef.current && pageRef.current.contains(e.target as Node);
 
-    // Smoothly move the map so the chosen card is centred in the visible map area
-    scrollToCard.current = (index: number) => {
+    // Where pos.{x,y} would need to be for the given card to sit centred in
+    // the visible map area (the part of the screen not covered by .page,
+    // whichever side it's on: a side panel narrows it from the left on
+    // desktop, a top bar narrows it from the top on mobile — using the same
+    // real obstruction measurement as getOffsetY(), so this is correct
+    // whether .page is collapsed or expanded). Returns null if that card
+    // isn't rendered (bad index, or called before refs are attached).
+    // Unclamped — callers decide whether/how to clamp.
+    const getCardCenterTarget = (index: number): { x: number; y: number } | null => {
       const card = cardRefs.current[index];
-      if (!card) return;
+      if (!card) return null;
 
       const c = container.getBoundingClientRect();
       const l = layer.getBoundingClientRect();
       const r = card.getBoundingClientRect();
       const p = pageRef.current?.getBoundingClientRect();
 
-      // Visible map area = the part of the screen not covered by .page,
-      // whichever side it's on: a side panel (desktop) narrows it from the
-      // left, a top bar (mobile) narrows it from the top — using the same
-      // real obstruction measurement as getOffsetY(), so a card is still
-      // centred correctly whether .page is collapsed or expanded.
       const pageBottom = getPageBottom();
       const visibleLeft = p && p.width < c.width * 0.9 ? p.right : c.left;
       const visibleTop = pageBottom ?? c.top;
@@ -287,9 +329,25 @@ export default function Contact() {
       const cardX = r.left + r.width / 2 - l.left;
       const cardY = r.top + r.height / 2 - l.top;
 
+      return { x: centerX - cardX, y: centerY - cardY };
+    };
+
+    // Start centred on DEFAULT_CARD_INDEX's card, so the page doesn't open on
+    // an arbitrary corner of the map. Falls back to the old "just reveal
+    // what's behind .page" behaviour if that card isn't renderable for some
+    // reason (e.g. CONTACTS was shortened and the index is now out of range).
+    const initialTarget = getCardCenterTarget(DEFAULT_CARD_INDEX);
+    pos.current = clampPos(initialTarget ?? { x: pos.current.x, y: getOffsetY() });
+    setActive(DEFAULT_CARD_INDEX);
+
+    // Smoothly move the map so the chosen card is centred in the visible map area
+    scrollToCard.current = (index: number) => {
+      const raw = getCardCenterTarget(index);
+      if (!raw) return;
+
       isFlicking.current = false;
       vel.current = { x: 0, y: 0 };
-      target.current = clampPos({ x: centerX - cardX, y: centerY - cardY });
+      target.current = clampPos(raw);
     };
 
     // 1. Wheel input. Two very different devices send "wheel" events:
@@ -700,6 +758,17 @@ export default function Contact() {
           </h2>
         </div>
       </section>
+
+      {/* Overlaid, not a replacement — the map above stays mounted the whole
+          time so its drag/pan effect (which only runs once) attaches to real
+          refs from the very first render. Once the assets finish loading and
+          the exit animation runs, Preloader calls markEntered() and unmounts
+          here, revealing the already-ready map underneath. Skipped entirely
+          if the preloader already played elsewhere this session (`entered`
+          is a single session-wide flag from TransitionProvider). */}
+      {!entered && (
+        <Preloader assets={CONTACT_ASSETS} onEnter={markEntered} />
+      )}
     </div>
   );
 }

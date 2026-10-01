@@ -85,7 +85,7 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
   }
 
   .cardContainer {
-    background-image: url(../assets/contact/card.png);
+    background-image: url(../assets/contact/card.webp);
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
@@ -139,7 +139,7 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
     height: 100vh;
     width: auto;
     aspect-ratio: 767/1080;
-    background-image: url(../assets/contact/page.png);
+    background-image: url(../assets/contact/page.webp);
     background-repeat: no-repeat;
     background-position: left;
     background-size: cover;
@@ -261,7 +261,7 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
         content: "";
         position: absolute;
         inset: 0;
-        background: url(../assets//contact/pageMob.png) top / cover no-repeat;
+        background: url(../assets//contact/pageMob.webp) top / cover no-repeat;
         transform: translateY(-50%); /* collapsed: only half the parchment shows */
         transition: transform 0.4s ease;
         will-change: transform;

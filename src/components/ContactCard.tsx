@@ -1,5 +1,5 @@
 import styles from "../styles/Contact.module.scss";
-import mail from "../assets/contact/mail.png";
+import mail from "../assets/contact/mail.webp";
 
 interface ContactCardProps {
   image: string;
