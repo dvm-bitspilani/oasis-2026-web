@@ -127,9 +127,27 @@ const Instructions = ({
           <li>All prof shows are free. </li>
           <li>All team members are required to register separately.</li>
           <li>
-            For further details contact, Srihans:{" "}
+            For further details, contact :-{/*} Srihans:{" "}
             <a href="tel:+91 90003 69723">+91 90003 69723</a>, Sneha:{" "}
-            <a href="tel:+91 90268 55597">+91 90268 55597</a>
+            <a href="tel:+91 90268 55597">+91 90268 55597</a>*/}
+            <br />
+            <h3 className={styles.work}>Dance - </h3>
+            Srihans: <a href="tel:+91 90003 69723">+91 90003 69723</a>,
+            <br />
+            Kashvi: <a href="tel:+91 86198 07859">+91 86198 07859</a>
+            <br />
+            <h3 className={styles.work}>Music - </h3>
+            Dhruv: <a href="tel:+91 90007 44099">+91 90007 44099</a>
+            <br />
+            <h3 className={styles.work}>Fashion - </h3>
+            Srihans: <a href="tel:+91 90003 69723">+91 90003 69723</a>
+            <br />
+            <h3 className={styles.work}>Theatre - </h3>
+            Prisha: <a href="tel:+91 97370 56704">+91 97370 56704</a>
+            <br />
+            <h3 className={styles.work}>Film - </h3>
+            Ishan: <a href="tel:+91 91061 21092">+91 91061 21092</a>
+
           </li>
           <li>
             For detailed Instructions{" "}
