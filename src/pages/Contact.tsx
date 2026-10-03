@@ -149,7 +149,7 @@ const LIST_PEEK_PADDING = 6;
 const KEY_SPEED = 12;
 
 export default function Contact() {
-  const { entered, markEntered } = useTransition();
+  const { entered, markEntered, transitioning } = useTransition();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
@@ -174,6 +174,13 @@ export default function Contact() {
 
   // Set inside the effect, called by the list items
   const scrollToCard = useRef<(index: number) => void>(() => {});
+  // Re-centers on DEFAULT_CARD_INDEX's card. Set inside the main effect below;
+  // also called from the font/transition-settle effect further down, to
+  // correct the initial position if it was computed before layout was
+  // actually stable (see that effect for why).
+  const centerDefaultCard = useRef<(opts?: { instant?: boolean }) => void>(
+    () => {},
+  );
 
   // Which list item / card is the currently "selected" one. Stays highlighted
   // until another item is clicked, or the map is dragged / scrolled.
@@ -332,12 +339,27 @@ export default function Contact() {
       return { x: centerX - cardX, y: centerY - cardY };
     };
 
-    // Start centred on DEFAULT_CARD_INDEX's card, so the page doesn't open on
-    // an arbitrary corner of the map. Falls back to the old "just reveal
-    // what's behind .page" behaviour if that card isn't renderable for some
-    // reason (e.g. CONTACTS was shortened and the index is now out of range).
-    const initialTarget = getCardCenterTarget(DEFAULT_CARD_INDEX);
-    pos.current = clampPos(initialTarget ?? { x: pos.current.x, y: getOffsetY() });
+    // Centers on DEFAULT_CARD_INDEX's card, so the page doesn't open on an
+    // arbitrary corner of the map. Falls back to the old "just reveal what's
+    // behind .page" behaviour if that card isn't renderable for some reason
+    // (e.g. CONTACTS was shortened and the index is now out of range).
+    // instant=true snaps pos.current directly (used for the very first guess,
+    // below); instant=false (default) eases smoothly via target.current, for
+    // the later correction in the font/transition-settle effect — by then the
+    // page may already be visible, so a sudden snap would be jarring.
+    centerDefaultCard.current = ({ instant = false } = {}) => {
+      const t = clampPos(
+        getCardCenterTarget(DEFAULT_CARD_INDEX) ?? { x: pos.current.x, y: getOffsetY() },
+      );
+      if (instant) {
+        pos.current = t;
+      } else {
+        isFlicking.current = false;
+        vel.current = { x: 0, y: 0 };
+        target.current = t;
+      }
+    };
+    centerDefaultCard.current({ instant: true });
     setActive(DEFAULT_CARD_INDEX);
 
     // Smoothly move the map so the chosen card is centred in the visible map area
@@ -624,6 +646,37 @@ export default function Contact() {
       if (animFrameId.current) cancelAnimationFrame(animFrameId.current);
     };
   }, []);
+
+  // The initial centering above (centerDefaultCard.current({ instant: true }))
+  // runs at mount, using whatever layout exists at that exact instant. Two
+  // things can make that layout wrong, specifically when this page is reached
+  // via Nav's SPA transition rather than a direct/refreshed URL:
+  //  - Fonts: a font this page uses (e.g. the card's name heading) may not
+  //    have been requested yet by the time Contact mounts, if it wasn't part
+  //    of whatever the app-level Preloader warmed before Home first showed.
+  //    The browser renders a fallback font, THEN swaps once the real one
+  //    loads, reflowing the card and silently invalidating the measurement
+  //    centerDefaultCard.current() already took (same class of bug the list
+  //    measurement above already guards against, for the same reason).
+  //  - The transition itself: Contact mounts while `transitioning` is still
+  //    true (the curtain is still covering the screen, mid-animation) — by
+  //    the time it settles, more than enough has happened for a layout change
+  //    to slip in unnoticed.
+  // Re-running once both are known-settled corrects either case. It's a no-op
+  // if the first guess was already right. On a direct/refreshed load,
+  // `transitioning` is false from the start, so this just re-confirms it
+  // once fonts are ready.
+  useEffect(() => {
+    let cancelled = false;
+    if (!transitioning) {
+      document.fonts?.ready.then(() => {
+        if (!cancelled) centerDefaultCard.current();
+      });
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [transitioning]);
 
   // Measure the list so the mobile collapse/expand can animate max-height:
   //   --list-collapsed = height showing only the first 2 entries
