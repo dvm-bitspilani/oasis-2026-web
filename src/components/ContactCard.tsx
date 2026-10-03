@@ -1,78 +1,56 @@
-import { useEffect, useRef, useState } from "react";
 import styles from "../styles/Contact.module.scss";
-import mail from "../assets/contact/mail.png";
+import mail from "../assets/contact/mail.webp";
 
 interface ContactCardProps {
   image: string;
   name: string;
-  designation: string;
   email: string;
 }
 
-// Uses the Clipboard API, with a fallback for non-HTTPS / older browsers.
-async function copyToClipboard(text: string): Promise<boolean> {
-  try {
-    if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(text);
-      return true;
-    }
-  } catch {
-    // fall through to the fallback below
-  }
+// Opens Gmail's "compose" view with the recipient pre-filled. Routed through
+// Google's account chooser first, so if the user is signed into more than one
+// Google account, they get to pick which one to send from before compose opens.
+// Falls back to a plain mailto: link if the tab is blocked (e.g. popup
+// blockers) or the user isn't on Gmail.
+function openGmailCompose(email: string) {
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+    email
+  )}`;
+  const accountChooserUrl = `https://accounts.google.com/AccountChooser?continue=${encodeURIComponent(
+    gmailUrl
+  )}`;
 
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  textarea.style.position = "fixed";
-  textarea.style.opacity = "0";
-  document.body.appendChild(textarea);
-  textarea.select();
+  const tab = window.open(accountChooserUrl, "_blank", "noopener,noreferrer");
 
-  let ok = false;
-  try {
-    ok = document.execCommand("copy");
-  } catch {
-    ok = false;
+  if (!tab) {
+    window.location.href = `mailto:${email}`;
   }
-  document.body.removeChild(textarea);
-  return ok;
 }
 
-export default function ContactCard({ image, name, designation, email }: ContactCardProps) {
-  const [copied, setCopied] = useState(false);
-  const timer = useRef<number | undefined>(undefined);
-
-  useEffect(() => () => window.clearTimeout(timer.current), []);
-
-  const handleCopy = async () => {
-    const ok = await copyToClipboard(email);
-    if (!ok) return;
-
-    setCopied(true);
-    window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setCopied(false), 1500);
-  };
+export default function ContactCard({ image, name, email }: ContactCardProps) {
+  const handleMailClick = () => openGmailCompose(email);
 
   return (
     <div className={styles.cardContainer}>
-      <img src={image} alt={name} />
-      <h1>{name}</h1>
-      <h2>{designation}</h2>
-      <img
-        src={mail}
-        alt="Copy email"
-        title="Copy email"
-        className={styles.mail}
-        role="button"
-        tabIndex={0}
-        onClick={handleCopy}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            handleCopy();
-          }
-        }}
-      />
-      {copied && <span className={styles.copiedToast}>Email copied!</span>}
+      <img className={styles.stuccanImage} src={image} alt={name} />
+      <section className={styles.details}>
+        <h1>{name}</h1>
+        <img
+          src={mail}
+          alt={`Email ${name}`}
+          title={`Email ${name}`}
+          className={styles.mail}
+          role="button"
+          tabIndex={0}
+          onClick={handleMailClick}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              handleMailClick();
+            }
+          }}
+        />
+      </section>
     </div>
   );
 }

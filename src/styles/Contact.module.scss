@@ -1,5 +1,9 @@
 $cross-size: 80px; // change cross size here
-$card-gap: -45px;   // extra space between the bottom of a card and the top of its cross
+$card-gap: -40px;   // extra space between the bottom of a cross and the top of a card (negative = overlap)
+$mobile-card-gap: -100px; // same as $card-gap, but only for screens <= $mobile-breakpoint
+$mobile-breakpoint: 729px;
+$mobile-map-scale: 0.7;   // map image size on screens <= $mobile-breakpoint
+$mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at full size
 
 .mapContainer {
   width: 100%;
@@ -19,15 +23,27 @@ $card-gap: -45px;   // extra space between the bottom of a card and the top of i
     cursor: grabbing;
   }
 
-  /* Wraps the map image + crosses + cards. This is the element that gets translated. */
+  /* Outer wrapper: sized to the map image, receives ONLY the JS drag transform
+     (set as an inline style every frame) — never give this a CSS transform,
+     it would be overwritten. */
   .mapLayer {
     position: absolute;
     top: 0;
     left: 0;
-    width: max-content; /* layer is exactly as big as the map image */
+    width: max-content;
     will-change: transform;
     transform-origin: 0 0;
     pointer-events: none;
+  }
+
+  /* Inner wrapper: same size as .mapLayer, holds the CSS-only mobile scale-down. */
+  .mapScale {
+    width: max-content;
+    transform-origin: 0 0;
+
+    @media screen and (max-width: $mobile-breakpoint) {
+      transform: scale($mobile-map-scale);
+    }
   }
 
   .mapImage {
@@ -37,83 +53,92 @@ $card-gap: -45px;   // extra space between the bottom of a card and the top of i
     pointer-events: none; /* Prevents default image ghost-dragging */
   }
 
-  /* Positioned relative to .mapLayer via inline left/top percentages */
+  /* Positioned relative to .mapScale via inline left/top percentages */
   .cross {
     position: absolute;
     width: $cross-size;
     height: auto;
     transform: translate(-50%, -50%); /* left/top = center of the cross */
     pointer-events: none;
+    z-index: 10;
+
+    @media screen and (max-width: $mobile-breakpoint) {
+      /* Counters .mapScale's shrink so the cross stays full size, anchored
+         at the same center point. */
+      transform: translate(-50%, -170%) scale($mobile-counter-scale);
+    }
   }
 
-  /* Same left/top as its cross; the transform lifts the card so its bottom edge
-     rests just above the cross (half the cross height + $card-gap). */
+  /* Same left/top as its cross; the transform drops the card so its top edge
+     rests just below the cross (half the cross height + $card-gap). */
   .cardAnchor {
     position: absolute;
     width: max-content;
-    transform: translate(-50%, calc(-100% - #{$cross-size * 0.5 + $card-gap}));
+    transform: translate(-50%, calc(#{$cross-size * 0.5} + #{$card-gap}));
+
+    @media screen and (max-width: $mobile-breakpoint) {
+      /* Counters .mapScale's shrink so the card stays full size, anchored
+         at the same top point. Uses $mobile-card-gap, not $card-gap. */
+      transform: translate(-50%, calc(#{$cross-size * 0.5} + #{$mobile-card-gap}))
+        scale($mobile-counter-scale);
+    }
   }
 
   .cardContainer {
-    background-image: url(../assets/contact/card.png);
-    width: 411px;
-    aspect-ratio: 411/376;
+    background-image: url(../assets/contact/card.webp);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    width: 362px;
+    aspect-ratio: 362/381;
     height: auto;
 
-    position: relative; /* positioned by .cardAnchor now; also anchors the toast */
+    position: relative; /* positioned by .cardAnchor now */
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 30px;
+    padding-top: 40px;
 
-    h1 {
-      font-family: 'Syamsiah', sans-serif;
-      color: #151C22;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      text-shadow: 0 0 20px #E5DECE;
+    .stuccanImage {
+      width: 310px;
+      aspect-ratio: 318/287;
+      height: auto;
     }
 
-    h2 {
-      transform: translateY(-10px);
-      color: #1E262C;
-      font-family: 'EB', sans-serif;
-      text-shadow: 0 0 20px #E5DECE;
-    }
+    .details {
+      display: flex;
+      width: 310px;
+      justify-content: space-between;
 
-    /* Mail icon: clickable (the map layer has pointer-events: none) */
-    .mail {
-      pointer-events: auto;
-      cursor: pointer;
-      transition: transform 0.15s ease;
-
-      &:hover {
-        transform: scale(1.1);
+      h1 {
+        font-family: 'Dancing Script', sans-serif;
+        color: #35332D;
+        text-shadow: 0 0 20px #E5DECE;
+        font-weight: 900;
+        white-space: nowrap;
       }
-    }
 
-    .copiedToast {
-      position: absolute;
-      bottom: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 2px 12px;
-      border-radius: 4px;
-      background: #E5DECE;
-      color: #151C22;
-      font-family: 'EB', sans-serif;
-      font-size: 0.9rem;
-      white-space: nowrap;
-      pointer-events: none;
+      /* Mail icon: clickable (the map layer has pointer-events: none) */
+      .mail {
+        pointer-events: auto;
+        cursor: pointer;
+        //scale: 0.35;
+        transform: scale(0.8);
+        transition: transform 0.15s ease;
+
+        &:hover {
+          transform: scale(0.9);
+        }
+      }
     }
   }
 
   .page {
     height: 100vh;
     width: auto;
-    aspect-ratio: 783/1080;
-    background-image: url(../assets/contact/page.png);
+    aspect-ratio: 767/1080;
+    background-image: url(../assets/contact/page.webp);
     background-repeat: no-repeat;
     background-position: left;
     background-size: cover;
@@ -121,38 +146,68 @@ $card-gap: -45px;   // extra space between the bottom of a card and the top of i
     position: absolute;
     inset: 0;
 
+    /* The panel doesn't drag the map, so don't show the grab / grabbing cursor
+       inherited from .mapContainer. */
+    cursor: default;
+
     .pageStuff {
       position: absolute;
-      top: 15%;
+      top: 5%;
       left: 10%;
 
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      align-items: center;
 
       text-align: center;
 
+      a {
+        align-self: flex-start;
+
+        .backBtn {
+          transition: all 0.3s ease;
+
+          &:hover {
+            scale: 1.15;
+          }
+        }
+      }
+
       h1 {
         font-family: 'Syamsiah', sans-serif;
-        color: #6C1700;
-        font-size: 6rem;
+        color: #866D52;
+        font-size: 7rem;
+        font-weight: 400;
+        margin-bottom: 0px;
       }
 
       ul {
         font-family: 'EB', sans-serif;
-        color: #36261A;
+        color: #7E6B58;
         list-style: none;
         font-size: 2rem;
+        font-weight: 400;
+        padding: 0;
+        position: relative; /* li.offsetTop is measured from the list (Contact.tsx) */
 
         li {
-          margin-top: 20px;
+          margin-bottom: 20px;
           cursor: pointer;
-          transition: color 0.15s ease;
+          transition: all 0.15s ease;
 
-          &:hover {
-            color: #6C1700;
+          /* .active keeps the hover look applied after a click, until another
+             item is clicked or the map is moved (cleared in Contact.tsx). */
+          &:hover,
+          &.active {
+            color: #D3C6C6;
+            text-shadow: 0 0 40px #D3C6C6;
+            scale: 1.05;
           }
         }
+      }
+
+      h2 {
+        display: none;
       }
     }
   }
@@ -162,12 +217,146 @@ $card-gap: -45px;   // extra space between the bottom of a card and the top of i
   .mapContainer {
     .page {
       .pageStuff {
+        a {
+          .backBtn {
+            scale: 0.85;
+
+            &:hover {
+              scale: 1;
+            }
+          }
+        }
+
         h1 {
           font-size: 4.5rem;
+          margin: 0;
         }
 
         ul {
           font-size: 1.5rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: $mobile-breakpoint) {
+  .mapContainer {
+    .page {
+      /* The parchment is drawn by ::before so it can slide up/down on its own
+         while the back button + heading (in .pageStuff) never move. */
+      background-image: none;
+      width: 100vw;
+      aspect-ratio: 402/503;
+      height: auto;
+
+      top: 0;
+
+      /* The box keeps its full height, so its transparent lower part must not
+         swallow map drags while collapsed. Only the parchment and the content
+         (below) take pointer events. */
+      pointer-events: none;
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: url(../assets//contact/pageMob.webp) top / cover no-repeat;
+        transform: translateY(-50%); /* collapsed: only half the parchment shows */
+        transition: transform 0.4s ease;
+        will-change: transform;
+        pointer-events: auto;
+      }
+
+      /* "See Less": parchment back at its original position */
+      &.expanded::before {
+        transform: translateY(0);
+      }
+
+      .pageStuff {
+        top: 0;
+        left: 12%;
+        z-index: 1;
+        pointer-events: auto;
+
+        a {
+          .backBtn {
+            scale: 0.6;
+            transform: translateX(-80%);
+
+            &:hover {
+              scale: 0.65;
+            }
+          }
+        }
+
+        h1 {
+          font-size: 4rem;
+
+          /* Collapsed: nudged up (expanded resets it, see below) */
+          transform: translateY(-30%);
+          transition: transform 0.4s ease;
+        }
+
+        ul {
+          font-size: 1.2rem;
+
+          /* Collapsed: only the first 2 entries show, the rest scroll.
+             --list-collapsed / --list-expanded are measured in Contact.tsx. */
+          box-sizing: border-box;
+          overflow-y: auto;
+          max-height: var(--list-collapsed);
+          /* Collapsed: nudged up by 70% of the COLLAPSED height. Deliberately not
+             translateY(-70%): a % is resolved against the list's current height,
+             which is animating during expand/collapse, so the offset would
+             swell mid-transition and the list would dip up into the h1. This
+             stays a fixed px amount and eases cleanly to 0. */
+          transform: translateY(calc(var(--list-collapsed) * -0.55));
+          transition: max-height 0.4s ease, transform 0.4s ease;
+          touch-action: pan-y; /* lets a finger scroll the list, not the map */
+          overscroll-behavior: contain;
+          scrollbar-width: thin;
+          scrollbar-color: #866D52 transparent;
+
+          li {
+            margin-bottom: 12px;
+          }
+        }
+
+        h2 {
+          display: inline-block;
+          font-family: 'Dancing Script', sans-serif;
+          color: #D3C6C6;
+          text-shadow: 0 0 40px #D3C6C6;
+          cursor: pointer;
+          user-select: none;
+
+          align-self: flex-end;
+          margin: 0;
+          transform: translateY(-100%);
+          transition: transform 0.4s ease;
+        }
+      }
+
+      /* Expanded: everything back to its normal position, every entry
+         visible, no scrollbar */
+      &.expanded .pageStuff {
+        h1 {
+          transform: translateY(0);
+        }
+
+        ul {
+          max-height: var(--list-expanded);
+          transform: translateY(0);
+          scrollbar-width: none;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
+        }
+
+        h2 {
+          transform: translateY(0);
         }
       }
     }

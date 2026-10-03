@@ -200,8 +200,7 @@ const Registration = () => {
           redirectWithPost(
             "https://bits-oasis.org/2026/main/registrations/",
             {
-              token: res.data.tokens.access,
-              dummy: "hello",
+              token: res.data.tokens.access
             },
           );
 
