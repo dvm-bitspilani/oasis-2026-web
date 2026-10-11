@@ -6,7 +6,7 @@ import styles from "../styles/Contact.module.scss";
 import back from "../assets/contact/backButton.webp";
 
 import dvm from "../assets/contact/avyaktVerma.webp";
-import pcr from "../assets/contact/snehaSrivastava.jpeg";
+import pcr from "../assets/contact/snehaSrivastava1.jpeg";
 import adp from "../assets/contact/devanshAgarwal.jpg";
 import spons from "../assets/contact/prafulMalik.jpg";
 import controls from "../assets/contact/shreyasAnand.webp";
