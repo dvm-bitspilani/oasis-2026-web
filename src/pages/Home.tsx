@@ -16,7 +16,7 @@ import cloudBig from "../assets/cloudBig.svg";
 import cloudThree from "../assets/cloudThree.svg";
 import Castle from "../assets/castlefinal2.png";
 import Moon from "../assets/Moon.png";
-import LogoOasis from "../assets/LogoOasisi.png";
+import LogoOasis from "../assets/oasis26logo.png";
 /* The register button artwork is split into two layers so the shine can be
    masked to the carpet alone. Both files are expected to be exported on the
    SAME canvas as the old cactuschange.png — that is what lets them stack at

@@ -17,7 +17,7 @@ import cloudBig from "./assets/cloudBig.svg";
 import cloudSmall from "./assets/cloudSmall.svg";
 import cloudThree from "./assets/cloudThree.svg";
 import hamLine from "./assets/hamLine.svg";
-import LogoOasis from "./assets/LogoOasisi.png";
+import LogoOasis from "./assets/oasis26logo.png";
 import Moon from "./assets/Moon.png";
 import navCircle from "./assets/navCircle.svg";
 import navSan from "./assets/navSan.svg";
