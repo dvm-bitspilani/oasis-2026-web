@@ -1305,7 +1305,6 @@
         scale: 0.45;
     }
 
-    /* BOTTOM POTS */
 
     .danceContainer {
         left: -33%;
@@ -1325,3 +1324,120 @@
         scale: 0.36;
     }
 }
+
+
+
+// .dramaContainer,
+// .photographyContainer,
+// .danceContainer,
+// .otherContainer,
+// .musicContainer {
+//     position: absolute;
+//     bottom: auto;
+//     margin-bottom: 0;
+//     scale: 0.8;
+//     z-index: 2;
+// }
+
+// .dramaContainer {
+//     left: 20%;
+//     top: 47%;
+// }
+
+// .photographyContainer {
+//     right: 20%;
+//     top: 47%;
+// }
+
+
+// .danceContainer {
+//     left: 3%;
+//     top: 73%;
+// }
+
+// .otherContainer {
+//     left: 50%;
+//     top: 73%;
+//     transform: translateX(-50%);
+// }
+
+// .musicContainer {
+//     right: 3%;
+//     top: 73%;
+// }
+
+// /* Consistent vase sizing */
+
+// .dramaContainer .imageWrap,
+// .photographyContainer .imageWrap,
+// .danceContainer .imageWrap,
+// .otherContainer .imageWrap,
+// .musicContainer .imageWrap {
+//     display: inline-block;
+//     position: relative;
+// }
+
+// .dramaContainer img,
+// .photographyContainer img,
+// .danceContainer img,
+// .otherContainer img,
+// .musicContainer img {
+//     display: block;
+//     // width: clamp(105px, 15vw, 220px);
+//     height: auto;
+// }
+
+// /* Tablet */
+
+// @media (max-width: 900px) {
+//     .dramaContainer {
+//         left: 7%;
+//     }
+
+//     .photographyContainer {
+//         right: 7%;
+//     }
+
+//     .dramaContainer img,
+//     .photographyContainer img {
+//         width: clamp(100px, 19vw, 165px);
+//     }
+
+//     .danceContainer img,
+//     .otherContainer img,
+//     .musicContainer img {
+//         width: clamp(95px, 18vw, 150px);
+//     }
+// }
+
+// /* Mobile */
+
+// @media (max-width: 600px) {
+//     .dramaContainer,
+//     .photographyContainer {
+//         top: 48%;
+//     }
+
+//     .dramaContainer {
+//         left: 4%;
+//     }
+
+//     .photographyContainer {
+//         right: 4%;
+//     }
+//     .danceContainer,
+//     .otherContainer,
+//     .musicContainer {
+//         top: 75%;
+//     }
+//     .danceContainer {
+//         left: 1%;
+//     }
+//     .otherContainer {
+//         left: 50%;
+//     }
+//     .musicContainer {
+//         right: 1%;
+//     }
+    
+// }
