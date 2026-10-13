@@ -1,148 +1,93 @@
+
 import {
   createContext,
+  useCallback,
   useContext,
   useRef,
   useState,
-  useCallback,
-  useMemo,
   type ReactNode,
 } from "react";
-
-import {
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import PageTransition, {
+  type PageKey,
   type PageTransitionHandle,
 } from "../components/pageTransition/PageTransition";
 
 type TransitionContextValue = {
   transitioning: boolean;
-  navigateWithTransition: (to: string) => void;
+  navigateWithTransition: (to: string, pageKey?: PageKey) => void;
   entered: boolean;
   markEntered: () => void;
 };
 
-const TransitionContext =
-  createContext<TransitionContextValue | null>(null);
+const TransitionContext = createContext<
+  TransitionContextValue | undefined
+>(undefined);
 
-const PRELOADER_KEY = "oasis_preloader_shown";
+type TransitionProviderProps = {
+  children: ReactNode;
+};
 
-function waitForNextPaint(): Promise<void> {
-  return new Promise((resolve) => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        resolve();
-      });
-    });
-  });
+type TransitionStage = "cover" | "reveal";
+
+function getPageKey(to: string): PageKey {
+  const path = to.split("?")[0].split("#")[0];
+
+  if (path === "/") return "home";
+  if (path.startsWith("/events")) return "events";
+  if (path === "/aboutUs" || path.startsWith("/aboutUs/")) {
+    return "about";
+  }
+  if (path.startsWith("/sponsors")) return "sponsors";
+  if (path.startsWith("/gallery")) return "gallery";
+  if (path.startsWith("/contact")) return "contact";
+
+  return "home";
 }
-
-type TransitionStage = "strings" | "curtain";
 
 export function TransitionProvider({
   children,
-}: {
-  children: ReactNode;
-}) {
+}: TransitionProviderProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [transitioning, setTransitioning] =
-    useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+  const [entered, setEntered] = useState(false);
+  const [selectedPage, setSelectedPage] =
+    useState<PageKey>("home");
 
-  // pendingPath is only read by transition callbacks and
-  // is never rendered, so it belongs in a ref rather than state.
-  const pendingPathRef =
-    useRef<string | null>(null);
-
-  const [entered, setEntered] = useState<boolean>(() => {
-    try {
-      return (
-        sessionStorage.getItem(PRELOADER_KEY) === "true"
-      );
-    } catch {
-      return false;
-    }
-  });
-
-  const transitionRef =
-    useRef<PageTransitionHandle>(null);
-
-  const navigatingRef =
-    useRef(false);
-
-  const transitionStageRef =
-    useRef<TransitionStage>("strings");
-
-  // =========================================
-  // PRELOADER STATE
-  // =========================================
+  const transitionRef = useRef<PageTransitionHandle>(null);
+  const pendingPathRef = useRef<string | null>(null);
+  const navigatingRef = useRef(false);
+  const stageRef = useRef<TransitionStage>("cover");
 
   const markEntered = useCallback(() => {
     setEntered(true);
-
-    try {
-      sessionStorage.setItem(
-        PRELOADER_KEY,
-        "true",
-      );
-    } catch {
-      // Ignore storage errors.
-    }
   }, []);
 
-  // =========================================
-  // NAVIGATION
-  // =========================================
-
   const navigateWithTransition = useCallback(
-    (to: string) => {
-      const currentPath = location.pathname;
+    (to: string, pageKey?: PageKey) => {
+      if (navigatingRef.current) return;
 
-      if (
-        to === currentPath ||
-        navigatingRef.current
-      ) {
-        return;
-      }
+      const targetPath = to.split("?")[0].split("#")[0];
 
-      // Skip transition when entering or leaving About Us.
-      if (
-        to === "/aboutUs" ||
-        currentPath === "/aboutUs"
-      ) {
-        markEntered();
-        navigate(to);
-        return;
-      }
-
-      markEntered();
+      if (targetPath === location.pathname) return;
 
       navigatingRef.current = true;
-      transitionStageRef.current = "strings";
-
-      // This value does not need to trigger a render.
       pendingPathRef.current = to;
+      stageRef.current = "cover";
 
+      setSelectedPage(pageKey ?? getPageKey(to));
+      setEntered(true);
       setTransitioning(true);
     },
-    [
-      location.pathname,
-      markEntered,
-      navigate,
-    ],
+    [location.pathname],
   );
 
-  // =========================================
-  // FIRST TRANSITION COMPLETE
-  // =========================================
-
-  const handleTransitionComplete =
-    useCallback(async () => {
-      const destination =
-        pendingPathRef.current;
+  const handleTransitionComplete = useCallback(() => {
+    if (stageRef.current === "cover") {
+      const destination = pendingPathRef.current;
 
       if (!destination) {
         navigatingRef.current = false;
@@ -150,89 +95,42 @@ export function TransitionProvider({
         return;
       }
 
-      /*
-       * Strings have finished.
-       * Curtain is paused while covering the screen.
-       */
-
+      // The selected page now covers the screen.
+      stageRef.current = "reveal";
       navigate(destination);
 
-      /*
-       * Allow the new route to mount and paint.
-       */
-      await waitForNextPaint();
-      await waitForNextPaint();
+      // Allow the destination page to render underneath.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          transitionRef.current?.resumeCurtain();
+        });
+      });
 
-      /*
-       * Resume the same curtain animation.
-       */
-      transitionRef.current?.resumeCurtain();
-    }, [
-      navigate,
-    ]);
+      return;
+    }
 
-  // =========================================
-  // TRANSITION HANDLER
-  // =========================================
-
-  const handleTransition =
-    useCallback(async () => {
-      /*
-       * FIRST completion:
-       * strings have finished.
-       */
-      if (
-        transitionStageRef.current === "strings"
-      ) {
-        transitionStageRef.current =
-          "curtain";
-
-        await handleTransitionComplete();
-
-        return;
-      }
-
-      /*
-       * SECOND completion:
-       * curtain has finished.
-       */
-      transitionStageRef.current = "strings";
-
-      pendingPathRef.current = null;
-      setTransitioning(false);
-      navigatingRef.current = false;
-    }, [handleTransitionComplete]);
-
-  // =========================================
-  // MEMOIZED CONTEXT VALUE
-  // =========================================
-
-  const contextValue =
-    useMemo<TransitionContextValue>(
-      () => ({
-        transitioning,
-        navigateWithTransition,
-        entered,
-        markEntered,
-      }),
-      [
-        transitioning,
-        navigateWithTransition,
-        entered,
-        markEntered,
-      ],
-    );
+    // The transition has finished revealing the new page.
+    pendingPathRef.current = null;
+    navigatingRef.current = false;
+    setTransitioning(false);
+  }, [navigate]);
 
   return (
     <TransitionContext.Provider
-      value={contextValue}
+      value={{
+        transitioning,
+        navigateWithTransition,
+        entered,
+        markEntered,
+      }}
     >
       {children}
 
       {transitioning && (
         <PageTransition
           ref={transitionRef}
-          onComplete={handleTransition}
+          selectedPage={selectedPage}
+          onComplete={handleTransitionComplete}
         />
       )}
     </TransitionContext.Provider>
@@ -240,8 +138,7 @@ export function TransitionProvider({
 }
 
 export function useTransition() {
-  const context =
-    useContext(TransitionContext);
+  const context = useContext(TransitionContext);
 
   if (!context) {
     throw new Error(

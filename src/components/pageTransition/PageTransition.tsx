@@ -1,520 +1,332 @@
-import styles from "./PageTransition.module.scss";
-import { gsap } from "gsap";
+
 import {
   forwardRef,
   useEffect,
   useImperativeHandle,
   useRef,
 } from "react";
-import curtainVideo from "../../assets/video/curtain.mp4";
-
-const CLOUD_SELECTOR = "[data-cloud-string]";
-const CASTLE_SELECTOR = "[data-castle-drown]";
-const MOON_SELECTOR = "[data-moon-shrink]";
-const FADE_SELECTOR = "[data-transition-fade]";
-
-type CloudRig = {
-  el: HTMLElement;
-  group: SVGGElement;
-  path: SVGPathElement;
-  anchorX: number;
-  hookY: number;
-};
+import { gsap } from "gsap";
+import styles from "./PageTransition.module.scss";
 
 export type PageTransitionHandle = {
   resumeCurtain: () => void;
 };
 
+export type PageKey =
+  | "home"
+  | "events"
+  | "about"
+  | "sponsors"
+  | "gallery"
+  | "contact";
+
 type PageTransitionProps = {
+  selectedPage: PageKey;
   onComplete?: () => void;
-  /** Brightness threshold (0-255). Pixels darker than this become transparent. */
-  blackThreshold?: number;
 };
 
-const STRING_TAUT_DELAY = 0.05;
-const CURTAIN_PAUSE_TIME = 2;
-const VIDEO_START_PERCENT = 0.5;
+const PAGES: {
+  key: PageKey;
+  title: string;
+  image: string;
+}[] = [
+  { key: "home", title: "Oasis", image: "" },
+  { key: "events", title: "Events", image: "" },
+  { key: "about", title: "About", image: "" },
+  { key: "sponsors", title: "Sponsors", image: "" },
+  { key: "gallery", title: "Gallery", image: "" },
+  { key: "contact", title: "Contact", image: "" },
+];
 
-const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
-  function PageTransition({ onComplete, blackThreshold = 10 }, ref) {
-    const rootRef = useRef<HTMLDivElement | null>(null);
-    const layerRef = useRef<SVGSVGElement | null>(null);
-    const videoRef = useRef<HTMLVideoElement | null>(null);
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+const PageTransition = forwardRef<
+  PageTransitionHandle,
+  PageTransitionProps
+>(function PageTransition({ selectedPage, onComplete }, ref) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
 
-    const onCompleteRef = useRef(onComplete);
+  const onCompleteRef = useRef(onComplete);
+  const revealRef = useRef<(() => void) | null>(null);
 
-    // Keep the latest callback without mutating a ref during render.
-    useEffect(() => {
-      onCompleteRef.current = onComplete;
-    }, [onComplete]);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
-    const curtainPausedRef = useRef(false);
+  useImperativeHandle(ref, () => ({
+    resumeCurtain: () => revealRef.current?.(),
+  }));
 
-    // =========================================
-    // CHROMA KEY CANVAS LOOP
-    // =========================================
-    useEffect(() => {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      if (!video || !canvas) return;
+  useEffect(() => {
+    const root = rootRef.current;
+    const gallery = galleryRef.current;
+    const glow = glowRef.current;
 
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      if (!ctx) return;
+    if (!root || !gallery || !glow) return;
 
-      let animFrameId: number;
-
-      const renderFrame = () => {
-        if (!video.paused && !video.ended) {
-          if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-            canvas.width = video.videoWidth || 1920;
-            canvas.height = video.videoHeight || 1080;
-          }
-
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-          const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const data = frame.data;
-          const len = data.length;
-
-          // Key out dark background pixels
-          for (let i = 0; i < len; i += 4) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
-
-            if (r < blackThreshold && g < blackThreshold && b < blackThreshold) {
-              data[i + 3] = 0; // Alpha channel
-            }
-          }
-
-          ctx.putImageData(frame, 0, 0);
-        }
-        animFrameId = requestAnimationFrame(renderFrame);
-      };
-
-      animFrameId = requestAnimationFrame(renderFrame);
-
-      return () => {
-        cancelAnimationFrame(animFrameId);
-      };
-    }, [blackThreshold]);
-
-    // =========================================
-    // RESUME CURTAIN
-    // =========================================
-    useImperativeHandle(
-      ref,
-      () => ({
-        resumeCurtain: () => {
-          const video = videoRef.current;
-          if (!video) return;
-
-          curtainPausedRef.current = true;
-
-          video
-            .play()
-            .catch(() => {
-              onCompleteRef.current?.();
-            });
-        },
-      }),
-      [],
+    const cards = Array.from(
+      gallery.querySelectorAll<HTMLElement>("[data-page-card]"),
     );
 
-    // =========================================
-    // MAIN STRING ANIMATION
-    // =========================================
-    useEffect(() => {
-      const root = rootRef.current;
-      const layer = layerRef.current;
-      if (!root || !layer) return;
+    const selectedIndex = PAGES.findIndex(
+      (page) => page.key === selectedPage,
+    );
 
-      const cloudEls = Array.from(
-        document.querySelectorAll<HTMLElement>(CLOUD_SELECTOR),
-      );
-      const fadeEls = Array.from(
-        document.querySelectorAll<HTMLElement>(FADE_SELECTOR),
-      );
-      const castleEl = document.querySelector<HTMLElement>(CASTLE_SELECTOR);
-      const moonEl = document.querySelector<HTMLElement>(MOON_SELECTOR);
+    const selectedCard = cards[selectedIndex];
+
+    if (!selectedCard) {
+      onCompleteRef.current?.();
+      return;
+    }
+
+    let revealStarted = false;
+    let selectionStarted = false;
+    let orbitAngle = 0;
+
+    const initialAngles = cards.map(
+      (_, index) => -90 + index * (360 / cards.length),
+    );
 
 
-      while (layer.firstChild) {
-        layer.removeChild(layer.firstChild);
-      }
+    const maxCardWidth = Math.max(
+      ...cards.map((card) => card.offsetWidth),
+    );
 
-      gsap.killTweensOf(cloudEls);
+    const maxCardHeight = Math.max(
+      ...cards.map((card) => card.offsetHeight),
+    );
 
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
+    const availableRadius =
+      Math.min(window.innerWidth, window.innerHeight) * 0.36;
 
-      if (video && canvas) {
-        video.pause();
-        video.currentTime = 0;
-        canvas.style.opacity = "0";
-        canvas.style.visibility = "hidden";
-        curtainPausedRef.current = false;
-      }
+    const baseScale = Math.min(
+      1,
+      (availableRadius * 0.72) / Math.max(maxCardWidth, 1),
+      (availableRadius * 0.72) / Math.max(maxCardHeight, 1),
+    );
 
-      const ctx = gsap.context(() => {
-        const rigs: CloudRig[] = cloudEls.map((el) => {
-          const rect = el.getBoundingClientRect();
-          const group = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "g",
-          );
-          const path = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "path",
-          );
+   
+    const radius =
+      Math.max(maxCardWidth * baseScale, maxCardHeight * baseScale) +
+      18;
 
-          path.setAttribute("class", styles.path);
-          group.appendChild(path);
-          layer.appendChild(group);
+    const setCardPositions = (angleOffset: number) => {
+      cards.forEach((card, index) => {
+        const angle =
+          (initialAngles[index] + angleOffset) * (Math.PI / 180);
 
-          return {
-            el,
-            group,
-            path,
-            anchorX: rect.left + rect.width / 2,
-            hookY: rect.top + rect.height / 2,
-          };
+        gsap.set(card, {
+          x: Math.cos(angle) * radius,
+          y: Math.sin(angle) * radius,
+          rotation: 0,
         });
-
-        const TOP_Y = 0;
-        const START_LEN = 30;
-        const START_SAG = 120;
-        const STRAIGHT_T = 0.55;
-        const HOOK_T = 0.85;
-
-        const buildPath = (r: CloudRig, endY: number, sag: number) => {
-          const control1Y = TOP_Y + (endY - TOP_Y) * STRAIGHT_T;
-          const control2Y = TOP_Y + (endY - TOP_Y) * HOOK_T;
-          return `M ${r.anchorX} ${TOP_Y} C ${r.anchorX} ${control1Y} ${r.anchorX + sag
-            } ${control2Y} ${r.anchorX} ${endY}`;
-        };
-
-        rigs.forEach((r) => {
-          r.path.setAttribute(
-            "d",
-            buildPath(r, START_LEN, START_SAG),
-          );
-          gsap.set(r.path, { opacity: 0 });
-        });
-
-        // NOTE: onComplete removed here — video start is now triggered
-        // at VIDEO_START_PERCENT of the total timeline via tl.call() below.
-        const tl = gsap.timeline();
-
-        if (rigs.length > 0) {
-          rigs.forEach((r, i) => {
-            const state = { fall: 0 };
-
-            tl.to(
-              state,
-              {
-                fall: 1,
-                duration: 0.35,
-                ease: "power1.in",
-                onUpdate: () => {
-                  const p = state.fall;
-                  const endY = gsap.utils.interpolate(START_LEN, r.hookY, p);
-                  const sag = gsap.utils.interpolate(
-                    START_SAG,
-                    0,
-                    Math.pow(p, 0.7),
-                  );
-
-                  r.path.setAttribute("d", buildPath(r, endY, sag));
-                  const fadeInP = Math.min(p / 0.25, 1);
-                  gsap.set(r.path, { opacity: fadeInP });
-
-                  const currentLen = r.path.getTotalLength();
-                  const drawP = Math.min(p / 0.6, 1);
-                  r.path.style.strokeDasharray = `${currentLen}`;
-                  r.path.style.strokeDashoffset = `${currentLen * (1 - drawP)}`;
-                },
-              },
-              i * 0.045,
-            )
-              .to(
-                {},
-                {
-                  duration: 0.05,
-                  onUpdate: function () {
-                    const overshoot =
-                      -Math.sin(this.progress() * Math.PI) * 10;
-                    r.path.setAttribute(
-                      "d",
-                      buildPath(r, r.hookY, overshoot),
-                    );
-                  },
-                },
-                ">-0.03",
-              )
-              .to({}, { duration: STRING_TAUT_DELAY })
-              .to(
-                {},
-                {
-                  duration: 0.05,
-                  ease: "power3.out",
-                  onUpdate: function () {
-                    const sag = gsap.utils.interpolate(5, 0, this.progress());
-                    r.path.setAttribute("d", buildPath(r, r.hookY, sag));
-                    gsap.set(r.path, {
-                      strokeDashoffset: 0,
-                      opacity: 1,
-                    });
-                  },
-                },
-              );
-          });
-
-          const liftDistance = window.innerHeight * 1.3;
-
-          tl.to(
-            rigs.map((r) => r.group),
-            {
-              y: -liftDistance,
-              duration: 0.35,
-              ease: "power2.in",
-              stagger: 0.03,
-            },
-            "+=0.05",
-          ).to(
-            rigs.map((r) => r.el),
-            {
-              y: -liftDistance,
-              opacity: 0,
-              duration: 0.35,
-              ease: "power2.in",
-              stagger: 0.03,
-            },
-            "<",
-          );
-        }
-
-        const cloudsDuration = tl.duration() || 0.5;
-        const SINK_DISTANCE = window.innerHeight;
-        const FOREGROUND_DURATION = cloudsDuration * 1.0;
-        const MOON_DURATION = cloudsDuration * 1.2;
-
-        const applyDrownWobble = (
-          el: HTMLElement,
-          duration: number,
-          sinkDistance = SINK_DISTANCE,
-          basePercent?: { xPercent?: number; yPercent?: number },
-        ) => {
-          gsap.set(el, {
-            willChange: "transform",
-            ...(basePercent ?? {}),
-          });
-
-          const state = { p: 0 };
-
-          tl.to(
-            state,
-            {
-              p: 1,
-              duration,
-              ease: "power2.in",
-
-              onUpdate: () => {
-                const p = state.p;
-
-                const y = sinkDistance * p;
-
-                /*
-                 * IMPORTANT:
-                 * Do NOT touch x.
-                 * Do NOT touch rotation.
-                 *
-                 * The castle's horizontal position is controlled
-                 * entirely by its CSS.
-                 */
-                gsap.set(el, {
-                  y,
-                  ...(basePercent ?? {}),
-                });
-              },
-            },
-            0,
-          );
-        };
-
-        const applyDrown = (
-          el: HTMLElement,
-          duration: number,
-          sinkDistance = SINK_DISTANCE,
-          basePercent?: { xPercent?: number; yPercent?: number },
-        ) => {
-          gsap.set(el, {
-            willChange: "transform",
-            ...(basePercent ?? {}),
-          });
-
-          const state = { p: 0 };
-
-          tl.to(
-            state,
-            {
-              p: 1,
-              duration,
-              ease: "power2.in",
-
-              onUpdate: () => {
-                const p = state.p;
-                const y = sinkDistance * p;
-
-                gsap.set(el, {
-                  y,
-                  ...(basePercent ?? {}),
-                });
-              },
-            },
-            0,
-          );
-        };
-
-        if (castleEl) {
-          applyDrownWobble(castleEl, FOREGROUND_DURATION, SINK_DISTANCE, {
-          });
-        }
-
-        if (moonEl) {
-          applyDrown(moonEl, MOON_DURATION, SINK_DISTANCE, {});
-        }
-
-
-
-        if (fadeEls.length > 0) {
-          tl.to(
-            fadeEls,
-            {
-              opacity: 0,
-              duration: 0.35,
-              ease: "power2.out",
-            },
-            0,
-          );
-        }
-
-        // =========================================
-        // START CURTAIN VIDEO AT VIDEO_START_PERCENT
-        // OF THE TOTAL ANIMATION DURATION
-        // =========================================
-        const startVideo = () => {
-          const transitionVideo = videoRef.current;
-          const transitionCanvas = canvasRef.current;
-
-          if (!transitionVideo || !transitionCanvas) {
-            onCompleteRef.current?.();
-            return;
-          }
-
-          transitionCanvas.style.visibility = "visible";
-          transitionCanvas.style.opacity = "1";
-          transitionVideo.currentTime = 0;
-          curtainPausedRef.current = false;
-
-          transitionVideo.play().catch(() => {
-            onCompleteRef.current?.();
-          });
-        };
-
-        const totalDuration = tl.duration();
-        tl.call(startVideo, [], totalDuration * VIDEO_START_PERCENT);
       });
+    };
 
-      // Capture the nodes for this effect instance. Refs can point to a
-      // different node by the time React runs the cleanup.
-      const transitionVideo = videoRef.current;
-      const transitionCanvas = canvasRef.current;
-      const transitionLayer = layer;
+    gsap.set(root, {
+      autoAlpha: 1,
+      backgroundColor: "#07091c",
+    });
 
-      return () => {
-        ctx.revert();
+    gsap.set(gallery, {
+      rotation: 0,
+      transformOrigin: "50% 50%",
+    });
 
-        // Release GPU promotion after the transition so will-change
-        // does not remain permanently active on animated elements.
-        if (castleEl) gsap.set(castleEl, { clearProps: "willChange" });
-        if (moonEl) gsap.set(moonEl, { clearProps: "willChange" });
+    gsap.set(cards, {
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      xPercent: -50,
+      yPercent: -50,
+      x: 0,
+      y: 0,
+      rotation: 0,
+      scale: baseScale,
+      opacity: 1,
+      transformOrigin: "50% 50%",
+    });
 
-        if (transitionVideo) {
-          transitionVideo.pause();
-          transitionVideo.currentTime = 0;
-        }
-        if (transitionCanvas) {
-          transitionCanvas.style.opacity = "0";
-          transitionCanvas.style.visibility = "hidden";
-        }
+    setCardPositions(0);
 
-        while (transitionLayer.firstChild) {
-          transitionLayer.removeChild(transitionLayer.firstChild);
-        }
-      };
-    }, []);
+    gsap.set(cards, {
+      zIndex: 1,
+    });
 
-    // =========================================
-    // CURTAIN VIDEO TIME CONTROL
-    // =========================================
-    useEffect(() => {
-      const video = videoRef.current;
-      if (!video) return;
+    gsap.set(selectedCard, {
+      zIndex: 10,
+    });
 
-      const handleTimeUpdate = () => {
-        if (
-          video.currentTime >= CURTAIN_PAUSE_TIME &&
-          !curtainPausedRef.current
-        ) {
-          curtainPausedRef.current = true;
-          video.currentTime = CURTAIN_PAUSE_TIME;
-          video.pause();
-          onCompleteRef.current?.();
-        }
-      };
+    gsap.set(glow, {
+      opacity: 0,
+      scale: 0.1,
+    });
 
-      video.addEventListener("timeupdate", handleTimeUpdate);
-      return () => {
-        video.removeEventListener("timeupdate", handleTimeUpdate);
-      };
-    }, []);
+    // Animate positions instead of rotating the parent gallery.
+    const orbitTween = gsap.to(
+      { angle: 0 },
+      {
+        angle: 360,
+        duration: 16,
+        ease: "none",
+        repeat: -1,
+        onUpdate() {
+          orbitAngle = gsap.getProperty(
+            orbitTween.targets()[0],
+            "angle",
+          ) as number;
 
-    return (
-      <div ref={rootRef} className={styles.root}>
-        {/* STRING SVG */}
-        <div className={styles.stringLayerWrap}>
-          <svg
-            ref={layerRef}
-            className={styles.stringLayer}
-            width="100%"
-            height="100%"
-          />
-        </div>
-
-        {/* HIDDEN VIDEO SOURCE */}
-        <video
-          ref={videoRef}
-          src={curtainVideo}
-          muted
-          playsInline
-          preload="auto"
-          className="hidden"
-          style={{ display: "none" }}
-          onEnded={() => {
-            onCompleteRef.current?.();
-          }}
-        />
-
-        {/* VISIBLE KEYED CANVAS */}
-        <canvas
-          ref={canvasRef}
-          className={styles.curtainVideo}
-        />
-      </div>
+          setCardPositions(orbitAngle);
+        },
+      },
     );
-  },
-);
+
+    // Measure the card at its initial scale to calculate the cover scale.
+    const selectedRect = selectedCard.getBoundingClientRect();
+
+    const coverScale =
+      baseScale *
+      Math.max(
+        (window.innerWidth * 1.2) / Math.max(selectedRect.width, 1),
+        (window.innerHeight * 1.2) / Math.max(selectedRect.height, 1),
+      );
+
+    const timeline = gsap.timeline({
+      paused: true,
+      onComplete: () => {
+        onCompleteRef.current?.();
+      },
+    });
+
+    // Fade the other cards away.
+    timeline.to(cards.filter((_, i) => i !== selectedIndex), {
+      opacity: 0,
+      duration: 0.3,
+      stagger: 0.04,
+      ease: "power2.out",
+    });
+
+    // Force the selected card upright and centered.
+    timeline.set(selectedCard, {
+      rotation: 0,
+    });
+
+    timeline.to(
+      selectedCard,
+      {
+        x: 0,
+        y: 0,
+        scale: baseScale * 1.15,
+        duration: 0.65,
+        ease: "power3.inOut",
+      },
+      "-=0.05",
+    );
+
+    // Expand the glow behind the selected card.
+    timeline.to(
+      glow,
+      {
+        opacity: 1,
+        scale: 1.6,
+        duration: 0.4,
+        ease: "power2.out",
+      },
+      "-=0.25",
+    );
+
+    // Enlarge the selected card to cover the screen.
+    timeline.to(
+      selectedCard,
+      {
+        scale: coverScale,
+        duration: 0.7,
+        ease: "power2.in",
+      },
+      "-=0.05",
+    );
+
+    timeline.to(
+      glow,
+      {
+        scale: 12,
+        opacity: 1,
+        duration: 0.55,
+        ease: "power2.in",
+      },
+      "<",
+    );
+
+    const selectionTimer = window.setTimeout(() => {
+      if (revealStarted || selectionStarted) return;
+
+      selectionStarted = true;
+
+      // Stop changing card positions before the selected card moves.
+      orbitTween.pause();
+      timeline.play(0);
+    }, 1100);
+
+    revealRef.current = () => {
+      if (revealStarted) return;
+
+      revealStarted = true;
+
+      window.clearTimeout(selectionTimer);
+      orbitTween.kill();
+      timeline.kill();
+
+      gsap.to(root, {
+        autoAlpha: 0,
+        duration: 0.85,
+        ease: "power2.out",
+        onComplete: () => {
+          onCompleteRef.current?.();
+        },
+      });
+    };
+
+    return () => {
+      window.clearTimeout(selectionTimer);
+      orbitTween.kill();
+      timeline.kill();
+
+      gsap.killTweensOf([root, gallery, glow, ...cards]);
+
+      revealRef.current = null;
+    };
+  }, [selectedPage]);
+
+  return (
+    <div
+      ref={rootRef}
+      className={styles.root}
+      aria-hidden="true"
+    >
+      <div ref={glowRef} className={styles.glow} />
+
+      <div ref={galleryRef} className={styles.gallery}>
+        {PAGES.map((page) => (
+          <div
+            key={page.key}
+            data-page-card
+            className={styles.card}
+          >
+            {page.image && (
+              <img
+                src={page.image}
+                alt=""
+                draggable={false}
+              />
+            )}
+
+            <div className={styles.cardTitle}>{page.title}</div>
+            <div className={styles.cardShine} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+});
 
 export default PageTransition;
