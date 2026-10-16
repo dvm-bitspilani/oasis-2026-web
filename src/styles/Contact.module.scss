@@ -1,6 +1,6 @@
 $cross-size: 80px; // change cross size here
-$card-gap: -75px;   // extra space between the bottom of a cross and the top of a card (negative = overlap)
-$mobile-card-gap: -125px; // same as $card-gap, but only for screens <= $mobile-breakpoint
+$card-gap: -40px;   // extra space between the bottom of a cross and the top of a card (negative = overlap)
+$mobile-card-gap: -100px; // same as $card-gap, but only for screens <= $mobile-breakpoint
 $mobile-breakpoint: 729px;
 $mobile-map-scale: 0.7;   // map image size on screens <= $mobile-breakpoint
 $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at full size
@@ -98,7 +98,7 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 60px;
+    padding-top: 40px;
 
     .stuccanImage {
       width: 310px;
@@ -110,7 +110,6 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
       display: flex;
       width: 310px;
       justify-content: space-between;
-      transform: translateY(-15px);
 
       h1 {
         font-family: 'Dancing Script', sans-serif;
@@ -125,11 +124,11 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
         pointer-events: auto;
         cursor: pointer;
         //scale: 0.35;
-        transform: translateX(30px) scale(0.35);
+        transform: scale(0.8);
         transition: transform 0.15s ease;
 
         &:hover {
-          transform: translateX(30px) scale(0.4);
+          transform: scale(0.9);
         }
       }
     }
@@ -187,8 +186,6 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
         color: #7E6B58;
         list-style: none;
         font-size: 2rem;
-        padding: 0;
-        position: relative; /* li.offsetTop is measured from the list (Contact.tsx) */
 
         li {
           margin-bottom: 20px;
@@ -281,11 +278,11 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
 
         a {
           .backBtn {
-            scale: 0.7;
+            scale: 0.6;
             transform: translateX(-80%);
 
             &:hover {
-              scale: 0.8;
+              scale: 0.65;
             }
           }
         }
@@ -311,7 +308,7 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
              which is animating during expand/collapse, so the offset would
              swell mid-transition and the list would dip up into the h1. This
              stays a fixed px amount and eases cleanly to 0. */
-          transform: translateY(calc(var(--list-collapsed) * -0.7));
+          transform: translateY(calc(var(--list-collapsed) * -0.55));
           transition: max-height 0.4s ease, transform 0.4s ease;
           touch-action: pan-y; /* lets a finger scroll the list, not the map */
           overscroll-behavior: contain;
@@ -333,7 +330,7 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
 
           align-self: flex-end;
           margin: 0;
-          transform: translateY(-200%);
+          transform: translateY(-100%);
           transition: transform 0.4s ease;
         }
       }
@@ -356,7 +353,7 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
         }
 
         h2 {
-          transform: translateY(-70%);
+          transform: translateY(0);
         }
       }
     }
