@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import CharacterMobile from "./CharacterMobile";
 import styles from "../../styles/DevPage/Devpagemobile.module.scss";
@@ -14,13 +14,10 @@ import bgBlue from "../../assets/DevPage/bgBlue.png";
 import image from "../../assets/DevPage/profile.png";
 
 type Vertical = "Frontend" | "Backend" | "Ui";
+type Direction = "left" | "right";
 
 // Fixed cycle order for the ‹ › arrows
-const VERTICAL_ORDER: Vertical[] = [
-  "Frontend",
-  "Backend",
-  "Ui",
-];
+const VERTICAL_ORDER: Vertical[] = ["Frontend", "Backend", "Ui"];
 
 const VERTICAL_INFO: Record<
   Vertical,
@@ -66,30 +63,46 @@ const VERTICAL_INFO: Record<
 };
 
 export default function DevPageMobile() {
-  const [activeVertical, setActiveVertical] =
-    useState<Vertical | null>(null);
+  const [activeVertical, setActiveVertical] = useState<Vertical | null>(null);
+
+  // While this is non-null, a curtain image of the NEXT vertical is sliding in over
+  // the current page. When its CSS animation ends we swap activeVertical and clear it.
+  const [transition, setTransition] = useState<{
+    to: Vertical;
+    direction: Direction;
+  } | null>(null);
+
+  // the scrolling layer of the vertical view — we reset it to the top after each swap
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const goToVertical = (name: Vertical) => {
     setActiveVertical(name);
   };
 
   const goHome = () => {
+    setTransition(null);
     setActiveVertical(null);
   };
 
   const step = (direction: -1 | 1) => {
-    if (!activeVertical) return;
+    if (!activeVertical || transition) return; // ignore taps mid-transition
 
-    const currentIndex =
-      VERTICAL_ORDER.indexOf(activeVertical);
-
+    const currentIndex = VERTICAL_ORDER.indexOf(activeVertical);
     const nextIndex =
-      (currentIndex +
-        direction +
-        VERTICAL_ORDER.length) %
-      VERTICAL_ORDER.length;
+      (currentIndex + direction + VERTICAL_ORDER.length) % VERTICAL_ORDER.length;
 
-    setActiveVertical(VERTICAL_ORDER[nextIndex]);
+    setTransition({
+      to: VERTICAL_ORDER[nextIndex],
+      // › (next) -> curtain enters from the right, ‹ (previous) -> from the left
+      direction: direction === 1 ? "right" : "left",
+    });
+  };
+
+  const finishTransition = () => {
+    if (!transition) return;
+    setActiveVertical(transition.to);
+    setTransition(null);
+    scrollRef.current?.scrollTo({ top: 0 }); // next page starts at the top
   };
 
   // ---------------------------------------
@@ -98,18 +111,11 @@ export default function DevPageMobile() {
 
   if (!activeVertical) {
     return (
-      <div
-        className={styles.wrapper}
-        style={{
-          backgroundImage: `url(${bgphone})`,
-        }}
-      >
+      <div className={styles.stage}>
+        <img className={styles.backdrop} src={bgphone} alt="" />
+        <div className={styles.wrapper}>
         <div className={styles.back}>
-          <button
-            className={styles.backButton}
-            onClick={goHome}
-            aria-hidden
-          />
+          <button className={styles.backButton} onClick={goHome} aria-hidden />
         </div>
 
         <div className={styles.heading}>
@@ -140,6 +146,7 @@ export default function DevPageMobile() {
             </button>
           </div>
         </div>
+        </div>
       </div>
     );
   }
@@ -151,17 +158,19 @@ export default function DevPageMobile() {
   const info = VERTICAL_INFO[activeVertical];
 
   return (
-    <div
-      className={styles.wrapper}
-      style={{
-        backgroundImage: `url(${info.background})`,
-      }}
-    >
+    <div className={styles.stage}>
+      <img className={styles.backdrop} src={info.background} alt="" />
+      {/* data-lenis-prevent + the stopPropagation handlers stop site-wide smooth-scroll
+          libraries (Lenis etc.) from hijacking wheel/touch, so THIS box scrolls natively */}
+      <div
+        className={styles.wrapper}
+        ref={scrollRef}
+        data-lenis-prevent
+        onWheel={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+      >
       <div className={styles.back}>
-        <button
-          className={styles.backButton}
-          onClick={goHome}
-        >
+        <button className={styles.backButton} onClick={goHome}>
           <img src={BackButton} alt="Back" />
         </button>
       </div>
@@ -174,25 +183,26 @@ export default function DevPageMobile() {
         <button
           className={styles.navArrow}
           onClick={() => step(-1)}
+          disabled={!!transition}
           aria-label="Previous vertical"
         >
           ‹
         </button>
 
-        <h2 className={styles.navTitle}>
-          {info.label}
-        </h2>
+        <h2 className={styles.navTitle}>{info.label}</h2>
 
         <button
           className={styles.navArrow}
           onClick={() => step(1)}
+          disabled={!!transition}
           aria-label="Next vertical"
         >
           ›
         </button>
       </div>
 
-      <div className={styles.grid}>
+      {/* key = vertical, so the grid remounts (and fades in) after each swap */}
+      <div className={styles.grid} key={activeVertical}>
         {info.members.map((member, i) => (
           <CharacterMobile
             key={`${activeVertical}-${i}`}
@@ -201,6 +211,22 @@ export default function DevPageMobile() {
           />
         ))}
       </div>
+
+      </div>
+
+      {/* The sliding curtain. Same image + same sizing as the backdrop of the page it's
+          about to become, so when it lands and the real page swaps in underneath,
+          there's no visible jump. */}
+      {transition && (
+        <img
+          src={VERTICAL_INFO[transition.to].background}
+          alt=""
+          className={`${styles.curtainOverlay} ${
+            transition.direction === "right" ? styles.fromRight : styles.fromLeft
+          }`}
+          onAnimationEnd={finishTransition}
+        />
+      )}
     </div>
   );
 }

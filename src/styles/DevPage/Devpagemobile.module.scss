@@ -1,12 +1,47 @@
-.wrapper {
+// BG BLEED: how much taller than the screen the curtain image is drawn (split evenly
+// above and below, the extra is clipped off). This hides empty/black strips that are
+// part of the image files. Raise it (e.g. 10%) if you still see a strip at the top or
+// bottom, lower it (e.g. 3%) / set 0% if the image is fine and you want no zoom.
+$bg-bleed: 6%;
+
+// STAGE = the full-screen frame. BACKDROP = the curtain image, always filling it.
+// WRAPPER = the scrolling content layer on top (so content scrolls, backdrop doesn't).
+.stage {
   position: relative;
-  width: 100vw;
-  min-height: 100vh;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.backdrop {
+  position: absolute;
+  left: 0;
+  top: -$bg-bleed;
+  width: 100%;
+  height: calc(100% + #{$bg-bleed * 2});
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.wrapper {
+  position: absolute;
+  inset: 0;
   overflow-x: hidden;
+  overflow-y: auto; // scrolls only when content is taller than the screen (e.g. UI/UX, 5 members)
+  overscroll-behavior-y: contain; // scroll doesn't leak to the page behind
+  touch-action: pan-y;
   padding-bottom: 8vw;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; // hide scrollbar (Firefox)
+
+  &::-webkit-scrollbar {
+    display: none; // hide scrollbar (Chrome / Safari)
+  }
 }
 
 .back {
@@ -14,7 +49,7 @@
   top: 4vw;
   left: 4vw;
   width: 11vw;
-  z-index: 2;
+  z-index: 3; // above .heading / .navRow (z-index 2), otherwise they block taps
 
   .backButton {
     width: 100%;
@@ -34,6 +69,8 @@
   display: flex;
   justify-content: center;
   padding-top: 8vw;
+  position: relative; // transition: stays above the sliding curtain
+  z-index: 2;
 
   img {
     width: 62%;
@@ -123,6 +160,8 @@
   justify-content: center;
   gap: 6vw;
   margin-top: 6vw;
+  position: relative; // transition: stays above the sliding curtain
+  z-index: 2;
 }
 
 .navArrow {
@@ -147,7 +186,10 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 6vw 4vw;
-  padding: 8vw 6vw 4vw;
+  padding: 8vw 6vw 16vw;
+  position: relative; // transition: sits under the curtain
+  z-index: 0;
+  animation: gridFadeIn 0.5s ease both; // fades in after each swap
 }
 
 .card {
@@ -184,4 +226,42 @@
     justify-content: center;
     font-size: 0; // icon-only, replace with real icons/images as needed
   }
+}
+
+// ---------------- CURTAIN TRANSITION (‹ › arrows) ----------------
+.curtainOverlay {
+  position: absolute;
+  left: 0;
+  top: -$bg-bleed;
+  width: 100%;
+  height: calc(100% + #{$bg-bleed * 2}); // must match .backdrop
+  object-fit: cover; // identical sizing to .backdrop -> seamless swap
+  object-position: center;
+  z-index: 1;
+  pointer-events: none;
+  will-change: transform;
+}
+
+// change 0.75s to make the slide faster / slower
+.fromRight {
+  animation: curtainFromRight 0.75s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+.fromLeft {
+  animation: curtainFromLeft 0.75s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+@keyframes curtainFromRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes curtainFromLeft {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes gridFadeIn {
+  from { opacity: 0; transform: translateY(2vw); }
+  to   { opacity: 1; transform: translateY(0); }
 }

@@ -187,32 +187,38 @@
   z-index: 11;
   pointer-events: none; // individual buttons opt back in via inline/gsap when visible
 }
-
 .verticalLabel {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%) rotate(180deg);
+  top: 75%;                      // vertical position: Figma has them in the lower half
+  transform: translateY(-50%) translateX(-60%) rotateZ(185deg);
   writing-mode: vertical-rl;
   text-orientation: mixed;
   background: none;
   border: none;
-  padding: 0;
+  padding:0;
   margin: 0;
-  font-size: 1.1rem;
-  letter-spacing: 0.08em;
-  color: #f3e6c8; // warm gold, matches the tassel/embroidery tones in the curtains
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+
+  font-family: "YourDesignFont", cursive; // same font as in Figma (see below)
+  font-size: 2.8vw;              // text size
+  letter-spacing: 0.04em;
+  text-transform: lowercase;     // Figma shows "backend" / "ui/ux" in lowercase
+  white-space: nowrap;
+
+  color: #cfc3d6;                // fallback, overridden per label below
+  text-shadow: none;
   cursor: pointer;
-  opacity: 0; // GSAP fades this in once its curtain has landed
+  opacity: 0;                    // GSAP fades this in, don't change
   pointer-events: none;
-  // no fixed `left` here on purpose — DevPage.tsx sets it per click (LABEL_FAR_LEFT /
-  // LABEL_NEAR_LEFT) since which slot each label ends up in changes depending on
-  // which vertical is currently active
 
   &:hover {
-    color: #ffffff;
+    filter: brightness(1.25);
   }
 }
+
+// colours tinted to match each curtain, like the design
+.labelFrontend { color: rgba(214, 170, 214, 0.85); }
+.labelBackend  { color: rgba(150, 196, 214, 0.9); }
+.labelUi       { color: rgba(190, 160, 214, 0.85); }
 
 // Groups just gate pointer-events; visibility is handled per-character below
 // so the stagger fade-in has something to animate from.
