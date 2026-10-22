@@ -9,13 +9,14 @@ import chestBase from "../assets/ham/chestBase.png";
 import sandBottom from "../assets/ham/sandBottom.png";
 import sandAbove from "../assets/ham/sandAbove.png";
 import board from "../assets/ham/board.png";
-import styles from "../styles/Ham.module.scss";
 import guitarBook from "../assets/ham/guitarBook.png";
 import trunkStuff from "../assets/ham/trunkStuff.png";
 import bgHome from "../assets/home/bg.jpg";
 
+import styles from "../styles/Ham.module.scss";
 // dx / dy = where the sign starts, relative to its final spot (roughly the chest mouth).
 // Tweak these until each sign leaves the chest from the right place.
+// (Desktop only. On mobile the start point is computed from the chest position.)
 const BOARDS = [
     { label: "DEVELOPERS", pos: "board", to: "/comingSoon", dx: "14vw", dy: "-16vh" },
     { label: "WALL MAG", pos: "board1", to: "/comingSoon", dx: "-14vw", dy: "-16vh" },
@@ -23,6 +24,15 @@ const BOARDS = [
     { label: "GALLERY", pos: "board2", to: "/comingSoon", dx: "-10vw", dy: "-26vh" },
     { label: "MEDIA PARTNERS", pos: "board4", to: "/comingSoon", dx: "0vw", dy: "-38vh" },
 ];
+
+// Mobile (portrait) layout constants. These MUST match the SCSS:
+//   SB     = --sb  (sandBottom height as a fraction of the screen height, 14dvh)
+//   SB_FIT = the 0.5 in the mobile `--top` rule (how much of sandBottom the chest sinks into)
+const MOBILE_QUERY = "(max-aspect-ratio: 1/1)";
+const SB = 0.14;
+const SB_FIT = 0.5;
+
+// faster climb
 
 // The closed lid's dome, built from thin flat strips along an elliptical arch.
 // All numbers are in ART pixels (the 1417x1167 chest image), so they scale with the chest.
@@ -153,53 +163,82 @@ export default function Ham() {
         // CSS defaults are the final pose, so reduced motion just skips the timeline
         if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+        // ---- mobile (portrait) geometry, mirrors the SCSS ----
+        const mobile = matchMedia(MOBILE_QUERY).matches;
+        const W = window.innerWidth;
+        const Hpx = window.innerHeight;
+        const hPx = Math.min(Hpx, (W * 1167) / 1417);       // chest art height
+        const topPx = Hpx - hPx - Hpx * SB * SB_FIT;         // chest top on mobile
+        const mouthY = topPx + hPx * 0.45;                    // roughly where signs leave the chest
+
         const ctx = gsap.context(() => {
             const q = (n: string) => `.${styles[n]}`;
 
-            // ---- timing knobs ----
-            const riseDelay = 0.15, riseTime = 2;
-            const hold = 0;                                // chest hangs in the air before the lid opens
+            // ---- timing knobs ----\
+            const riseDelay = mobile ? 0.5 : 0.15;
+            const riseTime = mobile ? 1.4 : 2;
+            const hold = 0.2;                                // chest hangs in the air before the lid opens
             const lidDelay = riseDelay + riseTime + hold - 0.5, lidTime = 1.9;
             const seg = (f: number) => f * lidTime; // fraction of the lid swing -> seconds
-            const hoverLift = -3;                             // yPercent: how far above its resting spot it floats
+            const hoverLift = mobile ? -1.2 : -3;             // yPercent: how far above its resting spot it floats
             const letGo = lidDelay + seg(0.3);                // the force releases...
             const landAt = lidDelay + seg(0.57);              // ...and it lands exactly when the lid hits
             const popDelay = lidDelay + seg(0.55), popStagger = 0.14, popTime = 0.9;
-            const camStart = 0.6, camClosed = 0.7;
+            const camStart = mobile ? 0.8 : 0.6;
+            const camClosed = mobile ? 0.9 : 0.7;            // closed chest is less tiny on mobile
 
             const tl = gsap.timeline();
             const chestTop = q("chestTop");
 
             gsap.set(chestTop, { zIndex: 5 }); // in front of the base while lying over it
+            // background iris + dim
+            // mobile: the reveal grows up from the bottom center; desktop stays at the center
+            const irisAt = mobile ? "50% 100%" : "50% 50%";
 
-            // background iris + dim// background iris + dim
-tl.fromTo(root, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: E.out }, 0)
-    .fromTo(q("bgHome"),
-        { clipPath: "circle(0% at 50% 50%)", "--dim": 0.5 },
-        { clipPath: "circle(150% at 50% 50%)", "--dim": 0, duration: 2.5, ease: E.iris }, 1);
+            tl
+                .fromTo(q("bgHome"),
+                    { clipPath: `circle(0% at ${irisAt})` },
+                    { clipPath: `circle(150% at ${irisAt})`, duration: 2.5, ease: E.iris }, 1)
+                .fromTo(`${q("bgHome")} img`, { opacity: 0.5 }, { opacity: 1, duration: 2.5, ease: E.iris }, 1);
 
             // sand
             tl.fromTo(q("sandAbove"), { yPercent: 30 }, { yPercent: 0, duration: 1.6, ease: E.sand }, 0.1)
                 .fromTo(q("sandBottom"), { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.8, ease: E.sand }, 0.1);
 
+            // laptop only: same soft 0.6s fade-in the old root fade gave the sand,
+            // applied to the sand layers so the container itself is never transparent
+            if (!mobile) {
+                tl.fromTo(`${q("lSand")}, ${q("lFront")}`,
+                    { opacity: 0 },
+                    { opacity: 1, duration: 0.6, ease: E.out }, 0);
+            }
             // chest zoom (chest only, everything else stays at scale 1):
-            // 0.6 -> 0.7 while the lid is closed -> 1 during the swing
+            // camStart -> camClosed while the lid is closed -> 1 during the swing\
+            // thud when the lid lands (chest only, so the clipped background is never touched)// chest zoom (chest only): camStart -> camClosed while the lid is closed -> 1 during the swing
             tl.fromTo(q("lChest"), { scale: camStart }, { scale: camClosed, duration: lidDelay - riseDelay, ease: E.ease }, riseDelay)
                 .to(q("lChest"), { scale: 1, duration: lidTime, ease: E.zoom }, lidDelay);
+
+            // thud when the lid lands (chest only, so the background is never touched)
+            tl.to(q("lChest"), {
+                keyframes: [{ y: 5, duration: 0.05 }, { y: -3, duration: 0.05 }, { y: 1, duration: 0.05 }, { y: 0, duration: 0.05 }],
+                easeEach: "none",
+            }, lidDelay + seg(0.57));
 
             // chest is LIFTED by an unseen force: slow start, long weightless drift up to a hover
             // height, held there, then the force lets go and it sinks to rest as the lid lands.
             // (no scale here, so the zoom above is the only scale)
-            tl.fromTo(q("chestRig"), { yPercent: 120 }, { yPercent: hoverLift, duration: riseTime, ease: E.emerge }, riseDelay)
-                .fromTo(q("chestRig"), { opacity: 0 }, { opacity: 1, duration: riseTime * 0.25, ease: E.rise }, riseDelay)
+            // start closer to its final spot so it is on screen sooner
+            tl.fromTo(q("chestRig"), { yPercent: mobile ? 60 : 120 }, { yPercent: hoverLift, duration: riseTime, ease: mobile ? E.rise : E.emerge }, riseDelay)
+                .fromTo(q("chestRig"), { opacity: 0 }, { opacity: 1, duration: riseTime * 0.15, ease: E.rise }, riseDelay)
                 .to(q("chestRig"), { yPercent: 0, duration: landAt - letGo, ease: "power3.in" }, letGo);
 
             // Levitation drift, driven by one clock so it is scrubbable/reversible. Pure motion, no
             // glow or particles: a slow bob, a lateral drift, and a tilt that starts leaning as it is
             // lifted and levels out. All of it fades to zero right at the landing.
             const rig = root.querySelector<HTMLElement>(q("chestRig"))!;
-            gsap.set(rig, { transformOrigin: "50% 65%" }); // sway around the chest, not the screen centre
-            const vh = window.innerHeight / 100;
+            // sway around the chest body, not the screen centre
+            gsap.set(rig, { transformOrigin: mobile ? `50% ${topPx + hPx * 0.55}px` : "50% 65%" });
+            const vh = (window.innerHeight / 100) * (mobile ? 0.6 : 1); // smaller wander on a phone
             const smooth = (x: number) => { const c = Math.min(1, Math.max(0, x)); return c * c * (3 - 2 * c); };
             const floatDur = landAt - riseDelay;
             const fade = 0.7;                                 // seconds over which the drift dies out
@@ -230,20 +269,15 @@ tl.fromTo(root, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: E.out }, 0)
             // hinge fit: 12% -> 45% of the swing
             tl.fromTo(chestTop, { "--fit": 0 }, { "--fit": 1, duration: seg(0.33), ease: E.lid1 }, lidDelay + seg(0.12));
 
-            // z-order swap at 50%, dome/lip hidden at 47%
             // z-order swap at 50%; dome, lip and well hidden at 47%
-tl.set(chestTop, { zIndex: 3 }, lidDelay + seg(0.5))
-    .set(`${q("strip")}, ${q("lip")}, ${q("chestWell")}`, { visibility: "hidden" }, lidDelay + seg(0.47));
+            tl.set(chestTop, { zIndex: 3 }, lidDelay + seg(0.5))
+                .set(`${q("strip")}, ${q("lip")}, ${q("chestWell")}`, { visibility: "hidden" }, lidDelay + seg(0.47));
 
             // lid shadow on the base + inner face lighting up
             tl.fromTo(q("inner"), { filter: "brightness(0.35)" },
                 { filter: "brightness(1)", duration: 0.8, ease: E.out, clearProps: "filter" }, lidDelay + seg(0.35));
 
-            // thud when the lid lands
-            tl.to(root, {
-                keyframes: [{ y: 5, duration: 0.05 }, { y: -3, duration: 0.05 }, { y: 1, duration: 0.05 }, { y: 0, duration: 0.05 }],
-                easeEach: "none",
-            }, lidDelay + seg(0.57));
+
 
             // contents + lantern
             // guitar + book: hidden until the lid starts to open, then scale up out of the chest mouth.
@@ -257,13 +291,35 @@ tl.set(chestTop, { zIndex: 3 }, lidDelay + seg(0.5))
                 .fromTo(q("lantern"), { opacity: 0 }, { opacity: 1, duration: 1, ease: E.out }, lidDelay + 0.7);
 
             // signs launch out of the chest
-            gsap.utils.toArray<HTMLElement>(q("sign")).forEach((sign, i) => {
+            const signs = gsap.utils.toArray<HTMLElement>(q("sign"));
+
+            // Mobile: rank by the sign's BOTTOM edge (fixed by its CSS `bottom`, so it does not
+            // depend on image height). Lowest sign on screen = rank 0 = pops first, so the
+            // boards pile up from bottom to top.
+            const rank = new Map<number, number>(
+                signs
+                    .map((s, i) => ({ i, bottomEdge: s.offsetTop + s.offsetHeight }))
+                    .sort((a, b) => b.bottomEdge - a.bottomEdge)
+                    .map((o, r) => [o.i, r] as [number, number])
+            );
+
+            signs.forEach((sign, i) => {
                 const b = BOARDS[i];
-                const at = popDelay + (BOARDS.length - 1 - i) * popStagger;
-                tl.fromTo(sign, { x: b.dx, scale: 0.4 }, { x: "0vw", scale: 1, duration: popTime, ease: E.fly }, at)
+                const order = mobile ? rank.get(i)! : BOARDS.length - 1 - i;
+                const at = popDelay + order * (mobile ? 0.2 : popStagger);
+
+                // where the sign starts, relative to its final spot
+                const from: { x: string | number; y: string | number } = mobile
+                    ? {
+                        x: W / 2 - (sign.offsetLeft + sign.offsetWidth / 2),
+                        y: mouthY - (sign.offsetTop + sign.offsetHeight / 2),
+                    }
+                    : { x: b.dx, y: b.dy };
+
+                tl.fromTo(sign, { x: from.x, scale: 0.4 }, { x: mobile ? 0 : "0vw", scale: 1, duration: popTime, ease: E.fly }, at)
                     .fromTo(sign, { opacity: 0 }, { opacity: 1, duration: popTime * 0.15, ease: E.fly }, at)
-                    .fromTo(sign.firstElementChild, { y: b.dy, rotation: i * 12 - 24 },
-                        { y: "0vh", rotation: 0, duration: popTime, ease: E.spring }, at)
+                    .fromTo(sign.firstElementChild, { y: from.y, rotation: i * 12 - 24 },
+                        { y: mobile ? 0 : "0vh", rotation: 0, duration: popTime, ease: E.spring }, at)
                     .set(sign, { pointerEvents: "auto" }, at + popTime); // was `unlock`
             });
         }, root);

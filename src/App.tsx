@@ -186,7 +186,19 @@ import board from "./assets/ham/board.png";
 import guitarBook from "./assets/ham/guitarBook.png";
 import trunkStuff from "./assets/ham/trunkStuff.png";
 
+import lidInner from "./assets/ham/lidInner.png";
+import lidDome from "./assets/ham/lidDome.png";
+import lidEdge from "./assets/ham/lidEdge.png";
+import chestWell from "./assets/ham/chestWell.png";
+import chestBase from "./assets/ham/chestBase.png";
+import bgHome from "./assets/home/bg.jpg";
 const desktopAssets = [
+  bgHome,
+  chestBase,
+  chestWell,
+  lidEdge,
+  lidDome,
+  lidInner,
   trunkStuff,
   guitarBook,
   sandAbove,
