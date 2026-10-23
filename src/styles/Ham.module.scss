@@ -335,7 +335,9 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
     object-position: center;
   }
 }
-
+  .guitarBook{
+    display: none;
+  }
   .sandAbove {
     bottom: calc(var(--sb) - 1px);
     height: 100vh;
@@ -478,17 +480,17 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
 
 @media (max-aspect-ratio: 1/1) {
   .boards {
-    --row: 17vw;
-    --base: calc(var(--H) - var(--top) + 10dvh);
+    --row: 20vw;
+    --base: calc((var(--H) - var(--top))*0.9);
   }
 
-  .sign { width: 70vw; }
+  .sign { width: 100vw; }
 
-  .board4 { bottom: calc(var(--base)*0.9); left: 16%; right: auto; }
-  .board3 { bottom: calc(var(--base) + var(--row)*0.2); left: 16%; right: auto; }
-  .board2 { bottom: calc(var(--base) + var(--row)*1); left:16%; right: auto; }
-  .board  { bottom: calc(var(--base) + var(--row) * 1.8); left:16%; right: auto; }
-  .board1 { bottom: calc(var(--base) + var(--row) * 2.6); left:16%;  }
+  .board4 { bottom: calc(var(--base) + var(--row)*0.2 ); left: 0%; right: auto; }
+  .board3 { bottom: calc(var(--base) + var(--row)*1.2); left: 0%; right: auto; }
+  .board2 { bottom: calc(var(--base) + var(--row)*2.2); left:0%; right: auto; }
+  .board  { bottom: calc(var(--base) + var(--row) * 3.2); left:0%; right: auto; }
+  .board1 { bottom: calc(var(--base) + var(--row) * 4.2); left:0%;  }
 }
 
 /* ---------- Reduced motion ---------- */
@@ -534,3 +536,52 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
     );
   }
 }
+.plank {
+  span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -53%);
+    z-index: 2;
+    width: 100%;
+    text-align: center;
+    font-family: "Aladin", cursive;
+    font-size: clamp(12px, 3vw, 28px);
+    font-weight: 400;
+    white-space: nowrap;
+    pointer-events: none;
+
+    // Gradient text for desktop and mobile
+    background: linear-gradient(
+      266.62deg,
+      #401900 -17%,
+      #B14E00 117.13%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+
+    transition: text-shadow 0.3s ease;
+  }
+}
+
+// Mobile adjustments
+@media (max-aspect-ratio: 1/1) {
+  .plank span {
+    font-size: clamp(18px, 6vw, 40px);
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    transform: translate(-50%, -53%);
+    text-align: center;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding-bottom: 0;
+  }
+}
+
+

@@ -274,8 +274,9 @@ export default function Ham() {
                 .set(`${q("strip")}, ${q("lip")}, ${q("chestWell")}`, { visibility: "hidden" }, lidDelay + seg(0.47));
 
             // lid shadow on the base + inner face lighting up
-            tl.fromTo(q("inner"), { filter: "brightness(0.35)" },
-                { filter: "brightness(1)", duration: 0.8, ease: E.out, clearProps: "filter" }, lidDelay + seg(0.35));
+            // lid shadow: starts lighter and clears faster
+            tl.fromTo(q("inner"), { filter: "brightness(0.6)" },
+                { filter: "brightness(1)", duration: 0.4, ease: E.out, clearProps: "filter" }, lidDelay + seg(0.3));
 
 
 
@@ -303,25 +304,56 @@ export default function Ham() {
                     .map((o, r) => [o.i, r] as [number, number])
             );
 
-            signs.forEach((sign, i) => {
-                const b = BOARDS[i];
-                const order = mobile ? rank.get(i)! : BOARDS.length - 1 - i;
-                const at = popDelay + order * (mobile ? 0.2 : popStagger);
+            const center = (s: HTMLElement) => s.offsetTop + s.offsetHeight / 2;
 
-                // where the sign starts, relative to its final spot
-                const from: { x: string | number; y: string | number } = mobile
-                    ? {
-                        x: W / 2 - (sign.offsetLeft + sign.offsetWidth / 2),
-                        y: mouthY - (sign.offsetTop + sign.offsetHeight / 2),
-                    }
-                    : { x: b.dx, y: b.dy };
+            if (mobile) {
+                // lowest-on-screen first: ordered[0] is the board that leaves the trunk
+                const ordered = signs
+                    .map((s, i) => ({ s, r: rank.get(i)! }))
+                    .sort((a, b) => a.r - b.r)
+                    .map((o) => o.s);
 
-                tl.fromTo(sign, { x: from.x, scale: 0.4 }, { x: mobile ? 0 : "0vw", scale: 1, duration: popTime, ease: E.fly }, at)
-                    .fromTo(sign, { opacity: 0 }, { opacity: 1, duration: popTime * 0.15, ease: E.fly }, at)
-                    .fromTo(sign.firstElementChild, { y: from.y, rotation: i * 12 - 24 },
-                        { y: mobile ? 0 : "0vh", rotation: 0, duration: popTime, ease: E.spring }, at)
-                    .set(sign, { pointerEvents: "auto" }, at + popTime); // was `unlock`
-            });
+                const first = ordered[0];
+                const firstCenter = center(first);
+                const firstAt = popDelay;
+
+                // stacked: the first board is in front, the rest slide out from behind it
+                ordered.forEach((s, r) => gsap.set(s, { zIndex: ordered.length - r }));
+
+                // 1) first board rises out of the trunk
+                tl.fromTo(first,
+                    { y: mouthY - firstCenter, scale: 0.6, opacity: 0 },
+                    { y: 0, scale: 1, duration: 0.55, ease: "power3.out" }, firstAt)
+                    .fromTo(first, { opacity: 0 }, { opacity: 1, duration: 0.15, ease: "power1.out" }, firstAt);
+
+                // 2) the other four extend upward out of it, one after another
+                const extendAt = firstAt + 0.3;
+                const stagger = 0.08;
+                const dur = 0.5;
+                ordered.slice(1).forEach((s, k) => {
+                    const at = extendAt + k * stagger;
+                    tl.fromTo(s,
+                        { y: firstCenter - center(s), scale: 0.96, opacity: 0 },
+                        { y: 0, scale: 1, duration: dur, ease: "power3.out" }, at)
+                        .fromTo(s, { opacity: 0 }, { opacity: 1, duration: 0.12, ease: "none" }, at);
+                });
+
+                // unlock clicks and remove the temporary z-index
+                const end = extendAt + (ordered.length - 2) * stagger + dur;
+                tl.set(signs, { pointerEvents: "auto", clearProps: "zIndex" }, end);
+            } else {
+                // desktop: unchanged
+                signs.forEach((sign, i) => {
+                    const b = BOARDS[i];
+                    const at = popDelay + (BOARDS.length - 1 - i) * popStagger;
+
+                    tl.fromTo(sign, { x: b.dx, scale: 0.4 }, { x: "0vw", scale: 1, duration: popTime, ease: E.fly }, at)
+                        .fromTo(sign, { opacity: 0 }, { opacity: 1, duration: popTime * 0.15, ease: E.fly }, at)
+                        .fromTo(sign.firstElementChild, { y: b.dy, rotation: i * 12 - 24 },
+                            { y: "0vh", rotation: 0, duration: popTime, ease: E.spring }, at)
+                        .set(sign, { pointerEvents: "auto" }, at + popTime);
+                });
+            }
         }, root);
 
         return () => ctx.revert();

@@ -238,9 +238,8 @@ const desktopAssets = [
   Scroll2,
   googleButton,
   // lamps,
-
+  
 ];
-
 
 const fonts = [
   "Ramadhan",
