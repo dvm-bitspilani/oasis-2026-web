@@ -18,7 +18,7 @@ import bgHome from "../assets/home/bg.jpg";
 // dx / dy = where the sign starts, relative to its final spot (roughly the chest mouth).
 // Tweak these until each sign leaves the chest from the right place.
 const BOARDS = [
-    { label: "DEVELOPERS", pos: "board", to: "/comingSoon", dx: "14vw", dy: "-16vh" },
+    { label: "DEVELOPERS", pos: "board", to: "/DevPage", dx: "14vw", dy: "-16vh" },
     { label: "WALL MAG", pos: "board1", to: "/comingSoon", dx: "-14vw", dy: "-16vh" },
     { label: "SPONSORS", pos: "board3", to: "/comingSoon", dx: "10vw", dy: "-26vh" },
     { label: "GALLERY", pos: "board2", to: "/comingSoon", dx: "-10vw", dy: "-26vh" },
