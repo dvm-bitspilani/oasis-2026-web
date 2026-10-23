@@ -39,7 +39,7 @@ function waitForNextPaint(): Promise<void> {
   });
 }
 
-type TransitionStage = "strings" | "curtain";
+type TransitionStage = "strings" | "smoke";
 
 export function TransitionProvider({
   children,
@@ -152,7 +152,7 @@ export function TransitionProvider({
 
       /*
        * Strings have finished.
-       * Curtain is paused while covering the screen.
+       * Smoke covers the screen while the destination route mounts.
        */
 
       navigate(destination);
@@ -164,9 +164,9 @@ export function TransitionProvider({
       await waitForNextPaint();
 
       /*
-       * Resume the same curtain animation.
+       * Fade away the smoke after the destination paints.
        */
-      transitionRef.current?.resumeCurtain();
+      transitionRef.current?.resumeSmoke();
     }, [
       navigate,
     ]);
@@ -185,7 +185,7 @@ export function TransitionProvider({
         transitionStageRef.current === "strings"
       ) {
         transitionStageRef.current =
-          "curtain";
+          "smoke";
 
         await handleTransitionComplete();
 
@@ -194,7 +194,7 @@ export function TransitionProvider({
 
       /*
        * SECOND completion:
-       * curtain has finished.
+       * smoke has faded away.
        */
       transitionStageRef.current = "strings";
 

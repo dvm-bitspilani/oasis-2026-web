@@ -279,9 +279,9 @@ useEffect(() => {
       const dy = current.y - previousPointer.y;
       const distance = Math.hypot(dx, dy);
 
-      const spacing = 0.8;
+      const spacing = 2.8;
       const total = emissionRemainder + distance;
-      const count = Math.min(40, Math.floor(total / spacing));
+      const count = Math.min(30, Math.floor(total / spacing));
       emissionRemainder = total % spacing;
 
       for (let i = 0; i < count; i++) {
@@ -299,7 +299,7 @@ useEffect(() => {
           spin: (Math.random() - 0.5) * 0.035,
           color: sandColors[Math.floor(Math.random() * sandColors.length)],
           life: 0,
-          maxLife: 55 + Math.random() * 100,
+          maxLife: 55 + Math.random() * 40,
         });
       }
 
