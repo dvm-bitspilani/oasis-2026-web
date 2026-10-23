@@ -35,22 +35,64 @@
    SPOTLIGHT
 ========================================================= */
 
+/* =========================================================
+   SPOTLIGHT
+========================================================= */
+
+@property --spotlight-inner {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 250px;
+}
+
+@property --spotlight-outer {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 300px;
+}
+
 .spotlightOverlay {
+    --spotlight-inner: 250px;
+    --spotlight-outer: 300px;
+
     position: absolute;
     inset: 0;
     z-index: 5;
     pointer-events: none;
 
     backdrop-filter: brightness(0.4);
-    // -webkit-backdrop-filter: brightness(0.4);
 
     mask-image: radial-gradient(
         circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-        transparent 0px,
-        transparent 250px,
-        black 300px,
+        transparent 0,
+        transparent var(--spotlight-inner),
+        black var(--spotlight-outer),
         black 100%
     );
+}
+/* Before the intro runs: spotlight is fully open, so the page
+   is at normal brightness. The doubled selector gives it higher
+   specificity than the breakpoint overrides of .spotlightOverlay. */
+.spotlightOverlay.spotlightIdle {
+    --spotlight-inner: 150vmax;
+    --spotlight-outer: 150vmax;
+}
+.spotlightIntro {
+    animation: spotlightShrink 1s
+        cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes spotlightShrink {
+    from {
+        --spotlight-inner: 150vmax;
+        --spotlight-outer: 150vmax;
+    }
+
+    to {
+        --spotlight-inner: 250px;
+        --spotlight-outer: 300px;
+    }
+}
 
     // -webkit-mask-image: radial-gradient(
     //     circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
@@ -59,7 +101,7 @@
     //     black 300px,
     //     black 100%
     // );
-}
+
 
 
 /* =========================================================
@@ -150,23 +192,26 @@
         right: 15%;
     }
 
-    .spotlightOverlay {
-        mask-image: radial-gradient(
-            circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            transparent 0,
-            transparent 140px,
-            black 220px,
-            black 100%
-        );
+   .spotlightOverlay {
+    --spotlight-inner: 140px;
+    --spotlight-outer: 220px;
+}
 
-        -webkit-mask-image: radial-gradient(
-            circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            transparent 0,
-            transparent 140px,
-            black 220px,
-            black 100%
-        );
+.spotlightIntro {
+    animation-name: spotlightShrinkTablet;
+}
+
+@keyframes spotlightShrinkTablet {
+    from {
+        --spotlight-inner: 150vmax;
+        --spotlight-outer: 150vmax;
     }
+
+    to {
+        --spotlight-inner: 140px;
+        --spotlight-outer: 220px;
+    }
+}
 }
 
 
@@ -476,7 +521,7 @@
    <= 400px
 ========================================================= */
 
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 395px) {
 
     .fullPageContainer {
         height: 100dvh;
@@ -630,10 +675,12 @@
     }
 }
 .danceContainer .hitArea {
+
     left: 20.5%;
     right: 5%;
 }
 .otherContainer .hitArea {
+
     left: 33.5%;
     right: 10%;
 }
@@ -775,7 +822,7 @@
     flex: 0 0 auto;
     font-family: "Syamsiah";
     margin: 0 0 5px;
-  
+
     min-height: 1.5em;
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -1282,7 +1329,7 @@
         display: none;
     }
 
-    
+
     .title {
         display: none;
         left: -13%;
@@ -1305,6 +1352,7 @@
         scale: 0.45;
     }
 
+    /* BOTTOM POTS */
 
     .danceContainer {
         left: -33%;
@@ -1322,122 +1370,4 @@
         right: -39%;
         margin-bottom: -165px;
         scale: 0.36;
-    }
-}
-
-
-
-// .dramaContainer,
-// .photographyContainer,
-// .danceContainer,
-// .otherContainer,
-// .musicContainer {
-//     position: absolute;
-//     bottom: auto;
-//     margin-bottom: 0;
-//     scale: 0.8;
-//     z-index: 2;
-// }
-
-// .dramaContainer {
-//     left: 20%;
-//     top: 47%;
-// }
-
-// .photographyContainer {
-//     right: 20%;
-//     top: 47%;
-// }
-
-
-// .danceContainer {
-//     left: 3%;
-//     top: 73%;
-// }
-
-// .otherContainer {
-//     left: 50%;
-//     top: 73%;
-//     transform: translateX(-50%);
-// }
-
-// .musicContainer {
-//     right: 3%;
-//     top: 73%;
-// }
-
-// /* Consistent vase sizing */
-
-// .dramaContainer .imageWrap,
-// .photographyContainer .imageWrap,
-// .danceContainer .imageWrap,
-// .otherContainer .imageWrap,
-// .musicContainer .imageWrap {
-//     display: inline-block;
-//     position: relative;
-// }
-
-// .dramaContainer img,
-// .photographyContainer img,
-// .danceContainer img,
-// .otherContainer img,
-// .musicContainer img {
-//     display: block;
-//     // width: clamp(105px, 15vw, 220px);
-//     height: auto;
-// }
-
-// /* Tablet */
-
-// @media (max-width: 900px) {
-//     .dramaContainer {
-//         left: 7%;
-//     }
-
-//     .photographyContainer {
-//         right: 7%;
-//     }
-
-//     .dramaContainer img,
-//     .photographyContainer img {
-//         width: clamp(100px, 19vw, 165px);
-//     }
-
-//     .danceContainer img,
-//     .otherContainer img,
-//     .musicContainer img {
-//         width: clamp(95px, 18vw, 150px);
-//     }
-// }
-
-// /* Mobile */
-
-// @media (max-width: 600px) {
-//     .dramaContainer,
-//     .photographyContainer {
-//         top: 48%;
-//     }
-
-//     .dramaContainer {
-//         left: 4%;
-//     }
-
-//     .photographyContainer {
-//         right: 4%;
-//     }
-//     .danceContainer,
-//     .otherContainer,
-//     .musicContainer {
-//         top: 75%;
-//     }
-//     .danceContainer {
-//         left: 1%;
-//     }
-//     .otherContainer {
-//         left: 50%;
-//     }
-//     .musicContainer {
-//         right: 1%;
-//     }
-    
-// }
+    }}

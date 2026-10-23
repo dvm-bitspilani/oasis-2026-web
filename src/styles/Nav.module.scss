@@ -2,14 +2,14 @@
   position: absolute;
   top: 24px;
   left: -2%;
-
+  display: none;
   width: 100vw;
   height: 10vh;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-
+  
   padding: 0 24px;
   margin-left: 5%;
 
@@ -307,4 +307,8 @@
     flex-shrink: 1;
     min-width: 0;
   }
+}
+
+.circle{
+  visibility: hidden !important;
 }
