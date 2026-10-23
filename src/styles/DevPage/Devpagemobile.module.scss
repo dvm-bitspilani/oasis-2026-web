@@ -73,7 +73,7 @@ $bg-bleed: 6%;
   z-index: 2;
 
   img {
-    width: 62%;
+    width: 90%;
   }
 }
 
@@ -168,15 +168,16 @@ $bg-bleed: 6%;
   background: none;
   border: none;
   color: #f3e6c8;
-  font-size: 9vw;
+  font-size: 16vw;
   line-height: 1;
   cursor: pointer;
   padding: 2vw;
 }
 
 .navTitle {
+  font-family: Arabian Night;
   color: #f3e6c8;
-  font-size: 7vw;
+  font-size: 14vw;
   margin: 0;
   min-width: 40vw;
   text-align: center;
@@ -185,8 +186,8 @@ $bg-bleed: 6%;
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 6vw 4vw;
-  padding: 8vw 6vw 16vw;
+  gap:0vw;
+  // padding: 8vw 6vw 16vw;
   position: relative; // transition: sits under the curtain
   z-index: 0;
   animation: gridFadeIn 0.5s ease both; // fades in after each swap
@@ -198,33 +199,39 @@ $bg-bleed: 6%;
   align-items: center;
 
   .cardImage {
-    width: 100%;
-    max-width: 40vw;
-    object-fit: contain;
+    width: 130%;
+    max-width: 70vw;
+    object-fit: cover;
     display: block;
   }
 }
 
 .cardName {
-  color: #f3e6c8;
+  color: #AFA360;
   text-align: center;
-  font-size: 3.6vw;
+  font-size: 5.2vw;
   margin: 2vw 0 1vw;
 }
 
+// Instagram + LinkedIn icons under each name (drawn by SocialIcons.tsx)
 .cardSocials {
   display: flex;
-  gap: 3vw;
+  justify-content: center;
+  align-items: center;
+  gap: 8vw;          // space BETWEEN the two icons
+  margin-top: 1.5vw; // space between the name and the icons
+}
 
-  a {
-    display: inline-flex;
-    background: #d8bd83;
-    border-radius: 4px;
-    width: 6vw;
-    height: 6vw;
-    align-items: center;
-    justify-content: center;
-    font-size: 0; // icon-only, replace with real icons/images as needed
+.cardSocialLink {
+  display: block;
+  width: 5.5vw;      // icon size
+  height: 5.5vw;
+  color: #AFA360;    // same gold as the design
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 }
 

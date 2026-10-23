@@ -27,8 +27,16 @@ a {
 }
 
 @font-face {
+  font-family: "Amita";
+  src: url(./assets/fonts/Amita-Regular.ttf);
+}
+@font-face {
   font-family: "Almalik";
   src: url(./assets/fonts/Almalik.otf);
+}
+@font-face {
+  font-family: "Arabian Night";
+  src: url(./assets/fonts/ArabianNight-CommercialUsed.otf);
 }
 
 @font-face {

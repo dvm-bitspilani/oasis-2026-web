@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-
 import CharacterMobile from "./CharacterMobile";
+import { MEMBERS } from "./DevMembers";
 import styles from "../../styles/DevPage/Devpagemobile.module.scss";
 import bgphone from "../../assets/DevPage/bgphone.png";
 import heading from "../../assets/DevPage/heading.png";
@@ -12,54 +12,22 @@ import bgPink from "../../assets/DevPage/bpPink.png";
 import bgPurple from "../../assets/DevPage/bgPurple.png";
 import bgBlue from "../../assets/DevPage/bgBlue.png";
 import image from "../../assets/DevPage/profile.png";
-
 type Vertical = "Frontend" | "Backend" | "Ui";
 type Direction = "left" | "right";
-
 // Fixed cycle order for the ‹ › arrows
 const VERTICAL_ORDER: Vertical[] = ["Frontend", "Backend", "Ui"];
 
+// names + Instagram/LinkedIn links live in devMembers.ts (shared with desktop)
 const VERTICAL_INFO: Record<
   Vertical,
   {
     label: string;
     background: string;
-    members: { name: string }[];
   }
 > = {
-  Frontend: {
-    label: "Frontend",
-    background: bgPink,
-    members: [
-      { name: "Name Middle Surname" },
-      { name: "Name Middle Surname" },
-      { name: "Name Middle Surname" },
-      { name: "Name Middle Surname" },
-    ],
-  },
-
-  Backend: {
-    label: "Backend",
-    background: bgBlue,
-    members: [
-      { name: "Name Middle Surname" },
-      { name: "Name Middle Surname" },
-      { name: "Name Middle Surname" },
-      { name: "Name Middle Surname" },
-    ],
-  },
-
-  Ui: {
-    label: "UI/UX",
-    background: bgPurple,
-    members: [
-      { name: "Name Middle Surname" },
-      { name: "Name Middle Surname" },
-      { name: "Name Middle Surname" },
-      { name: "Name Middle Surname" },
-      { name: "Name Middle Surname" },
-    ],
-  },
+  Frontend: { label: "Frontend", background: bgPink },
+  Backend: { label: "Backend", background: bgBlue },
+  Ui: { label: "UI/UX", background: bgPurple },
 };
 
 export default function DevPageMobile() {
@@ -203,11 +171,13 @@ export default function DevPageMobile() {
 
       {/* key = vertical, so the grid remounts (and fades in) after each swap */}
       <div className={styles.grid} key={activeVertical}>
-        {info.members.map((member, i) => (
+        {MEMBERS[activeVertical].map((member) => (
           <CharacterMobile
-            key={`${activeVertical}-${i}`}
+            key={`${activeVertical}-${member.name}`}
             image={image}
             name={member.name}
+            instagram={member.instagram}
+            linkedin={member.linkedin}
           />
         ))}
       </div>
