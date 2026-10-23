@@ -92,7 +92,7 @@ const righttop =
 
 const book =
   "https://res.cloudinary.com/bhfhuzru/image/upload/book.png";
-  
+
 
 const buttonBg =
   "https://res.cloudinary.com/bhfhuzru/image/upload/buttonbg.png";
@@ -142,6 +142,17 @@ if (isOasisDomain) {
 const isMobile = window.innerWidth <= 768;
 
 const mobileAssets = [
+  bgHome,
+  chestBase,
+  chestWell,
+  lidEdge,
+  lidDome,
+  lidInner,
+  trunkStuff,
+  guitarBook,
+  sandAbove,
+  board,
+  sandBottom,
   video,
   // camel1,
   // camel2,
@@ -185,7 +196,6 @@ import sandAbove from "./assets/ham/sandAbove.png";
 import board from "./assets/ham/board.png";
 import guitarBook from "./assets/ham/guitarBook.png";
 import trunkStuff from "./assets/ham/trunkStuff.png";
-
 import lidInner from "./assets/ham/lidInner.png";
 import lidDome from "./assets/ham/lidDome.png";
 import lidEdge from "./assets/ham/lidEdge.png";
@@ -238,7 +248,7 @@ const desktopAssets = [
   Scroll2,
   googleButton,
   // lamps,
-  
+
 ];
 
 const fonts = [
@@ -323,13 +333,13 @@ export default function App() {
         style={
           introActive
             ? {
-                position: "fixed",
-                inset: 0,
-                width: "100vw",
-                height: "100dvh",
-                overflow: "hidden",
-                background: "#080a18",
-              }
+              position: "fixed",
+              inset: 0,
+              width: "100vw",
+              height: "100dvh",
+              overflow: "hidden",
+              background: "#080a18",
+            }
             : undefined
         }
       >
@@ -337,16 +347,16 @@ export default function App() {
           style={
             introActive
               ? {
-                  width: "100%",
-                  minHeight: "100%",
-                  transform: homeExiting
-                    ? "translate3d(0, 0, 0)"
-                    : "translate3d(0, 100%, 0)",
-                  transition: homeExiting
-                    ? `transform ${TRANSITION_DURATION}ms cubic-bezier(0.76, 0, 0.24, 1)`
-                    : "none",
-                  willChange: "transform",
-                }
+                width: "100%",
+                minHeight: "100%",
+                transform: homeExiting
+                  ? "translate3d(0, 0, 0)"
+                  : "translate3d(0, 100%, 0)",
+                transition: homeExiting
+                  ? `transform ${TRANSITION_DURATION}ms cubic-bezier(0.76, 0, 0.24, 1)`
+                  : "none",
+                willChange: "transform",
+              }
               : undefined
           }
         >
@@ -364,7 +374,7 @@ export default function App() {
       {isHome && !preloaderDone && (
         <Preloader
           assets={assets}
-              fonts={fonts}
+          fonts={fonts}
           onExitStart={handlePreloaderExit}
           onEnter={handleEnter}
         />

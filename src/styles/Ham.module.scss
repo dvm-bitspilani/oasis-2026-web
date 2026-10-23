@@ -40,11 +40,7 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
 
 // MOBILE / portrait: chest sits at the bottom, resting in the sand.
 // The 0.5 controls how deeply the chest sits inside sandBottom.
-@media (max-aspect-ratio: 1/1) {
-  .container {
-    --top: calc(var(--H) - var(--h) - var(--sb) * 0.1);
-  }
-}
+
 
 /* ---------- Parallax layers ---------- */
 
@@ -62,10 +58,8 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
 .lChest { --d: 12; z-index: 3; transform-origin: 50% 65%; }
 .lFront { --d: 34; z-index: 6; inset: 0 -3% -40px; }
 
-@media (max-aspect-ratio: 1/1) {
-  .lChest { transform-origin: 50% calc(var(--top) + var(--h) * 0.55); }
-  .lFront { inset: 0 -3% -40px; z-index: 2; }
-}
+
+
 /* ---------- Background ---------- */
 
 .bgHome {
@@ -99,12 +93,7 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
 
 // Mobile perspective multiplier: 10.
 // Override the dependent values as well, since Sass variables are compiled ahead of time.
-@media (max-aspect-ratio: 1/1) {
-  .chestRig {
-    --dy: calc(0.0449014 * (var(--hy) - var(--cy)));
-    perspective: calc(var(--h) * 10);
-  }
-}
+
 
 .chestBase,
 .chestTop,
@@ -171,11 +160,7 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
   scale: calc(1 + var(--fit) * #{$lidK - 1});
 }
 
-@media (max-aspect-ratio: 1/1) {
-  .chestTop {
-    scale: calc(1 + var(--fit) * 0.0449014);
-  }
-}
+
 
 .face {
   position: absolute;
@@ -319,56 +304,7 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
   }
 }
 
-@media (max-aspect-ratio: 1/1) {
-  
-  .trunkStuff {
-  position: absolute;
-  left:  -5%;
-  bottom: 13%;
-  width: 100vw;
 
-  img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-  }
-}
-  .guitarBook{
-    display: none;
-  }
-  .sandAbove {
-    bottom: calc(var(--sb) - 1px);
-    height: 100vh;
-    display: none;
-  img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-  }
-  }
-  .sandBottom {
-    // always glued to the bottom, height = the same --sb the chest math uses
-    position: absolute;
-    left: 0;
-    bottom: 4%;
-    width: 100%;
-    height: calc(var(--sb) + 40px);
-    overflow: hidden;
-
-    img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center top;
-    }
-  }
-
-}
 
 /* ---------- Signs ---------- */
 
@@ -478,20 +414,7 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
 .board3 { bottom: 25%; left: 30%; }
 .board4 { bottom: 15%; left: 40%; }
 
-@media (max-aspect-ratio: 1/1) {
-  .boards {
-    --row: 20vw;
-    --base: calc((var(--H) - var(--top))*0.9);
-  }
 
-  .sign { width: 100vw; }
-
-  .board4 { bottom: calc(var(--base) + var(--row)*0.2 ); left: 0%; right: auto; }
-  .board3 { bottom: calc(var(--base) + var(--row)*1.2); left: 0%; right: auto; }
-  .board2 { bottom: calc(var(--base) + var(--row)*2.2); left:0%; right: auto; }
-  .board  { bottom: calc(var(--base) + var(--row) * 3.2); left:0%; right: auto; }
-  .board1 { bottom: calc(var(--base) + var(--row) * 4.2); left:0%;  }
-}
 
 /* ---------- Reduced motion ---------- */
 
@@ -522,20 +445,8 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
 }
 
 
-@media (max-aspect-ratio: 1/1) {
-  .lantern {
-    mix-blend-mode: normal;
-    width: 22vw;
-  }
-  .lantern::before {
-    background: radial-gradient(
-      circle,
-      rgba(255, 170, 70, 0.4),
-      rgba(255, 120, 30, 0.12) 40%,
-      transparent 68%
-    );
-  }
-}
+
+
 .plank {
   span {
     position: absolute;
@@ -567,7 +478,98 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
 }
 
 // Mobile adjustments
-@media (max-aspect-ratio: 1/1) {
+
+@media (max-width: 750px) {
+  .container {
+    --top: calc(var(--H) - var(--h) - var(--sb) * 0.1);
+  }
+
+  .lChest { transform-origin: 50% calc(var(--top) + var(--h) * 0.55); }
+  .lFront { inset: 0 -3% -40px; z-index: 2; }
+
+  .chestRig {
+    --dy: calc(0.0449014 * (var(--hy) - var(--cy)));
+    perspective: calc(var(--h) * 10);
+  }
+
+  .chestTop {
+    scale: calc(1 + var(--fit) * 0.0449014);
+  }
+
+  
+  .trunkStuff {
+  position: absolute;
+  left:  -5%;
+  bottom: 13%;
+  width: 100vw;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+}
+  .guitarBook{
+    display: none;
+  }
+  .sandAbove {
+    bottom:-45%;
+    height: 100vh;
+    // display: none;
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+  }
+  .sandBottom {
+    // always glued to the bottom, height = the same --sb the chest math uses
+    position: absolute;
+    left: 0;
+    bottom: 4%;
+    width: 100%;
+    height: calc(var(--sb) + 40px);
+    overflow: hidden;
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+  }
+
+  .boards {
+    --row: 17vw;
+    --base: calc((var(--H) - var(--top))*0.9);
+  }
+
+  .sign { width: 80vw; }
+
+  .board4 { bottom: calc(var(--base) + var(--row)*0.2 ); left: 10%; right: auto; }
+  .board3 { bottom: calc(var(--base) + var(--row)*1.2); left: 10%; right: auto; }
+  .board2 { bottom: calc(var(--base) + var(--row)*2.2); left:10%; right: auto; }
+  .board  { bottom: calc(var(--base) + var(--row) * 3.2); left:10%; right: auto; }
+  .board1 { bottom: calc(var(--base) + var(--row) * 4.2); left:10%;  }
+
+  .lantern {
+    mix-blend-mode: normal;
+    width: 22vw;
+  }
+  .lantern::before {
+    background: radial-gradient(
+      circle,
+      rgba(255, 170, 70, 0.4),
+      rgba(255, 120, 30, 0.12) 40%,
+      transparent 68%
+    );
+  }
+
   .plank span {
     font-size: clamp(18px, 6vw, 40px);
     top: 50%;
@@ -582,6 +584,67 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
     height: 100%;
     padding-bottom: 0;
   }
+
+  .container {
+    --sbH: calc(var(--sb) + 40px);
+    --sandOverlap: 2px; // raise if you still see a gap
+  }
+
+  // same box + no parallax, so the two sands can't drift apart
+  .lSand,
+  .lFront {
+    inset: 0;
+    --d: 0;
+  }
+  .lFront { z-index: 2; }
+
+  .sandBottom {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100vw;
+    overflow: hidden;
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+  }
+
+  .sandAbove {
+    display: none;
+    position: absolute;
+    left: 0;
+    bottom: 3%;
+    width: 100%;
+    height: auto;
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
 }
 
 
+
+@media (min-width: 751px) and (max-width: 1150px) {
+  .container {
+    --drop: 18dvh;
+    --top: calc(var(--top0) + var(--drop));
+  }
+  .sandAbove { margin-bottom: -10%;   }
+  .guitarBook { display: none; }
+  .board  { bottom: calc(45% - var(--drop));left: 17%; }
+  .board1 { bottom: calc(45% - var(--drop)); right: 17%; }
+  .board2 { bottom: calc(38% - var(--drop)); left: 25%; }
+  .board3 { bottom: calc(38% - var(--drop)); left: 53%; }
+  .board4 { bottom: calc(32% - var(--drop));left: 40%; }
+
+  .sign { width: 24vw; }
+}
