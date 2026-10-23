@@ -28,7 +28,7 @@
 //     </div>
 //   );
 // }
-import styles from "../../styles/DevPage/DevPagemobile.module.scss";
+import styles from "../../styles/DevPage/Devpagemobile.module.scss";
 import SocialIcons from "./SocialIcons";
 
 interface CharacterMobileProps {
