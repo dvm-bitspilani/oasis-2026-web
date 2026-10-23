@@ -35,22 +35,64 @@
    SPOTLIGHT
 ========================================================= */
 
+/* =========================================================
+   SPOTLIGHT
+========================================================= */
+
+@property --spotlight-inner {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 250px;
+}
+
+@property --spotlight-outer {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 300px;
+}
+
 .spotlightOverlay {
+    --spotlight-inner: 250px;
+    --spotlight-outer: 300px;
+
     position: absolute;
     inset: 0;
     z-index: 5;
     pointer-events: none;
 
     backdrop-filter: brightness(0.4);
-    // -webkit-backdrop-filter: brightness(0.4);
 
     mask-image: radial-gradient(
         circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-        transparent 0px,
-        transparent 250px,
-        black 300px,
+        transparent 0,
+        transparent var(--spotlight-inner),
+        black var(--spotlight-outer),
         black 100%
     );
+}
+/* Before the intro runs: spotlight is fully open, so the page
+   is at normal brightness. The doubled selector gives it higher
+   specificity than the breakpoint overrides of .spotlightOverlay. */
+.spotlightOverlay.spotlightIdle {
+    --spotlight-inner: 150vmax;
+    --spotlight-outer: 150vmax;
+}
+.spotlightIntro {
+    animation: spotlightShrink 1s
+        cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes spotlightShrink {
+    from {
+        --spotlight-inner: 150vmax;
+        --spotlight-outer: 150vmax;
+    }
+
+    to {
+        --spotlight-inner: 250px;
+        --spotlight-outer: 300px;
+    }
+}
 
     // -webkit-mask-image: radial-gradient(
     //     circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
@@ -59,7 +101,7 @@
     //     black 300px,
     //     black 100%
     // );
-}
+
 
 
 /* =========================================================
@@ -150,23 +192,26 @@
         right: 15%;
     }
 
-    .spotlightOverlay {
-        mask-image: radial-gradient(
-            circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            transparent 0,
-            transparent 140px,
-            black 220px,
-            black 100%
-        );
+   .spotlightOverlay {
+    --spotlight-inner: 140px;
+    --spotlight-outer: 220px;
+}
 
-        -webkit-mask-image: radial-gradient(
-            circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            transparent 0,
-            transparent 140px,
-            black 220px,
-            black 100%
-        );
+.spotlightIntro {
+    animation-name: spotlightShrinkTablet;
+}
+
+@keyframes spotlightShrinkTablet {
+    from {
+        --spotlight-inner: 150vmax;
+        --spotlight-outer: 150vmax;
     }
+
+    to {
+        --spotlight-inner: 140px;
+        --spotlight-outer: 220px;
+    }
+}
 }
 
 

@@ -1467,7 +1467,9 @@ export default function EventsPage() {
     // if the component unmounts or another close happens first.
     const smokeFadeTimeoutRef =
         useRef<number | null>(null);
-
+const [spotlightPhase, setSpotlightPhase] = useState<
+    "idle" | "intro" | "done"
+>("idle");
     const [
         selectedCategory,
         setSelectedCategory,
@@ -1512,10 +1514,10 @@ export default function EventsPage() {
         setEventsPreloaderDone,
     ] = useState(false);
 
-    const handleEventsPreloaderEnter =
-        useCallback(() => {
-            setEventsPreloaderDone(true);
-        }, []);
+   const handleEventsPreloaderEnter = useCallback(() => {
+    setEventsPreloaderDone(true);
+    setSpotlightPhase("intro");
+}, []);
 
     /* =====================================================
        SPOTLIGHT
@@ -2002,10 +2004,15 @@ export default function EventsPage() {
             ================================================= */}
 
             <div
-                ref={overlayRef}
-                className={
-                    styles.spotlightOverlay
-                }
+             ref={overlayRef}
+             className={`${styles.spotlightOverlay} ${
+             spotlightPhase === "idle"
+              ? styles.spotlightIdle
+              : spotlightPhase === "intro"
+              ? styles.spotlightIntro
+              : ""
+             }`}
+             onAnimationEnd={() => setSpotlightPhase("done")}
             />
 
             {/* =================================================
