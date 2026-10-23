@@ -221,7 +221,152 @@ export default function Home({
 
     return () => img.removeEventListener("load", onLoad);
   }, []);
+  
 
+  const sandCanvasRef = useRef<HTMLCanvasElement>(null);
+
+useEffect(() => {
+  const canvas = sandCanvasRef.current;
+  const container = containerRef.current;
+  const ctx = canvas?.getContext("2d");
+
+  if (!canvas || !container || !ctx) return;
+
+  type Grain = {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    size: number;
+    angle: number;
+    spin: number;
+    color: string;
+    life: number;
+    maxLife: number;
+  };
+
+  const grains: Grain[] = [];
+  const sandColors = ["#d7a85c", "#edc77f", "#bd8742", "#f1d293"];
+
+  let width = 0;
+  let height = 0;
+  let frame = 0;
+  let previousPointer: { x: number; y: number } | null = null;
+  let emissionRemainder = 0;
+
+  const resize = () => {
+    const rect = container.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    width = rect.width;
+    height = rect.height;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+
+  const onPointerMove = (event: PointerEvent) => {
+    if (event.pointerType === "touch") return;
+
+    const rect = container.getBoundingClientRect();
+    const current = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+
+    if (previousPointer) {
+      const dx = current.x - previousPointer.x;
+      const dy = current.y - previousPointer.y;
+      const distance = Math.hypot(dx, dy);
+
+      const spacing = 0.8;
+      const total = emissionRemainder + distance;
+      const count = Math.min(40, Math.floor(total / spacing));
+      emissionRemainder = total % spacing;
+
+      for (let i = 0; i < count; i++) {
+        const t = Math.min(1, ((i + 1) * spacing) / Math.max(distance, 1));
+        const directionX = dx / Math.max(distance, 1);
+        const directionY = dy / Math.max(distance, 1);
+
+        grains.push({
+          x: previousPointer.x + dx * t + (Math.random() - 0.5) * 7,
+          y: previousPointer.y + dy * t + (Math.random() - 0.5) * 5,
+          vx: directionX * 0.25 + (Math.random() - 0.5) * 0.8,
+          vy: directionY * 0.15 - Math.random() * 0.35,
+          size: 1 + Math.random() * 1.8,
+          angle: Math.random() * Math.PI,
+          spin: (Math.random() - 0.5) * 0.035,
+          color: sandColors[Math.floor(Math.random() * sandColors.length)],
+          life: 0,
+          maxLife: 55 + Math.random() * 100,
+        });
+      }
+
+      if (grains.length > 260) {
+        grains.splice(0, grains.length - 260);
+      }
+    }
+
+    previousPointer = current;
+  };
+
+  const onPointerLeave = () => {
+    previousPointer = null;
+    emissionRemainder = 0;
+  };
+
+  const draw = () => {
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = grains.length - 1; i >= 0; i--) {
+      const grain = grains[i];
+
+      grain.x += grain.vx;
+      grain.y += grain.vy;
+      grain.vy += 0.028;
+      grain.vx *= 0.995;
+      grain.angle += grain.spin;
+      grain.life += 1;
+
+      const fade = Math.max(0, 1 - grain.life / grain.maxLife);
+
+      ctx.globalAlpha = fade * 0.78;
+      ctx.fillStyle = grain.color;
+      ctx.beginPath();
+      ctx.ellipse(
+        grain.x,
+        grain.y,
+        grain.size * 1.25,
+        grain.size * 0.58,
+        grain.angle,
+        0,
+        Math.PI * 2,
+      );
+      ctx.fill();
+
+      if (grain.life >= grain.maxLife || grain.y > height + 8) {
+        grains.splice(i, 1);
+      }
+    }
+
+    ctx.globalAlpha = 1;
+    frame = requestAnimationFrame(draw);
+  };
+
+  resize();
+  window.addEventListener("resize", resize);
+  container.addEventListener("pointermove", onPointerMove);
+  container.addEventListener("pointerleave", onPointerLeave);
+  frame = requestAnimationFrame(draw);
+
+  return () => {
+    cancelAnimationFrame(frame);
+    window.removeEventListener("resize", resize);
+    container.removeEventListener("pointermove", onPointerMove);
+    container.removeEventListener("pointerleave", onPointerLeave);
+  };
+}, []);
   const isOverCarpet = useCallback((clientX: number, clientY: number) => {
     const el = carpetImgRef.current;
     const alpha = carpetAlphaRef.current;
@@ -1041,6 +1186,7 @@ export default function Home({
 
   return (
     <div className={styles.container} ref={containerRef}>
+       <canvas ref={sandCanvasRef} className={styles.sandParticles} aria-hidden="true" />
       <div
         style={{
           pointerEvents: introComplete ? "auto" : "none",
