@@ -13,7 +13,7 @@ import board from "../assets/ham/board.png";
 import guitarBook from "../assets/ham/guitarBook.png";
 import trunkStuff from "../assets/ham/trunkStuff.png";
 import bgHome from "../assets/home/bg.jpg";
-
+import styles from "../styles/Ham.module.scss";
 
 const BOARDS = [
     { label: "DEVELOPERS", pos: "board", to: "/DevPage", dx: "14vw", dy: "-16vh" },
