@@ -6,6 +6,8 @@ import { TransitionProvider } from "../context/TransitionProvider";
 // LAZY LOADED PAGES
 // ======================================================
 
+import Devpageresponsive from "../pages/DevPage/Devpageresponsive.tsx";
+
 const Home = lazy(() => import("../pages/Home"));
 // import Ham from "../pages/Ham/Ham.jsx"
 const Registration = lazy(
@@ -76,7 +78,9 @@ export default function AppRoutes({
           {/* ==================================================
               CONTACT
           ================================================== */}
-
+          <Route
+          path="/DevPage"
+          element={<Devpageresponsive />}/>
           <Route
             path="/contactus"
             element={<Contact />}

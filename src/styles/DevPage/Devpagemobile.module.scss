@@ -1,0 +1,274 @@
+// BG BLEED: how much taller than the screen the curtain image is drawn (split evenly
+// above and below, the extra is clipped off). This hides empty/black strips that are
+// part of the image files. Raise it (e.g. 10%) if you still see a strip at the top or
+// bottom, lower it (e.g. 3%) / set 0% if the image is fine and you want no zoom.
+$bg-bleed: 6%;
+
+// STAGE = the full-screen frame. BACKDROP = the curtain image, always filling it.
+// WRAPPER = the scrolling content layer on top (so content scrolls, backdrop doesn't).
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.backdrop {
+  position: absolute;
+  left: 0;
+  top: -$bg-bleed;
+  width: 100%;
+  height: calc(100% + #{$bg-bleed * 2});
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.wrapper {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto; // scrolls only when content is taller than the screen (e.g. UI/UX, 5 members)
+  overscroll-behavior-y: contain; // scroll doesn't leak to the page behind
+  touch-action: pan-y;
+  padding-bottom: 8vw;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; // hide scrollbar (Firefox)
+
+  &::-webkit-scrollbar {
+    display: none; // hide scrollbar (Chrome / Safari)
+  }
+}
+
+.back {
+  position: absolute;
+  top: 4vw;
+  left: 4vw;
+  width: 11vw;
+  z-index: 3; // above .heading / .navRow (z-index 2), otherwise they block taps
+
+  .backButton {
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    img {
+      width: 100%;
+      object-fit: contain;
+      display: block;
+    }
+  }
+}
+
+.heading {
+  display: flex;
+  justify-content: center;
+  padding-top: 8vw;
+  position: relative; // transition: stays above the sliding curtain
+  z-index: 2;
+
+  img {
+    width: 90%;
+  }
+}
+
+// ---------------- HOME: stacked cushions ----------------
+.cushions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+//   gap: 4vw;
+  margin-top: 10vw;
+//   padding: 0 6vw;
+}
+
+.frontendCushion {
+  width: 84%;
+  background: none;
+  border: none;
+  
+  padding: 0;
+  cursor: pointer;
+
+  img {
+    position: absolute;
+    width: 80%;
+    top: 18%;
+    transform: rotateZ(20deg);
+    object-fit: contain;
+    display: block;
+  }
+}
+
+.bottomRow {
+  display: flex;
+  position: absolute;
+  bottom: 0%;
+//   gap: 4vw;
+  width: 100%;
+//   justify-content: center;
+}
+
+.backendCushion{
+
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+
+  img {
+    position: relative;
+    left: -30%;
+    top: -33%;
+    transform: rotateZ(-8deg);
+    width: 150%;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+
+.uiCushion{
+
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+
+  img {
+    position: relative;
+    left: -43%;
+    top: -25%;
+    transform: rotateZ(2deg);
+    width: 200%;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+// ---------------- SINGLE VERTICAL: nav + grid ----------------
+.navRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6vw;
+  margin-top: 6vw;
+  position: relative; // transition: stays above the sliding curtain
+  z-index: 2;
+}
+
+.navArrow {
+  background: none;
+  border: none;
+  color: #f3e6c8;
+  font-size: 16vw;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2vw;
+}
+
+.navTitle {
+  font-family: Arabian Night;
+  color: #f3e6c8;
+  font-size: 14vw;
+  margin: 0;
+  min-width: 40vw;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:0vw;
+  // padding: 8vw 6vw 16vw;
+  position: relative; // transition: sits under the curtain
+  z-index: 0;
+  animation: gridFadeIn 0.5s ease both; // fades in after each swap
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .cardImage {
+    width: 130%;
+    max-width: 70vw;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.cardName {
+  color: #AFA360;
+  text-align: center;
+  font-size: 5.2vw;
+  margin: 2vw 0 1vw;
+}
+
+// Instagram + LinkedIn icons under each name (drawn by SocialIcons.tsx)
+.cardSocials {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8vw;          // space BETWEEN the two icons
+  margin-top: 1.5vw; // space between the name and the icons
+}
+
+.cardSocialLink {
+  display: block;
+  width: 5.5vw;      // icon size
+  height: 5.5vw;
+  color: #AFA360;    // same gold as the design
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// ---------------- CURTAIN TRANSITION (‹ › arrows) ----------------
+.curtainOverlay {
+  position: absolute;
+  left: 0;
+  top: -$bg-bleed;
+  width: 100%;
+  height: calc(100% + #{$bg-bleed * 2}); // must match .backdrop
+  object-fit: cover; // identical sizing to .backdrop -> seamless swap
+  object-position: center;
+  z-index: 1;
+  pointer-events: none;
+  will-change: transform;
+}
+
+// change 0.75s to make the slide faster / slower
+.fromRight {
+  animation: curtainFromRight 0.75s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+.fromLeft {
+  animation: curtainFromLeft 0.75s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+@keyframes curtainFromRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes curtainFromLeft {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes gridFadeIn {
+  from { opacity: 0; transform: translateY(2vw); }
+  to   { opacity: 1; transform: translateY(0); }
+}

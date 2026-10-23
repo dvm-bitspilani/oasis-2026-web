@@ -1,0 +1,341 @@
+// ───────── DESIGN SIZE ─────────
+// Set these to your Mac's browser viewport (type `innerWidth, innerHeight`
+// in the Mac console). The stage keeps this aspect ratio on every screen,
+// so the Mac view stays identical and other screens just scale it.
+.wrapper {
+  --design-w: 1440;
+  --design-h: 784;
+
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1a0f1f;
+  // the inline bg image on the wrapper only fills the letterbox bars
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+// px(40) = "40px at design width", scaled with the stage
+@function px($n) {
+  @return calc(#{$n} * 100cqw / var(--design-w));
+}
+
+.stage {
+  position: relative;
+  // largest box with the design aspect ratio that fits the window
+  width: min(100vw, calc(100vh * var(--design-w) / var(--design-h)));
+  height: min(100vh, calc(100vw * var(--design-h) / var(--design-w)));
+  container-type: size; // enables cqw / cqh for all children
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+.heading {
+  width: 90%;
+  padding-top: px(40);
+  display: flex;
+  justify-content: center;
+
+  img {
+    width: 40%;
+  }
+}
+
+.cushion {
+  position: absolute;
+  bottom: 13%;
+  display: flex;
+  width: 100%;
+  align-items: center;
+
+  .FrontendButton {
+    width: 28%;
+    margin-left: px(100);
+    z-index: 1;
+
+    clip-path: polygon(
+      8% 8%,
+      30% 13%,
+      60% 10%,
+      92% 3%,
+      83% 12%,
+      83% 50%,
+      90% 85%,
+      90% 85%,
+      60% 84%,
+      12% 91%,
+      11% 90%,
+      3.3% 15%
+    );
+  }
+  .BackendButton {
+    margin-left: px(-130);
+    width: 28%;
+    z-index: 2;
+
+    clip-path: polygon(
+      13% 8%,
+      30% 13%,
+      60% 10%,
+      92% 10%,
+      92% 12%,
+      87.5% 40%,
+      87.5% 75%,
+      90% 90%,
+      50% 87%,
+      11% 87%,
+      7.2% 92%,
+      8.5% 12%
+    );
+  }
+  .UiButton {
+    margin-left: px(-200);
+    width: 38%;
+    z-index: 1;
+    margin-bottom: px(-20);
+
+    clip-path: polygon(
+      21% 8%,
+      49% 22%,
+      75% 20%,
+      92% 30%,
+      86% 12%,
+      78% 50%,
+      76% 75%,
+      78% 97%,
+      80% 84%,
+      43% 78%,
+      17% 75%,
+      23% 35%
+    );
+  }
+  .cushionButton {
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    img {
+      object-fit: contain;
+      padding: 0;
+      margin: 0;
+    }
+    .Frontend,
+    .Backend,
+    .Ui {
+      width: 100%;
+    }
+  }
+}
+
+.back {
+  position: absolute;
+  top: 5%;
+  left: 3%;
+  width: 5%;
+  z-index: 6; // stays above the curtains so it's clickable to reset
+
+  .BackButton {
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    pointer-events: auto;
+
+    .backImg {
+      object-fit: contain;
+      width: 100%;
+    }
+  }
+}
+
+// ───────── CURTAINS (relative to the stage, not the window) ─────────
+.curtainOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: hidden;
+  pointer-events: none;
+
+  .pinkCurtain,
+  .purpleCurtain,
+  .blueCurtain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 110%;
+    object-fit: cover;
+  }
+
+  // resting (parked) positions — these match HOME_X / HOME_Z in DevPage.tsx.
+  // Keep them in sync if you tweak one side, tweak the other.
+  .pinkCurtain {
+    z-index: 1;
+    transform: translateX(74%) rotateZ(5deg);
+  }
+  .blueCurtain {
+    z-index: 2;
+    transform: translateX(84%) rotateZ(5deg);
+  }
+  .purpleCurtain {
+    z-index: 3;
+    transform: translateX(92%) rotateZ(5deg);
+  }
+}
+
+.rightTop {
+  position: absolute;
+  top: -10%;
+  right: -4%;
+  transform: rotateZ(5deg);
+  z-index: 1000;
+  // A raw <img> keeps its natural pixel size, so it won't scale with the stage.
+  // Set width = (image's natural width ÷ design width) × 100.
+  // e.g. 260px image on a 1440 design → 18cqw. Adjust to match your Mac look.
+  width: 18cqw;
+  height: auto;
+}
+
+// ───────── NAV LABELS ─────────
+.verticalLabels {
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+  pointer-events: none; // individual buttons opt back in via gsap when visible
+}
+.verticalLabel {
+  position: absolute;
+  top: 75%;
+  transform: translateY(-50%) translateX(-60%) rotateZ(185deg);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  font-family: "YourDesignFont", cursive; // same font as in Figma
+  font-size: 2.8cqw;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  white-space: nowrap;
+
+  color: #cfc3d6; // fallback, overridden per label below
+  text-shadow: none;
+  cursor: pointer;
+  opacity: 0; // GSAP fades this in, don't change
+  pointer-events: none;
+
+  &:hover {
+    filter: brightness(1.25);
+  }
+}
+
+// colours tinted to match each curtain
+.labelFrontend { color: rgba(214, 170, 214, 0.85); }
+.labelBackend  { color: rgba(150, 196, 214, 0.9); }
+.labelUi       { color: rgba(190, 160, 214, 0.85); }
+
+// ───────── CHARACTERS ─────────
+// Groups just gate pointer-events; visibility is handled per-character below
+// so the stagger fade-in has something to animate from.
+.frontendCharacters,
+.backendCharacters,
+.uiCharacters {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.character {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 6%;
+  position: absolute;
+  opacity: 0; // each character starts hidden, GSAP fades it in individually
+
+  img {
+    display: block;
+    width: 30cqw;
+    object-fit: contain;
+    height: auto;
+  }
+}
+.characterInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  p {
+    margin-top: -50px;
+    font-family: Amita;
+    font-size: 1.5rem;
+    color: #AFA360;
+  }
+}
+
+// ───────── INSTAGRAM + LINKEDIN ICONS (under each name) ─────────
+.socials {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.4cqw;        // space BETWEEN the two icons
+  margin-top: 0.6cqw; // space between the name and the icons
+}
+
+.socialLink {
+  display: block;
+  width: 1.7cqw;      // icon size
+  height: 1.7cqw;
+  color: #AFA360;     // same gold as the names
+  transition: color 0.2s ease, transform 0.2s ease;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// only real links (not the not-yet-filled ones) react to hover
+a.socialLink {
+  cursor: pointer;
+
+  &:hover {
+    color: #d8cf8a;
+    transform: scale(1.12);
+  }
+}
+
+// Character positions stay inside roughly 0–84% of the stage: the active curtain
+// only covers up to 88% (see ACTIVE_X in DevPage.tsx).
+
+// Frontend — 4 people
+.frontend1 { left: 0%;  top: 12%; width: 18%; }
+.frontend2 { left: 20%; top: 25%; width: 18%; }
+.frontend3 { left: 40%; top: 12%; width: 18%; }
+.frontend4 { left: 60%; top: 25%; width: 18%; }
+
+// Backend — 4 people
+.backend1 { left: 0%;  top: 12%; width: 18%; }
+.backend2 { left: 20%; top: 25%; width: 18%; }
+.backend3 { left: 40%; top: 12%; width: 18%; }
+.backend4 { left: 60%; top: 25%; width: 18%; }
+
+// UI/UX — 5 people
+.ui1 { left: 0%;  top: 3%; width: 14%; }
+.ui2 { left: 16%; top: 28%; width: 14%; }
+.ui3 { left: 32%; top: 3%; width: 14%; }
+.ui4 { left: 48%; top: 28%; width: 14%; }
+.ui5 { left: 64%; top: 3%; width: 14%; }

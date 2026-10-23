@@ -14,6 +14,7 @@ import guitarBook from "../assets/ham/guitarBook.png";
 import trunkStuff from "../assets/ham/trunkStuff.png";
 import bgHome from "../assets/home/bg.jpg";
 
+
 // dx / dy = where the sign starts, relative to its final spot (roughly the chest mouth).
 // Tweak these until each sign leaves the chest from the right place.
 const BOARDS = [

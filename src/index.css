@@ -30,11 +30,19 @@ a {
 }
 
 @font-face {
+  font-family: "Amita";
+  src: url(./assets/fonts/Amita-Regular.ttf);
+}
+@font-face {
   font-family: "Almalik";
   src: url("/fonts/Almalik.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
+}
+@font-face {
+  font-family: "Arabian Night";
+  src: url(./assets/fonts/ArabianNight-CommercialUsed.otf);
 }
 
 @font-face {
