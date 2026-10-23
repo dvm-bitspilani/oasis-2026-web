@@ -1,7 +1,7 @@
 
 import DevPage from "./DevPage.tsx";
 import DevPageMobile from "./DevPageMobile.tsx";
-import styles from "../../styles/DevPage/DevPageResponsive.module.scss";
+import styles from "../../styles/DevPage/Devpageresponsive.module.scss";
 
 // Both versions mount; CSS decides which one is visible.
 export default function DevPageResponsive() {
