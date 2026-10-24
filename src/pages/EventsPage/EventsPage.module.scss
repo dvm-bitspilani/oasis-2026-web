@@ -8,6 +8,7 @@
    FULL PAGE
 ========================================================= */
 
+
 .fullPageContainer {
     background-image: url(../../assets/Events/eventsPagebg.webp);
     background-position: bottom center;
@@ -16,6 +17,8 @@
         overflow: hidden;
     overscroll-behavior: none;
     width: 100%;
+
+    // cursor: url("../../assets/Events/lantern1.png") 16 16, auto;
 
     /*
      * dvh follows the actual visible Safari viewport.
