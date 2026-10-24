@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import Character from "./character";
-import { MEMBERS } from "./devMembers";
+import { MEMBERS } from "./DevMembers";
 import bg from "../../assets/DevPage/bg.png";
 import heading from "../../assets/DevPage/heading.png";
 import styles from "../../styles/DevPage/DevPage.module.scss";
