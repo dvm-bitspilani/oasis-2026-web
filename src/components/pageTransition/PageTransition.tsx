@@ -348,7 +348,6 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         // u runs along the spine: 0 = base (below the page), 1 = top
         // -------------------------------------------------------------
         const centerX = width * 0.5;
-        const centerY = height * 0.5;
         const baseY = height * 1.1;
         const topY = height * 0.06;
         const spineHeight = baseY - topY;
