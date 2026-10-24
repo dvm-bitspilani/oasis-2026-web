@@ -14,18 +14,8 @@ import recnacc from "../assets/contact/prithviGowda.webp";
 import prez from "../assets/contact/pulkitBhardwaj.webp";
 import gensec from "../assets/contact/kushalPoosala.jpeg";
 
-// ContactCard also imports this (for the on-card mail icon); imported again
-// here purely so its URL can go in CONTACT_ASSETS below.
-import mail from "../assets/contact/mail.webp";
-// These three are referenced only via CSS url() in Contact.module.scss, never
-// rendered from these bindings — imported here purely to get their
-// bundler-resolved URLs for CONTACT_ASSETS, so the Preloader warms them too.
-import cardBg from "../assets/contact/card.webp";
-import pageBg from "../assets/contact/page.webp";
-import pageMobBg from "../assets/contact/pageMob.webp";
 
 import ContactCard from "../components/ContactCard";
-import Preloader from "../pages/Preloader"; // ⚠️ verify this path — see chat
 import { useTransition } from "../context/TransitionProvider";
 
 // ─────────────────────────────────────────────────────────────
@@ -113,23 +103,7 @@ const DEFAULT_CARD_INDEX = Math.max(
 // map, crosses, mail icon, backgrounds and every team photo are all already
 // cached by the time the page reveals, instead of popping in individually.
 // ─────────────────────────────────────────────────────────────
-const CONTACT_ASSETS = [
-  map,
-  cross,
-  back,
-  mail,
-  cardBg,
-  pageBg,
-  pageMobBg,
-  dvm,
-  pcr,
-  adp,
-  spons,
-  controls,
-  recnacc,
-  prez,
-  gensec
-];
+
 
 // Keyboard controls. Uses e.code (physical keys), so W/A/S/D work on any
 // keyboard layout. Values are the direction the VIEW moves across the map.
@@ -149,7 +123,7 @@ const LIST_PEEK_PADDING = 6;
 const KEY_SPEED = 12;
 
 export default function Contact() {
-  const { entered, markEntered, transitioning } = useTransition();
+  const {  transitioning } = useTransition();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
@@ -819,9 +793,7 @@ export default function Contact() {
           here, revealing the already-ready map underneath. Skipped entirely
           if the preloader already played elsewhere this session (`entered`
           is a single session-wide flag from TransitionProvider). */}
-      {!entered && (
-        <Preloader assets={CONTACT_ASSETS} onEnter={markEntered} />
-      )}
+
     </div>
   );
 }

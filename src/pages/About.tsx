@@ -1539,8 +1539,6 @@
 
 import styles from "../styles/About.module.scss";
 
-import Preloader from "./Preloader";
-
 const bgback = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418120/bgback.webp";
 const cloud = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418122/cloud.webp";
 const backBg = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418120/bgBottom.webp";
@@ -1576,25 +1574,6 @@ declare global {
     onYouTubeIframeAPIReady?: () => void;
   }
 }
-
-const ABOUT_ASSETS = [
-  bgback,
-  cloud,
-  backBg,
-  leftCloud,
-  leftTop,
-  leftTopMob,
-  head,
-  lamp,
-  bgCon,
-  play,
-  ff,
-  playBtn,
-  bgVid,
-  cover,
-  backBtn,
-  scrollVid,
-];
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -1647,8 +1626,7 @@ const About = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [playerReady, setPlayerReady] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(false);
-  const [aboutPreloaderDone, setAboutPreloaderDone] =
-    useState(false);
+
   const [currentVideoIndex, setCurrentVideoIndex] =
     useState(0);
 
@@ -1742,19 +1720,7 @@ const About = () => {
     ? leftTopMob
     : leftTop;
 
-  /*
-   * -------------------------------------------------------
-   * PRELOADER
-   * -------------------------------------------------------
-   */
 
-  const handleAboutPreloaderEnter = useCallback(() => {
-    setAboutPreloaderDone(true);
-
-    requestAnimationFrame(() => {
-      ScrollTrigger.refresh();
-    });
-  }, []);
 
   /*
    * -------------------------------------------------------
@@ -3056,19 +3022,7 @@ const About = () => {
         <SvgImg src={backBtn} />
       </div>
 
-      {/*
-       * PRELOADER
-       */}
 
-      {!aboutPreloaderDone && (
-        <Preloader
-          assets={ABOUT_ASSETS}
-           fonts={["EBGaramond"]}
-          onEnter={
-            handleAboutPreloaderEnter
-          }
-        />
-      )}
     </div>
   );
 };

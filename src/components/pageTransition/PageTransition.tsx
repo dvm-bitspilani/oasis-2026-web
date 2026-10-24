@@ -26,21 +26,53 @@ export type PageTransitionHandle = {
 
 type PageTransitionProps = {
   onComplete?: () => void;
+  /** URLs to start loading as soon as the transition mounts (images, fonts, json, video...). */
+  assets?: string[];
+  /** Optional extra loader, e.g. () => import("../pages/Home"). Counts as one unit in the bar. */
+  preload?: () => Promise<unknown>;
 };
 
 const STRING_TAUT_DELAY = 0.05;
 const SMOKE_START_PERCENT = 0.48;
 
-// Whole smoke sequence, in seconds. Phases:
-//   TORNADO_SECONDS : the tornado forms
-//   BURST_SECONDS   : the tornado itself explodes and spreads over the whole screen
+// Smoke sequence, in seconds. Phases:
+//   TORNADO_SECONDS : the tornado forms (see the formation timeline below)
+//   (hold)          : if assets are still loading, the tornado keeps spinning for
+//                     as long as it takes and a loading bar shows bottom right
+//   BURST_SECONDS   : the tornado explodes and spreads over the whole screen
 //   COVER_SECONDS   : tiny final settle so the screen is guaranteed opaque
+// The burst only starts once BOTH the tornado has formed AND assets are loaded.
 const TORNADO_SECONDS = 3.5;
 const BURST_SECONDS = 1.4;
 const COVER_SECONDS = 0.5;
-const SMOKE_DURATION = TORNADO_SECONDS + BURST_SECONDS + COVER_SECONDS;
-const TORNADO_END = TORNADO_SECONDS / SMOKE_DURATION;
-const BURST_END = (TORNADO_SECONDS + BURST_SECONDS) / SMOKE_DURATION;
+const BURST_SHARE = BURST_SECONDS / (BURST_SECONDS + COVER_SECONDS);
+
+// Safety net: never wait forever on a stuck asset.
+const ASSET_TIMEOUT_SECONDS = 20;
+
+// Warm the browser cache for one asset. Resolves when done, rejects on error
+// (errors are counted as "done" by the caller so one bad url cannot block the page).
+const loadAsset = (url: string): Promise<void> => {
+  const clean = url.split("?")[0].toLowerCase();
+  if (/\.(png|jpe?g|gif|webp|avif|svg)$/.test(clean)) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      if (img.decode) {
+        img.decode().then(() => resolve(), () => resolve());
+      } else {
+        resolve();
+      }
+    };
+    img.onerror = () => reject(new Error("image failed: " + url));
+    img.src = url;
+  });
+}
+  return fetch(url).then((res) => {
+    if (!res.ok) throw new Error("asset failed: " + url);
+    return res.blob().then(() => undefined);
+  });
+};
 
 // Formation timeline (seconds). Overlaps are intentional so phases blend together.
 const FLARE_SECONDS = 0.6;
@@ -63,11 +95,20 @@ const COLS = 36;
 const ROWS = 22;
 
 const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
-  function PageTransitionComponent({ onComplete }, ref) {
+  function PageTransitionComponent({ onComplete, assets, preload }, ref) {
     const rootRef = useRef<HTMLDivElement | null>(null);
     const layerRef = useRef<SVGSVGElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const smokeProgressRef = useRef({ value: 0 });
+    // 0 -> 1 over burst + cover. Only starts once the tornado has formed AND assets are loaded.
+    const burstProgressRef = useRef({ value: 0 });
+    const burstStartedRef = useRef(false);
+    const smokeStartRef = useRef(0);          // performance.now() when the smoke started
+    const loadedRef = useRef(false);
+    const loadProgressRef = useRef(0);        // 0 -> 1
+    const barRef = useRef<HTMLDivElement | null>(null);
+    const barFillRef = useRef<HTMLDivElement | null>(null);
+    const assetsRef = useRef(assets);
+    const preloadRef = useRef(preload);
     const smokeVisibleRef = useRef(false);
 
     const onCompleteRef = useRef(onComplete);
@@ -76,6 +117,44 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
     useEffect(() => {
       onCompleteRef.current = onComplete;
     }, [onComplete]);
+
+    // ASSET PRELOAD: starts the moment the transition mounts, in the background.
+    useEffect(() => {
+      const urls = assetsRef.current ?? [];
+      const extra = preloadRef.current;
+      const total = urls.length + (extra ? 1 : 0);
+
+      loadedRef.current = total === 0;
+      loadProgressRef.current = total === 0 ? 1 : 0;
+      if (total === 0) return;
+
+      let cancelled = false;
+      let done = 0;
+      const tick = () => {
+        if (cancelled) return;
+        done += 1;
+        loadProgressRef.current = done / total;
+        if (done >= total) loadedRef.current = true;
+      };
+
+      urls.forEach((url) => {
+        loadAsset(url).then(tick, tick);
+      });
+      if (extra) {
+        Promise.resolve().then(extra).then(tick, tick);
+      }
+
+      const timeout = window.setTimeout(() => {
+        if (cancelled) return;
+        loadProgressRef.current = 1;
+        loadedRef.current = true;
+      }, ASSET_TIMEOUT_SECONDS * 1000);
+
+      return () => {
+        cancelled = true;
+        window.clearTimeout(timeout);
+      };
+    }, []);
 
     useEffect(() => {
       const canvas = canvasRef.current;
@@ -312,17 +391,40 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       const smooth = (t: number) => t * t * (3 - 2 * t);
       const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
+      let barShown = 0; // smoothed value shown by the loading bar
+
       const draw = (now: number) => {
         frame = requestAnimationFrame(draw);
         if (now - lastDrawTime < frameInterval) return;
         lastDrawTime = now;
         if (!smokeVisibleRef.current) {
           smokeContext.clearRect(0, 0, width, height);
+          if (barRef.current) barRef.current.style.opacity = "0";
           return;
         }
 
-        const progress = smokeProgressRef.current.value;
-        const elapsed = progress * SMOKE_DURATION;
+        // Real clock: keeps running while the tornado waits for assets, so it
+        // keeps spinning instead of freezing.
+        const elapsed = Math.max(0, (now - smokeStartRef.current) / 1000);
+
+        // BURST GATE: tornado formed AND assets loaded -> start the burst.
+        if (!burstStartedRef.current && elapsed >= TORNADO_SECONDS && loadedRef.current) {
+          burstStartedRef.current = true;
+          gsap.to(burstProgressRef.current, {
+            value: 1,
+            duration: BURST_SECONDS + COVER_SECONDS,
+            ease: "none",
+            onComplete: () => onCompleteRef.current?.(),
+          });
+        }
+
+        // LOADING BAR: only while the formed tornado is waiting on assets
+        const waitingForAssets = elapsed >= TORNADO_SECONDS && !burstStartedRef.current;
+        barShown += (loadProgressRef.current - barShown) * 0.2;
+        if (barRef.current) barRef.current.style.opacity = waitingForAssets ? "1" : "0";
+        if (barFillRef.current) barFillRef.current.style.transform = "scaleX(" + barShown + ")";
+
+        const burstP = burstProgressRef.current.value;
 
         // -------------------------------------------------------------
         // FORMATION TIMELINE (each value 0 -> 1, eased so nothing snaps)
@@ -334,7 +436,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         const capAmount = smooth(clamp01((streamReach - TOP_FLARE_FROM) / (1 - TOP_FLARE_FROM)));
         const expand = smooth(clamp01((elapsed - EXPAND_START) / EXPAND_SECONDS));
 
-        const burstRaw = clamp01((progress - TORNADO_END) / (BURST_END - TORNADO_END));
+        const burstRaw = clamp01(burstP / BURST_SHARE);
         const burst = smooth(burstRaw);
 
         // -------------------------------------------------------------
@@ -399,7 +501,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         // -------------------------------------------------------------
         // 1. SIDE MIST (behind everything)
         // -------------------------------------------------------------
-        const mistProgress = easeOut(clamp01(progress / (TORNADO_END * 1.1)));
+        const mistProgress = easeOut(clamp01(elapsed / (TORNADO_SECONDS * 1.1)));
         for (const mist of mistPuffs) {
           const x =
             width * (mist.startX + (mist.endX - mist.startX) * mistProgress) +
@@ -565,7 +667,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         //    particles already hide the page; this just guarantees it is
         //    100% opaque before navigation, with no visible pop.
         // -------------------------------------------------------------
-        const coverProgress = clamp01((progress - BURST_END) / (1 - BURST_END));
+        const coverProgress = clamp01((burstP - BURST_SHARE) / (1 - BURST_SHARE));
         if (coverProgress > 0) {
           smokeContext.fillStyle = "rgba(142, 105, 80, " + coverProgress + ")";
           smokeContext.fillRect(0, 0, width, height);
@@ -820,14 +922,10 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           }
 
           smokeVisibleRef.current = true;
-          smokeProgressRef.current.value = 0;
+          smokeStartRef.current = performance.now();
+          burstProgressRef.current.value = 0;
+          burstStartedRef.current = false;
           gsap.set(canvas, { opacity: 1, visibility: "visible" });
-          gsap.to(smokeProgressRef.current, {
-            value: 1,
-            duration: SMOKE_DURATION,
-            ease: "none", // linear so the phase timings land on real seconds
-            onComplete: () => onCompleteRef.current?.(),
-          });
         };
 
         tl.call(
@@ -855,7 +953,9 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           transitionCanvas.style.opacity = "0";
           transitionCanvas.style.visibility = "hidden";
           smokeVisibleRef.current = false;
-          smokeProgressRef.current.value = 0;
+          gsap.killTweensOf(burstProgressRef.current);
+          burstProgressRef.current.value = 0;
+          burstStartedRef.current = false;
         }
 
         while (transitionLayer.firstChild) {
@@ -877,6 +977,39 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         </div>
 
         <canvas ref={canvasRef} aria-hidden="true" style={{position:"fixed",inset:0,width:"100vw",height:"100vh",zIndex:10000,pointerEvents:"none",opacity:0,visibility:"hidden"}} />
+
+        {/* LOADING BAR — bottom right, only visible while the tornado waits for assets */}
+        <div
+          ref={barRef}
+          role="progressbar"
+          aria-label="Loading"
+          style={{
+            position: "fixed",
+            right: 28,
+            bottom: 28,
+            width: 160,
+            height: 4,
+            borderRadius: 4,
+            overflow: "hidden",
+            background: "rgba(255, 255, 255, 0.22)",
+            zIndex: 10001,
+            pointerEvents: "none",
+            opacity: 0,
+            transition: "opacity 0.4s ease",
+          }}
+        >
+          <div
+            ref={barFillRef}
+            style={{
+              width: "100%",
+              height: "100%",
+              borderRadius: 4,
+              background: "rgba(244, 226, 196, 0.95)",
+              transformOrigin: "left center",
+              transform: "scaleX(0)",
+            }}
+          />
+        </div>
       </div>
     );
   },
