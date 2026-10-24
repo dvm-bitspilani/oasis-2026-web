@@ -1,6 +1,5 @@
-
-import { NavLink } from "react-router-dom";
-import { useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useTransition } from "../context/TransitionProvider";
 import gsap from "gsap";
 import lidInner from "../assets/ham/lidInner.png";
 import lidDome from "../assets/ham/lidDome.png";
@@ -23,7 +22,16 @@ const BOARDS = [
     { label: "MEDIA PARTNERS", pos: "board4", to: "/comingSoon", dx: "0vw", dy: "-38vh" },
 ];
 
+// Extra links that only exist in the stacked mobile layout (<= 750px).
+// Change label / route as needed. Each `pos` needs a matching .boardN class in the SCSS.
+const MOBILE_EXTRA = [
+    { label: "EVENTS", pos: "board5", to: "/events" },
+    { label: "ABOUT US", pos: "board6", to: "/aboutUs" },
+    { label: "CONTACT", pos: "board7", to: "/contactUs" },
+];
+
 const MOBILE_QUERY = "(max-aspect-ratio: 1/1)";
+const NARROW_QUERY = "(max-width: 750px)"; // must match the SCSS breakpoint
 const SB = 0.14;
 const SB_FIT = 0.5;
 
@@ -147,7 +155,20 @@ const E = {
 };
 
 export default function Ham() {
+    const { navigateWithTransition } = useTransition();
     const rootRef = useRef<HTMLDivElement>(null);
+
+    // true when the stacked, scrollable mobile layout is active (<= 750px)
+    const [narrow, setNarrow] = useState(
+        () => typeof window !== "undefined" && matchMedia(NARROW_QUERY).matches
+    );
+
+    useEffect(() => {
+        const mq = matchMedia(NARROW_QUERY);
+        const on = () => setNarrow(mq.matches);
+        mq.addEventListener("change", on);
+        return () => mq.removeEventListener("change", on);
+    }, []);
 
     useEffect(() => {
         const el = rootRef.current;
@@ -202,6 +223,7 @@ export default function Ham() {
         const hPx = Math.min(Hpx, (W * 1167) / 1417);
         const topPx = Hpx - hPx - Hpx * SB * SB_FIT;
         const mouthY = topPx + hPx * 0.45;
+        let offScroll: (() => void) | undefined;
 
         const ctx = gsap.context(() => {
             const q = (n: string) => `.${styles[n]}`;
@@ -415,14 +437,20 @@ export default function Ham() {
 
             const rank = new Map<number, number>(
                 signs
-                    .map((s, i) => ({ i, bottomEdge: s.offsetTop + s.offsetHeight }))
+                    .map((s, i) => ({ i, bottomEdge: s.getBoundingClientRect().bottom }))
                     .sort((a, b) => b.bottomEdge - a.bottomEdge)
                     .map((o, r) => [o.i, r] as [number, number])
             );
 
-            const center = (s: HTMLElement) => s.offsetTop + s.offsetHeight / 2;
+            // Viewport-based centre of the visible plank (the list can be scrolled,
+            // so offsetTop would be relative to the scroll content, not the screen).
+            const center = (s: HTMLElement) => {
+                const r = (s.firstElementChild as HTMLElement).getBoundingClientRect();
+                return r.top + r.height / 2;
+            };
 
-            if (mobile) {
+            // Sign animation follows the LAYOUT (width breakpoint), not the aspect ratio.
+            if (narrow) {
                 const ordered = signs
                     .map((s, i) => ({ s, r: rank.get(i)! }))
                     .sort((a, b) => a.r - b.r)
@@ -431,6 +459,50 @@ export default function Ham() {
                 const first = ordered[0];
                 const firstCenter = center(first);
                 const firstAt = popDelay;
+
+                // While the list scrolls, boards that slide down toward the chest get
+                // narrower (scaleX) and are clipped at the chest mouth by the SCSS,
+                // so they look like they disappear behind the trunk.
+                const scroller = root.querySelector<HTMLElement>(q("boards"))!;
+                const startY = firstCenter + 2; // lowest board's resting centre = no squeeze
+                const half = (first.firstElementChild as HTMLElement).getBoundingClientRect().height / 2;
+                const endY = scroller.getBoundingClientRect().bottom + half; // fully squeezed once mostly hidden
+                const minSx = 1; // 1 = no shrink, lower = narrower near the chest
+                const follow = 0.22; // 0..1, lower = softer
+                const cur = new Map<HTMLElement, number>(signs.map((s) => [s, 1]));
+                let raf = 0;
+
+                const frame = () => {
+                    let busy = false;
+
+                    signs.forEach((s) => {
+                        const target =
+                            1 - (1 - minSx) * smooth((center(s) - startY) / (endY - startY));
+                        const next = cur.get(s)! + (target - cur.get(s)!) * follow;
+
+                        if (Math.abs(target - next) > 0.002) busy = true;
+
+                        cur.set(s, next);
+                        s.style.setProperty("--sx", next.toFixed(3));
+                    });
+
+                    raf = busy ? requestAnimationFrame(frame) : 0;
+                };
+
+                const onScroll = () => {
+                    if (!raf) raf = requestAnimationFrame(frame);
+                };
+
+                scroller.addEventListener("scroll", onScroll, { passive: true });
+                offScroll = () => {
+                    scroller.removeEventListener("scroll", onScroll);
+                    cancelAnimationFrame(raf);
+                };
+
+                // Keep the (screen-sized) scroller out of rendering while the lid opens;
+                // the signs are invisible until `firstAt` anyway.
+                gsap.set(scroller, { visibility: "hidden" });
+                tl.set(scroller, { visibility: "visible" }, firstAt);
 
                 ordered.forEach((s, r) => gsap.set(s, { zIndex: ordered.length - r }));
 
@@ -494,8 +566,13 @@ export default function Ham() {
             }
         }, root);
 
-        return () => ctx.revert();
-    }, []);
+        return () => {
+            offScroll?.();
+            ctx.revert();
+        };
+    }, [narrow]);
+
+    const items = narrow ? [...BOARDS, ...MOBILE_EXTRA] : BOARDS;
 
     return (
         <div ref={rootRef} className={styles.container}>
@@ -564,10 +641,14 @@ export default function Ham() {
             </div>
 
             <nav className={styles.boards} aria-label="Sections">
-                {BOARDS.map((b, i) => (
-                    <NavLink
+                {items.map((b, i) => (
+                    <a
                         key={b.label}
-                        to={b.to}
+                        href={b.to}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigateWithTransition(b.to);
+                        }}
                         className={`${styles.sign} ${styles[b.pos]}`}
                         style={{ "--i": i } as CSSProperties}
                     >
@@ -577,7 +658,7 @@ export default function Ham() {
                                 <span>{b.label}</span>
                             </div>
                         </div>
-                    </NavLink>
+                    </a>
                 ))}
             </nav>
 

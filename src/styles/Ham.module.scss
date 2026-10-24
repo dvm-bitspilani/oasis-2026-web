@@ -11,6 +11,15 @@
 
 $split: 50.7%; // where lidInner / chestBase were cut (596/1167px)
 
+// Chest well rectangle, as % of the chest art box
+$wellL: 8.19%;
+$wellW: 84.14%;
+$wellB: $split;                         // front rim
+$wellT: $split - 0.449014 * 100%;       // ≈ 5.8% (rim minus depth)
+$wellCX: $wellL + math.div($wellW, 2);  // ≈ 50.26%
+
+$sw: 27%; // board width as % of chest art width
+
 // Camera perspective is proportional to --h so the correction is a pure number.
 // 2.9 * 900px ≈ your original 2600px.
 $persp: 2.9;
@@ -21,8 +30,18 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
   --py: 0;
   --H: 100vh;
   --h: min(var(--H), calc(100vw * 1167 / 1417));
+  --aw: calc(var(--h) * 1417 / 1167);        // chest art width
+  --al: calc((100vw - var(--aw)) / 2);       // chest art left
   --top0: calc(-8vh + (var(--H) - var(--h)) / 2);
   --top: var(--top0);
+  --drop: 0px;                                   // extra downward shift (set per breakpoint)
+  --sandAR: 2.4;                                 // sandAbove.png width / height  <-- set to your real ratio
+  --sandH: calc(104vw / var(--sandAR));          // rendered sandAbove height (.lSand is 104vw wide)
+  --sandBottomAR: 12.4;                           // sandBottom.png width / height  <-- set to your real ratio
+  --sandBottomH: calc(106vw / var(--sandBottomAR)); // rendered sandBottom height (.lFront is 106vw wide)
+  --seam: calc(var(--sandBottomH) - 40px - 3px); // top edge of sandBottom, up from the container bottom (-40px = .lFront bottom inset, -3px overlap so no gap)
+  --sandBot: var(--seam);                        // sandAbove's bottom edge sits exactly on that seam
+  --sandMid: calc(var(--H) - var(--sandBot) - var(--sandH) / 2); // y of the sand's middle (from top)
   --dtop: calc(var(--top) - var(--top0));
   --sb: 14dvh;
   --sa: 30dvh;
@@ -74,7 +93,7 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
     height: 100%;
     object-fit: cover;
   }
-} 
+}
 /* ---------- Chest rig (3D) ---------- */
 .sign { will-change: transform, opacity; }
 .plank { will-change: transform; }
@@ -408,11 +427,7 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
   100% { transform: translateY(-6px) rotate(0); }
 }
 
-.board { bottom: 34%; left: 26%; }
-.board1 { bottom: 34%; right: 26%; }
-.board2 { bottom: 25%; right: 30%; }
-.board3 { bottom: 25%; left: 30%; }
-.board4 { bottom: 15%; left: 40%; }
+// Desktop board positions now live in the "> 750px" block at the end of the file.
 
 
 
@@ -496,35 +511,35 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
     scale: calc(1 + var(--fit) * 0.0449014);
   }
 
-  
-  .trunkStuff {
-  position: absolute;
-  left:  -5%;
-  bottom: 13%;
-  width: 100vw;
 
-  img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
+  .trunkStuff {
+    position: absolute;
+    left: -5%;
+    bottom: 13%;
+    width: 100vw;
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+    }
   }
-}
-  .guitarBook{
+  .guitarBook {
     display: none;
   }
   .sandAbove {
-    bottom:-45%;
+    bottom: -45%;
     height: 100vh;
     // display: none;
-  img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-  }
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+    }
   }
   .sandBottom {
     // always glued to the bottom, height = the same --sb the chest math uses
@@ -544,18 +559,67 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
     }
   }
 
+  // The boards are a vertically scrollable stack. Flex column-reverse keeps the
+  // first board at the bottom (next to the chest) and the list grows upward;
+  // scrolling starts at the bottom, and the user scrolls up to reach the rest.
   .boards {
     --row: 17vw;
-    --base: calc((var(--H) - var(--top))*0.9);
+    --base: calc((var(--H) - var(--top)) * 0.9);
+
+    --d: 0;
+    translate: none;
+    box-sizing: border-box;
+    // The scroller ends exactly at the lowest board's bottom edge (chest lid line).
+    // Anything scrolled below it is clipped, which (with the scaleX squeeze below)
+    // reads as "behind the trunk lid".
+    inset: 0 0 auto 0;
+    height: calc(var(--H) - var(--base) - var(--row) * 0.2);
+    touch-action: pan-y;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    pointer-events: auto;
+    // room under the lowest board (same offset it had before) and above the top one
+    padding-bottom: 0;
+    // extra room so the lowest boards can be scrolled all the way into the chest
+    padding-top: 45vw;
+    &::-webkit-scrollbar { display: none; }
   }
 
-  .sign { width: 80vw; }
+  // Each sign occupies one "row" of the stack; the plank hangs up from its bottom
+  // edge, so neighbouring boards overlap exactly like the old absolute layout.
+  .sign {
+    position: relative;
+    inset: auto;
+    flex: none;
+    width: 80vw;
+    height: var(--row);
+  }
 
-  .board4 { bottom: calc(var(--base) + var(--row)*0.2 ); left: 10%; right: auto; }
-  .board3 { bottom: calc(var(--base) + var(--row)*1.2); left: 10%; right: auto; }
-  .board2 { bottom: calc(var(--base) + var(--row)*2.2); left:10%; right: auto; }
-  .board  { bottom: calc(var(--base) + var(--row) * 3.2); left:10%; right: auto; }
-  .board1 { bottom: calc(var(--base) + var(--row) * 4.2); left:10%;  }
+  // --sx is set from JS while scrolling (1 = full width, smaller near the chest)
+  .drop {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: scaleX(var(--sx, 1));
+    transform-origin: 50% 100%;
+  }
+
+  // bottom -> top order (lowest `order` is nearest the chest)
+  .board4 { order: 0; }   // MEDIA PARTNERS
+  .board3 { order: 1; }   // SPONSORS
+  .board2 { order: 2; }   // GALLERY
+  .board  { order: 3; }   // DEVELOPERS
+  .board1 { order: 4; }   // WALL MAG
+  .board5 { order: 5; }   // extra 1
+  .board6 { order: 6; }   // extra 2
+  .board7 { order: 7; }   // extra 3
 
   .lantern {
     mix-blend-mode: normal;
@@ -636,15 +700,76 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
 @media (min-width: 751px) and (max-width: 1150px) {
   .container {
     --drop: 18dvh;
-    --top: calc(var(--top0) + var(--drop));
   }
-  .sandAbove { margin-bottom: -10%;   }
   .guitarBook { display: none; }
-  .board  { bottom: calc(45% - var(--drop));left: 17%; }
-  .board1 { bottom: calc(45% - var(--drop)); right: 17%; }
-  .board2 { bottom: calc(38% - var(--drop)); left: 25%; }
-  .board3 { bottom: calc(38% - var(--drop)); left: 53%; }
-  .board4 { bottom: calc(32% - var(--drop));left: 40%; }
+}
 
-  .sign { width: 24vw; }
+
+
+/* ---------- Desktop / tablet (> 750px): boards live inside the chest well ---------- */
+// Must stay last so it wins the cascade over the base .sign / .plank span rules.
+// Board size and tier spacing are derived from the board image's aspect ratio, so
+// the three tiers always fit between the well top (~5.8%) and the front rim (50.7%)
+// at every screen size, however tall the plank art is.
+@media (min-width: 751px) {
+  // Chest rests with its bottom edge at the MIDDLE of sandAbove (never lower than that),
+  // never higher than --top0 and never lower than --top0 + --drop.
+  .container {
+    --push: 6dvh; // extra push DOWN after the clamp; raise to lower the chest, 0 to undo
+    --top: calc(
+      max(
+        var(--top0),
+        min(calc(var(--top0) + var(--drop)), calc(var(--sandMid) - var(--h)))
+      ) + var(--push)
+    );
+  }
+
+  // sandAbove starts exactly where sandBottom ends, at every size
+  .sandAbove {
+    bottom: var(--seam);
+    margin-bottom: 0;
+  }
+
+  .boards {
+    --d: 12;                 // same parallax as .lChest, so boards never drift out
+    inset: auto;
+    left: var(--al);
+    top: var(--top);
+    width: var(--aw);
+    height: var(--h);
+
+    // All numbers below are unitless "percent of the chest art box".
+    --ar: 3;                 // board.png width / height  <-- set to your real ratio
+    --bwMax: 27;             // widest allowed board (% of art width)
+    --bhMax: 12;             // tallest allowed board (% of art height) so 3 tiers fit
+    --gap: 1.5;              // vertical gap between tiers
+    --rimGap: -32;           // space between the bottom tier and the front rim (was 3; lower = boards sit lower)
+    --bw: min(var(--bwMax), calc(var(--bhMax) * var(--ar) * 1167 / 1417));
+    --bh: calc(var(--bw) * 1417 / 1167 / var(--ar));
+    --c3: calc(#{math.div($wellB, 1%)} - var(--rimGap) - var(--bh) / 2); // bottom tier centre
+    --c2: calc(var(--c3) - var(--bh) - var(--gap));            // middle tier centre
+    --c1: calc(var(--c2) - var(--bh) - var(--gap));            // top tier centre
+  }
+
+  .sign {
+    width: calc(var(--bw) * 1%);
+    right: auto;
+    bottom: auto;
+    left: calc(var(--cx) * 1% - var(--bw) * 0.5%);  // --cx = board centre X
+    top: calc(var(--cy) * 1%);                       // --cy = board centre Y
+    translate: 0 -50%;                               // GSAP uses transform, no clash
+  }
+
+  $cx0: math.div($wellCX, 1%); // well centre X as a plain number
+
+  .board  { --cx: #{$cx0 - 23}; --cy: calc(var(--c1)*1.08); }  // DEVELOPERS
+  .board1 { --cx: #{$cx0 + 23}; --cy: calc(var(--c1)*1.08); }  // WALL MAG
+  .board3 { --cx: #{$cx0 - 16}; --cy: calc(var(--c2)*1.04); }  // SPONSORS
+  .board2 { --cx: #{$cx0 + 16}; --cy: calc(var(--c2)*1.04); }  // GALLERY
+  .board4 { --cx: #{$cx0};      --cy: var(--c3); }  // MEDIA PARTNERS
+
+  // Text scales with the chest, not the viewport
+  .plank span {
+    font-size: clamp(10px, calc(var(--aw) * 0.026), 36px);
+  }
 }
