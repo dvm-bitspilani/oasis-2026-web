@@ -32,31 +32,35 @@ const STRING_TAUT_DELAY = 0.05;
 const SMOKE_START_PERCENT = 0.48;
 
 // Whole smoke sequence, in seconds. Phases:
-//   TORNADO_SECONDS : the tornado forms (see the formation timeline below)
-//   BURST_SECONDS   : the tornado explodes outwards into a cloud
-//   COVER_SECONDS   : cloud settles into a fully opaque smoke screen
-const TORNADO_SECONDS = 3.5;   // was 2.8, gives the slower climb room
-const BURST_SECONDS = 1.2;
+//   TORNADO_SECONDS : the tornado forms
+//   BURST_SECONDS   : the tornado itself explodes and spreads over the whole screen
+//   COVER_SECONDS   : tiny final settle so the screen is guaranteed opaque
+const TORNADO_SECONDS = 3.5;
+const BURST_SECONDS = 1.4;
 const COVER_SECONDS = 0.5;
 const SMOKE_DURATION = TORNADO_SECONDS + BURST_SECONDS + COVER_SECONDS;
-const TORNADO_END = TORNADO_SECONDS / SMOKE_DURATION;                    // progress (0 -> 1) where the burst starts
-const BURST_END = (TORNADO_SECONDS + BURST_SECONDS) / SMOKE_DURATION;    // progress where the burst ends
+const TORNADO_END = TORNADO_SECONDS / SMOKE_DURATION;
+const BURST_END = (TORNADO_SECONDS + BURST_SECONDS) / SMOKE_DURATION;
 
 // Formation timeline (seconds). Overlaps are intentional so phases blend together.
-const FLARE_SECONDS = 0.6;     // inverted funnel emerges from below the page
-const STREAM_START = 0.5;      // the column starts climbing out of the funnel
-const STREAM_SECONDS = 2.0;    // ...and takes this long to reach the top (was 1.3)
-const HEAD_START = 0.1;        // the column's width starts building
-const TOP_FLARE_FROM = 0.55;   // column progress at which the top funnel starts to flare
-const EXPAND_START = 2.0;      // the whole thing expands into the full tornado (was 1.6)
+const FLARE_SECONDS = 0.6;
+const STREAM_START = 0.5;
+const STREAM_SECONDS = 2.0;
+const HEAD_START = 0.1;
+const TOP_FLARE_FROM = 0.55;
+const EXPAND_START = 2.0;
 const EXPAND_SECONDS = 1.0;
-const SWELL_START = 2.2;       // soft cloud begins building before the burst (was 2.2)
 
 // Spin builds up with this time constant instead of starting at full speed.
 const SPIN_UP_SECONDS = 0.7;
 
 // Tail width multiplier (1 = the original tail width, 1.4 = 40% wider).
 const TAIL_WIDTH = 1.2;
+
+// Burst targets: particles are spread over a COLS x ROWS jittered grid that
+// covers the screen, so the burst fills every part of the page.
+const COLS = 36;
+const ROWS = 22;
 
 const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
   function PageTransitionComponent({ onComplete }, ref) {
@@ -96,13 +100,28 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       window.addEventListener("resize", resize);
 
       // ---------------------------------------------------------------
-      // SPRITES — same recipe as the Events page smoke:
-      //   1. a feathered radial body (soft falloff, then blurred)
-      //   2. a few BIG, softly blurred light/dark specks for a little texture
-      //   3. a soft clip so the specks never create a hard edge
-      // The result is a smooth oval with gentle texture, not a grainy dot.
+      // SPRITES
+      // Built from many soft overlapping blobs (a billowy puff, not a grainy
+      // dot), then given light/dark shading for volume and a soft edge.
+      // No ctx.filter, so it also works on Safari.
+      // puffiness: 0 = few big blobs (smooth), 1 = many small blobs (lumpy)
       // ---------------------------------------------------------------
-      const makeSmokeSprite = (blur: number) => {
+      // Palette sorted dark -> light. Narrow, mid-tone range on purpose: low
+      // contrast so overlapping puffs melt into one smoke mass.
+      const palette = [
+        [112, 82, 64],
+        [121, 90, 70],
+        [130, 97, 75],
+        [138, 103, 79],
+        [146, 109, 83],
+        [154, 116, 88],
+        [162, 124, 94],
+        [170, 132, 100],
+        [178, 140, 106],
+        [186, 149, 114],
+      ];
+
+      const makeSmokeSprite = (puffiness: number) => {
         const spriteSize = 256;
         const sprite = document.createElement("canvas");
         sprite.width = spriteSize;
@@ -112,85 +131,94 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
         const r = spriteSize / 2;
 
-        // 1. feathered body
-        sctx.filter = "blur(" + blur + "px)";
-        const gradient = sctx.createRadialGradient(r, r, 0, r, r, r * 0.78);
-        gradient.addColorStop(0, "rgba(200, 208, 228, 1)");
-        gradient.addColorStop(0.5, "rgba(160, 172, 200, 0.62)");
-        gradient.addColorStop(0.8, "rgba(128, 141, 172, 0.22)");
-        gradient.addColorStop(1, "rgba(111, 123, 155, 0)");
-        sctx.fillStyle = gradient;
-        sctx.beginPath();
-        sctx.arc(r, r, r * 0.78, 0, Math.PI * 2);
-        sctx.fill();
 
-        // 2. texture: uneven light/dark specks, lighter blur than the body
-        sctx.filter = "blur(" + blur * 0.4 + "px)";
-        for (let i = 0; i < 40; i++) {
+        // 1. lumpy body: overlapping soft blobs of varying tone
+        const blobCount = 9 + Math.floor(puffiness * 12);
+        for (let i = 0; i < blobCount; i++) {
           const angle = Math.random() * Math.PI * 2;
-          const distance = Math.random() * r * 0.75;
-          const speckRadius = 6 + Math.random() * 22;
-          sctx.globalAlpha = 0.08 + Math.random() * 0.16;
-          sctx.fillStyle = Math.random() > 0.45
-            ? "rgba(228, 234, 248, 1)"
-            : "rgba(82, 94, 126, 1)";
+          const dist = Math.pow(Math.random(), 0.7) * r * 0.42;
+          const cx = r + Math.cos(angle) * dist;
+          const cy = r + Math.sin(angle) * dist;
+          const br = r * (0.5 - puffiness * 0.18 + Math.random() * 0.2);
+
+          // blobs on the upper-left are lighter, lower-right darker
+          const lightBias = 0.5 - ((cx - r) + (cy - r)) / (r * 1.6);
+          // biased towards the darker/mid tones so the light ones stay as highlights
+          const t = Math.max(0, Math.min(1, lightBias * 0.5 + Math.random() * 0.4 + 0.15));
+          const pick = palette[Math.min(palette.length - 1, Math.floor(t * palette.length))];
+          const cr = pick[0];
+          const cg = pick[1];
+          const cb = pick[2];
+
+          const g = sctx.createRadialGradient(cx, cy, 0, cx, cy, br);
+          g.addColorStop(0, "rgba(" + cr + "," + cg + "," + cb + ",0.5)");
+          g.addColorStop(0.55, "rgba(" + cr + "," + cg + "," + cb + ",0.24)");
+          g.addColorStop(1, "rgba(" + cr + "," + cg + "," + cb + ",0)");
+          sctx.fillStyle = g;
           sctx.beginPath();
-          sctx.arc(r + Math.cos(angle) * distance, r + Math.sin(angle) * distance, speckRadius, 0, Math.PI * 2);
+          sctx.arc(cx, cy, br, 0, Math.PI * 2);
           sctx.fill();
         }
-        sctx.globalAlpha = 1;
 
-        // 3. clip the texture back to the soft circle
+        // 2. volume shading: light from the top-left, shade on the bottom-right
+        sctx.globalCompositeOperation = "source-atop";
+        const shade = sctx.createLinearGradient(r * 0.45, r * 0.3, r * 1.55, r * 1.7);
+        shade.addColorStop(0, "rgba(236, 210, 176, 0.12)");
+        shade.addColorStop(0.5, "rgba(120, 84, 62, 0)");
+        shade.addColorStop(1, "rgba(90, 66, 52, 0.14)");
+        sctx.fillStyle = shade;
+        sctx.fillRect(0, 0, spriteSize, spriteSize);
+
+        // 3. soft circular edge so no puff ever has a hard outline
         sctx.globalCompositeOperation = "destination-in";
-        sctx.filter = "blur(" + blur + "px)";
-        const clipGradient = sctx.createRadialGradient(r, r, 0, r, r, r * 0.78);
-        clipGradient.addColorStop(0, "rgba(255, 255, 255, 1)");
-        clipGradient.addColorStop(0.8, "rgba(255, 255, 255, 1)");
-        clipGradient.addColorStop(1, "rgba(255, 255, 255, 0)");
-        sctx.fillStyle = clipGradient;
-        sctx.beginPath();
-        sctx.arc(r, r, r * 0.78, 0, Math.PI * 2);
-        sctx.fill();
+        const clip = sctx.createRadialGradient(r, r, 0, r, r, r * 0.98);
+        clip.addColorStop(0, "rgba(255, 255, 255, 1)");
+        clip.addColorStop(0.4, "rgba(255, 255, 255, 0.85)");
+        clip.addColorStop(0.75, "rgba(255, 255, 255, 0.3)");
+        clip.addColorStop(1, "rgba(255, 255, 255, 0)");
+        sctx.fillStyle = clip;
+        sctx.fillRect(0, 0, spriteSize, spriteSize);
         sctx.globalCompositeOperation = "source-over";
         return sprite;
       };
 
-      const particleSprite = makeSmokeSprite(6);   // lightest blur, still smooth
-      const puffSprite = makeSmokeSprite(15);      // soft body / mist / cover
-      const midSprite = makeSmokeSprite(10);       // in-between texture for the tornado body
+      // 6 variants (2 per puffiness level) so repeats are not noticeable.
+      // index % 3 = softness level: 0 small/lumpy, 1 mid, 2 big/smooth
+      const spriteList = [
+        makeSmokeSprite(0.45),
+        makeSmokeSprite(0.25),
+        makeSmokeSprite(0.08),
+        makeSmokeSprite(0.4),
+        makeSmokeSprite(0.2),
+        makeSmokeSprite(0.05),
+      ];
+      const puffSprite = spriteList[2]; // used for mist / glow
 
       // ---------------------------------------------------------------
       // TORNADO PARTICLES
-      //
-      //   spine particles — flow up a spine that runs from BELOW the page to the top.
-      //                     The spine is a cone: a wide inverted funnel at the base,
-      //                     narrow just above it, widening as the column climbs, and
-      //                     flaring open again at the top (mirroring the base).
-      //                     A share of them ("trail") stays clustered near the
-      //                     rising tip so the column stays dense as it extends.
-      //   cap particles   — a funnel-shaped mass at the top. Its formation is driven
-      //                     by how far the column has climbed (not a separate clock),
-      //                     so it grows out of the arriving column.
-      //
-      // sprite: 0 / 1 / 2 = three softness levels (all use the feathered,
-      // lightly textured Events-style sprite)
+      // Every particle flows up the spine (a cone from below the page to the
+      // top). On burst, each one flies to its own target cell on the screen,
+      // growing as it goes, so the tornado itself spreads over the page.
       // ---------------------------------------------------------------
       type TornadoParticle = {
-        isCap: boolean;
-        trail: boolean;        // spine only: stays clustered near the rising tip to keep the trail dense
+        trail: boolean;        // stays clustered near the rising tip to keep the trail dense
         streak: boolean;
-        sprite: 0 | 1 | 2;
-        f0: number;            // spine only: starting place along the spine (0 = base, 1 = column tip)
-        rise: number;          // spine only: how fast it flows up the spine
+        sprite: number;        // index into spriteList
+        f0: number;            // starting place along the spine (0 = base, 1 = tip)
+        rise: number;          // how fast it flows up the spine
         radiusJitter: number;
-        yOffset: number;       // cap only: place inside the cap (-0.5 .. 0.5, +0.5 = top)
         phase: number;
         spin: number;
         size: number;
         opacity: number;
-        burstAngle: number;
-        burstSpeed: number;
-        appear: number;        // cap only: how far into the cap formation this particle fades in (0 .. 0.7)
+        // burst
+        tx: number;            // target, as fraction of screen width
+        ty: number;            // target, as fraction of screen height
+        burstSize: number;     // size at the end of the burst
+        burstDelay: number;    // 0 .. 0.4, centre goes first
+        swirlDir: number;      // -1 / 1, which way the path curves
+        coverAlpha: number;    // opacity at the end of the burst
+        burstRotation: number;
         // written every frame, read by the draw passes below
         x: number;
         y: number;
@@ -202,36 +230,54 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         scaleY: number;
       };
 
-      const makeParticle = (group: "spine" | "cap"): TornadoParticle => {
-        const isBig = group !== "spine";
-        // Like the Events smoke, every particle is a soft oval drawn at low opacity;
-        // the look comes from lots of them overlapping, not from small dots.
-        // The spine only uses the two softest sprites, so the early formation
-        // reads as smooth smoke instead of small grainy dots.
-        const roll = Math.random();
-        let sprite: 0 | 1 | 2 = roll < 0.3 ? 0 : roll < 0.7 ? 1 : 2;
-        if (group === "spine") sprite = roll < 0.5 ? 1 : 2;
+      // jittered grid of burst targets, shuffled so neighbours in the tornado
+      // do not all land next to each other
+      const targets: Array<[number, number]> = [];
+      for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+          const jx = (Math.random() - 0.5) * 0.9;
+          const jy = (Math.random() - 0.5) * 0.9;
+          targets.push([
+            ((col + 0.5 + jx) / COLS) * 1.06 - 0.03,
+            ((row + 0.5 + jy) / ROWS) * 1.06 - 0.03,
+          ]);
+        }
+      }
+      for (let i = targets.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [targets[i], targets[j]] = [targets[j], targets[i]];
+      }
 
-        let size = isBig ? 60 + Math.random() * 45 : 50 + Math.random() * 30;
-        if (sprite === 1) size = isBig ? 80 + Math.random() * 55 : 60 + Math.random() * 30;
-        if (sprite === 2) size = isBig ? 100 + Math.random() * 60 : 80 + Math.random() * 40;
+      const makeParticle = (target: [number, number]): TornadoParticle => {
+        const sprite = [1, 2, 4, 5][Math.floor(Math.random() * 4)];
+        const level = sprite % 3;
+
+        let size = 50 + Math.random() * 30;
+        if (level === 1) size = 60 + Math.random() * 30;
+        if (level === 2) size = 80 + Math.random() * 40;
+
+        const [tx, ty] = target;
+        // distance from the middle of the screen, 0 .. ~1
+        const dist = Math.min(1, Math.hypot(tx - 0.5, (ty - 0.5) * 0.6) / 0.7);
 
         return {
-          isCap: group === "cap",
-          trail: group === "spine" && Math.random() < 0.4,
+          trail: Math.random() < 0.4,
           streak: Math.random() < 0.3,
           sprite,
           f0: Math.random(),
           rise: 0.25 + Math.random() * 0.3,
-          radiusJitter: isBig ? 0.3 + Math.random() * 0.75 : 0.55 + Math.random() * 0.75,
-          yOffset: Math.random() - 0.5,
+          radiusJitter: 0.55 + Math.random() * 0.75,
           phase: Math.random() * Math.PI * 2,
           spin: 0.85 + Math.random() * 0.3,
-          size: size * 0.8,
+          size: size * 1.2,
           opacity: 0.55 + Math.random() * 0.7,
-          burstAngle: Math.random() * Math.PI * 2,
-          burstSpeed: 0.55 + Math.random() * 0.75,
-          appear: Math.random() * 0.7,
+          tx,
+          ty,
+          burstSize: 125 + Math.random() * 70,
+          burstDelay: dist * 0.4,
+          swirlDir: Math.random() < 0.5 ? -1 : 1,
+          coverAlpha: 0.34 + Math.random() * 0.2,
+          burstRotation: Math.random() * Math.PI * 2,
           x: 0,
           y: 0,
           drawSize: 0,
@@ -243,11 +289,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         };
       };
 
-      const particles: TornadoParticle[] = [
-        ...Array.from({ length: 180 }, () => makeParticle("cap")),
-        ...Array.from({ length: 760 }, () => makeParticle("spine")),   // took over the old head particles' share
-      ];
-      const spriteList = [particleSprite, midSprite, puffSprite];
+      const particles: TornadoParticle[] = targets.map(makeParticle);
 
       // ---------------------------------------------------------------
       // SIDE MIST — big soft puffs that drift in from the left and right
@@ -257,23 +299,14 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         const side = index % 2 === 0 ? -1 : 1;
         return {
           side,
-          startX: side < 0 ? -0.12 : 1.12,          // fraction of width (off-screen)
+          startX: side < 0 ? -0.12 : 1.12,
           endX: side < 0 ? 0.04 + Math.random() * 0.26 : 0.96 - Math.random() * 0.26,
-          y: 0.18 + Math.random() * 0.78,           // fraction of height
-          radius: 0.16 + Math.random() * 0.14,      // fraction of max(width, height)
+          y: 0.18 + Math.random() * 0.78,
+          radius: 0.5 + Math.random() * 0.3,
           phase: Math.random() * Math.PI * 2,
-          alpha: 0.04 + Math.random() * 0.04,       // very subtle
+          alpha: 0.04 + Math.random() * 0.04,
         };
       });
-
-      // Full-screen lobes. They start swelling BEFORE the burst (driven by
-      // `swell` below) so the burst is a continuation, not a sudden pop.
-      const screenPuffs = Array.from({ length: 20 }, (_, index) => ({
-        x: ((index % 5) / 4) * 1.06 - 0.03 + (Math.random() - 0.5) * 0.08,
-        y: (Math.floor(index / 5) / 3) * 1.06 - 0.03 + (Math.random() - 0.5) * 0.08,
-        scale: 0.8 + Math.random() * 0.45,
-        delay: Math.random() * 0.25,
-      }));
 
       const easeOut = (t: number) => 1 - Math.pow(1 - t, 2.25);
       const smooth = (t: number) => t * t * (3 - 2 * t);
@@ -294,28 +327,20 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         // -------------------------------------------------------------
         // FORMATION TIMELINE (each value 0 -> 1, eased so nothing snaps)
         // -------------------------------------------------------------
-        const intro = smooth(clamp01(elapsed / 0.3));                                   // overall fade-in
-        const flareAmount = smooth(clamp01(elapsed / FLARE_SECONDS));                   // base funnel emerges from below the page
+        const intro = smooth(clamp01(elapsed / 0.3));
+        const flareAmount = smooth(clamp01(elapsed / FLARE_SECONDS));
         const streamRaw = clamp01((elapsed - STREAM_START) / STREAM_SECONDS);
-        // part linear, part eased: a steadier climb than pure smoothstep
-        const streamReach = 0.55 * streamRaw + 0.45 * smooth(streamRaw);                // column climbs the page
-        // the top funnel forms as the column arrives, not on its own clock
+        const streamReach = 0.55 * streamRaw + 0.45 * smooth(streamRaw);
         const capAmount = smooth(clamp01((streamReach - TOP_FLARE_FROM) / (1 - TOP_FLARE_FROM)));
-        const expand = smooth(clamp01((elapsed - EXPAND_START) / EXPAND_SECONDS));      // whole thing expands to full tornado
+        const expand = smooth(clamp01((elapsed - EXPAND_START) / EXPAND_SECONDS));
 
-        // swell starts well before the burst and builds gently into it
-        const burstEndSeconds = BURST_END * SMOKE_DURATION;
-        const swell = smooth(clamp01((elapsed - SWELL_START) / (burstEndSeconds - SWELL_START)));
         const burstRaw = clamp01((progress - TORNADO_END) / (BURST_END - TORNADO_END));
         const burst = smooth(burstRaw);
 
         // -------------------------------------------------------------
         // PHYSICS
-        // Spin-up: angular speed builds up with an exponential ease instead of
-        // starting at full speed, so the swirl gathers momentum like real smoke.
         // -------------------------------------------------------------
         const spinTime = elapsed - SPIN_UP_SECONDS * (1 - Math.exp(-elapsed / SPIN_UP_SECONDS));
-        // The sway of the column also builds up gradually
         const swayGrow = smooth(clamp01(elapsed / 1.0));
 
         // -------------------------------------------------------------
@@ -324,50 +349,38 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         // -------------------------------------------------------------
         const centerX = width * 0.5;
         const centerY = height * 0.5;
-        const baseY = height * 1.1;           // base of the tornado sits BELOW the page
+        const baseY = height * 1.1;
         const topY = height * 0.06;
         const spineHeight = baseY - topY;
 
         const baseRadius = 9;
-        const streamRadius = 14;                               // width of the column at its base
-        const fullRadius = Math.min(width * 0.28, 300);        // widest part of the finished tornado
+        const streamRadius = 14;
+        const fullRadius = Math.min(width * 0.28, 300);
         const flareRadius = Math.min(width * 0.3, 340) * flareAmount;
-        const flareHeight = 0.3;                               // base funnel thins into the column over this part of the spine
+        const flareHeight = 0.3;
 
-        const capHeight = spineHeight * (0.18 + 0.12 * expand);  // was 0.1 + 0.1 * expand
-        const capRadius = fullRadius * (0.5 + 0.5 * expand) * (0.25 + 0.75 * capAmount);   // grows from a small funnel, never jumps
-        const topFlareRadius = Math.min(width * 0.3, 340) * capAmount;                     // mirrors flareRadius at the top
+        const capHeight = spineHeight * (0.18 + 0.12 * expand);
+        const capRadius = fullRadius * (0.5 + 0.5 * expand) * (0.25 + 0.75 * capAmount);
+        const topFlareRadius = Math.min(width * 0.3, 340) * capAmount;
 
-        // the whole spine rises into place from below the page as the base forms
         const riseOffset = (1 - flareAmount) * height * 0.2;
 
-        // THE RISING TIP: headU is how far up the spine the column has climbed, and
-        // headWidth is how wide the column is at that tip. No particles are drawn for
-        // the tip itself; spineRadius uses them to size the cone.
         const headStartU = flareHeight * 0.6;
-        const headTopU = 1.0;                                  // was 0.95, so the column reaches the top
+        const headTopU = 1.0;
         const headU = headStartU + (headTopU - headStartU) * streamReach;
         const headAmount = smooth(clamp01((elapsed - HEAD_START) / 0.5));
         const headWidth = Math.min(width * 0.2, 230) * (0.6 + 0.4 * headAmount) * (1 + 0.25 * streamReach);
 
-        // how far up the spine the column reaches
         const spineExtent = headU;
 
-        // Width of the spine at position u.
-        // FORMATION: a cone whose top always matches the width of the rising tip, so the
-        // column widens AS it climbs (no thin stream that expands later), with a
-        // flare at the top that mirrors the one at the base.
-        // FULL: classic tornado shape, blended in by `expand` for the final settle.
         const spineRadius = (u: number) => {
-          const flareK = u < flareHeight ? Math.pow(1 - u / flareHeight, 1.6) : 0;   // trumpet-like flare at the base
+          const flareK = u < flareHeight ? Math.pow(1 - u / flareHeight, 1.6) : 0;
           const topFlareK = u > 1 - flareHeight
             ? Math.pow((u - (1 - flareHeight)) / flareHeight, 1.6)
-            : 0;                                                                     // matching flare at the top
+            : 0;
 
-          // position along the part of the spine that exists so far (0 = base, 1 = tip)
           const tu = headU > 0.001 ? clamp01(u / headU) : 0;
 
-          // cone: thin at the base, as wide as the tip right under it
           const coneTop = headWidth * 0.9 * (0.35 + 0.65 * headAmount);
           const cone = streamRadius + (coneTop - streamRadius) * Math.pow(tu, 1.35) * TAIL_WIDTH;
 
@@ -415,18 +428,19 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         }
 
         // -------------------------------------------------------------
-        // 2. SOFT BODY GLOW — puffs along the spine plus one at the top cap,
-        //    so the tornado has a smoky core under the particles
+        // 2. SOFT BODY GLOW — puffs along the spine plus one at the top,
+        //    so the tornado has a smoky core under the particles.
+        //    Fades out as the burst takes over.
         // -------------------------------------------------------------
         if (burst < 0.6) {
           const glowFade = 1 - burst / 0.6;
 
-          for (let i = 0; i < 24; i++) {                          // was 16
-            const u = Math.pow(i / 23, 1.4) * spineExtent;        // was i / 15
+          for (let i = 0; i < 24; i++) {
+            const u = Math.pow(i / 23, 1.4) * spineExtent;
             const glowRadius = spineRadius(u) * 1.2 + 16;
             const baseBoost = u < flareHeight ? 1 + 0.8 * (1 - u / flareHeight) : 1;
             const x = centerX + Math.sin(elapsed * 2.1 + u * 3.2) * 26 * u * swayGrow;
-            const y = baseY - u * spineHeight + riseOffset;
+            const y = (baseY - u * spineHeight + riseOffset) * 1.3;
 
             smokeContext.save();
             smokeContext.globalAlpha = 0.22 * (1 + 0.5 * streamReach) * intro * glowFade * baseBoost;
@@ -449,83 +463,72 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         // 3. UPDATE TORNADO PARTICLES
         // -------------------------------------------------------------
         for (const particle of particles) {
-          let x = 0;
-          let y = 0;
-          let angle = 0;
-          let alpha = 0;
-          let sizeScale = 1;
+          // SPINE: flows up from below the page. Particles loop along the spine,
+          // fading in near the base and out near the tip, so the column
+          // looks continuous and its tip tapers instead of ending in a hard cut.
+          const f = (particle.f0 + elapsed * particle.rise) % 1;
+          const u = (particle.trail ? 0.7 + 0.3 * f : Math.pow(f, 1.2)) * spineExtent;
+          const radius = spineRadius(u) * particle.radiusJitter;
 
-          if (particle.isCap) {
-            // CAP: funnel-shaped mass at the top, wide on top and narrowing downward
-            angle = particle.phase + spinTime * particle.spin * 3.2;
-            const yFrac = particle.yOffset + 0.5;               // 1 = very top of the cap
-            const radius = capRadius * particle.radiusJitter * (0.3 + 0.7 * yFrac);
+          // faster swirl near the base, slower higher up
+          const angle = particle.phase + spinTime * particle.spin * (3 + (1 - u) * 6);
 
-            x = centerX + Math.sin(elapsed * 2.1 + 3.2) * 26 * swayGrow + Math.cos(angle) * radius;
-            y = topY + capHeight * (1 - yFrac) + Math.sin(angle) * radius * 0.22;
-            // each cap particle fades in at its own moment, so the funnel's density
-            // builds up gradually instead of appearing all at once
-            alpha = smooth(clamp01((capAmount - particle.appear) / 0.3));
-            sizeScale = 0.35 + 0.65 * capAmount;
-          } else {
-            // SPINE: flows up from below the page. Particles loop along the spine,
-            // fading in near the base and out near the tip, so the column
-            // looks continuous and its tip tapers instead of ending in a hard cut.
-            const f = (particle.f0 + elapsed * particle.rise) % 1;
-            // trail particles stay in the top 30% of the column, so density holds near the tip
-            const u = (particle.trail ? 0.7 + 0.3 * f : Math.pow(f, 1.2)) * spineExtent;
-            const radius = spineRadius(u) * particle.radiusJitter;
+          const turbulence = Math.sin(elapsed * 1.3 + particle.phase * 2.1 + u * 6) * (4 + 10 * expand);
 
-            // faster swirl near the base, slower higher up
-            angle = particle.phase + spinTime * particle.spin * (3 + (1 - u) * 6);
-
-            // a little turbulence so the column is never perfectly rigid
-            const turbulence = Math.sin(elapsed * 1.3 + particle.phase * 2.1 + u * 6) * (4 + 10 * expand);
-
-            x = centerX + Math.sin(elapsed * 2.1 + u * 3.2) * 26 * u * swayGrow + Math.cos(angle) * radius + turbulence;
-            y = baseY - u * spineHeight + riseOffset + Math.sin(angle) * radius * 0.22;
-
-            const edgeFade = smooth(clamp01(f / 0.1)) * smooth(clamp01((1 - f) / 0.12));
-            alpha = intro * edgeFade;
-
-            // particles in the narrow part are smaller than the ones in the wide body
-            sizeScale = 0.45 + 0.55 * smooth(clamp01(radius / (fullRadius * 0.6)));
-          }
+          let x = centerX + Math.sin(elapsed * 2.1 + u * 3.2) * 26 * u * swayGrow + Math.cos(angle) * radius + turbulence;
+          let y = baseY - u * spineHeight + riseOffset + Math.sin(angle) * radius * 0.22;
 
           const sinA = Math.sin(angle);
 
-          // front-of-funnel particles are bigger/brighter, back ones smaller/dimmer.
-          // swell grows size/opacity before the burst so there is no sudden jump.
-          let size = particle.size * sizeScale * (0.85 + 0.3 * sinA) * (1 + swell * 0.5);
-          alpha *= particle.opacity * (0.24 + 0.1 * sinA) * (1 + swell * 0.35);
+          // particles in the narrow part are smaller than the ones in the wide body
+          const sizeScale = 0.45 + 0.55 * smooth(clamp01(radius / (fullRadius * 0.6)));
 
-          // -----------------------------------------------------------
-          // BURST: every particle flies outwards from where it was
-          // -----------------------------------------------------------
-          if (burst > 0) {
-            const push = Math.hypot(width, height) * 0.95 * particle.burstSpeed * burst;
-            const swirl = particle.burstAngle + burst * 0.9;
-            x += Math.cos(swirl) * push;
-            y += Math.sin(swirl) * push * 0.8;
-            size *= 1 + burst * 1.7;
+          // BURST progress for THIS particle: the middle goes first, the edges
+          // follow, so the burst reads as a shockwave leaving the tornado.
+          const local = clamp01((burstRaw - particle.burstDelay) / (1 - 0.4));
+          const e = easeOut(local);
+
+          // fade-out at the ends of the spine goes away as the particle bursts,
+          // so every particle is visible and helps cover the screen
+          const rawEdge = smooth(clamp01(f / 0.1)) * smooth(clamp01((1 - f) / 0.12));
+          const edgeFade = rawEdge + (1 - rawEdge) * e;
+
+          let size = particle.size * sizeScale * (0.92 + 0.16 * sinA);
+          let alpha = intro * edgeFade * particle.opacity * (0.18 + 0.05 * sinA);
+
+          if (e > 0) {
+            // fly from the tornado to this particle's own spot on the screen,
+            // along a curved (spiral) path
+            const targetX = particle.tx * width;
+            const targetY = particle.ty * height;
+            const dx = targetX - x;
+            const dy = targetY - y;
+            const curve = Math.sin(e * Math.PI) * 0.18 * particle.swirlDir;
+
+            x += dx * e - dy * curve;
+            y += dy * e + dx * curve;
+
+            size = size * (1 - e) + particle.burstSize * e;
+            alpha = alpha * (1 - e) + particle.coverAlpha * e;
           }
 
           particle.x = x;
           particle.y = y;
           particle.drawSize = size;
           particle.drawAlpha = Math.min(alpha, 0.9);
-          particle.depth = sinA;
+          particle.depth = e > 0.5 ? Math.sin(particle.phase) : sinA;
 
           // streaks are stretched along the direction of the spin so the
           // smoke looks like wind-blown bands; they relax into round puffs on burst
           if (particle.streak) {
-            particle.rotation = Math.atan2(Math.cos(angle) * 0.22, -Math.sin(angle));
-            particle.scaleX = 1.45 - burst * 0.45;
-            particle.scaleY = 0.55 + burst * 0.25;
+            const streakRot = Math.atan2(Math.cos(angle) * 0.22, -Math.sin(angle));
+            particle.rotation = streakRot + (particle.burstRotation - streakRot) * e * 0.3;
+            particle.scaleX = 1.2 - e * 0.2;
+            particle.scaleY = 0.75 + e * 0.2;
           } else {
-            particle.rotation = particle.phase + angle * 0.15;
+            particle.rotation = particle.phase + angle * 0.15 * (1 - e) + particle.burstRotation * e * 0.3;
             particle.scaleX = 1;
-            particle.scaleY = 0.62 + Math.sin(particle.phase) * 0.18;
+            particle.scaleY = (0.85 + Math.sin(particle.phase) * 0.1) * (1 - e) + 0.95 * e;
           }
         }
 
@@ -557,46 +560,13 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         }
 
         // -------------------------------------------------------------
-        // 5. SWELLING BODY — a broad cloud growing out from the funnel.
-        //    Driven by `swell`, which begins before the burst, and squared
-        //    so it fades in gently instead of appearing all at once.
+        // 5. FINAL COVER — only starts once the burst is done. The burst
+        //    particles already hide the page; this just guarantees it is
+        //    100% opaque before navigation, with no visible pop.
         // -------------------------------------------------------------
-        if (swell > 0) {
-          const bodyAmount = swell * swell;
-          const bodyRadius = Math.hypot(width, height) * (0.1 + 1.1 * swell);
-          const body = smokeContext.createRadialGradient(
-            centerX, centerY, bodyRadius * 0.06,
-            centerX, centerY, bodyRadius,
-          );
-          body.addColorStop(0, "rgba(157, 166, 191, " + (0.94 * bodyAmount) + ")");
-          body.addColorStop(0.52, "rgba(137, 148, 176, " + (0.84 * bodyAmount) + ")");
-          body.addColorStop(0.82, "rgba(116, 129, 160, " + (0.64 * bodyAmount) + ")");
-          body.addColorStop(1, "rgba(103, 116, 148, 0)");
-          smokeContext.fillStyle = body;
-          smokeContext.fillRect(0, 0, width, height);
-
-          // overlapping lobes expanding from the centre keep the texture billowy
-          screenPuffs.forEach((puff) => {
-            const puffEase = smooth(clamp01((swell - puff.delay) / 0.75));
-            const x = centerX + (puff.x * width - centerX) * puffEase;
-            const y = centerY + (puff.y * height - centerY) * puffEase;
-            const radius = Math.max(width, height) * 0.24 * puff.scale * (0.35 + puffEase * 0.65);
-
-            smokeContext.save();
-            smokeContext.globalAlpha = 0.88 * puffEase;
-            smokeContext.translate(x, y);
-            smokeContext.scale(1, 0.82);
-            smokeContext.drawImage(puffSprite, -radius, -radius, radius * 2, radius * 2);
-            smokeContext.restore();
-          });
-        }
-
-        // -------------------------------------------------------------
-        // 6. FINAL COVER — fully opaque before navigation (same idea as before)
-        // -------------------------------------------------------------
-        const coverProgress = clamp01((progress - (BURST_END - 0.06)) / (1 - (BURST_END - 0.06)));
+        const coverProgress = clamp01((progress - BURST_END) / (1 - BURST_END));
         if (coverProgress > 0) {
-          smokeContext.fillStyle = "rgba(120, 131, 157, " + coverProgress + ")";
+          smokeContext.fillStyle = "rgba(142, 105, 80, " + coverProgress + ")";
           smokeContext.fillRect(0, 0, width, height);
         }
       };
@@ -796,59 +766,12 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         const FOREGROUND_DURATION = cloudsDuration * 1.0;
         const MOON_DURATION = cloudsDuration * 1.2;
 
-        const applyDrownWobble = (
-          el: HTMLElement,
-          duration: number,
-          sinkDistance = SINK_DISTANCE,
-          basePercent?: { xPercent?: number; yPercent?: number },
-        ) => {
-          gsap.set(el, {
-            willChange: "transform",
-            ...(basePercent ?? {}),
-          });
-
-          const state = { p: 0 };
-
-          tl.to(
-            state,
-            {
-              p: 1,
-              duration,
-              ease: "power2.in",
-
-              onUpdate: () => {
-                const p = state.p;
-
-                const y = sinkDistance * p;
-
-                /*
-                 * IMPORTANT:
-                 * Do NOT touch x.
-                 * Do NOT touch rotation.
-                 *
-                 * The castle's horizontal position is controlled
-                 * entirely by its CSS.
-                 */
-                gsap.set(el, {
-                  y,
-                  ...(basePercent ?? {}),
-                });
-              },
-            },
-            0,
-          );
-        };
-
         const applyDrown = (
           el: HTMLElement,
           duration: number,
           sinkDistance = SINK_DISTANCE,
-          basePercent?: { xPercent?: number; yPercent?: number },
         ) => {
-          gsap.set(el, {
-            willChange: "transform",
-            ...(basePercent ?? {}),
-          });
+          gsap.set(el, { willChange: "transform" });
 
           const state = { p: 0 };
 
@@ -858,15 +781,10 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
               p: 1,
               duration,
               ease: "power2.in",
-
               onUpdate: () => {
-                const p = state.p;
-                const y = sinkDistance * p;
-
-                gsap.set(el, {
-                  y,
-                  ...(basePercent ?? {}),
-                });
+                // Only y is touched. The element's horizontal position
+                // is controlled entirely by its CSS.
+                gsap.set(el, { y: sinkDistance * state.p });
               },
             },
             0,
@@ -874,15 +792,12 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         };
 
         if (castleEl) {
-          applyDrownWobble(castleEl, FOREGROUND_DURATION, SINK_DISTANCE, {
-          });
+          applyDrown(castleEl, FOREGROUND_DURATION);
         }
 
         if (moonEl) {
-          applyDrown(moonEl, MOON_DURATION, SINK_DISTANCE, {});
+          applyDrown(moonEl, MOON_DURATION);
         }
-
-
 
         if (fadeEls.length > 0) {
           tl.to(
@@ -909,7 +824,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           gsap.to(smokeProgressRef.current, {
             value: 1,
             duration: SMOKE_DURATION,
-            ease: "none", // was "power2.inOut" — linear so the phase timings land on real seconds
+            ease: "none", // linear so the phase timings land on real seconds
             onComplete: () => onCompleteRef.current?.(),
           });
         };
