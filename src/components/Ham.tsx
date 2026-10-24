@@ -222,7 +222,6 @@ export default function Ham() {
         const Hpx = window.innerHeight;
         const hPx = Math.min(Hpx, (W * 1167) / 1417);
         const topPx = Hpx - hPx - Hpx * SB * SB_FIT;
-        const mouthY = topPx + hPx * 0.45;
         let offScroll: (() => void) | undefined;
 
         const ctx = gsap.context(() => {
@@ -460,42 +459,72 @@ export default function Ham() {
                 const firstCenter = center(first);
                 const firstAt = popDelay;
 
-                // While the list scrolls, boards that slide down toward the chest get
-                // narrower (scaleX) and are clipped at the chest mouth by the SCSS,
-                // so they look like they disappear behind the trunk.
                 const scroller = root.querySelector<HTMLElement>(q("boards"))!;
-                const startY = firstCenter + 2; // lowest board's resting centre = no squeeze
-                const half = (first.firstElementChild as HTMLElement).getBoundingClientRect().height / 2;
-                const endY = scroller.getBoundingClientRect().bottom + half; // fully squeezed once mostly hidden
-                const minSx = 1; // 1 = no shrink, lower = narrower near the chest
+
+                // The SCSS ends the scroller exactly on the chest rim (lid line), so its
+                // bottom edge IS the lid line. Boards first emerge from there.
+                const mouthY = scroller.getBoundingClientRect().bottom;
+
+                const minSx = 0.8; // 1 = no shrink, lower = narrower near the chest
+                const minOp = 0.65; // 1 = no fade, lower = boards fade more as they enter the chest
                 const follow = 0.22; // 0..1, lower = softer
-                const cur = new Map<HTMLElement, number>(signs.map((s) => [s, 1]));
+                const cur = new Map<HTMLElement, { sx: number; op: number }>(
+                    signs.map((s) => [s, { sx: 1, op: 1 }])
+                );
                 let raf = 0;
 
+                const plankH = (s: HTMLElement) => (s.firstElementChild as HTMLElement).offsetHeight;
+
+                // Centre of a board's plank on screen, computed from LAYOUT values only
+                // (offsetTop / scrollTop), so GSAP transforms never affect it.
+                const liveCenter = (s: HTMLElement, scrollerTop: number) =>
+                    scrollerTop + s.offsetTop - scroller.scrollTop + s.offsetHeight - plankH(s) / 2;
+
+                // Everything is measured fresh on every frame. Before, startY / endY were
+                // measured once at mount, so if the viewport changed afterwards (mobile URL
+                // bar showing or hiding, rotation, resize, fonts or images settling) they
+                // were stale. Then, on the first scroll, every board looked "below the
+                // chest" and shrank, and they only grew back as they scrolled up.
                 const frame = () => {
+                    const sr = scroller.getBoundingClientRect();
+                    const half = plankH(first) / 2;
+                    const startY = sr.bottom - half; // lowest board's resting centre = no squeeze, no fade
+                    const endY = sr.bottom + half; // fully squeezed / faded once mostly hidden
                     let busy = false;
 
                     signs.forEach((s) => {
-                        const target =
-                            1 - (1 - minSx) * smooth((center(s) - startY) / (endY - startY));
-                        const next = cur.get(s)! + (target - cur.get(s)!) * follow;
+                        const p = smooth((liveCenter(s, sr.top) - startY) / (endY - startY));
+                        const c = cur.get(s)!;
+                        const tSx = 1 - (1 - minSx) * p;
+                        const tOp = 1 - (1 - minOp) * p;
 
-                        if (Math.abs(target - next) > 0.002) busy = true;
+                        const nSx = c.sx + (tSx - c.sx) * follow;
+                        const nOp = c.op + (tOp - c.op) * follow;
 
-                        cur.set(s, next);
-                        s.style.setProperty("--sx", next.toFixed(3));
+                        if (Math.abs(tSx - nSx) > 0.002 || Math.abs(tOp - nOp) > 0.002) busy = true;
+
+                        c.sx = nSx;
+                        c.op = nOp;
+                        s.style.setProperty("--sx", nSx.toFixed(3));
+                        s.style.setProperty("--so", nOp.toFixed(3));
                     });
 
                     raf = busy ? requestAnimationFrame(frame) : 0;
                 };
 
-                const onScroll = () => {
+                const kick = () => {
                     if (!raf) raf = requestAnimationFrame(frame);
                 };
 
-                scroller.addEventListener("scroll", onScroll, { passive: true });
+                scroller.addEventListener("scroll", kick, { passive: true });
+                window.addEventListener("resize", kick);
+                const ro = new ResizeObserver(kick); // dvh / URL bar changes resize the scroller
+                ro.observe(scroller);
+
                 offScroll = () => {
-                    scroller.removeEventListener("scroll", onScroll);
+                    scroller.removeEventListener("scroll", kick);
+                    window.removeEventListener("resize", kick);
+                    ro.disconnect();
                     cancelAnimationFrame(raf);
                 };
 
@@ -541,6 +570,10 @@ export default function Ham() {
                 const end = extendAt + (ordered.length - 2) * stagger + dur;
 
                 tl.set(signs, { pointerEvents: "auto", clearProps: "zIndex" }, end);
+
+                // apply the correct squeeze / fade once everything is in place, so no
+                // board waits for the first scroll to get its real values
+                tl.call(kick, undefined, end);
             } else {
                 signs.forEach((sign, i) => {
                     const b = BOARDS[i];
@@ -572,7 +605,7 @@ export default function Ham() {
         };
     }, [narrow]);
 
-    const items = narrow ? [...BOARDS, ...MOBILE_EXTRA] : BOARDS;
+    const items = narrow ? [...MOBILE_EXTRA, ...BOARDS] : BOARDS;
 
     return (
         <div ref={rootRef} className={styles.container}>
