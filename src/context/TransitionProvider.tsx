@@ -137,7 +137,7 @@ const PRELOADER_KEY = "oasis_preloader_shown";
 
 // Safety nets so a failure can never leave the user stuck under the smoke.
 const ROUTE_TIMEOUT_MS = 8000;
-const PAGE_IMAGES_TIMEOUT_MS = 4000;
+const PAGE_READY_TIMEOUT_MS = 25000;
 const OLD_PAGE_TIMEOUT_MS = 5000;
 
 // Elements that only exist on the OLD page. Once they are gone from the DOM,
@@ -183,27 +183,113 @@ function waitForOldPageGone(
   });
 }
 
-// Wait until every <img> currently in the page (the new route) has loaded and
-// decoded, so nothing pops in when the smoke fades. Never blocks forever.
-function waitForPageImages(): Promise<void> {
-  const pending = Array.from(document.images)
-    .filter((img) => !img.complete || img.naturalWidth === 0)
-    .map(
-      (img) =>
-        new Promise<void>((resolve) => {
-          img.addEventListener("load", () => resolve(), { once: true });
-          img.addEventListener("error", () => resolve(), { once: true });
-        }),
-    );
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-  const decodes = Array.from(document.images).map((img) =>
-    img.decode ? img.decode().catch(() => undefined) : Promise.resolve(),
+const decodeSafe = (img: HTMLImageElement): Promise<void> =>
+  img.decode
+    ? img.decode().then(
+        () => undefined,
+        () => undefined,
+      )
+    : Promise.resolve();
+
+// Load + decode an image by URL (used for CSS background images).
+const loadImageUrl = (url: string): Promise<void> =>
+  new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      decodeSafe(img).then(resolve);
+    };
+    img.onerror = () => resolve();
+    img.src = url;
+  });
+
+const isNearViewport = (el: Element) => {
+  const r = el.getBoundingClientRect();
+  return (
+    r.bottom > -200 &&
+    r.top < window.innerHeight + 200 &&
+    r.right > -200 &&
+    r.left < window.innerWidth + 200
   );
+};
 
-  return Promise.race([
-    Promise.all([...pending, ...decodes]).then(() => undefined),
-    new Promise<void>((resolve) => setTimeout(resolve, PAGE_IMAGES_TIMEOUT_MS)),
-  ]);
+const BG_URL_RE = /url\((["']?)(.*?)\1\)/g;
+
+// Finds every CSS background-image url() currently applied in the page,
+// including ::before and ::after. <img> tags alone miss these, which is why
+// pages could look black even though "all images" had loaded.
+function collectBackgroundUrls(): string[] {
+  const urls = new Set<string>();
+
+  const add = (value: string) => {
+    if (!value || value === "none") return;
+    BG_URL_RE.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = BG_URL_RE.exec(value))) {
+      const url = match[2];
+      if (url && !url.startsWith("data:")) urls.add(url);
+    }
+  };
+
+  document.querySelectorAll<HTMLElement>("html, body, body *").forEach((el) => {
+    add(getComputedStyle(el).backgroundImage);
+    add(getComputedStyle(el, "::before").backgroundImage);
+    add(getComputedStyle(el, "::after").backgroundImage);
+  });
+
+  return Array.from(urls);
+}
+
+// Waits until the NEW page is really ready to be seen:
+//  - every <img> has loaded and decoded
+//  - every CSS background image has loaded and decoded
+//  - nothing new has appeared for a few frames (late-mounting components)
+// Repeats in rounds because new elements can mount while we wait.
+// Capped by PAGE_READY_TIMEOUT_MS so it can never block forever.
+async function waitForPageReady(): Promise<void> {
+  const deadline = performance.now() + PAGE_READY_TIMEOUT_MS;
+  const timeLeft = () => Math.max(0, deadline - performance.now());
+
+  const handledBg = new Set<string>();
+  const handledImgs = new WeakSet<HTMLImageElement>();
+  let calmRounds = 0;
+
+  while (calmRounds < 3 && timeLeft() > 0) {
+    const tasks: Promise<void>[] = [];
+
+    for (const img of Array.from(document.images)) {
+      if (handledImgs.has(img)) continue;
+      // Lazy images far off-screen never load on their own; do not wait for them.
+      if (img.loading === "lazy" && !isNearViewport(img)) continue;
+      handledImgs.add(img);
+
+      tasks.push(
+        img.complete
+          ? decodeSafe(img)
+          : new Promise<void>((resolve) => {
+              img.addEventListener("load", () => resolve(), { once: true });
+              img.addEventListener("error", () => resolve(), { once: true });
+            }).then(() => decodeSafe(img)),
+      );
+    }
+
+    for (const url of collectBackgroundUrls()) {
+      if (handledBg.has(url)) continue;
+      handledBg.add(url);
+      tasks.push(loadImageUrl(url));
+    }
+
+    if (tasks.length > 0) {
+      calmRounds = 0;
+      await Promise.race([Promise.all(tasks), sleep(timeLeft())]);
+    } else {
+      calmRounds += 1;
+    }
+
+    await waitForNextPaint();
+  }
 }
 
 type TransitionStage = "strings" | "smoke";
@@ -330,12 +416,16 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
       //    fonts are loaded so the page under the smoke is complete.
       await waitForNextPaint();
       await waitForNextPaint();
-      await waitForPageImages();
+      await waitForPageReady();
       try {
         await document.fonts?.ready;
       } catch {
         // Ignore font errors.
       }
+      // Final settle: let the browser actually paint the decoded images
+      // before the smoke starts to fade.
+      await sleep(150);
+      await waitForNextPaint();
       await waitForNextPaint();
     } catch (err) {
       console.error("Transition error:", err);
