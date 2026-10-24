@@ -9,6 +9,7 @@ import {
 import gsap from "gsap";
 import { useTransition } from "../context/TransitionProvider";
 import Nav from "../components/Nav";
+import LogoOasis from "../assets/oasis26logo.png"
 import ShootingStars from "../components/ShootingStars";
 import styles from "../styles/Home.module.scss";
 import instagramIcon from "../assets/links/instagram.png";
@@ -24,7 +25,7 @@ const cloudBig = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudBig.svg"
 const cloudThree = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudThree.svg";
 const Castle = "https://res.cloudinary.com/bhfhuzru/image/upload/castlefinal2.png";
 const Moon = "https://res.cloudinary.com/bhfhuzru/image/upload/Moon.webp";
-const LogoOasis = "https://res.cloudinary.com/bhfhuzru/image/upload/LogoOasisi.webp";
+//const LogoOasis = "https://res.cloudinary.com/bhfhuzru/image/upload/LogoOasisi.webp";
 /* The register button artwork is split into two layers so the shine can be
    masked to the carpet alone. Both files are expected to be exported on the
    SAME canvas as the old cactuschange.png — that is what lets them stack at
