@@ -100,17 +100,28 @@ const EVENTS_ASSETS = [
 
 // ---------- Per-route config ----------
 // assets : preloaded by PageTransition while the strings animate / tornado forms
-// chunk  : optional JS loader for lazy routes (remove if the page isn't lazy)
-// Adjust the route keys and page paths to match your router.
+// chunk  : JS loader for the lazy route, so the page code is ready before navigating
+//
+// Keys MUST be lowercase and match the paths in AppRoutes.tsx
+// (/aboutUs -> "/aboutus", /contactus -> "/contactus", etc.).
 type RouteConfig = {
   assets: string[];
   chunk?: () => Promise<unknown>;
 };
 
 const ROUTES: Record<string, RouteConfig> = {
-  "/about": { assets: ABOUT_ASSETS, chunk: () => import("../pages/About") },
-  "/contact": { assets: CONTACT_ASSETS, chunk: () => import("../pages/Contact") },
-  "/events": { assets: EVENTS_ASSETS, chunk: () => import("../pages/EventsPage/EventsPage") },
+  "/": { assets: [], chunk: () => import("../pages/Home") },
+  "/aboutus": { assets: ABOUT_ASSETS, chunk: () => import("../pages/About") },
+  "/contactus": { assets: CONTACT_ASSETS, chunk: () => import("../pages/Contact") },
+  "/events": {
+    assets: EVENTS_ASSETS,
+    chunk: () => import("../pages/EventsPage/EventsPage"),
+  },
+  "/register": {
+    assets: [],
+    chunk: () => import("../pages/registration/Registration"),
+  },
+  "/comingsoon": { assets: [], chunk: () => import("../pages/ComingSoon") },
 };
 
 type TransitionContextValue = {
@@ -127,15 +138,48 @@ const PRELOADER_KEY = "oasis_preloader_shown";
 // Safety nets so a failure can never leave the user stuck under the smoke.
 const ROUTE_TIMEOUT_MS = 8000;
 const PAGE_IMAGES_TIMEOUT_MS = 4000;
+const OLD_PAGE_TIMEOUT_MS = 5000;
+
+// Elements that only exist on the OLD page. Once they are gone from the DOM,
+// we know React has really swapped to the new page.
+const OLD_PAGE_MARKERS =
+  "[data-cloud-string],[data-castle-drown],[data-moon-shrink],[data-transition-fade]";
 
 const normalizePath = (path: string) =>
   path.split(/[?#]/)[0].replace(/\/+$/, "") || "/";
+
+// Lowercase key used to look up ROUTES (React Router matches case-insensitively).
+const routeKey = (path: string) => normalizePath(path).toLowerCase();
 
 function waitForNextPaint(): Promise<void> {
   return new Promise((resolve) => {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => resolve());
     });
+  });
+}
+
+// Resolves once every element from the old page has been removed from the DOM.
+// Never blocks forever.
+function waitForOldPageGone(
+  old: Element[],
+  timeoutMs = OLD_PAGE_TIMEOUT_MS,
+): Promise<void> {
+  if (old.length === 0) return Promise.resolve();
+
+  return new Promise((resolve) => {
+    const start = performance.now();
+    const check = () => {
+      if (
+        old.every((el) => !el.isConnected) ||
+        performance.now() - start > timeoutMs
+      ) {
+        resolve();
+        return;
+      }
+      requestAnimationFrame(check);
+    };
+    check();
   });
 }
 
@@ -230,10 +274,10 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
       transitionStageRef.current = "strings";
       pendingPathRef.current = to;
 
-      // From ANY page -> About / Contact / Events: PageTransition starts
-      // loading that route's assets the moment it mounts, in parallel with
-      // the strings and the tornado forming. Other routes load nothing.
-      const config = ROUTES[normalizePath(to)];
+      // From ANY page: PageTransition starts loading the destination's assets
+      // and JS chunk the moment it mounts, in parallel with the strings and
+      // the tornado forming.
+      const config = ROUTES[routeKey(to)];
       setTransitionAssets(config?.assets ?? []);
       setTransitionPreload(() => config?.chunk);
 
@@ -253,31 +297,53 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // 1. Change the route and wait until the router location has really
-    //    changed (timeout is only a safety net).
-    let timer: number | undefined;
-    const routeChanged = new Promise<void>((resolve) => {
-      if (normalizePath(pathnameRef.current) === normalizePath(destination)) {
-        resolve();
-        return;
+    try {
+      // Snapshot the old page's elements BEFORE navigating.
+      const oldMarkers = Array.from(
+        document.querySelectorAll(OLD_PAGE_MARKERS),
+      );
+
+      // 1. Change the route and wait until the router location has really
+      //    changed (timeout is only a safety net).
+      let timer: number | undefined;
+      const routeChanged = new Promise<void>((resolve) => {
+        if (
+          normalizePath(pathnameRef.current) === normalizePath(destination)
+        ) {
+          resolve();
+          return;
+        }
+        routeResolveRef.current = resolve;
+        timer = window.setTimeout(resolve, ROUTE_TIMEOUT_MS);
+      });
+
+      navigate(destination);
+      await routeChanged;
+      window.clearTimeout(timer);
+
+      // 2. The URL changing does not mean the new page has rendered
+      //    (lazy routes + React Router's startTransition keep the old page
+      //    on screen). Wait until the old page is really gone.
+      await waitForOldPageGone(oldMarkers);
+
+      // 3. Let the new route mount and paint, then make sure its images and
+      //    fonts are loaded so the page under the smoke is complete.
+      await waitForNextPaint();
+      await waitForNextPaint();
+      await waitForPageImages();
+      try {
+        await document.fonts?.ready;
+      } catch {
+        // Ignore font errors.
       }
-      routeResolveRef.current = resolve;
-      timer = window.setTimeout(resolve, ROUTE_TIMEOUT_MS);
-    });
-
-    navigate(destination);
-    await routeChanged;
-    window.clearTimeout(timer);
-
-    // 2. Let the new route mount and paint, then make sure its images are
-    //    loaded and decoded so the page under the smoke is complete.
-    await waitForNextPaint();
-    await waitForNextPaint();
-    await waitForPageImages();
-    await waitForNextPaint();
-
-    // 3. Only now fade the smoke away.
-    transitionRef.current?.resumeSmoke();
+      await waitForNextPaint();
+    } catch (err) {
+      console.error("Transition error:", err);
+    } finally {
+      // 4. Always fade the smoke away, even if something above failed,
+      //    so the user can never be stuck under it.
+      transitionRef.current?.resumeSmoke();
+    }
   }, [navigate]);
 
   const handleTransition = useCallback(async () => {
