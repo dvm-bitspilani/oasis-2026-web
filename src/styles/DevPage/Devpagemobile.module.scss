@@ -5,7 +5,7 @@
 $bg-bleed: 6%;
 
 // STAGE = the full-screen frame. BACKDROP = the curtain image, always filling it.
-// WRAPPER = the scrolling content layer on top (so content scrolls, backdrop doesn't).
+// WRAPPER = the content layer on top.
 .stage {
   position: relative;
   width: 100%;
@@ -27,28 +27,40 @@ $bg-bleed: 6%;
   user-select: none;
 }
 
+// HOME view layer (unchanged behaviour)
 .wrapper {
   position: absolute;
   inset: 0;
   overflow-x: hidden;
-  overflow-y: auto; // scrolls only when content is taller than the screen (e.g. UI/UX, 5 members)
-  overscroll-behavior-y: contain; // scroll doesn't leak to the page behind
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
   touch-action: pan-y;
   padding-bottom: 8vw;
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; // hide scrollbar (Firefox)
+  scrollbar-width: none;
 
   &::-webkit-scrollbar {
-    display: none; // hide scrollbar (Chrome / Safari)
+    display: none;
   }
+}
+
+// VERTICAL view layer: the page itself NEVER scrolls. It is a column:
+//   [back button / heading / nav row] = fixed size
+//   [.gridScroll]                      = takes the rest of the screen and scrolls
+.wrapper.pageFixed {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 0;
+  touch-action: none; // swipes on the header do nothing; .gridScroll re-enables pan-y
 }
 
 .back {
   position: absolute;
   top: 4vw;
   left: 4vw;
-  width: 11vw;
+  width: 16vw;
   z-index: 3; // above .heading / .navRow (z-index 2), otherwise they block taps
 
   .backButton {
@@ -71,6 +83,7 @@ $bg-bleed: 6%;
   padding-top: 8vw;
   position: relative; // transition: stays above the sliding curtain
   z-index: 2;
+  flex-shrink: 0; // never squashed by the scroll area
 
   img {
     width: 90%;
@@ -82,24 +95,32 @@ $bg-bleed: 6%;
   display: flex;
   flex-direction: column;
   align-items: center;
-//   gap: 4vw;
   margin-top: 10vw;
-//   padding: 0 6vw;
 }
 
 .frontendCushion {
+  -webkit-tap-highlight-color: transparent; // no grey box flash on tap
   width: 84%;
   background: none;
   border: none;
-  
+
   padding: 0;
   cursor: pointer;
 
   img {
     position: absolute;
     width: 80%;
-    top: 18%;
+    top: 15%;
     transform: rotateZ(20deg);
+    // CLICK AREA: same polygon as the desktop cushion. clip-path is applied to the image's own
+    // box BEFORE the rotate / resize below, so the shape follows the cushion automatically.
+    // Only the area inside the polygon is visible AND clickable; taps outside go through to
+    // whatever is underneath. Edit the percentages to reshape it.
+    clip-path: polygon(
+      8% 8%, 30% 13%, 60% 10%, 92% 3%, 83% 12%, 83% 50%, 90% 85%, 90% 85%,
+      60% 84%, 12% 91%, 11% 90%, 3.3% 15%
+    );
+
     object-fit: contain;
     display: block;
   }
@@ -109,13 +130,11 @@ $bg-bleed: 6%;
   display: flex;
   position: absolute;
   bottom: 0%;
-//   gap: 4vw;
   width: 100%;
-//   justify-content: center;
 }
 
-.backendCushion{
-
+.backendCushion {
+  -webkit-tap-highlight-color: transparent; // no grey box flash on tap
   background: none;
   border: none;
   padding: 0;
@@ -125,17 +144,25 @@ $bg-bleed: 6%;
   img {
     position: relative;
     left: -30%;
-    top: -33%;
+    top: -30%;
     transform: rotateZ(-8deg);
     width: 150%;
+    // CLICK AREA: same polygon as the desktop cushion. clip-path is applied to the image's own
+    // box BEFORE the rotate / resize below, so the shape follows the cushion automatically.
+    // Only the area inside the polygon is visible AND clickable; taps outside go through to
+    // whatever is underneath. Edit the percentages to reshape it.
+    clip-path: polygon(
+      13% 8%, 30% 13%, 60% 10%, 92% 10%, 92% 12%, 87.5% 40%, 87.5% 75%, 90% 90%,
+      50% 87%, 11% 87%, 7.2% 92%, 8.5% 12%
+    );
+
     object-fit: contain;
     display: block;
   }
 }
 
-
-.uiCushion{
-
+.uiCushion {
+  -webkit-tap-highlight-color: transparent; // no grey box flash on tap
   background: none;
   border: none;
   padding: 0;
@@ -145,9 +172,18 @@ $bg-bleed: 6%;
   img {
     position: relative;
     left: -43%;
-    top: -25%;
+    top: -20%;
     transform: rotateZ(2deg);
     width: 200%;
+    // CLICK AREA: same polygon as the desktop cushion. clip-path is applied to the image's own
+    // box BEFORE the rotate / resize below, so the shape follows the cushion automatically.
+    // Only the area inside the polygon is visible AND clickable; taps outside go through to
+    // whatever is underneath. Edit the percentages to reshape it.
+    clip-path: polygon(
+      21% 8%, 49% 22%, 75% 20%, 92% 30%, 86% 12%, 78% 50%, 76% 75%, 78% 97%,
+      80% 84%, 43% 78%, 17% 75%, 23% 35%
+    );
+
     object-fit: contain;
     display: block;
   }
@@ -159,7 +195,8 @@ $bg-bleed: 6%;
   align-items: center;
   justify-content: center;
   gap: 6vw;
-  margin-top: 6vw;
+  flex-shrink: 0; // stays fixed above the scrolling cards
+
   position: relative; // transition: stays above the sliding curtain
   z-index: 2;
 }
@@ -183,13 +220,32 @@ $bg-bleed: 6%;
   text-align: center;
 }
 
+// THE ONLY SCROLLING AREA of the vertical view: fills whatever space is left under the
+// nav row and scrolls the member cards inside it.
+.gridScroll {
+  flex: 1 1 0;
+  min-height: 0; // required so a flex child can shrink and scroll instead of growing
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain; // scroll doesn't leak to the page behind
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8vw; // breathing room under the last row
+  box-sizing: border-box;
+  scrollbar-width: none; // hide scrollbar (Firefox)
+
+  position: relative; // transition: sits under the curtain
+  z-index: 0;
+
+  &::-webkit-scrollbar {
+    display: none; // hide scrollbar (Chrome / Safari)
+  }
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap:0vw;
-  // padding: 8vw 6vw 16vw;
-  position: relative; // transition: sits under the curtain
-  z-index: 0;
+  gap: 0vw;
   animation: gridFadeIn 0.5s ease both; // fades in after each swap
 }
 
@@ -209,8 +265,10 @@ $bg-bleed: 6%;
 .cardName {
   color: #AFA360;
   text-align: center;
-  font-size: 5.2vw;
+  font-size: 7.2vw;
   margin: 2vw 0 1vw;
+
+  margin-top: -15px;
 }
 
 // Instagram + LinkedIn icons under each name (drawn by SocialIcons.tsx)
@@ -218,15 +276,15 @@ $bg-bleed: 6%;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8vw;          // space BETWEEN the two icons
+  gap: 8vw; // space BETWEEN the two icons
   margin-top: 1.5vw; // space between the name and the icons
 }
 
 .cardSocialLink {
   display: block;
-  width: 5.5vw;      // icon size
-  height: 5.5vw;
-  color: #AFA360;    // same gold as the design
+  width: 6.5vw; // icon size
+  height: 6.5vw;
+  color: #AFA360; // same gold as the design
 
   svg {
     display: block;

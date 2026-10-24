@@ -140,7 +140,7 @@
   position: absolute;
   top: 5%;
   left: 3%;
-  width: 5%;
+  width: 6%;
   z-index: 6; // stays above the curtains so it's clickable to reset
 
   .BackButton {
@@ -158,6 +158,9 @@
 }
 
 // ───────── CURTAINS (relative to the stage, not the window) ─────────
+// The three curtains hang on one rail, so their stacking NEVER changes:
+// pink (1) < blue (2) < purple (3). DevPage.tsx never touches z-index.
+// Only x / rotation / height are animated.
 .curtainOverlay {
   position: absolute;
   inset: 0;
@@ -174,9 +177,10 @@
     width: 100%;
     height: 110%;
     object-fit: cover;
+    will-change: transform;
   }
 
-  // resting (parked) positions — these match HOME_X / HOME_Z in DevPage.tsx.
+  // resting (home) positions — these match HOME_X in DevPage.tsx.
   // Keep them in sync if you tweak one side, tweak the other.
   .pinkCurtain {
     z-index: 1;
@@ -191,18 +195,15 @@
     transform: translateX(92%) rotateZ(5deg);
   }
 }
-
 .rightTop {
   position: absolute;
-  top: -10%;
-  right: -4%;
-  transform: rotateZ(5deg);
+  top: 0;
+  right: 0;
+  transform: none;
   z-index: 1000;
-  // A raw <img> keeps its natural pixel size, so it won't scale with the stage.
-  // Set width = (image's natural width ÷ design width) × 100.
-  // e.g. 260px image on a 1440 design → 18cqw. Adjust to match your Mac look.
-  width: 18cqw;
+  width: 25cqw;
   height: auto;
+
 }
 
 // ───────── NAV LABELS ─────────
@@ -282,6 +283,7 @@
     font-family: Amita;
     font-size: 1.5rem;
     color: #AFA360;
+    margin-bottom: 0;
   }
 }
 
@@ -296,8 +298,8 @@
 
 .socialLink {
   display: block;
-  width: 1.7cqw;      // icon size
-  height: 1.7cqw;
+  width: 1.8cqw;      // icon size
+  height: 1.8cqw;
   color: #AFA360;     // same gold as the names
   transition: color 0.2s ease, transform 0.2s ease;
 
@@ -318,24 +320,35 @@ a.socialLink {
   }
 }
 
-// Character positions stay inside roughly 0–84% of the stage: the active curtain
-// only covers up to 88% (see ACTIVE_X in DevPage.tsx).
+// ───────── CHARACTER POSITIONS ─────────
+// Each vertical sits in a different visible window, because the curtains that are
+// folded on the left / parked on the right take up different room each time:
+//
+//   Frontend open:  nothing folded left, Backend + UI parked right  → window ≈  0 – 84 %
+//   Backend  open:  Frontend folded left, UI parked right           → window ≈  5 – 89 %
+//   UI       open:  Frontend + Backend folded left, nothing right   → window ≈ 10 – 100 %
+//
+// Every slot below is placed so the group is CENTRED in its own window.
+//
+// How to read the numbers: a slot's centre = left + 6 (the .character margin-left) + width/2.
+// So to move a person, change `left`; to move a whole group, shift every `left` by the same amount.
+// Window centres used: Frontend 41 %, Backend 47 %, UI 55 %.
 
-// Frontend — 4 people
-.frontend1 { left: 0%;  top: 12%; width: 18%; }
-.frontend2 { left: 20%; top: 25%; width: 18%; }
-.frontend3 { left: 40%; top: 12%; width: 18%; }
-.frontend4 { left: 60%; top: 25%; width: 18%; }
+// Frontend — 4 people, centres at 11 / 31 / 51 / 71 %
+.frontend1 { left: -4%; top: 12%; width: 18%; }
+.frontend2 { left: 16%; top: 25%; width: 18%; }
+.frontend3 { left: 36%; top: 12%; width: 18%; }
+.frontend4 { left: 56%; top: 25%; width: 18%; }
 
-// Backend — 4 people
-.backend1 { left: 0%;  top: 12%; width: 18%; }
-.backend2 { left: 20%; top: 25%; width: 18%; }
-.backend3 { left: 40%; top: 12%; width: 18%; }
-.backend4 { left: 60%; top: 25%; width: 18%; }
+// Backend — 4 people, centres at 17 / 37 / 57 / 77 %
+.backend1 { left: 2%;  top: 12%; width: 18%; }
+.backend2 { left: 22%; top: 25%; width: 18%; }
+.backend3 { left: 42%; top: 12%; width: 18%; }
+.backend4 { left: 62%; top: 25%; width: 18%; }
 
-// UI/UX — 5 people
-.ui1 { left: 0%;  top: 3%; width: 14%; }
-.ui2 { left: 16%; top: 28%; width: 14%; }
-.ui3 { left: 32%; top: 3%; width: 14%; }
-.ui4 { left: 48%; top: 28%; width: 14%; }
-.ui5 { left: 64%; top: 3%; width: 14%; }
+// UI/UX — 5 people, centres at 23 / 39 / 55 / 71 / 87 %
+.ui1 { left: 12.5%; top: 3%;  width: 14%; }
+.ui2 { left: 28.5%; top: 28%; width: 14%; }
+.ui3 { left: 44.5%; top: 3%;  width: 14%; }
+.ui4 { left: 60.5%; top: 28%; width: 14%; }
+.ui5 { left: 76.5%; top: 3%;  width: 14%; }
