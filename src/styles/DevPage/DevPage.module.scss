@@ -1,7 +1,10 @@
 // ───────── DESIGN SIZE ─────────
-// Set these to your Mac's browser viewport (type `innerWidth, innerHeight`
-// in the Mac console). The stage keeps this aspect ratio on every screen,
-// so the Mac view stays identical and other screens just scale it.
+// The page now FILLS THE WHOLE WINDOW (no side bars on wide screens).
+// --design-w / --design-h are the Mac viewport the page was designed on. At that exact
+// shape the page looks identical to before; on wider or taller windows:
+//   • background, curtains, cushions and all POSITIONS stretch to the full window
+//   • people, labels, icons, back button keep their natural shape (sized with --u below)
+// Keep these two numbers equal to DESIGN_W / DESIGN_H at the top of DevPage.tsx.
 .wrapper {
   --design-w: 1440;
   --design-h: 784;
@@ -23,15 +26,31 @@
 
 // px(40) = "40px at design width", scaled with the stage
 @function px($n) {
-  @return calc(#{$n} * 100cqw / var(--design-w));
+  @return calc(#{$n} * 100 * var(--u) / var(--design-w));
+}
+
+// u(n) = "n% of the design width", in the shape-preserving unit (was `ncqw`)
+@function u($n) {
+  @return calc(#{$n} * var(--u));
+}
+
+// pw(n) = "n design-pixels", as a % of the stage width, so it STRETCHES with the window.
+// Used for the cushion row, which must stay lined up with the stretched background.
+@function pw($n) {
+  @return calc(#{$n} * 100% / var(--design-w));
 }
 
 .stage {
   position: relative;
-  // largest box with the design aspect ratio that fits the window
-  width: min(100vw, calc(100vh * var(--design-w) / var(--design-h)));
-  height: min(100vh, calc(100vw * var(--design-h) / var(--design-w)));
+  // fills the entire window
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
   container-type: size; // enables cqw / cqh for all children
+  // --u = the size unit for anything that must NOT be squashed or stretched (1u = 1cqw at the
+  // design shape). It is the smaller of "1% of width" and "1% of height, converted", so
+  // content never grows taller than the window can hold.
+  --u: min(1cqw, calc(1cqh * var(--design-w) / var(--design-h)));
   overflow: hidden;
   background-repeat: no-repeat;
   background-position: center;
@@ -45,7 +64,7 @@
   justify-content: center;
 
   img {
-    width: 40%;
+    width: u(36); // = 40% of the 90% heading box, at the design shape
   }
 }
 
@@ -55,10 +74,15 @@
   display: flex;
   width: 100%;
   align-items: center;
+  // The cushions are painted objects that sit on the (stretched) sofa, so they are squashed to
+  // match it: --sy is set by DevPage.tsx (= how much taller/shorter the window is than the
+  // design). Anchored at the bottom so they keep resting on the sofa.
+  transform: scaleY(var(--sy, 1));
+  transform-origin: 50% 100%;
 
   .FrontendButton {
     width: 28%;
-    margin-left: px(100);
+    margin-left: pw(100);
     z-index: 1;
 
     clip-path: polygon(
@@ -77,7 +101,7 @@
     );
   }
   .BackendButton {
-    margin-left: px(-130);
+    margin-left: pw(-130);
     width: 28%;
     z-index: 2;
 
@@ -97,10 +121,10 @@
     );
   }
   .UiButton {
-    margin-left: px(-200);
+    margin-left: pw(-200);
     width: 38%;
     z-index: 1;
-    margin-bottom: px(-20);
+    margin-bottom: pw(-20);
 
     clip-path: polygon(
       21% 8%,
@@ -140,7 +164,7 @@
   position: absolute;
   top: 5%;
   left: 3%;
-  width: 6%;
+  width: u(6);
   z-index: 6; // stays above the curtains so it's clickable to reset
 
   .BackButton {
@@ -201,7 +225,7 @@
   right: 0;
   transform: none;
   z-index: 1000;
-  width: 25cqw;
+  width: u(25);
   height: auto;
 
 }
@@ -225,7 +249,7 @@
   margin: 0;
 
   font-family: "YourDesignFont", cursive; // same font as in Figma
-  font-size: 2.8cqw;
+  font-size: u(2.8);
   letter-spacing: 0.04em;
   text-transform: lowercase;
   white-space: nowrap;
@@ -268,7 +292,7 @@
 
   img {
     display: block;
-    width: 30cqw;
+    width: u(30);
     object-fit: contain;
     height: auto;
   }
@@ -292,14 +316,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2.4cqw;        // space BETWEEN the two icons
-  margin-top: 0.6cqw; // space between the name and the icons
+  gap: u(2.4);        // space BETWEEN the two icons
+  margin-top: u(0.6); // space between the name and the icons
 }
 
 .socialLink {
   display: block;
-  width: 1.8cqw;      // icon size
-  height: 1.8cqw;
+  width: u(1.8);      // icon size
+  height: u(1.8);
   color: #AFA360;     // same gold as the names
   transition: color 0.2s ease, transform 0.2s ease;
 

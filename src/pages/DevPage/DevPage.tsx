@@ -17,6 +17,10 @@ import rightTop from "../../assets/DevPage/rightTop.png";
 
 type Vertical = "Frontend" | "Backend" | "Ui";
 
+// The viewport shape the page was designed for. MUST match --design-w / --design-h in the scss.
+const DESIGN_W = 1440;
+const DESIGN_H = 784;
+
 // which scss position slot each person goes into (same order as MEMBERS in devMembers.ts)
 const FRONTEND_SLOTS = [styles.frontend1, styles.frontend2, styles.frontend3, styles.frontend4];
 const BACKEND_SLOTS = [styles.backend1, styles.backend2, styles.backend3, styles.backend4];
@@ -130,6 +134,24 @@ export default function DevPage() {
   const labelRefFrontend = useRef<HTMLButtonElement | null>(null);
   const labelRefBackend = useRef<HTMLButtonElement | null>(null);
   const labelRefUi = useRef<HTMLButtonElement | null>(null);
+
+  // The page fills the whole window. The cushions are painted on the sofa in the background, so
+  // they have to be squashed/stretched vertically by the same amount as the background:
+  // --sy = (window height / width) compared to the design's. 1 = exactly the design shape.
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  useLayoutEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const apply = () => {
+      const { width, height } = el.getBoundingClientRect();
+      if (!width || !height) return;
+      el.style.setProperty("--sy", String(height / width / (DESIGN_H / DESIGN_W)));
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   // the running timeline, so a new move can take over cleanly
   const tlRef = useRef<gsap.core.Timeline | null>(null);
@@ -272,8 +294,8 @@ export default function DevPage() {
 
   return (
     <div className={styles.wrapper}>
-      {/* Fixed-aspect-ratio stage: everything inside scales together on every screen */}
-      <div className={styles.stage} style={{ backgroundImage: `url(${bg})` }}>
+      {/* Full-window stage: background / curtains / cushions stretch, people & labels keep their shape */}
+      <div ref={stageRef} className={styles.stage} style={{ backgroundImage: `url(${bg})` }}>
         <div className={styles.heading}>
           <img src={heading} />
         </div>
