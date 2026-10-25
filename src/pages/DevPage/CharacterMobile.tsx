@@ -1,4 +1,4 @@
-import styles from "../../styles/DevPage/DevPageMobile.module.scss";
+import styles from "../../styles/DevPage/Devpagemobile.module.scss";
 import SocialIcons from "./SocialIcons";
 import FramedPhoto from "./FramedPhoto";
 
