@@ -193,8 +193,8 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       resize();
       window.addEventListener("resize", resize);
 
-      // Sprites are built once, so the "fine texture" decision is made at mount.
-      const fineTexture = window.innerWidth < MOBILE_MAX_WIDTH;
+      // Sprites are built once, so the "stylized texture" decision is made at mount.
+      const stylizedTexture = window.innerWidth < MOBILE_MAX_WIDTH;
 
       // ---------------------------------------------------------------
       // SPRITES
@@ -202,7 +202,8 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       // dot), then given light/dark shading for volume and a soft edge.
       // No ctx.filter, so it also works on Safari.
       // puffiness: 0 = few big blobs (smooth), 1 = many small blobs (lumpy)
-      // fine (mobile only): more, smaller blobs + tiny grain specks
+      // stylized (mobile only): FEWER, BIGGER, flatter blobs and no grain,
+      // so the smoke reads as soft cartoon puffs instead of realistic wisps.
       // ---------------------------------------------------------------
       // Palette sorted dark -> light. Narrow, mid-tone range on purpose: low
       // contrast so overlapping puffs melt into one smoke mass.
@@ -219,7 +220,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         [186, 149, 114],
       ];
 
-      const makeSmokeSprite = (puffiness: number, fine: boolean) => {
+      const makeSmokeSprite = (puffiness: number, stylized: boolean) => {
         const spriteSize = 256;
         const sprite = document.createElement("canvas");
         sprite.width = spriteSize;
@@ -229,64 +230,109 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
         const r = spriteSize / 2;
 
-        // 1. lumpy body: overlapping soft blobs of varying tone
-        const blobCount = fine
-          ? 14 + Math.floor(puffiness * 18)
+        // 1. body: overlapping soft blobs of varying tone
+        // stylized: only a handful of big round blobs -> simple cloud shape
+        const blobCount = stylized
+          ? 4 + Math.floor(puffiness * 4)
           : 9 + Math.floor(puffiness * 12);
         for (let i = 0; i < blobCount; i++) {
           const angle = Math.random() * Math.PI * 2;
-          const dist = Math.pow(Math.random(), 0.7) * r * (fine ? 0.5 : 0.42);
+          const dist = Math.pow(Math.random(), 0.7) * r * (stylized ? 0.36 : 0.42);
           const cx = r + Math.cos(angle) * dist;
           const cy = r + Math.sin(angle) * dist;
-          const br = fine
-            ? r * (0.36 - puffiness * 0.12 + Math.random() * 0.18)
+          const br = stylized
+            ? r * (0.5 - puffiness * 0.1 + Math.random() * 0.12)
             : r * (0.5 - puffiness * 0.18 + Math.random() * 0.2);
 
           // blobs on the upper-left are lighter, lower-right darker
           const lightBias = 0.5 - ((cx - r) + (cy - r)) / (r * 1.6);
-          // biased towards the darker/mid tones so the light ones stay as highlights
-          const t = Math.max(0, Math.min(1, lightBias * 0.5 + Math.random() * 0.4 + 0.15));
+          // stylized: narrower tone range -> flatter, less photographic
+          const t = stylized
+            ? Math.max(0, Math.min(1, lightBias * 0.3 + Math.random() * 0.2 + 0.3))
+            : Math.max(0, Math.min(1, lightBias * 0.5 + Math.random() * 0.4 + 0.15));
           const pick = palette[Math.min(palette.length - 1, Math.floor(t * palette.length))];
           const cr = pick[0];
           const cg = pick[1];
           const cb = pick[2];
 
           const g = sctx.createRadialGradient(cx, cy, 0, cx, cy, br);
-          g.addColorStop(0, "rgba(" + cr + "," + cg + "," + cb + "," + (fine ? 0.42 : 0.5) + ")");
-          g.addColorStop(0.55, "rgba(" + cr + "," + cg + "," + cb + "," + (fine ? 0.2 : 0.24) + ")");
-          g.addColorStop(1, "rgba(" + cr + "," + cg + "," + cb + ",0)");
+          if (stylized) {
+            // fuller, flatter gradient: solid-ish centre, quick soft falloff
+            g.addColorStop(0, "rgba(" + cr + "," + cg + "," + cb + ",0.55)");
+            g.addColorStop(0.65, "rgba(" + cr + "," + cg + "," + cb + ",0.4)");
+            g.addColorStop(1, "rgba(" + cr + "," + cg + "," + cb + ",0)");
+          } else {
+            g.addColorStop(0, "rgba(" + cr + "," + cg + "," + cb + ",0.5)");
+            g.addColorStop(0.55, "rgba(" + cr + "," + cg + "," + cb + ",0.24)");
+            g.addColorStop(1, "rgba(" + cr + "," + cg + "," + cb + ",0)");
+          }
           sctx.fillStyle = g;
           sctx.beginPath();
           sctx.arc(cx, cy, br, 0, Math.PI * 2);
           sctx.fill();
         }
 
-        // 1b. fine grain (mobile only): tiny soft specks for a wispy surface
-        if (fine) {
-          const grainCount = 40 + Math.floor(puffiness * 50);
-          for (let i = 0; i < grainCount; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const dist = Math.sqrt(Math.random()) * r * 0.75;
-            const gx = r + Math.cos(angle) * dist;
-            const gy = r + Math.sin(angle) * dist;
-            const gr = r * (0.025 + Math.random() * 0.06);
-            const pick = palette[Math.floor(Math.random() * palette.length)];
-            const gg = sctx.createRadialGradient(gx, gy, 0, gx, gy, gr);
-            gg.addColorStop(0, "rgba(" + pick[0] + "," + pick[1] + "," + pick[2] + ",0.22)");
-            gg.addColorStop(1, "rgba(" + pick[0] + "," + pick[1] + "," + pick[2] + ",0)");
-            sctx.fillStyle = gg;
+        // 1b. stylized only: a few soft curved wisps (alternating light/dark,
+        // very low alpha, blurred). Because each puff rotates with the spin,
+        // these bands visibly drift around and make the smoke feel like it
+        // is moving, without adding grain or harsh detail.
+        if (stylized) {
+          for (let i = 0; i < 4; i++) {
+            const wr = r * (0.28 + Math.random() * 0.3);
+            const a0 = Math.random() * Math.PI * 2;
+            const sweep = 1.1 + Math.random() * 0.9;
+            const light = i % 2 === 0;
+            const col = light ? [204, 168, 130] : [100, 73, 58];
+            sctx.save();
+            sctx.translate(
+              r + (Math.random() - 0.5) * r * 0.2,
+              r + (Math.random() - 0.5) * r * 0.2,
+            );
+            sctx.strokeStyle =
+              "rgba(" + col[0] + "," + col[1] + "," + col[2] + "," + (light ? 0.16 : 0.12) + ")";
+            sctx.shadowColor =
+              "rgba(" + col[0] + "," + col[1] + "," + col[2] + ",0.35)";
+            sctx.shadowBlur = r * 0.12;
+            sctx.lineWidth = r * (0.1 + Math.random() * 0.06);
+            sctx.lineCap = "round";
             sctx.beginPath();
-            sctx.arc(gx, gy, gr, 0, Math.PI * 2);
+            sctx.arc(0, 0, wr, a0, a0 + sweep);
+            sctx.stroke();
+            sctx.restore();
+          }
+        }
+
+        // 1c. stylized only: subtle lumpy texture ON the blobs. A handful of
+        // small, soft, low-alpha mini puffs (a bit lighter or darker than the
+        // body) so the surface has gentle bumps without any grain.
+        if (stylized) {
+          for (let i = 0; i < 7; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = Math.sqrt(Math.random()) * r * 0.42;
+            const mx = r + Math.cos(angle) * dist;
+            const my = r + Math.sin(angle) * dist;
+            const mr = r * (0.12 + Math.random() * 0.1);
+            const idx = Math.floor(
+              palette.length * (i % 2 === 0 ? 0.55 + Math.random() * 0.3 : 0.1 + Math.random() * 0.25),
+            );
+            const mc = palette[Math.min(palette.length - 1, idx)];
+            const mg = sctx.createRadialGradient(mx, my, 0, mx, my, mr);
+            mg.addColorStop(0, "rgba(" + mc[0] + "," + mc[1] + "," + mc[2] + ",0.22)");
+            mg.addColorStop(1, "rgba(" + mc[0] + "," + mc[1] + "," + mc[2] + ",0)");
+            sctx.fillStyle = mg;
+            sctx.beginPath();
+            sctx.arc(mx, my, mr, 0, Math.PI * 2);
             sctx.fill();
           }
         }
 
         // 2. volume shading: light from the top-left, shade on the bottom-right
+        // (much subtler when stylized, so puffs look flat and soft)
         sctx.globalCompositeOperation = "source-atop";
         const shade = sctx.createLinearGradient(r * 0.45, r * 0.3, r * 1.55, r * 1.7);
-        shade.addColorStop(0, "rgba(236, 210, 176, 0.12)");
+        shade.addColorStop(0, "rgba(236, 210, 176, " + (stylized ? 0.05 : 0.12) + ")");
         shade.addColorStop(0.5, "rgba(120, 84, 62, 0)");
-        shade.addColorStop(1, "rgba(90, 66, 52, 0.14)");
+        shade.addColorStop(1, "rgba(90, 66, 52, " + (stylized ? 0.06 : 0.14) + ")");
         sctx.fillStyle = shade;
         sctx.fillRect(0, 0, spriteSize, spriteSize);
 
@@ -306,12 +352,12 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       // 6 variants (2 per puffiness level) so repeats are not noticeable.
       // index % 3 = softness level: 0 small/lumpy, 1 mid, 2 big/smooth
       const spriteList = [
-        makeSmokeSprite(0.45, fineTexture),
-        makeSmokeSprite(0.25, fineTexture),
-        makeSmokeSprite(0.08, fineTexture),
-        makeSmokeSprite(0.4, fineTexture),
-        makeSmokeSprite(0.2, fineTexture),
-        makeSmokeSprite(0.05, fineTexture),
+        makeSmokeSprite(0.45, stylizedTexture),
+        makeSmokeSprite(0.25, stylizedTexture),
+        makeSmokeSprite(0.08, stylizedTexture),
+        makeSmokeSprite(0.4, stylizedTexture),
+        makeSmokeSprite(0.2, stylizedTexture),
+        makeSmokeSprite(0.05, stylizedTexture),
       ];
       const puffSprite = spriteList[2]; // used for mist / glow
 
@@ -425,7 +471,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           y: 0.18 + Math.random() * 0.78,
           radius: 0.5 + Math.random() * 0.3,
           phase: Math.random() * Math.PI * 2,
-          alpha: 0.04 + Math.random() * 0.35,
+          alpha: 0.04 + Math.random() * 0.04,
         };
       });
 
@@ -522,24 +568,25 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         // GEOMETRY (recomputed each frame so resize just works)
         // u runs along the spine: 0 = base (below the page), 1 = top
         // -------------------------------------------------------------
-        // MOBILE ONLY: wider, more visible base + smaller (finer) puffs.
+        // MOBILE ONLY: wider, more visible base + slightly smaller puffs
+        // (0.9 = chunkier than before, so the stylized shapes stay readable).
         // On desktop every value below equals the original.
         const isMobile = width < MOBILE_MAX_WIDTH;
-        const sizeMul = isMobile ? 0.82 : 1;
+        const sizeMul = isMobile ? 0.9 : 1;
 
         const centerX = width * 0.5;
         const baseY = height * (isMobile ? 1.02 : 1.1);
         const topY = height * 0.06;
         const spineHeight = baseY - topY;
 
-        const baseRadius = isMobile ? 28 : 9;
+        const baseRadius = isMobile ? 14 : 9;
         const streamRadius = 14;
         const fullRadius = isMobile
           ? Math.min(width * 0.36, 180)
           : Math.min(width * 0.28, 300);
         const flareRadius =
-          (isMobile ? Math.min(width * 0.62, 300) : Math.min(width * 0.3, 340)) * flareAmount;
-        const flareHeight = isMobile ? 0.42 : 0.3;
+          (isMobile ? Math.min(width * 0.4, 190) : Math.min(width * 0.3, 340)) * flareAmount;
+        const flareHeight = isMobile ? 0.32 : 0.3;
 
         const capHeight = spineHeight * (0.18 + 0.12 * expand);
         const capRadius = fullRadius * (0.5 + 0.5 * expand) * (0.25 + 0.75 * capAmount);
@@ -601,11 +648,11 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         // dusty glow where the base funnel meets the bottom of the page
         // (mobile: wider, taller and stronger so the base is clearly visible)
         if (burst < 1) {
-          const dustRadius = (isMobile ? 90 : 60) + flareRadius * (isMobile ? 1.4 : 1.1);
+          const dustRadius = (isMobile ? 55 : 60) + flareRadius * (isMobile ? 1.0 : 1.1);
           smokeContext.save();
-          smokeContext.globalAlpha = (isMobile ? 0.85 : 0.55) * flareAmount * (1 - burst);
+          smokeContext.globalAlpha = (isMobile ? 0.6 : 0.55) * flareAmount * (1 - burst);
           smokeContext.translate(centerX, height);
-          smokeContext.scale(isMobile ? 2.1 : 1.6, isMobile ? 0.6 : 0.55);
+          smokeContext.scale(isMobile ? 1.6 : 1.6, isMobile ? 0.6 : 0.55);
           smokeContext.drawImage(puffSprite, -dustRadius, -dustRadius, dustRadius * 2, dustRadius * 2);
           smokeContext.restore();
         }
@@ -622,7 +669,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
             const u = Math.pow(i / 23, 1.4) * spineExtent;
             const glowRadius = spineRadius(u) * 1.2 + 16;
             const baseBoost =
-              u < flareHeight ? 1 + (isMobile ? 1.4 : 0.8) * (1 - u / flareHeight) : 1;
+              u < flareHeight ? 1 + (isMobile ? 0.9 : 0.8) * (1 - u / flareHeight) : 1;
             const x = centerX + Math.sin(elapsed * 2.1 + u * 3.2) * 26 * u * swayGrow;
             const y = (baseY - u * spineHeight + riseOffset) * 1.3;
 
@@ -670,10 +717,10 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           const sinA = Math.sin(angle);
 
           // particles in the narrow part are smaller than the ones in the wide body
-          // (mobile: smaller overall for a finer look, but chunkier at the base)
+          // (mobile: slightly smaller overall, but chunkier at the base)
           let sizeScale =
             (0.45 + 0.55 * smooth(clamp01(radius / (fullRadius * 0.6)))) * sizeMul;
-          if (isMobile) sizeScale *= 1 + 0.3 * baseK;
+          if (isMobile) sizeScale *= 1 + 0.15 * baseK;
 
           // BURST progress for THIS particle: the middle goes first, the edges
           // follow, so the burst reads as a shockwave leaving the tornado.
@@ -691,7 +738,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
             edgeFade *
             particle.opacity *
             (0.58 + 0.05 * sinA) *
-            (1 + (isMobile ? 0.7 : 0) * baseK);
+            (1 + (isMobile ? 0.4 : 0) * baseK);
 
           if (e > 0) {
             // fly from the tornado to this particle's own spot on the screen,
@@ -725,7 +772,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
             particle.scaleX = 1.2 + e * 0.6;
             particle.scaleY = 0.75 + e * 0.05;
           } else {
-            particle.rotation = (particle.phase + angle * 0.15) * (1 - e);
+            particle.rotation = (particle.phase + angle * (isMobile ? 0.22 : 0.15)) * (1 - e);
             particle.scaleX = 1 + e * 0.6;
             particle.scaleY = (0.85 + Math.sin(particle.phase) * 0.1) * (1 - e) + 0.8 * e;
           }
