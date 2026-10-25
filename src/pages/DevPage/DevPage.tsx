@@ -12,7 +12,6 @@ import BackButton from "../../assets/DevPage/BackButton.png";
 import bgPink from "../../assets/DevPage/bpPink.png";
 import bgPurple from "../../assets/DevPage/bgPurple.png";
 import bgBlue from "../../assets/DevPage/bgBlue.png";
-import image from "../../assets/DevPage/profile.png";
 import rightTop from "../../assets/DevPage/rightTop.png";
 
 type Vertical = "Frontend" | "Backend" | "Ui";
@@ -286,9 +285,16 @@ export default function DevPage() {
     goTo(name);
   };
 
-  // Back: every curtain, folded or parked, slides back to the original home spot at the same time
+  // Back, two cases:
+  //  • a vertical is open  -> every curtain, folded or parked, slides back to the original home
+  //                           spot at the same time
+  //  • already on the home screen (cushions) -> leave this page, back to wherever the visitor came from
   const handleBack = () => {
-    if (activeVertical === null) return;
+    if (activeVertical === null) {
+      if (window.history.length > 1) window.history.back();
+      else window.location.assign("/");
+      return;
+    }
     goTo(null); // takes over from whatever is playing
   };
 
@@ -361,12 +367,12 @@ export default function DevPage() {
           </button>
         </div>
 
-        {/* FRONTEND — names + Instagram/LinkedIn come from devMembers.ts */}
+        {/* FRONTEND — names + photos + Instagram/LinkedIn come from devMembers.ts */}
         <div ref={frontendRef} className={styles.frontendCharacters}>
           {MEMBERS.Frontend.map((m, i) => (
             <Character
               key={m.name}
-              image={image}
+              image={m.image}
               name={m.name}
               instagram={m.instagram}
               linkedin={m.linkedin}
@@ -380,7 +386,7 @@ export default function DevPage() {
           {MEMBERS.Backend.map((m, i) => (
             <Character
               key={m.name}
-              image={image}
+              image={m.image}
               name={m.name}
               instagram={m.instagram}
               linkedin={m.linkedin}
@@ -394,7 +400,7 @@ export default function DevPage() {
           {MEMBERS.Ui.map((m, i) => (
             <Character
               key={m.name}
-              image={image}
+              image={m.image}
               name={m.name}
               instagram={m.instagram}
               linkedin={m.linkedin}

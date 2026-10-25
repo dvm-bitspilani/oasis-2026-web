@@ -1,0 +1,48 @@
+// Put this file in src/styles/DevPage/
+
+// Everything is nested under .framedPhoto on purpose: that makes these rules MORE specific
+// than any `.something img { ... }` rule in the page scss files, so they can't override them.
+.framedPhoto {
+  position: relative;
+
+  // ───── THE ONLY NUMBERS YOU MAY NEED TO TUNE ─────
+  // The oval "window" inside the frame that the photo shows through,
+  // as a % of the frame image's size. Make the photo a little BIGGER than the visible hole
+  // (the frame's ring then covers its edge, so no gap shows).
+  --hole-w: 73%;
+  --hole-h: 70%;
+  // where the centre of the window is (50% / 50% = exactly the middle of the frame)
+  --hole-x: 50%;
+  --hole-y: 50%;
+
+  // the frame sits ON TOP of the photo and sets the size of the whole thing
+  .frame {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .photo,
+  .photoPlaceholder {
+    position: absolute;
+    z-index: 1;
+    left: var(--hole-x);
+    top: var(--hole-y);
+    width: var(--hole-w);
+    height: var(--hole-h);
+    max-width: none;
+    transform: translate(-50%, -50%);
+    border-radius: 50%; // a rectangle with 50% radius = an oval
+    object-fit: cover; // fills the oval without stretching the photo
+    object-position: center 20%; // keeps faces in view when a photo is cropped
+  }
+
+  // shown when a person has no photo yet
+  .photoPlaceholder {
+    background: radial-gradient(circle at 50% 38%, #8a6a58 0%, #4a2a36 55%, #2a1420 100%);
+  }
+}

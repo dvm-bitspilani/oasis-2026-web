@@ -1,121 +1,36 @@
-  // // import React, { forwardRef } from "react";
-  // // import styles from "../../styles/DevPage/DevPage.module.scss";
-  // // import image from "../../assets/DevPage/profile.png"
-  // // interface CharacterProps {
-  // //   image: {image};
-  // //   name: string;
-  // //   instagram?: string;
-  // //   linkedin?: string;
-  // // }
+import { forwardRef } from "react";
+import styles from "../../styles/DevPage/DevPage.module.scss";
+import SocialIcons from "./SocialIcons";
+import FramedPhoto from "./FramedPhoto";
 
-  // // const Character = forwardRef<HTMLDivElement, CharacterProps>(
-  // //   ({ image, name, instagram, linkedin }, ref) => {
-  // //     return (
-  // //       <div ref={ref} className={styles.character}>
-  // //         <img
-  // //           className={styles.characterImage}
-  // //           src={image}
-  // //           alt={name}
-  // //         />
+interface CharacterProps {
+  image?: string; // the person's photo (the golden frame is added by FramedPhoto)
+  name: string;
+  instagram?: string;
+  linkedin?: string;
+  className?: string;
+}
 
-  // //         <div className={styles.characterInfo}>
-  // //           <p>{name}</p>
-
-  // //           <div className={styles.socials}>
-  // //             {instagram && (
-  // //               <a href={instagram} target="_blank" rel="noreferrer">
-  // //                 Instagram
-  // //               </a>
-  // //             )}
-
-  // //             {linkedin && (
-  // //               <a href={linkedin} target="_blank" rel="noreferrer">
-  // //                 LinkedIn
-  // //               </a>
-  // //             )}
-  // //           </div>
-  // //         </div>
-  // //       </div>
-  // //     );
-  // //   }
-  // // );
-
-  // // Character.displayName = "Character";
-
-  // // export default Character;
-  // import { forwardRef } from "react";
-  // import styles from "../../styles/DevPage/DevPage.module.scss";
-
-  // interface CharacterProps {
-  //   image: string;
-  //   name: string;
-  //   instagram?: string;
-  //   linkedin?: string;
-  //   className?: string;
-  // }
-
-  // const Character = forwardRef<HTMLDivElement, CharacterProps>(
-  //   ({ image, name, instagram, linkedin, className }, ref) => {
-  //     return (
-  //       <div ref={ref} className={`${styles.character} ${className ?? ""}`}>
-  //         <img className={styles.characterImage} src={image} alt={name} />
-  //         <div className={styles.characterInfo}>
-  //           <p>{name}</p>
-  //           <div className={styles.socials}>
-  //             {instagram && (
-  //               <a href={instagram} target="_blank" rel="noreferrer">
-  //                 Instagram
-  //               </a>
-  //             )}
-
-  //             {linkedin && (
-  //               <a href={linkedin} target="_blank" rel="noreferrer">
-  //                 LinkedIn
-  //               </a>
-  //             )}
-  //           </div>
-  //         </div>
-  //       </div>
-  //     );
-  //   },
-  // );
-
-  // Character.displayName = "Character";
-
-  // export default Character;
-
-  import { forwardRef } from "react";
-  import styles from "../../styles/DevPage/DevPage.module.scss";
-  import SocialIcons from "./SocialIcons";
-
-  interface CharacterProps {
-    image: string;
-    name: string;
-    instagram?: string;
-    linkedin?: string;
-    className?: string;
-  }
-
-  const Character = forwardRef<HTMLDivElement, CharacterProps>(
-    ({ image, name, instagram, linkedin, className }, ref) => {
-      return (
-        <div ref={ref} className={`${styles.character} ${className ?? ""}`}>
-          <img className={styles.characterImage} src={image} alt={name} />
-          <div className={styles.characterInfo}>
-            <p>{name}</p>
-            <SocialIcons
-              name={name}
-              instagram={instagram}
-              linkedin={linkedin}
-              className={styles.socials}
-              linkClassName={styles.socialLink}
-            />
-          </div>
+const Character = forwardRef<HTMLDivElement, CharacterProps>(
+  ({ image, name, instagram, linkedin, className }, ref) => {
+    return (
+      <div ref={ref} className={`${styles.character} ${className ?? ""}`}>
+        <FramedPhoto image={image} name={name} className={styles.characterFrame} />
+        <div className={styles.characterInfo}>
+          <p>{name}</p>
+          <SocialIcons
+            name={name}
+            instagram={instagram}
+            linkedin={linkedin}
+            className={styles.socials}
+            linkClassName={styles.socialLink}
+          />
         </div>
-      );
-    },
-  );
+      </div>
+    );
+  },
+);
 
-  Character.displayName = "Character";
+Character.displayName = "Character";
 
-  export default Character;
+export default Character;

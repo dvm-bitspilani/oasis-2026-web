@@ -289,13 +289,13 @@
   margin-left: 6%;
   position: absolute;
   opacity: 0; // each character starts hidden, GSAP fades it in individually
+  // NOTE: there must be NO `img { ... }` rule here any more. It used to size the old one-piece
+  // picture, but now it would also hit the photo inside <FramedPhoto> and break its oval crop.
+}
 
-  img {
-    display: block;
-    width: u(30);
-    object-fit: contain;
-    height: auto;
-  }
+// Size of the whole framed photo (frame + photo). FramedPhoto's own scss does the rest.
+.characterFrame {
+  width: u(20);
 }
 .characterInfo {
   display: flex;
@@ -303,11 +303,13 @@
   align-items: center;
 
   p {
-    margin-top: -50px;
+    margin-top: 20px;
     font-family: Amita;
     font-size: 1.5rem;
     color: #AFA360;
     margin-bottom: 0;
+    display: flex;
+    justify-content: center;
   }
 }
 
@@ -359,20 +361,20 @@ a.socialLink {
 // Window centres used: Frontend 41 %, Backend 47 %, UI 55 %.
 
 // Frontend — 4 people, centres at 11 / 31 / 51 / 71 %
-.frontend1 { left: -4%; top: 12%; width: 18%; }
-.frontend2 { left: 16%; top: 25%; width: 18%; }
-.frontend3 { left: 36%; top: 12%; width: 18%; }
-.frontend4 { left: 56%; top: 25%; width: 18%; }
+.frontend1 { left: -2%; top: 12%; width: 18%; }
+.frontend2 { left: 18%; top: 25%; width: 18%; }
+.frontend3 { left: 38%; top: 12%; width: 18%; }
+.frontend4 { left: 58%; top: 25%; width: 18%; }
 
 // Backend — 4 people, centres at 17 / 37 / 57 / 77 %
-.backend1 { left: 2%;  top: 12%; width: 18%; }
-.backend2 { left: 22%; top: 25%; width: 18%; }
-.backend3 { left: 42%; top: 12%; width: 18%; }
-.backend4 { left: 62%; top: 25%; width: 18%; }
+.backend1 { left: 4%;  top: 12%; width: 18%; }
+.backend2 { left: 24%; top: 25%; width: 18%; }
+.backend3 { left: 44%; top: 12%; width: 18%; }
+.backend4 { left: 64%; top: 25%; width: 18%; }
 
 // UI/UX — 5 people, centres at 23 / 39 / 55 / 71 / 87 %
-.ui1 { left: 12.5%; top: 3%;  width: 14%; }
-.ui2 { left: 28.5%; top: 28%; width: 14%; }
+.ui1 { left: 11.5%; top: 3%;  width: 14%; }
+.ui2 { left: 28.5%; top: 37%; width: 14%; }
 .ui3 { left: 44.5%; top: 3%;  width: 14%; }
-.ui4 { left: 60.5%; top: 28%; width: 14%; }
+.ui4 { left: 61.5%; top: 37%; width: 14%; }
 .ui5 { left: 76.5%; top: 3%;  width: 14%; }
