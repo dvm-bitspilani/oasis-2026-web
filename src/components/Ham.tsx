@@ -568,8 +568,9 @@ export default function Ham() {
                 });
 
                 const end = extendAt + (ordered.length - 2) * stagger + dur;
-
-                tl.set(signs, { pointerEvents: "auto", clearProps: "zIndex" }, end);
+                const hitZones = signs.map((s) => s.querySelector<HTMLElement>("span")!);
+                tl.set(hitZones, { pointerEvents: "auto" }, end);
+                tl.set(signs, { clearProps: "zIndex" }, end);
 
                 // apply the correct squeeze / fade once everything is in place, so no
                 // board waits for the first scroll to get its real values

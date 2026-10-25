@@ -786,3 +786,15 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
     --push: 15dvh !important; // extra push DOWN after the clamp; raise to lower the chest, 0 to undo
   }
 }
+
+
+.plank span {
+  height: calc(var(--row) * 0.7);   // ~12vw tap zone, leaves ~5vw dead gap between boards
+  // keep the rest of your rules (top/left/transform/flex) as they are
+}
+
+.drop,
+.plank,
+.plank img {
+  pointer-events: none;
+}
