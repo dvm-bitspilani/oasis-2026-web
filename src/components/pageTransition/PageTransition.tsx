@@ -231,7 +231,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
         // 1. lumpy body: overlapping soft blobs of varying tone
         const blobCount = fine
-          ? 18 + Math.floor(puffiness * 24)
+          ? 14 + Math.floor(puffiness * 18)
           : 9 + Math.floor(puffiness * 12);
         for (let i = 0; i < blobCount; i++) {
           const angle = Math.random() * Math.PI * 2;
@@ -239,7 +239,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           const cx = r + Math.cos(angle) * dist;
           const cy = r + Math.sin(angle) * dist;
           const br = fine
-            ? r * (0.3 - puffiness * 0.1 + Math.random() * 0.16)
+            ? r * (0.36 - puffiness * 0.12 + Math.random() * 0.18)
             : r * (0.5 - puffiness * 0.18 + Math.random() * 0.2);
 
           // blobs on the upper-left are lighter, lower-right darker
@@ -263,7 +263,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
         // 1b. fine grain (mobile only): tiny soft specks for a wispy surface
         if (fine) {
-          const grainCount = 70 + Math.floor(puffiness * 90);
+          const grainCount = 40 + Math.floor(puffiness * 50);
           for (let i = 0; i < grainCount; i++) {
             const angle = Math.random() * Math.PI * 2;
             const dist = Math.sqrt(Math.random()) * r * 0.75;
@@ -272,7 +272,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
             const gr = r * (0.025 + Math.random() * 0.06);
             const pick = palette[Math.floor(Math.random() * palette.length)];
             const gg = sctx.createRadialGradient(gx, gy, 0, gx, gy, gr);
-            gg.addColorStop(0, "rgba(" + pick[0] + "," + pick[1] + "," + pick[2] + ",0.3)");
+            gg.addColorStop(0, "rgba(" + pick[0] + "," + pick[1] + "," + pick[2] + ",0.22)");
             gg.addColorStop(1, "rgba(" + pick[0] + "," + pick[1] + "," + pick[2] + ",0)");
             sctx.fillStyle = gg;
             sctx.beginPath();
@@ -425,7 +425,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           y: 0.18 + Math.random() * 0.78,
           radius: 0.5 + Math.random() * 0.3,
           phase: Math.random() * Math.PI * 2,
-          alpha: 0.04 + Math.random() * 0.04,
+          alpha: 0.04 + Math.random() * 0.35,
         };
       });
 
@@ -525,7 +525,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         // MOBILE ONLY: wider, more visible base + smaller (finer) puffs.
         // On desktop every value below equals the original.
         const isMobile = width < MOBILE_MAX_WIDTH;
-        const sizeMul = isMobile ? 0.75 : 1;
+        const sizeMul = isMobile ? 0.82 : 1;
 
         const centerX = width * 0.5;
         const baseY = height * (isMobile ? 1.02 : 1.1);
