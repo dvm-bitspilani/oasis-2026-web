@@ -35,7 +35,9 @@ type PageTransitionProps = {
 
 const STRING_TAUT_DELAY = 0.05;
 const SMOKE_START_PERCENT = 0.48;
-
+// Opaque base under the textured backing, so the final frame is fully solid
+// but still shows the smoke texture. Matches the mid-tone of the palette.
+const COVER_BASE_RGB = "150, 112, 86";
 // Smoke sequence, in seconds. Phases:
 //   TORNADO_SECONDS : MINIMUM time for the tornado to form. On slow devices the
 //                     formation is stretched: it advances only as fast as the
@@ -814,29 +816,37 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           }
         }
 
-        // -------------------------------------------------------------
-        // 3b. SMOKE-TEXTURED BACKING: replaces the old flat colour cover.
-        //     A few big puffs on a coarse grid guarantee full coverage
-        //     while keeping the smoke texture all the way to the end.
-        // -------------------------------------------------------------
-        const backAlpha = smooth(clamp01((burstRaw - 0.35) / 0.65)) * 0.92;
-        if (backAlpha > 0.002) {
-          const cellW = width / BACK_COLS;
-          const cellH = height / BACK_ROWS;
-          const rad = Math.hypot(cellW, cellH) * 0.75;
-          smokeContext.save();
-          smokeContext.globalAlpha = backAlpha;
-          for (const b of backing) {
-            const rr = rad * b.k;
-            smokeContext.save();
-            smokeContext.translate(b.x * width, b.y * height);
-            smokeContext.rotate(b.rot);
-            smokeContext.drawImage(spriteList[b.sprite], -rr, -rr, rr * 2, rr * 2);
-            smokeContext.restore();
-          }
-          smokeContext.restore();
-        }
+// -------------------------------------------------------------
+// 3b. OPAQUE BASE + SMOKE-TEXTURED BACKING
+//     The base reaches alpha 1 exactly when the burst ends, so the
+//     final frame is opaque. The puffs on top keep the cloud texture.
+// -------------------------------------------------------------
+const baseAlpha = smooth(clamp01((burstRaw - 0.4) / 0.6));
+if (baseAlpha > 0.002) {
+  smokeContext.save();
+  smokeContext.globalAlpha = baseAlpha;
+  smokeContext.fillStyle = "rgb(" + COVER_BASE_RGB + ")";
+  smokeContext.fillRect(0, 0, width, height);
+  smokeContext.restore();
+}
 
+const backAlpha = smooth(clamp01((burstRaw - 0.35) / 0.65));
+if (backAlpha > 0.002) {
+  const cellW = width / BACK_COLS;
+  const cellH = height / BACK_ROWS;
+  const rad = Math.hypot(cellW, cellH) * 0.75;
+  smokeContext.save();
+  smokeContext.globalAlpha = backAlpha;
+  for (const b of backing) {
+    const rr = rad * b.k;
+    smokeContext.save();
+    smokeContext.translate(b.x * width, b.y * height);
+    smokeContext.rotate(b.rot);
+    smokeContext.drawImage(spriteList[b.sprite], -rr, -rr, rr * 2, rr * 2);
+    smokeContext.restore();
+  }
+  smokeContext.restore();
+}
         // -------------------------------------------------------------
         // 4. DRAW: back half of the spin first, then the front half,
         //    so the particles read as orbiting around the funnel

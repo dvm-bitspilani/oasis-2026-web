@@ -15,9 +15,6 @@ import PageTransition, {
   type PageTransitionHandle,
 } from "../components/pageTransition/PageTransition";
 
-import { HOME_ASSETS, getRegAssets } from "../assets/preloaderLists";
-import { loadAsset } from "../utils/loadAssest";
-
 // ---------- Contact assets ----------
 import map from "../assets/contact/map.webp";
 import cross from "../assets/contact/cross.webp";
@@ -102,19 +99,18 @@ const EVENTS_ASSETS = [
 ];
 
 // ---------- Per-route config ----------
-// assets : preloaded by PageTransition while the strings animate / tornado forms.
-//          A function is used when the list depends on the viewport (Reg).
+// assets : preloaded by PageTransition while the strings animate / tornado forms
 // chunk  : JS loader for the lazy route, so the page code is ready before navigating
 //
 // Keys MUST be lowercase and match the paths in AppRoutes.tsx
 // (/aboutUs -> "/aboutus", /contactus -> "/contactus", etc.).
 type RouteConfig = {
-  assets: string[] | (() => string[]);
+  assets: string[];
   chunk?: () => Promise<unknown>;
 };
 
 const ROUTES: Record<string, RouteConfig> = {
-  "/": { assets: HOME_ASSETS, chunk: () => import("../pages/Home") },
+  "/": { assets: [], chunk: () => import("../pages/Home") },
   "/aboutus": { assets: ABOUT_ASSETS, chunk: () => import("../pages/About") },
   "/contactus": { assets: CONTACT_ASSETS, chunk: () => import("../pages/Contact") },
   "/events": {
@@ -122,7 +118,7 @@ const ROUTES: Record<string, RouteConfig> = {
     chunk: () => import("../pages/EventsPage/EventsPage"),
   },
   "/register": {
-    assets: getRegAssets,
+    assets: [],
     chunk: () => import("../pages/registration/Registration"),
   },
   "/comingsoon": { assets: [], chunk: () => import("../pages/ComingSoon") },
@@ -143,6 +139,9 @@ const PRELOADER_KEY = "oasis_preloader_shown";
 const ROUTE_TIMEOUT_MS = 8000;
 const PAGE_READY_TIMEOUT_MS = 25000;
 const OLD_PAGE_TIMEOUT_MS = 5000;
+
+// Only show the loader if loading takes longer than this after the burst.
+const LOADER_DELAY_MS = 400;
 
 // Elements that only exist on the OLD page. Once they are gone from the DOM,
 // we know React has really swapped to the new page.
@@ -199,9 +198,15 @@ const decodeSafe = (img: HTMLImageElement): Promise<void> =>
     : Promise.resolve();
 
 // Load + decode an image by URL (used for CSS background images).
-// Uses the shared memoized loader, so anything already warmed resolves instantly.
 const loadImageUrl = (url: string): Promise<void> =>
-  loadAsset(url).catch(() => undefined);
+  new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      decodeSafe(img).then(resolve);
+    };
+    img.onerror = () => resolve();
+    img.src = url;
+  });
 
 const isNearViewport = (el: Element) => {
   const r = el.getBoundingClientRect();
@@ -215,10 +220,9 @@ const isNearViewport = (el: Element) => {
 
 const BG_URL_RE = /url\((["']?)(.*?)\1\)/g;
 
-// Finds every CSS background-image url() currently applied inside the app,
+// Finds every CSS background-image url() currently applied in the page,
 // including ::before and ::after. <img> tags alone miss these, which is why
 // pages could look black even though "all images" had loaded.
-// Scans only #root (not html/body/everything) to keep it cheap.
 function collectBackgroundUrls(): string[] {
   const urls = new Set<string>();
 
@@ -232,7 +236,7 @@ function collectBackgroundUrls(): string[] {
     }
   };
 
-  document.querySelectorAll<HTMLElement>("#root, #root *").forEach((el) => {
+  document.querySelectorAll<HTMLElement>("html, body, body *").forEach((el) => {
     add(getComputedStyle(el).backgroundImage);
     add(getComputedStyle(el, "::before").backgroundImage);
     add(getComputedStyle(el, "::after").backgroundImage);
@@ -244,7 +248,7 @@ function collectBackgroundUrls(): string[] {
 // Waits until the NEW page is really ready to be seen:
 //  - every <img> has loaded and decoded
 //  - every CSS background image has loaded and decoded
-//  - nothing new has appeared for a couple of frames (late-mounting components)
+//  - nothing new has appeared for a few frames (late-mounting components)
 // Repeats in rounds because new elements can mount while we wait.
 // Capped by PAGE_READY_TIMEOUT_MS so it can never block forever.
 async function waitForPageReady(): Promise<void> {
@@ -255,7 +259,7 @@ async function waitForPageReady(): Promise<void> {
   const handledImgs = new WeakSet<HTMLImageElement>();
   let calmRounds = 0;
 
-  while (calmRounds < 2 && timeLeft() > 0) {
+  while (calmRounds < 3 && timeLeft() > 0) {
     const tasks: Promise<void>[] = [];
 
     for (const img of Array.from(document.images)) {
@@ -291,6 +295,39 @@ async function waitForPageReady(): Promise<void> {
   }
 }
 
+// Spinner shown over the plain sand-colored screen after the tornado burst,
+// only when loading the destination takes a while.
+function SandLoader() {
+  return (
+    <div className="sand-loader" role="status" aria-label="Loading">
+      <style>{`
+        .sand-loader {
+          position: fixed;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          pointer-events: none;
+          /* must sit above PageTransition; raise if your smoke layer is higher */
+          z-index: 2147483000;
+          animation: sandLoaderIn 300ms ease-out both;
+        }
+        .sand-loader__ring {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          border: 5px solid rgba(107, 74, 43, 0.25);
+          border-top-color: #6b4a2b;
+          animation: sandLoaderSpin 0.9s linear infinite;
+        }
+        @keyframes sandLoaderSpin { to { transform: rotate(360deg); } }
+        @keyframes sandLoaderIn { from { opacity: 0; } to { opacity: 1; } }
+      `}</style>
+      <div className="sand-loader__ring" />
+    </div>
+  );
+}
+
 type TransitionStage = "strings" | "smoke";
 
 export function TransitionProvider({ children }: { children: ReactNode }) {
@@ -298,6 +335,10 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
 
   const [transitioning, setTransitioning] = useState(false);
+
+  // Loader shown after the burst if loading takes longer than LOADER_DELAY_MS.
+  const [showLoader, setShowLoader] = useState(false);
+  const loaderTimerRef = useRef<number | undefined>(undefined);
 
   // Handed to PageTransition at mount (same batch as `transitioning`).
   // PageTransition holds the tornado burst until all of these have loaded.
@@ -319,6 +360,11 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
   const transitionRef = useRef<PageTransitionHandle>(null);
   const navigatingRef = useRef(false);
   const transitionStageRef = useRef<TransitionStage>("strings");
+
+  // Make sure the loader timer can never fire after unmount.
+  useEffect(() => {
+    return () => window.clearTimeout(loaderTimerRef.current);
+  }, []);
 
   // Latest pathname for async callbacks + resolves the "route changed" wait.
   const pathnameRef = useRef(location.pathname);
@@ -363,11 +409,7 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
       // and JS chunk the moment it mounts, in parallel with the strings and
       // the tornado forming.
       const config = ROUTES[routeKey(to)];
-      const list =
-        typeof config?.assets === "function"
-          ? config.assets()
-          : (config?.assets ?? []);
-      setTransitionAssets(list);
+      setTransitionAssets(config?.assets ?? []);
       setTransitionPreload(() => config?.chunk);
 
       setTransitioning(true);
@@ -383,12 +425,21 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
     const destination = pendingPathRef.current;
 
     if (!destination) {
+      window.clearTimeout(loaderTimerRef.current);
+      setShowLoader(false);
       navigatingRef.current = false;
       setTransitioning(false);
       return;
     }
 
     try {
+      // Burst is done and the screen is plain sand: show the loader
+      // only if the wait turns out to be long.
+      loaderTimerRef.current = window.setTimeout(
+        () => setShowLoader(true),
+        LOADER_DELAY_MS,
+      );
+
       // Snapshot the old page's elements BEFORE navigating.
       const oldMarkers = Array.from(
         document.querySelectorAll(OLD_PAGE_MARKERS),
@@ -412,16 +463,23 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
 
       await waitForOldPageGone(oldMarkers);
       await waitForNextPaint();
+      await waitForNextPaint();
       await waitForPageReady();
       try {
         await document.fonts?.ready;
       } catch {
         // Ignore font errors.
       }
+      await sleep(150);
+      await waitForNextPaint();
       await waitForNextPaint();
     } catch (err) {
       console.error("Transition error:", err);
     } finally {
+      // Remove the loader right before the smoke fades away.
+      window.clearTimeout(loaderTimerRef.current);
+      setShowLoader(false);
+
       // Always fade the smoke away, even if something above failed.
       transitionRef.current?.resumeSmoke();
     }
@@ -460,6 +518,8 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
           onComplete={handleTransition}
         />
       )}
+
+      {transitioning && showLoader && <SandLoader />}
     </TransitionContext.Provider>
   );
 }
