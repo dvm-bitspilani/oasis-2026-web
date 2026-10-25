@@ -394,7 +394,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           y: 0.18 + Math.random() * 0.78,
           radius: 0.5 + Math.random() * 0.3,
           phase: Math.random() * Math.PI * 2,
-          alpha: 0.04 + Math.random() * 0.35,
+          alpha: 0.04 + Math.random() * 0.04,
         };
       });
 
@@ -637,7 +637,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           const edgeFade = rawEdge + (1 - rawEdge) * e;
 
           let size = particle.size * sizeScale * (0.92 + 0.16 * sinA);
-          let alpha = intro * edgeFade * particle.opacity * (0.58 + 0.05 * sinA);
+          let alpha = intro * edgeFade * particle.opacity * (0.28 + 0.05 * sinA);
 
           if (e > 0) {
             // fly from the tornado to this particle's own spot on the screen,
