@@ -586,7 +586,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           : Math.min(width * 0.28, 300);
         const flareRadius =
           (isMobile ? Math.min(width * 0.4, 190) : Math.min(width * 0.3, 340)) * flareAmount;
-        const flareHeight = isMobile ? 0.32 : 0.3;
+        const flareHeight = isMobile ? 0.18 : 0.3;
 
         const capHeight = spineHeight * (0.18 + 0.12 * expand);
         const capRadius = fullRadius * (0.5 + 0.5 * expand) * (0.25 + 0.75 * capAmount);
