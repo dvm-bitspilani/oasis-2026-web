@@ -586,7 +586,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           : Math.min(width * 0.28, 300);
         const flareRadius =
           (isMobile ? Math.min(width * 0.4, 190) : Math.min(width * 0.3, 340)) * flareAmount;
-        const flareHeight = isMobile ? 0.18 : 0.3;
+        const flareHeight = isMobile ? 0.35 : 0.3;
 
         // MOBILE: the top cap is already full size, so it doesn't grow as the
         // tornado rises. Desktop keeps the original growing behaviour.
