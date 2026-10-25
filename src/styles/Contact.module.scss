@@ -1,6 +1,6 @@
 $cross-size: 80px; // change cross size here
-$card-gap: -40px;   // extra space between the bottom of a cross and the top of a card (negative = overlap)
-$mobile-card-gap: -100px; // same as $card-gap, but only for screens <= $mobile-breakpoint
+$card-gap: -60px;   // extra space between the bottom of a cross and the top of a card (negative = overlap)
+$mobile-card-gap: -110px; // same as $card-gap, but only for screens <= $mobile-breakpoint
 $mobile-breakpoint: 729px;
 $mobile-map-scale: 0.7;   // map image size on screens <= $mobile-breakpoint
 $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at full size
@@ -98,18 +98,20 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 40px;
+    //padding: 60px 0 20px;
 
     .stuccanImage {
       width: 310px;
       aspect-ratio: 318/287;
       height: auto;
+      margin: 40px 0 0;
     }
 
     .details {
       display: flex;
       width: 310px;
       justify-content: space-between;
+      transform: translateY(-15px);
 
       h1 {
         font-family: 'Dancing Script', sans-serif;
@@ -124,11 +126,11 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
         pointer-events: auto;
         cursor: pointer;
         //scale: 0.35;
-        transform: scale(0.8);
+        transform: scale(0.5) translateX(50px);
         transition: transform 0.15s ease;
 
         &:hover {
-          transform: scale(0.9);
+          transform: scale(0.55) translateX(50px);
         }
       }
     }
@@ -186,6 +188,9 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
         color: #7E6B58;
         list-style: none;
         font-size: 2rem;
+        font-weight: 400;
+        padding: 0;
+        position: relative; /* li.offsetTop is measured from the list (Contact.tsx) */
 
         li {
           margin-bottom: 20px;
