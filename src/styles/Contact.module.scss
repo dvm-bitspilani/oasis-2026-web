@@ -111,7 +111,6 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
       display: flex;
       width: 310px;
       justify-content: space-between;
-      transform: translateY(-15px);
 
       h1 {
         font-family: 'Dancing Script', sans-serif;
@@ -125,12 +124,11 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
       .mail {
         pointer-events: auto;
         cursor: pointer;
-        //scale: 0.35;
-        transform: scale(0.5) translateX(30px);
+        transform: scale(0.6) translateX(30px);
         transition: transform 0.15s ease;
 
         &:hover {
-          transform: scale(0.55) translateX(30px);
+          transform: scale(0.65) translateX(30px);
         }
       }
     }
