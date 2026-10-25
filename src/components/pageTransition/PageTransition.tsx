@@ -353,6 +353,30 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       ];
       const puffSprite = spriteList[2]; // used for mist / glow
 
+      // Light and dark tinted copies of a puff, used only by the wait screen.
+      // The normal sprites are the same brown as the screen, so they would be
+      // invisible there; these give the moving smoke highlights and shadows.
+      const tintSprite = (src: HTMLCanvasElement, color: string) => {
+        const c = document.createElement("canvas");
+        c.width = src.width;
+        c.height = src.height;
+        const cctx = c.getContext("2d");
+        if (!cctx) return src;
+        cctx.drawImage(src, 0, 0);
+        cctx.globalCompositeOperation = "source-atop";
+        cctx.fillStyle = color;
+        cctx.fillRect(0, 0, c.width, c.height);
+        return c;
+      };
+      const lightSprites = [
+        tintSprite(spriteList[1], "rgba(246, 222, 186, 0.8)"),
+        tintSprite(spriteList[2], "rgba(240, 212, 174, 0.8)"),
+      ];
+      const darkSprites = [
+        tintSprite(spriteList[2], "rgba(62, 42, 34, 0.7)"),
+        tintSprite(spriteList[1], "rgba(70, 48, 38, 0.7)"),
+      ];
+
       // ---------------------------------------------------------------
       // TORNADO PARTICLES
       // Every particle flows up the spine (a cone from below the page to the
@@ -500,9 +524,122 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       let prevNow = 0;
       let lastSmokeStart = -1;
 
+      // ---------------------------------------------------------------
+      // WAIT SCREEN (smoke only): once the burst has covered the page, the
+      // heavy frame is captured ONCE into holdFrame. While waiting for the
+      // next page we then draw just that one image (slowly drifting) plus a
+      // few light/dark smoke puffs: drifting fog banks and a slow swirling
+      // eddy in the middle. That is ~65 draws at 30fps instead of 800 at 40fps,
+      // so the screen stays alive and the page still has time to mount.
+      // ---------------------------------------------------------------
+      const holdFrame = document.createElement("canvas");
+      const holdCtx = holdFrame.getContext("2d");
+      let holdStart = 0;
+
+      const fog = Array.from({ length: 9 }, (_, i) => ({
+        x0: Math.random() * 1.4,
+        y: 0.1 + Math.random() * 0.8,
+        speed: (0.012 + Math.random() * 0.02) * (i % 2 === 0 ? 1 : -1),
+        r: 0.35 + Math.random() * 0.3,
+        light: i % 3 !== 0,
+        sprite: i % 2,
+        a: 0.14 + Math.random() * 0.12,
+        ph: Math.random() * Math.PI * 2,
+        w: 0.4 + Math.random() * 0.4,
+      }));
+
+      const EDDY_ARMS = 0;
+      const EDDY_PER_ARM = 18;
+
+      const captureHold = (now: number) => {
+        if (!holdCtx) return;
+        holdFrame.width = canvas.width;
+        holdFrame.height = canvas.height;
+        holdCtx.setTransform(1, 0, 0, 1, 0, 0);
+        holdCtx.clearRect(0, 0, holdFrame.width, holdFrame.height);
+        holdCtx.drawImage(canvas, 0, 0);
+        holdStart = now;
+      };
+
+      const drawHold = (now: number) => {
+        const t = (now - holdStart) / 1000;
+        const k = smooth(clamp01(t / 1.0)); // fade the movement in, no pop
+
+        smokeContext.clearRect(0, 0, width, height);
+
+        // captured last frame, drifting very slowly (slightly oversized so the
+        // edges never show)
+        const driftX = Math.sin(t * 0.35) * 8 * k;
+        const driftY = Math.cos(t * 0.28) * 6 * k;
+        smokeContext.drawImage(
+          holdFrame,
+          -width * 0.025 + driftX,
+          -height * 0.025 + driftY,
+          width * 1.05,
+          height * 1.05,
+        );
+
+        // fog banks drifting across, stretched sideways
+        const bigSide = Math.max(width, height);
+        for (const f of fog) {
+          const px = (((f.x0 + t * f.speed) % 1.4) + 1.4) % 1.4 - 0.2;
+          const x = px * width;
+          const y = f.y * height + Math.sin(t * f.w + f.ph) * 14;
+          const rad = bigSide * f.r * 0.5;
+          const img = f.light ? lightSprites[f.sprite] : darkSprites[f.sprite];
+          smokeContext.save();
+          smokeContext.globalAlpha = f.a * k;
+          smokeContext.translate(x, y);
+          smokeContext.scale(1.7, 0.6);
+          smokeContext.drawImage(img, -rad, -rad, rad * 2, rad * 2);
+          smokeContext.restore();
+        }
+
+        // slow swirling eddy of smoke, sitting above the loading bar
+        const mob = width < MOBILE_MAX_WIDTH;
+        const cx = width * 0.5;
+        const cy = height * (mob ? 0.45 : 0.47);
+        const R = mob ? Math.min(width * 0.42, 190) : Math.min(width * 0.26, 260);
+
+        // soft core glow, breathing
+        const coreR = R * (0.55 + 0.06 * Math.sin(t * 1.2));
+        smokeContext.save();
+        smokeContext.globalAlpha = 0.3 * k;
+        smokeContext.translate(cx, cy);
+        smokeContext.scale(1.2, 0.8);
+        smokeContext.drawImage(lightSprites[1], -coreR, -coreR, coreR * 2, coreR * 2);
+        smokeContext.restore();
+
+        for (let arm = 0; arm < EDDY_ARMS; arm++) {
+          for (let j = 0; j < EDDY_PER_ARM; j++) {
+            const sRel = j / (EDDY_PER_ARM - 1); // 0 centre .. 1 outer edge
+            const i = arm * EDDY_PER_ARM + j;
+            const rad = R * (0.1 + 0.9 * sRel);
+            // inner puffs turn faster than outer ones, and each arm trails
+            // behind its centre, which makes the spiral shape
+            const ang =
+              (arm * Math.PI * 2) / EDDY_ARMS + t * (0.75 - sRel * 0.45) + sRel * 3.4;
+            const x = cx + Math.cos(ang) * rad;
+            const y = cy + Math.sin(ang) * rad * 0.62;
+            const size = (26 + 48 * sRel) * (1 + 0.1 * Math.sin(t * 1.3 + i));
+            const alpha =
+              k * (0.14 + 0.22 * (1 - sRel)) * (0.8 + 0.2 * Math.sin(t * 0.9 + i * 0.7));
+            const img = (arm + j) % 2 === 0 ? lightSprites[i % 2] : darkSprites[i % 2];
+
+            smokeContext.save();
+            smokeContext.globalAlpha = alpha;
+            smokeContext.translate(x, y);
+            smokeContext.rotate(ang * 0.6);
+            smokeContext.scale(1.25, 0.8);
+            smokeContext.drawImage(img, -size, -size, size * 2, size * 2);
+            smokeContext.restore();
+          }
+        }
+      };
+
       const draw = (now: number) => {
         frame = requestAnimationFrame(draw);
-        if (now - lastDrawTime < frameInterval) return;
+        if (now - lastDrawTime < (frozenRef.current ? 1000 / 30 : frameInterval)) return;
         lastDrawTime = now;
         if (!smokeVisibleRef.current) {
           smokeContext.clearRect(0, 0, width, height);
@@ -554,8 +691,11 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         if (barRef.current) barRef.current.style.opacity = showBar ? "1" : "0";
         if (barFillRef.current) barFillRef.current.style.transform = "scaleX(" + barShown + ")";
 
-        // Final frame is already on the canvas: stop redrawing so the next page can mount
-        if (frozenRef.current) return;
+        // Burst is done: draw the light wait screen instead of the heavy frame
+        if (frozenRef.current) {
+          drawHold(now);
+          return;
+        }
 
         const burstP = burstProgressRef.current.value;
 
@@ -876,8 +1016,11 @@ if (backAlpha > 0.002) {
 
         // The flat "final cover" fillRect is gone: the textured backing above
         // already makes the screen opaque. Once the burst is done, this last
-        // frame stays on screen and we stop redrawing (see the frozen check).
-        if (burstP >= 0.999) frozenRef.current = true;
+        // frame is captured and replaced by the light wait screen (drawHold).
+        if (burstP >= 0.999) {
+          captureHold(now);
+          frozenRef.current = true;
+        }
       };
       frame = requestAnimationFrame(draw);
       return () => {
