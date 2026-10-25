@@ -540,6 +540,14 @@
   clip-path: polygon(0);
 
   box-sizing: border-box;
+
+  transform: translate(-5%, 5%);
+
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translate(0, 0);
+  }
 }
 
 .rightbottom {
@@ -552,6 +560,13 @@
   width: 30%;
 
   object-fit: contain;
+
+  transform: translate(5%, 5%);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translate(0, 0);
+  }
 }
 
 .lefttop {
@@ -572,6 +587,13 @@
   top: -8%;
 
   scale: 0.8;
+
+  transform: translate(5%, -5%);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translate(0, 0);
+  }
 }
 
 .rightmid {
@@ -582,6 +604,13 @@
   top: 22%;
 
   scale: 0.8;
+
+  transform: translateX(0);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateX(-5%);
+  }
 }
 
 .book {
@@ -594,6 +623,12 @@
   scale: 0.7;
 
   z-index: 20;
+
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.03);
+  }
 }
 
 .backButton {
@@ -799,6 +834,27 @@
 
       li {
         font-size: 1.1rem;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1600px) {
+  .content {
+    .headingCont {
+      .heading {
+        margin: 8vw 0 0;
+        font-size: 7rem;
+      }
+    }
+
+    h5 {
+      font-size: 2.5rem;
+    }
+
+    .instr {
+      li {
+        font-size: 1.5rem;
       }
     }
   }

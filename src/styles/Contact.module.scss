@@ -1,7 +1,7 @@
 $cross-size: 80px; // change cross size here
 $card-gap: -60px;   // extra space between the bottom of a cross and the top of a card (negative = overlap)
 $mobile-card-gap: -110px; // same as $card-gap, but only for screens <= $mobile-breakpoint
-$mobile-breakpoint: 729px;
+$mobile-breakpoint: 800px;
 $mobile-map-scale: 0.7;   // map image size on screens <= $mobile-breakpoint
 $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at full size
 
@@ -126,11 +126,11 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
         pointer-events: auto;
         cursor: pointer;
         //scale: 0.35;
-        transform: scale(0.5) translateX(50px);
+        transform: scale(0.5) translateX(30px);
         transition: transform 0.15s ease;
 
         &:hover {
-          transform: scale(0.55) translateX(50px);
+          transform: scale(0.55) translateX(30px);
         }
       }
     }
@@ -170,7 +170,7 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
           transition: all 0.3s ease;
 
           &:hover {
-            scale: 1.15;
+            transform: scale(1.15);
           }
         }
       }
@@ -203,7 +203,7 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
           &.active {
             color: #D3C6C6;
             text-shadow: 0 0 40px #D3C6C6;
-            scale: 1.05;
+            transform: scale(1.05);
           }
         }
       }
@@ -221,10 +221,10 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
       .pageStuff {
         a {
           .backBtn {
-            scale: 0.85;
+            transform: scale(0.85);
 
             &:hover {
-              scale: 1;
+              transform: scale(1);
             }
           }
         }
@@ -248,7 +248,7 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
       /* The parchment is drawn by ::before so it can slide up/down on its own
          while the back button + heading (in .pageStuff) never move. */
       background-image: none;
-      width: 100vw;
+      width: 110vw;
       aspect-ratio: 402/503;
       height: auto;
 
@@ -283,11 +283,10 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
 
         a {
           .backBtn {
-            scale: 0.6;
-            transform: translateX(-80%);
+            transform: translateX(-50%) scale(0.6);
 
             &:hover {
-              scale: 0.65;
+              transform: scale(0.65);
             }
           }
         }
@@ -313,15 +312,22 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
              which is animating during expand/collapse, so the offset would
              swell mid-transition and the list would dip up into the h1. This
              stays a fixed px amount and eases cleanly to 0. */
-          transform: translateY(calc(var(--list-collapsed) * -0.55));
+          transform: translateY(calc(var(--list-collapsed) * -0.75));
           transition: max-height 0.4s ease, transform 0.4s ease;
           touch-action: pan-y; /* lets a finger scroll the list, not the map */
           overscroll-behavior: contain;
           scrollbar-width: thin;
           scrollbar-color: #866D52 transparent;
+          overflow-x: hidden;
 
           li {
             margin-bottom: 12px;
+
+            &:hover,
+            &.active {
+              text-shadow: 0 0 15px #D3C6C6;
+              transform: scale(1);
+            }
           }
         }
 
@@ -335,7 +341,7 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
 
           align-self: flex-end;
           margin: 0;
-          transform: translateY(-100%);
+          transform: translateY(-250%);
           transition: transform 0.4s ease;
         }
       }
@@ -349,7 +355,7 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
 
         ul {
           max-height: var(--list-expanded);
-          transform: translateY(0);
+          transform: translateY(-5%);
           scrollbar-width: none;
 
           &::-webkit-scrollbar {
@@ -358,7 +364,70 @@ $mobile-counter-scale: 1.2; // 1 / $mobile-map-scale — keeps crosses/cards at 
         }
 
         h2 {
-          transform: translateY(0);
+          transform: translateY(-100%);
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 578px) and (max-width: 800px) {
+  .mapContainer {
+    .page {
+
+      &::before {
+        transform: translateY(-70%);
+      }
+
+      &.expanded::before {
+        transform: translateY(-40%);
+      }
+
+      .pageStuff {
+        top: 5%;
+        left: 20%;
+
+        h1 {
+          font-size: 5rem;
+          transform: translateY(-90%);
+        }
+
+        ul {
+          font-size: 1.6rem;
+          transform: translateY(calc(var(--list-collapsed) * -1.8));
+        }
+
+        h2 {
+          transform: translateY(-450%);
+        }
+
+        a {
+          .backBtn {
+            transform: translateX(-150%) scale(1);
+
+            &:hover {
+              transform: scale(1.05);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .mapContainer {
+    .page {
+      .pageStuff {
+        left: 11%;
+
+        h1 {
+          font-size: 3.5rem;
+          transform: translateY(-40%);
+        }
+
+        ul {
+          font-size: 1.1rem;
         }
       }
     }

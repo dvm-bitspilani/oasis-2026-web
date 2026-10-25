@@ -342,7 +342,7 @@ const eventsData: Record<Category, EventData[]> = {
             image_url: RapWars,
             rulebook: null,
         },
-        {
+        /*{
             id: "scontro",
             name: "Scontro",
             category: "Music",
@@ -352,7 +352,7 @@ const eventsData: Record<Category, EventData[]> = {
                 "A high-energy DJ Battle where talented DJs showcase their skills in live mixing, beat-matching, and creative transitions. DJs compete against each other, bringing their unique styles, from hard hitting bass drops to smooth grooves. The battle emphasizes technical proficiency, creativity, and the ability to engage the crowd through music.",
             image_url: null,
             rulebook: null,
-        },
+        },*/
         {
             id: "axetacy",
             name: "Axetacy",
