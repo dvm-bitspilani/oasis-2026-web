@@ -202,24 +202,76 @@
 /* =========================================================
    TABLET
 ========================================================= */
-
 @media (min-width: 751px) and (max-width: 1100px) {
   .container {
     position: absolute;
     top: 24px;
-    left: -50%;
+    left: 0;
 
-    width: 150vw;
-    height: 10vh;
+    width: 100%;
+    height: clamp(45px, 7vw, 75px);
 
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
 
     padding: 0 24px;
-    margin-left: 5%;
+    margin-left: 0;
 
+    box-sizing: border-box;
     z-index: 5000;
+  }
+
+  .circle {
+    height: 75%;
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
+
+    z-index: 5002;
+  }
+
+  .rectangle {
+  display: flex !important;
+  visibility: visible;
+
+  flex: 0 1 75%;
+  width: 75%;
+  max-width: 50%;
+  min-width: 0;
+  height: 100%;
+
+  margin: 0;
+  padding: 0 12px;
+
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+  .desktopLinks {
+    display: flex;
+    width: 100%;
+    height: 100%;
+
+    align-items: center;
+    justify-content: space-around;
+
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    gap: clamp(8px, 1.5vw, 20px);
+
+    min-width: 0;
+  }
+
+  .navLink {
+    font-size: clamp(12px, 1.4vw, 16px);
+    white-space: nowrap;
+    flex-shrink: 1;
+    min-width: 0;
+    margin-top: 0;
   }
 }
 
@@ -227,13 +279,13 @@
    MOBILE
 ========================================================= */
 
-@media (max-width: 650px) {
+@media (max-width: 750px) {
   .container {
     position: absolute;
 
     top: 24px;
-
-    left: 50%;
+    // display: none;
+    left: 60%;
     right: auto;
 
     transform: translateX(-55%);
@@ -275,7 +327,7 @@
     justify-content: center;
 
     box-sizing: border-box;
-
+    display:none !important;
     overflow: visible;
   }
 
@@ -307,8 +359,4 @@
     flex-shrink: 1;
     min-width: 0;
   }
-}
-
-.circle{
-  visibility: hidden !important;
 }

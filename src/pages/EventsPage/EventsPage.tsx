@@ -1,5 +1,4 @@
 import {
-    useCallback,
     useEffect,
     useRef,
     useState,
@@ -7,7 +6,8 @@ import {
 } from "react";
 
 import Nav from "../../components/Nav";
-import Preloader from "../Preloader";
+// adjust this path to wherever TransitionProvider lives
+import { useTransition } from "../../context/TransitionProvider";
 
 import styles from "./EventsPage.module.scss";
 
@@ -47,33 +47,7 @@ import Hypercut from "../../assets/Events/hypercut.webp";
    the page, the same way About.tsx does with ABOUT_ASSETS.
 ========================================================= */
 
-const EVENTS_ASSETS = [
-    dramaVase,
-    photographyVase,
-    danceVase,
-    otherVase,
-    musicVase,
-    eventsTitle,
-    Swaranjali,
-    PitchPerfect,
-    Tarang,
-    Andholika,
-    RapWars,
-    Axetacy,
-    DrumDuels,
-    BeatBrawl,
-    FashP,
-    Choreo,
-    StreetDance,
-    DesertDuel,
-    Razzmatazz,
-    Tandav,
-    Sukhmanch,
-    StreetPlay,
-    StagePlay,
-    Metamorphosis,
-    Hypercut,
-];
+
 
 
 interface EventData {
@@ -1509,15 +1483,20 @@ const [spotlightPhase, setSpotlightPhase] = useState<
     // stays mounted (blocking the page) until every asset in
     // EVENTS_ASSETS has loaded, then this flips to true and
     // it unmounts.
-    const [
-        eventsPreloaderDone,
-        setEventsPreloaderDone,
-    ] = useState(false);
 
-   const handleEventsPreloaderEnter = useCallback(() => {
-    setEventsPreloaderDone(true);
-    setSpotlightPhase("intro");
-}, []);
+    const { transitioning } = useTransition();
+
+/* =====================================================
+   SPOTLIGHT INTRO
+   Waits for the page transition (strings + smoke) to
+   fully finish, then plays the intro. On a direct load
+   of /events there is no transition, so it plays at once.
+===================================================== */
+useEffect(() => {
+    if (!transitioning && spotlightPhase === "idle") {
+        setSpotlightPhase("intro");
+    }
+}, [transitioning, spotlightPhase]);
 
     /* =====================================================
        SPOTLIGHT
@@ -2285,13 +2264,7 @@ const [spotlightPhase, setSpotlightPhase] = useState<
                 PRELOADER
             ================================================= */}
 
-            {!eventsPreloaderDone && (
-                <Preloader
-                    assets={EVENTS_ASSETS}
-                       fonts={["Syamsiah", "EBGaramond"]}
-                    onEnter={handleEventsPreloaderEnter}
-                />
-            )}
+      
         </div>
     );
 }

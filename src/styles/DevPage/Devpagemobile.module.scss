@@ -1,0 +1,332 @@
+// BG BLEED: how much taller than the screen the curtain image is drawn (split evenly
+// above and below, the extra is clipped off). This hides empty/black strips that are
+// part of the image files. Raise it (e.g. 10%) if you still see a strip at the top or
+// bottom, lower it (e.g. 3%) / set 0% if the image is fine and you want no zoom.
+$bg-bleed: 6%;
+
+// STAGE = the full-screen frame. BACKDROP = the curtain image, always filling it.
+// WRAPPER = the content layer on top.
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.backdrop {
+  position: absolute;
+  left: 0;
+  top: -$bg-bleed;
+  width: 100%;
+  height: calc(100% + #{$bg-bleed * 2});
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+// HOME view layer (unchanged behaviour)
+.wrapper {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  padding-bottom: 8vw;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// VERTICAL view layer: the page itself NEVER scrolls. It is a column:
+//   [back button / heading / nav row] = fixed size
+//   [.gridScroll]                      = takes the rest of the screen and scrolls
+.wrapper.pageFixed {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 0;
+  touch-action: none; // swipes on the header do nothing; .gridScroll re-enables pan-y
+}
+
+.back {
+  position: absolute;
+  top: 4vw;
+  left: 4vw;
+  width: 16vw;
+  z-index: 3; // above .heading / .navRow (z-index 2), otherwise they block taps
+
+  .backButton {
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    img {
+      width: 100%;
+      object-fit: contain;
+      display: block;
+    }
+  }
+}
+
+.heading {
+  display: flex;
+  justify-content: center;
+  padding-top: 8vw;
+  position: relative; // transition: stays above the sliding curtain
+  z-index: 2;
+  flex-shrink: 0; // never squashed by the scroll area
+
+  img {
+    width: 90%;
+  }
+}
+
+// ---------------- HOME: stacked cushions ----------------
+.cushions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10vw;
+}
+
+.frontendCushion {
+  -webkit-tap-highlight-color: transparent; // no grey box flash on tap
+  width: 84%;
+  background: none;
+  border: none;
+
+  padding: 0;
+  cursor: pointer;
+
+  img {
+    position: absolute;
+    width: 80%;
+    top: 15%;
+    transform: rotateZ(20deg);
+    // CLICK AREA: same polygon as the desktop cushion. clip-path is applied to the image's own
+    // box BEFORE the rotate / resize below, so the shape follows the cushion automatically.
+    // Only the area inside the polygon is visible AND clickable; taps outside go through to
+    // whatever is underneath. Edit the percentages to reshape it.
+    clip-path: polygon(
+      8% 8%, 30% 13%, 60% 10%, 92% 3%, 83% 12%, 83% 50%, 90% 85%, 90% 85%,
+      60% 84%, 12% 91%, 11% 90%, 3.3% 15%
+    );
+
+    object-fit: contain;
+    display: block;
+  }
+}
+
+.bottomRow {
+  display: flex;
+  position: absolute;
+  bottom: 0%;
+  width: 100%;
+}
+
+.backendCushion {
+  -webkit-tap-highlight-color: transparent; // no grey box flash on tap
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+
+  img {
+    position: relative;
+    left: -30%;
+    top: -30%;
+    transform: rotateZ(-8deg);
+    width: 150%;
+    // CLICK AREA: same polygon as the desktop cushion. clip-path is applied to the image's own
+    // box BEFORE the rotate / resize below, so the shape follows the cushion automatically.
+    // Only the area inside the polygon is visible AND clickable; taps outside go through to
+    // whatever is underneath. Edit the percentages to reshape it.
+    clip-path: polygon(
+      13% 8%, 30% 13%, 60% 10%, 92% 10%, 92% 12%, 87.5% 40%, 87.5% 75%, 90% 90%,
+      50% 87%, 11% 87%, 7.2% 92%, 8.5% 12%
+    );
+
+    object-fit: contain;
+    display: block;
+  }
+}
+
+.uiCushion {
+  -webkit-tap-highlight-color: transparent; // no grey box flash on tap
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+
+  img {
+    position: relative;
+    left: -43%;
+    top: -20%;
+    transform: rotateZ(2deg);
+    width: 200%;
+    // CLICK AREA: same polygon as the desktop cushion. clip-path is applied to the image's own
+    // box BEFORE the rotate / resize below, so the shape follows the cushion automatically.
+    // Only the area inside the polygon is visible AND clickable; taps outside go through to
+    // whatever is underneath. Edit the percentages to reshape it.
+    clip-path: polygon(
+      21% 8%, 49% 22%, 75% 20%, 92% 30%, 86% 12%, 78% 50%, 76% 75%, 78% 97%,
+      80% 84%, 43% 78%, 17% 75%, 23% 35%
+    );
+
+    object-fit: contain;
+    display: block;
+  }
+}
+
+// ---------------- SINGLE VERTICAL: nav + grid ----------------
+.navRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6vw;
+  flex-shrink: 0; // stays fixed above the scrolling cards
+
+  position: relative; // transition: stays above the sliding curtain
+  z-index: 2;
+}
+
+.navArrow {
+  background: none;
+  border: none;
+  color: #f3e6c8;
+  font-size: 16vw;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2vw;
+}
+
+.navTitle {
+  font-family: Arabian Night;
+  color: #f3e6c8;
+  font-size: 14vw;
+  margin: 0;
+  min-width: 40vw;
+  text-align: center;
+}
+
+// THE ONLY SCROLLING AREA of the vertical view: fills whatever space is left under the
+// nav row and scrolls the member cards inside it.
+.gridScroll {
+  flex: 1 1 0;
+  min-height: 0; // required so a flex child can shrink and scroll instead of growing
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain; // scroll doesn't leak to the page behind
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8vw; // breathing room under the last row
+  box-sizing: border-box;
+  scrollbar-width: none; // hide scrollbar (Firefox)
+
+  position: relative; // transition: sits under the curtain
+  z-index: 0;
+
+  &::-webkit-scrollbar {
+    display: none; // hide scrollbar (Chrome / Safari)
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0vw;
+  animation: gridFadeIn 0.5s ease both; // fades in after each swap
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .cardImage {
+    width: 130%;
+    max-width: 70vw;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.cardName {
+  color: #AFA360;
+  text-align: center;
+  font-size: 7.2vw;
+  margin: 2vw 0 1vw;
+
+  margin-top: -15px;
+}
+
+// Instagram + LinkedIn icons under each name (drawn by SocialIcons.tsx)
+.cardSocials {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8vw; // space BETWEEN the two icons
+  margin-top: 1.5vw; // space between the name and the icons
+}
+
+.cardSocialLink {
+  display: block;
+  width: 6.5vw; // icon size
+  height: 6.5vw;
+  color: #AFA360; // same gold as the design
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// ---------------- CURTAIN TRANSITION (‹ › arrows) ----------------
+.curtainOverlay {
+  position: absolute;
+  left: 0;
+  top: -$bg-bleed;
+  width: 100%;
+  height: calc(100% + #{$bg-bleed * 2}); // must match .backdrop
+  object-fit: cover; // identical sizing to .backdrop -> seamless swap
+  object-position: center;
+  z-index: 1;
+  pointer-events: none;
+  will-change: transform;
+}
+
+// change 0.75s to make the slide faster / slower
+.fromRight {
+  animation: curtainFromRight 0.75s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+.fromLeft {
+  animation: curtainFromLeft 0.75s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+@keyframes curtainFromRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes curtainFromLeft {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes gridFadeIn {
+  from { opacity: 0; transform: translateY(2vw); }
+  to   { opacity: 1; transform: translateY(0); }
+}

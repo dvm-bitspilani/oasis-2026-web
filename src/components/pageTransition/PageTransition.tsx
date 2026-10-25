@@ -6,7 +6,7 @@ import {
   useImperativeHandle,
   useRef,
 } from "react";
-import curtainVideo from "../../assets/video/curtain.mp4";
+import { loadAsset } from "../../utils/loadAssest";
 
 const CLOUD_SELECTOR = "[data-cloud-string]";
 const CASTLE_SELECTOR = "[data-castle-drown]";
@@ -22,25 +22,87 @@ type CloudRig = {
 };
 
 export type PageTransitionHandle = {
-  resumeCurtain: () => void;
+  resumeSmoke: () => void;
 };
 
 type PageTransitionProps = {
   onComplete?: () => void;
-  /** Brightness threshold (0-255). Pixels darker than this become transparent. */
-  blackThreshold?: number;
+  /** URLs to start loading as soon as the transition mounts (images, fonts, json...). */
+  assets?: string[];
+  /** Optional extra loader, e.g. () => import("../pages/Home"). Counts as one unit in the bar. */
+  preload?: () => Promise<unknown>;
 };
 
 const STRING_TAUT_DELAY = 0.05;
-const CURTAIN_PAUSE_TIME = 2;
-const VIDEO_START_PERCENT = 0.5;
+const SMOKE_START_PERCENT = 0.48;
+// Opaque base under the textured backing, so the final frame is fully solid
+// but still shows the smoke texture. Matches the mid-tone of the palette.
+const COVER_BASE_RGB = "150, 112, 86";
+// Smoke sequence, in seconds. Phases:
+//   TORNADO_SECONDS : MINIMUM time for the tornado to form. On slow devices the
+//                     formation is stretched: it advances only as fast as the
+//                     destination's assets, JS chunk and fonts load, so it is
+//                     fully formed exactly when loading is done (no idle spinning).
+//   BURST_SECONDS   : the tornado explodes and spreads over the whole screen
+//   COVER_SECONDS   : tiny final settle so the screen is guaranteed opaque
+// The route changes only AFTER the burst (in the provider), on the covered
+// screen. The loading bar stays visible until the smoke starts fading.
+const TORNADO_SECONDS = 2.2;
+const BURST_SECONDS = 1.0;
+const COVER_SECONDS = 0.3;
+const BURST_SHARE = BURST_SECONDS / (BURST_SECONDS + COVER_SECONDS);
+
+// Safety net: never wait forever on a stuck asset.
+const ASSET_TIMEOUT_SECONDS = 20;
+
+// Mobile breakpoint (px). Everything "mobile only" below keys off this.
+const MOBILE_MAX_WIDTH = 768;
+
+// Formation timeline (seconds). Overlaps are intentional so phases blend together.
+// These must stay consistent with TORNADO_SECONDS: expand ends at TORNADO_SECONDS.
+const FLARE_SECONDS = 0.5;
+const STREAM_START = 0.3;
+const STREAM_SECONDS = 1.4;
+const HEAD_START = 0.1;
+const TOP_FLARE_FROM = 0.55;
+const EXPAND_START = 1.3;
+const EXPAND_SECONDS = 0.9;
+
+// Spin builds up with this time constant instead of starting at full speed.
+const SPIN_UP_SECONDS = 0.7;
+
+// Tail width multiplier (1 = the original tail width, 1.4 = 40% wider).
+const TAIL_WIDTH = 1.2;
+
+// Burst targets: particles are spread over a COLS x ROWS jittered grid that
+// covers the screen, so the burst fills every part of the page.
+const COLS = 36;
+const ROWS = 22;
+// Mobile: fewer, bigger puffs (same coverage, ~60% fewer draws)
+const MOBILE_COLS = 22;
+const MOBILE_ROWS = 14;
 
 const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
-  function PageTransition({ onComplete, blackThreshold = 10 }, ref) {
+  function PageTransitionComponent({ onComplete, assets, preload }, ref) {
     const rootRef = useRef<HTMLDivElement | null>(null);
     const layerRef = useRef<SVGSVGElement | null>(null);
-    const videoRef = useRef<HTMLVideoElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    // 0 -> 1 over burst + cover. Only starts once the tornado has formed and
+    // everything is preloaded.
+    const burstProgressRef = useRef({ value: 0 });
+    const burstStartedRef = useRef(false);
+    const smokeStartRef = useRef(0); // performance.now() when the smoke started
+    const loadedRef = useRef(false);
+    const loadProgressRef = useRef(0); // 0 -> 1
+    const barRef = useRef<HTMLDivElement | null>(null);
+    const barFillRef = useRef<HTMLDivElement | null>(null);
+    const frozenRef = useRef(false); // true once the final frame is on screen
+    const assetsRef = useRef(assets);
+    const preloadRef = useRef(preload);
+    const smokeVisibleRef = useRef(false);
+
+    // True once the smoke starts fading away (page is ready underneath).
+    const fadingRef = useRef(false);
 
     const onCompleteRef = useRef(onComplete);
 
@@ -49,74 +111,943 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       onCompleteRef.current = onComplete;
     }, [onComplete]);
 
-    const curtainPausedRef = useRef(false);
-
-    // =========================================
-    // CHROMA KEY CANVAS LOOP
-    // =========================================
+    // ASSET PRELOAD: starts the moment the transition mounts, in the background.
     useEffect(() => {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      if (!video || !canvas) return;
+      const urls = assetsRef.current ?? [];
+      const extra = preloadRef.current;
+      // document.fonts is typed as always present, but older browsers lack it.
+      const fontsReady: Promise<unknown> | null =
+        "fonts" in document ? document.fonts.ready : null;
+      const total = urls.length + (extra ? 1 : 0) + (fontsReady ? 1 : 0);
 
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      if (!ctx) return;
+      loadedRef.current = total === 0;
+      loadProgressRef.current = total === 0 ? 1 : 0;
+      if (total === 0) return;
 
-      let animFrameId: number;
-
-      const renderFrame = () => {
-        if (!video.paused && !video.ended) {
-          if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-            canvas.width = video.videoWidth || 1920;
-            canvas.height = video.videoHeight || 1080;
-          }
-
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-          const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const data = frame.data;
-          const len = data.length;
-
-          // Key out dark background pixels
-          for (let i = 0; i < len; i += 4) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
-
-            if (r < blackThreshold && g < blackThreshold && b < blackThreshold) {
-              data[i + 3] = 0; // Alpha channel
-            }
-          }
-
-          ctx.putImageData(frame, 0, 0);
-        }
-        animFrameId = requestAnimationFrame(renderFrame);
+      let cancelled = false;
+      let done = 0;
+      const tick = () => {
+        if (cancelled) return;
+        done += 1;
+        loadProgressRef.current = done / total;
+        if (done >= total) loadedRef.current = true;
       };
 
-      animFrameId = requestAnimationFrame(renderFrame);
+      urls.forEach((url) => {
+        loadAsset(url).then(tick, tick);
+      });
+      if (extra) {
+        Promise.resolve().then(extra).then(tick, tick);
+      }
+      if (fontsReady) {
+        fontsReady.then(tick, tick);
+      }
+
+      const timeout = window.setTimeout(() => {
+        if (cancelled) return;
+        loadProgressRef.current = 1;
+        loadedRef.current = true;
+      }, ASSET_TIMEOUT_SECONDS * 1000);
 
       return () => {
-        cancelAnimationFrame(animFrameId);
+        cancelled = true;
+        window.clearTimeout(timeout);
       };
-    }, [blackThreshold]);
+    }, []);
 
-    // =========================================
-    // RESUME CURTAIN
-    // =========================================
+    useEffect(() => {
+      const canvas = canvasRef.current;
+      const smokeContext = canvas?.getContext("2d");
+      if (!canvas || !smokeContext) return;
+
+      let width = 0;
+      let height = 0;
+      let frame = 0;
+      let lastDrawTime = 0;
+      const frameInterval = 1000 / 40;
+
+      const resize = () => {
+        const nextW = window.innerWidth;
+        const nextH = window.innerHeight;
+        const small = nextW < MOBILE_MAX_WIDTH;
+
+        // Mobile browsers fire resize when the URL bar shows/hides. Ignore it.
+        if (width && small && nextW === width && Math.abs(nextH - height) < 160) return;
+
+        const dpr = Math.min(window.devicePixelRatio || 1, small ? 1 : 1.5);
+        width = nextW;
+        height = nextH;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        smokeContext.setTransform(dpr, 0, 0, dpr, 0, 0);
+        frozenRef.current = false; // resizing clears the canvas, so redraw once
+      };
+      resize();
+      window.addEventListener("resize", resize);
+
+      // Sprites are built once, so the "stylized texture" decision is made at mount.
+      const stylizedTexture = window.innerWidth < MOBILE_MAX_WIDTH;
+
+      // ---------------------------------------------------------------
+      // SPRITES
+      // Built from many soft overlapping blobs (a billowy puff, not a grainy
+      // dot), then given light/dark shading for volume and a soft edge.
+      // No ctx.filter, so it also works on Safari.
+      // puffiness: 0 = few big blobs (smooth), 1 = many small blobs (lumpy)
+      // stylized (mobile only): FEWER, BIGGER, flatter blobs and no grain,
+      // so the smoke reads as soft cartoon puffs instead of realistic wisps.
+      // ---------------------------------------------------------------
+      // Palette sorted dark -> light. Narrow, mid-tone range on purpose: low
+      // contrast so overlapping puffs melt into one smoke mass.
+      const palette = [
+        [112, 82, 64],
+        [121, 90, 70],
+        [130, 97, 75],
+        [138, 103, 79],
+        [146, 109, 83],
+        [154, 116, 88],
+        [162, 124, 94],
+        [170, 132, 100],
+        [178, 140, 106],
+        [186, 149, 114],
+      ];
+
+      const makeSmokeSprite = (puffiness: number, stylized: boolean) => {
+        const spriteSize = 256;
+        const sprite = document.createElement("canvas");
+        sprite.width = spriteSize;
+        sprite.height = spriteSize;
+        const sctx = sprite.getContext("2d");
+        if (!sctx) return sprite;
+
+        const r = spriteSize / 2;
+
+        // 1. body: overlapping soft blobs of varying tone
+        // stylized: only a handful of big round blobs -> simple cloud shape
+        const blobCount = stylized
+          ? 4 + Math.floor(puffiness * 4)
+          : 9 + Math.floor(puffiness * 12);
+        for (let i = 0; i < blobCount; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const dist = Math.pow(Math.random(), 0.7) * r * (stylized ? 0.36 : 0.42);
+          const cx = r + Math.cos(angle) * dist;
+          const cy = r + Math.sin(angle) * dist;
+          const br = stylized
+            ? r * (0.5 - puffiness * 0.1 + Math.random() * 0.12)
+            : r * (0.5 - puffiness * 0.18 + Math.random() * 0.2);
+
+          // blobs on the upper-left are lighter, lower-right darker
+          const lightBias = 0.5 - ((cx - r) + (cy - r)) / (r * 1.6);
+          // stylized: narrower tone range -> flatter, less photographic
+          const t = stylized
+            ? Math.max(0, Math.min(1, lightBias * 0.3 + Math.random() * 0.2 + 0.3))
+            : Math.max(0, Math.min(1, lightBias * 0.5 + Math.random() * 0.4 + 0.15));
+          const pick = palette[Math.min(palette.length - 1, Math.floor(t * palette.length))];
+          const cr = pick[0];
+          const cg = pick[1];
+          const cb = pick[2];
+
+          const g = sctx.createRadialGradient(cx, cy, 0, cx, cy, br);
+          if (stylized) {
+            // fuller, flatter gradient: solid-ish centre, quick soft falloff
+            g.addColorStop(0, "rgba(" + cr + "," + cg + "," + cb + ",0.55)");
+            g.addColorStop(0.65, "rgba(" + cr + "," + cg + "," + cb + ",0.4)");
+            g.addColorStop(1, "rgba(" + cr + "," + cg + "," + cb + ",0)");
+          } else {
+            g.addColorStop(0, "rgba(" + cr + "," + cg + "," + cb + ",0.5)");
+            g.addColorStop(0.55, "rgba(" + cr + "," + cg + "," + cb + ",0.24)");
+            g.addColorStop(1, "rgba(" + cr + "," + cg + "," + cb + ",0)");
+          }
+          sctx.fillStyle = g;
+          sctx.beginPath();
+          sctx.arc(cx, cy, br, 0, Math.PI * 2);
+          sctx.fill();
+        }
+
+        // 1b. stylized only: a few soft curved wisps (alternating light/dark,
+        // very low alpha, blurred). Because each puff rotates with the spin,
+        // these bands visibly drift around and make the smoke feel like it
+        // is moving, without adding grain or harsh detail.
+        if (stylized) {
+          for (let i = 0; i < 4; i++) {
+            const wr = r * (0.28 + Math.random() * 0.3);
+            const a0 = Math.random() * Math.PI * 2;
+            const sweep = 1.1 + Math.random() * 0.9;
+            const light = i % 2 === 0;
+            const col = light ? [204, 168, 130] : [100, 73, 58];
+            sctx.save();
+            sctx.translate(
+              r + (Math.random() - 0.5) * r * 0.2,
+              r + (Math.random() - 0.5) * r * 0.2,
+            );
+            sctx.strokeStyle =
+              "rgba(" + col[0] + "," + col[1] + "," + col[2] + "," + (light ? 0.16 : 0.12) + ")";
+            sctx.shadowColor =
+              "rgba(" + col[0] + "," + col[1] + "," + col[2] + ",0.35)";
+            sctx.shadowBlur = r * 0.12;
+            sctx.lineWidth = r * (0.1 + Math.random() * 0.06);
+            sctx.lineCap = "round";
+            sctx.beginPath();
+            sctx.arc(0, 0, wr, a0, a0 + sweep);
+            sctx.stroke();
+            sctx.restore();
+          }
+        }
+
+        // 1c. stylized only: subtle lumpy texture ON the blobs. A handful of
+        // small, soft, low-alpha mini puffs (a bit lighter or darker than the
+        // body) so the surface has gentle bumps without any grain.
+        if (stylized) {
+          for (let i = 0; i < 7; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = Math.sqrt(Math.random()) * r * 0.42;
+            const mx = r + Math.cos(angle) * dist;
+            const my = r + Math.sin(angle) * dist;
+            const mr = r * (0.12 + Math.random() * 0.1);
+            const idx = Math.floor(
+              palette.length * (i % 2 === 0 ? 0.55 + Math.random() * 0.3 : 0.1 + Math.random() * 0.25),
+            );
+            const mc = palette[Math.min(palette.length - 1, idx)];
+            const mg = sctx.createRadialGradient(mx, my, 0, mx, my, mr);
+            mg.addColorStop(0, "rgba(" + mc[0] + "," + mc[1] + "," + mc[2] + ",0.22)");
+            mg.addColorStop(1, "rgba(" + mc[0] + "," + mc[1] + "," + mc[2] + ",0)");
+            sctx.fillStyle = mg;
+            sctx.beginPath();
+            sctx.arc(mx, my, mr, 0, Math.PI * 2);
+            sctx.fill();
+          }
+        }
+
+        // 2. volume shading: light from the top-left, shade on the bottom-right
+        // (much subtler when stylized, so puffs look flat and soft)
+        sctx.globalCompositeOperation = "source-atop";
+        const shade = sctx.createLinearGradient(r * 0.45, r * 0.3, r * 1.55, r * 1.7);
+        shade.addColorStop(0, "rgba(236, 210, 176, " + (stylized ? 0.05 : 0.12) + ")");
+        shade.addColorStop(0.5, "rgba(120, 84, 62, 0)");
+        shade.addColorStop(1, "rgba(90, 66, 52, " + (stylized ? 0.06 : 0.14) + ")");
+        sctx.fillStyle = shade;
+        sctx.fillRect(0, 0, spriteSize, spriteSize);
+
+        // 3. soft circular edge so no puff ever has a hard outline
+        sctx.globalCompositeOperation = "destination-in";
+        const clip = sctx.createRadialGradient(r, r, 0, r, r, r * 0.98);
+        clip.addColorStop(0, "rgba(255, 255, 255, 1)");
+        clip.addColorStop(0.4, "rgba(255, 255, 255, 0.85)");
+        clip.addColorStop(0.75, "rgba(255, 255, 255, 0.3)");
+        clip.addColorStop(1, "rgba(255, 255, 255, 0)");
+        sctx.fillStyle = clip;
+        sctx.fillRect(0, 0, spriteSize, spriteSize);
+        sctx.globalCompositeOperation = "source-over";
+        return sprite;
+      };
+
+      // 6 variants (2 per puffiness level) so repeats are not noticeable.
+      // index % 3 = softness level: 0 small/lumpy, 1 mid, 2 big/smooth
+      const spriteList = [
+        makeSmokeSprite(0.45, stylizedTexture),
+        makeSmokeSprite(0.25, stylizedTexture),
+        makeSmokeSprite(0.08, stylizedTexture),
+        makeSmokeSprite(0.4, stylizedTexture),
+        makeSmokeSprite(0.2, stylizedTexture),
+        makeSmokeSprite(0.05, stylizedTexture),
+      ];
+      const puffSprite = spriteList[2]; // used for mist / glow
+
+      // Light and dark tinted copies of a puff, used only by the wait screen.
+      // The normal sprites are the same brown as the screen, so they would be
+      // invisible there; these give the moving smoke highlights and shadows.
+      const tintSprite = (src: HTMLCanvasElement, color: string) => {
+        const c = document.createElement("canvas");
+        c.width = src.width;
+        c.height = src.height;
+        const cctx = c.getContext("2d");
+        if (!cctx) return src;
+        cctx.drawImage(src, 0, 0);
+        cctx.globalCompositeOperation = "source-atop";
+        cctx.fillStyle = color;
+        cctx.fillRect(0, 0, c.width, c.height);
+        return c;
+      };
+      const lightSprites = [
+        tintSprite(spriteList[1], "rgba(246, 222, 186, 0.8)"),
+        tintSprite(spriteList[2], "rgba(240, 212, 174, 0.8)"),
+      ];
+      const darkSprites = [
+        tintSprite(spriteList[2], "rgba(62, 42, 34, 0.7)"),
+        tintSprite(spriteList[1], "rgba(70, 48, 38, 0.7)"),
+      ];
+
+      // ---------------------------------------------------------------
+      // TORNADO PARTICLES
+      // Every particle flows up the spine (a cone from below the page to the
+      // top). On burst, each one flies to its own target cell on the screen,
+      // growing as it goes, so the tornado itself spreads over the page.
+      // ---------------------------------------------------------------
+      type TornadoParticle = {
+        trail: boolean; // stays clustered near the rising tip to keep the trail dense
+        streak: boolean;
+        sprite: number; // index into spriteList
+        f0: number; // starting place along the spine (0 = base, 1 = tip)
+        rise: number; // how fast it flows up the spine
+        radiusJitter: number;
+        phase: number;
+        spin: number;
+        size: number;
+        opacity: number;
+        // burst
+        tx: number; // target, as fraction of screen width
+        ty: number; // target, as fraction of screen height
+        burstSize: number; // size at the end of the burst
+        burstDelay: number; // 0 .. 0.4, centre goes first
+        swirlDir: number; // -1 / 1, which way the path curves
+        coverAlpha: number; // opacity at the end of the burst
+        burstRotation: number;
+        // written every frame, read by the draw passes below
+        x: number;
+        y: number;
+        drawSize: number;
+        drawAlpha: number;
+        depth: number;
+        rotation: number;
+        scaleX: number;
+        scaleY: number;
+      };
+
+      // jittered grid of burst targets, shuffled so neighbours in the tornado
+      // do not all land next to each other. Mobile uses a coarser grid.
+      const cols = stylizedTexture ? MOBILE_COLS : COLS;
+      const rows = stylizedTexture ? MOBILE_ROWS : ROWS;
+      const targets: Array<[number, number]> = [];
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const jx = (Math.random() - 0.5) * 0.9;
+          const jy = (Math.random() - 0.5) * 0.9;
+          targets.push([
+            ((col + 0.5 + jx) / cols) * 1.06 - 0.03,
+            ((row + 0.5 + jy) / rows) * 1.06 - 0.03,
+          ]);
+        }
+      }
+      for (let i = targets.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [targets[i], targets[j]] = [targets[j], targets[i]];
+      }
+
+      const makeParticle = (target: [number, number]): TornadoParticle => {
+        const sprite = [1, 2, 4, 5][Math.floor(Math.random() * 4)];
+        const level = sprite % 3;
+
+        let size = 50 + Math.random() * 30;
+        if (level === 1) size = 60 + Math.random() * 30;
+        if (level === 2) size = 80 + Math.random() * 40;
+
+        const [tx, ty] = target;
+        // horizontal distance from the middle of the screen, 0 .. 1
+        const dist = Math.min(1, Math.abs(tx - 0.5) / 0.53);
+
+        return {
+          trail: Math.random() < 0.4,
+          streak: Math.random() < 0.3,
+          sprite,
+          f0: Math.random(),
+          rise: 0.25 + Math.random() * 0.3,
+          radiusJitter: 0.55 + Math.random() * 0.75,
+          phase: Math.random() * Math.PI * 2,
+          spin: 0.85 + Math.random() * 0.3,
+          size: size * 1.2,
+          opacity: 0.55 + Math.random() * 0.7,
+          tx,
+          ty,
+          burstSize: (125 + Math.random() * 70) * (stylizedTexture ? 1.35 : 1),
+          burstDelay: dist * 0.4,
+          swirlDir: Math.random() < 0.5 ? -1 : 1,
+          coverAlpha: 0.34 + Math.random() * 0.2,
+          burstRotation: Math.random() * Math.PI * 2,
+          x: 0,
+          y: 0,
+          drawSize: 0,
+          drawAlpha: 0,
+          depth: 0,
+          rotation: 0,
+          scaleX: 1,
+          scaleY: 0.62,
+        };
+      };
+
+      const particles: TornadoParticle[] = targets.map(makeParticle);
+
+      // Smoke-textured backing (replaces the flat colour cover): big puffs on a coarse grid
+      const BACK_COLS = 8;
+      const BACK_ROWS = 5;
+      const backing: Array<{ x: number; y: number; sprite: number; rot: number; k: number }> = [];
+      for (let r = 0; r < BACK_ROWS; r++) {
+        for (let c = 0; c < BACK_COLS; c++) {
+          backing.push({
+            x: (c + 0.5 + (Math.random() - 0.5) * 0.6) / BACK_COLS,
+            y: (r + 0.5 + (Math.random() - 0.5) * 0.6) / BACK_ROWS,
+            sprite: Math.floor(Math.random() * spriteList.length),
+            rot: Math.random() * Math.PI * 2,
+            k: 1.2 + Math.random() * 0.3,
+          });
+        }
+      }
+
+      // ---------------------------------------------------------------
+      // SIDE MIST: big soft puffs that drift in from the left and right
+      // edges while the tornado forms
+      // ---------------------------------------------------------------
+      const mistPuffs = Array.from({ length: 16 }, (_, index) => {
+        const side = index % 2 === 0 ? -1 : 1;
+        return {
+          side,
+          startX: side < 0 ? -0.12 : 1.12,
+          endX: side < 0 ? 0.04 + Math.random() * 0.26 : 0.96 - Math.random() * 0.26,
+          y: 0.18 + Math.random() * 0.78,
+          radius: 0.5 + Math.random() * 0.3,
+          phase: Math.random() * Math.PI * 2,
+          alpha: 0.04 + Math.random() * 0.04,
+        };
+      });
+
+      const easeOut = (t: number) => 1 - Math.pow(1 - t, 2.25);
+      const smooth = (t: number) => t * t * (3 - 2 * t);
+      const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+
+      let barShown = 0; // smoothed value shown by the loading bar
+
+      // FORMATION CLOCK: drives how far the tornado has formed. It advances at
+      // real speed but is capped by how much has loaded, so on slow devices the
+      // tornado forms slowly (thin and small at first, full only when loaded)
+      // instead of forming fast and then just spinning while it waits.
+      let formElapsed = 0;
+      let formGate = 0; // smoothed load progress, 0 -> 1
+      let prevNow = 0;
+      let lastSmokeStart = -1;
+
+      // ---------------------------------------------------------------
+      // WAIT SCREEN (smoke only): once the burst has covered the page, the
+      // heavy frame is captured ONCE into holdFrame. While waiting for the
+      // next page we then draw just that one image (slowly drifting) plus a
+      // few light/dark smoke puffs: drifting fog banks and a slow swirling
+      // eddy in the middle. That is ~65 draws at 30fps instead of 800 at 40fps,
+      // so the screen stays alive and the page still has time to mount.
+      // ---------------------------------------------------------------
+      const holdFrame = document.createElement("canvas");
+      const holdCtx = holdFrame.getContext("2d");
+      let holdStart = 0;
+
+      const fog = Array.from({ length: 9 }, (_, i) => ({
+        x0: Math.random() * 1.4,
+        y: 0.1 + Math.random() * 0.8,
+        speed: (0.012 + Math.random() * 0.02) * (i % 2 === 0 ? 1 : -1),
+        r: 0.35 + Math.random() * 0.3,
+        light: i % 3 !== 0,
+        sprite: i % 2,
+        a: 0.14 + Math.random() * 0.12,
+        ph: Math.random() * Math.PI * 2,
+        w: 0.4 + Math.random() * 0.4,
+      }));
+
+      const EDDY_ARMS = 0;
+      const EDDY_PER_ARM = 18;
+
+      const captureHold = (now: number) => {
+        if (!holdCtx) return;
+        holdFrame.width = canvas.width;
+        holdFrame.height = canvas.height;
+        holdCtx.setTransform(1, 0, 0, 1, 0, 0);
+        holdCtx.clearRect(0, 0, holdFrame.width, holdFrame.height);
+        holdCtx.drawImage(canvas, 0, 0);
+        holdStart = now;
+      };
+
+      const drawHold = (now: number) => {
+        const t = (now - holdStart) / 1000;
+        const k = smooth(clamp01(t / 1.0)); // fade the movement in, no pop
+
+        smokeContext.clearRect(0, 0, width, height);
+
+        // captured last frame, drifting very slowly (slightly oversized so the
+        // edges never show)
+        const driftX = Math.sin(t * 0.35) * 8 * k;
+        const driftY = Math.cos(t * 0.28) * 6 * k;
+        smokeContext.drawImage(
+          holdFrame,
+          -width * 0.025 + driftX,
+          -height * 0.025 + driftY,
+          width * 1.05,
+          height * 1.05,
+        );
+
+        // fog banks drifting across, stretched sideways
+        const bigSide = Math.max(width, height);
+        for (const f of fog) {
+          const px = (((f.x0 + t * f.speed) % 1.4) + 1.4) % 1.4 - 0.2;
+          const x = px * width;
+          const y = f.y * height + Math.sin(t * f.w + f.ph) * 14;
+          const rad = bigSide * f.r * 0.5;
+          const img = f.light ? lightSprites[f.sprite] : darkSprites[f.sprite];
+          smokeContext.save();
+          smokeContext.globalAlpha = f.a * k;
+          smokeContext.translate(x, y);
+          smokeContext.scale(1.7, 0.6);
+          smokeContext.drawImage(img, -rad, -rad, rad * 2, rad * 2);
+          smokeContext.restore();
+        }
+
+        // slow swirling eddy of smoke, sitting above the loading bar
+        const mob = width < MOBILE_MAX_WIDTH;
+        const cx = width * 0.5;
+        const cy = height * (mob ? 0.45 : 0.47);
+        const R = mob ? Math.min(width * 0.42, 190) : Math.min(width * 0.26, 260);
+
+        // soft core glow, breathing
+        const coreR = R * (0.55 + 0.06 * Math.sin(t * 1.2));
+        smokeContext.save();
+        smokeContext.globalAlpha = 0.3 * k;
+        smokeContext.translate(cx, cy);
+        smokeContext.scale(1.2, 0.8);
+        smokeContext.drawImage(lightSprites[1], -coreR, -coreR, coreR * 2, coreR * 2);
+        smokeContext.restore();
+
+        for (let arm = 0; arm < EDDY_ARMS; arm++) {
+          for (let j = 0; j < EDDY_PER_ARM; j++) {
+            const sRel = j / (EDDY_PER_ARM - 1); // 0 centre .. 1 outer edge
+            const i = arm * EDDY_PER_ARM + j;
+            const rad = R * (0.1 + 0.9 * sRel);
+            // inner puffs turn faster than outer ones, and each arm trails
+            // behind its centre, which makes the spiral shape
+            const ang =
+              (arm * Math.PI * 2) / EDDY_ARMS + t * (0.75 - sRel * 0.45) + sRel * 3.4;
+            const x = cx + Math.cos(ang) * rad;
+            const y = cy + Math.sin(ang) * rad * 0.62;
+            const size = (26 + 48 * sRel) * (1 + 0.1 * Math.sin(t * 1.3 + i));
+            const alpha =
+              k * (0.14 + 0.22 * (1 - sRel)) * (0.8 + 0.2 * Math.sin(t * 0.9 + i * 0.7));
+            const img = (arm + j) % 2 === 0 ? lightSprites[i % 2] : darkSprites[i % 2];
+
+            smokeContext.save();
+            smokeContext.globalAlpha = alpha;
+            smokeContext.translate(x, y);
+            smokeContext.rotate(ang * 0.6);
+            smokeContext.scale(1.25, 0.8);
+            smokeContext.drawImage(img, -size, -size, size * 2, size * 2);
+            smokeContext.restore();
+          }
+        }
+      };
+
+      const draw = (now: number) => {
+        frame = requestAnimationFrame(draw);
+        if (now - lastDrawTime < (frozenRef.current ? 1000 / 30 : frameInterval)) return;
+        lastDrawTime = now;
+        if (!smokeVisibleRef.current) {
+          smokeContext.clearRect(0, 0, width, height);
+          if (barRef.current) barRef.current.style.opacity = "0";
+          return;
+        }
+
+        // Real clock: keeps running while the tornado waits for assets and the
+        // new page, so it keeps spinning instead of freezing.
+        const elapsed = Math.max(0, (now - smokeStartRef.current) / 1000);
+
+        // New smoke run -> restart the formation clock.
+        if (smokeStartRef.current !== lastSmokeStart) {
+          lastSmokeStart = smokeStartRef.current;
+          formElapsed = 0;
+          formGate = 0;
+          barShown = 0;
+          prevNow = now;
+        }
+        const dt = Math.min(0.1, Math.max(0, (now - prevNow) / 1000));
+        prevNow = now;
+
+        // Fraction of the formation allowed so far: a small floor so the
+        // tornado always starts appearing, the rest unlocked by loading.
+        formGate += (loadProgressRef.current - formGate) * 0.08;
+        const allowedFrac = loadedRef.current ? 1 : 0.12 + 0.88 * formGate;
+        formElapsed = Math.min(formElapsed + dt, TORNADO_SECONDS * allowedFrac);
+
+        const tornadoFormed = formElapsed >= TORNADO_SECONDS - 0.001;
+
+        // BURST GATE: tornado formed AND everything preloaded -> burst.
+        // The route is NOT changed yet; the provider does that after the burst.
+        if (!burstStartedRef.current && tornadoFormed && loadedRef.current) {
+          burstStartedRef.current = true;
+          gsap.to(burstProgressRef.current, {
+            value: 1,
+            duration: BURST_SECONDS + COVER_SECONDS,
+            ease: "none",
+            onComplete: () => onCompleteRef.current?.(),
+          });
+        }
+
+        // LOADING BAR: visible from when the tornado has formed until the smoke
+        // starts fading. Preload fills it to 90%; the last 10% is "new page ready"
+        // (fadingRef), so a slow post-burst wait never looks like a frozen screen.
+        const showBar = !fadingRef.current;
+        const barTarget = fadingRef.current ? 1 : loadProgressRef.current * 0.9;
+        barShown += (barTarget - barShown) * 0.2;
+        if (barRef.current) barRef.current.style.opacity = showBar ? "1" : "0";
+        if (barFillRef.current) barFillRef.current.style.transform = "scaleX(" + barShown + ")";
+
+        // Burst is done: draw the light wait screen instead of the heavy frame
+        if (frozenRef.current) {
+          drawHold(now);
+          return;
+        }
+
+        const burstP = burstProgressRef.current.value;
+
+        // -------------------------------------------------------------
+        // FORMATION TIMELINE (each value 0 -> 1, eased so nothing snaps)
+        // -------------------------------------------------------------
+        const intro = smooth(clamp01(formElapsed / 0.3));
+        const flareAmount = smooth(clamp01(formElapsed / FLARE_SECONDS));
+        const streamRaw = clamp01((formElapsed - STREAM_START) / STREAM_SECONDS);
+        const streamReach = 0.55 * streamRaw + 0.45 * smooth(streamRaw);
+        const capAmount = smooth(clamp01((streamReach - TOP_FLARE_FROM) / (1 - TOP_FLARE_FROM)));
+        const expand = smooth(clamp01((formElapsed - EXPAND_START) / EXPAND_SECONDS));
+
+        const burstRaw = clamp01(burstP / BURST_SHARE);
+        const burst = smooth(burstRaw);
+
+        // -------------------------------------------------------------
+        // PHYSICS
+        // -------------------------------------------------------------
+        const spinTime = elapsed - SPIN_UP_SECONDS * (1 - Math.exp(-elapsed / SPIN_UP_SECONDS));
+        const swayGrow = smooth(clamp01(elapsed / 1.0));
+
+        // -------------------------------------------------------------
+        // GEOMETRY (recomputed each frame so resize just works)
+        // u runs along the spine: 0 = base (below the page), 1 = top
+        // -------------------------------------------------------------
+        // MOBILE ONLY: wider, more visible base + slightly smaller puffs
+        // (0.9 = chunkier than before, so the stylized shapes stay readable).
+        // On desktop every value below equals the original.
+        const isMobile = width < MOBILE_MAX_WIDTH;
+        const sizeMul = isMobile ? 0.9 : 1;
+
+        const centerX = width * 0.5;
+        const baseY = height * (isMobile ? 1.02 : 1.1);
+        const topY = height * 0.06;
+        const spineHeight = baseY - topY;
+
+        const baseRadius = isMobile ? 14 : 9;
+        const streamRadius = 14;
+        const fullRadius = isMobile
+          ? Math.min(width * 0.36, 180)
+          : Math.min(width * 0.28, 300);
+        const flareRadius =
+          (isMobile ? Math.min(width * 0.4, 190) : Math.min(width * 0.3, 340)) * flareAmount;
+        const flareHeight = isMobile ? 0.35 : 0.3;
+
+        // MOBILE: the top cap is already full size, so it doesn't grow as the
+        // tornado rises. Desktop keeps the original growing behaviour.
+        const capSize = isMobile ? 1 : capAmount;
+        const capHeight = spineHeight * (0.18 + 0.12 * expand);
+        const capRadius = fullRadius * (0.5 + 0.5 * expand) * (0.25 + 0.75 * capSize);
+        const topFlareRadius = Math.min(width * 0.3, 340) * capSize;
+
+        const riseOffset = (1 - flareAmount) * height * 0.2;
+
+        const headStartU = flareHeight * 0.6;
+        const headTopU = 1.0;
+        const headU = headStartU + (headTopU - headStartU) * streamReach;
+        const headAmount = smooth(clamp01((formElapsed - HEAD_START) / 0.5));
+        // MOBILE: the rising top is already at its final width from the start,
+        // so it doesn't start thin and grow as it climbs. The rest of the
+        // tornado shape is unchanged. Desktop keeps the original growth.
+        const headAmountW = isMobile ? 1 : headAmount;
+        const headReachW = isMobile ? 1 : streamReach;
+        const headWidth = Math.min(width * 0.2, 230) * (0.6 + 0.4 * headAmountW) * (1 + 0.25 * headReachW);
+
+        const spineExtent = headU;
+
+        const spineRadius = (u: number) => {
+          const flareK = u < flareHeight ? Math.pow(1 - u / flareHeight, 1.6) : 0;
+          const topFlareK = u > 1 - flareHeight
+            ? Math.pow((u - (1 - flareHeight)) / flareHeight, 1.6)
+            : 0;
+
+          const tu = headU > 0.001 ? clamp01(u / headU) : 0;
+
+          // MOBILE: the tornado already has its FINAL shape (the one it reaches
+          // at the top) from the first frame. The shape is measured along the
+          // rising head (tu) instead of the full screen height (u), so the wide
+          // top travels up with the head. Nothing widens when it reaches the top.
+          if (isMobile) {
+            const topK = tu > 1 - flareHeight
+              ? Math.pow((tu - (1 - flareHeight)) / flareHeight, 1.6)
+              : 0;
+            const topFlareFull = Math.min(width * 0.3, 340);
+            return (
+              Math.min(fullRadius, (baseRadius + (fullRadius - baseRadius) * Math.pow(tu, 1.35)) * TAIL_WIDTH) +
+              flareRadius * 0.7 * flareK +
+              topFlareFull * 0.7 * topK
+            );
+          }
+
+          const coneTop = headWidth * 0.9 * (0.35 + 0.65 * headAmountW);
+          const cone = streamRadius + (coneTop - streamRadius) * Math.pow(tu, 1.35) * TAIL_WIDTH;
+
+          const formation =
+            Math.min(cone, coneTop) + flareRadius * flareK + topFlareRadius * 0.8 * topFlareK;
+
+          const full =
+            Math.min(fullRadius, (baseRadius + (fullRadius - baseRadius) * Math.pow(u, 1.35)) * TAIL_WIDTH) +
+            flareRadius * 0.7 * flareK + topFlareRadius * 0.7 * topFlareK;
+
+          const expandLocal = smooth(clamp01(expand * 1.5 - (1 - u) * 0.5));
+          return formation + (full - formation) * expandLocal;
+        };
+
+        smokeContext.clearRect(0, 0, width, height);
+
+        // -------------------------------------------------------------
+        // 1. SIDE MIST (behind everything)
+        // -------------------------------------------------------------
+        const mistProgress = easeOut(clamp01(formElapsed / (TORNADO_SECONDS * 1.1)));
+        for (const mist of mistPuffs) {
+          const x =
+            width * (mist.startX + (mist.endX - mist.startX) * mistProgress) +
+            Math.sin(elapsed * 0.9 + mist.phase) * 34;
+          const y = height * mist.y + Math.cos(elapsed * 0.7 + mist.phase) * 16;
+          const radius = Math.max(width, height) * mist.radius * (1 + burst * 0.9);
+
+          smokeContext.save();
+          smokeContext.globalAlpha = mist.alpha * mistProgress;
+          smokeContext.translate(x, y);
+          smokeContext.scale(1.15, 0.7);
+          smokeContext.drawImage(puffSprite, -radius, -radius, radius * 2, radius * 2);
+          smokeContext.restore();
+        }
+
+        // dusty glow where the base funnel meets the bottom of the page
+        // (mobile: wider, taller and stronger so the base is clearly visible)
+        if (burst < 1) {
+          const dustRadius = (isMobile ? 55 : 60) + flareRadius * (isMobile ? 1.0 : 1.1);
+          smokeContext.save();
+          smokeContext.globalAlpha = (isMobile ? 0.6 : 0.55) * flareAmount * (1 - burst);
+          smokeContext.translate(centerX, height);
+          smokeContext.scale(isMobile ? 1.6 : 1.6, isMobile ? 0.6 : 0.55);
+          smokeContext.drawImage(puffSprite, -dustRadius, -dustRadius, dustRadius * 2, dustRadius * 2);
+          smokeContext.restore();
+        }
+
+        // -------------------------------------------------------------
+        // 2. SOFT BODY GLOW: puffs along the spine plus one at the top,
+        //    so the tornado has a smoky core under the particles.
+        //    Fades out as the burst takes over.
+        // -------------------------------------------------------------
+        if (burst < 0.6) {
+          const glowFade = 1 - burst / 0.6;
+
+          for (let i = 0; i < 24; i++) {
+            const u = Math.pow(i / 23, 1.4) * spineExtent;
+            const glowRadius = spineRadius(u) * 1.2 + 16;
+            const baseBoost =
+              u < flareHeight ? 1 + (isMobile ? 0.9 : 0.8) * (1 - u / flareHeight) : 1;
+            const x = centerX + Math.sin(elapsed * 2.1 + u * 3.2) * 26 * u * swayGrow;
+            const y = (baseY - u * spineHeight + riseOffset) * 1.3;
+
+            smokeContext.save();
+            smokeContext.globalAlpha = 0.22 * (1 + 0.5 * streamReach) * intro * glowFade * baseBoost;
+            smokeContext.translate(x, y);
+            smokeContext.scale(1, 1.25);
+            smokeContext.drawImage(puffSprite, -glowRadius, -glowRadius, glowRadius * 2, glowRadius * 2);
+            smokeContext.restore();
+          }
+
+          const capGlowRadius = capRadius * 0.95 + 1;
+          smokeContext.save();
+          smokeContext.globalAlpha = 0.38 * capSize * glowFade;
+          smokeContext.translate(centerX + Math.sin(elapsed * 2.1 + 3.2) * 26 * swayGrow, topY + capHeight * 0.5);
+          smokeContext.scale(1.4, 0.8);
+          smokeContext.drawImage(puffSprite, -capGlowRadius, -capGlowRadius, capGlowRadius * 2, capGlowRadius * 2);
+          smokeContext.restore();
+        }
+
+        // -------------------------------------------------------------
+        // 3. UPDATE TORNADO PARTICLES
+        // -------------------------------------------------------------
+        for (const particle of particles) {
+          // SPINE: flows up from below the page. Particles loop along the spine,
+          // fading in near the base and out near the tip, so the column
+          // looks continuous and its tip tapers instead of ending in a hard cut.
+          const f = (particle.f0 + elapsed * particle.rise) % 1;
+          // mobile: higher exponent keeps more particles near the base
+          const u =
+            (particle.trail ? 0.7 + 0.3 * f : Math.pow(f, isMobile ? 1.5 : 1.2)) * spineExtent;
+          const radius = spineRadius(u) * particle.radiusJitter;
+
+          // 1 at the very base, 0 above the flare (used for the mobile base boost)
+          const baseK = u < flareHeight ? 1 - u / flareHeight : 0;
+
+          // faster swirl near the base, slower higher up
+          const angle = particle.phase + spinTime * particle.spin * (3 + (1 - u) * 6);
+
+          const turbulence = Math.sin(elapsed * 1.3 + particle.phase * 2.1 + u * 6) * (4 + 10 * expand);
+
+          let x = centerX + Math.sin(elapsed * 2.1 + u * 3.2) * 26 * u * swayGrow + Math.cos(angle) * radius + turbulence;
+          let y = baseY - u * spineHeight + riseOffset + Math.sin(angle) * radius * 0.22;
+
+          const sinA = Math.sin(angle);
+
+          // particles in the narrow part are smaller than the ones in the wide body
+          // (mobile: slightly smaller overall, but chunkier at the base)
+          let sizeScale =
+            (0.45 + 0.55 * smooth(clamp01(radius / (fullRadius * 0.6)))) * sizeMul;
+          if (isMobile) sizeScale *= 1 + 0.15 * baseK;
+
+          // BURST progress for THIS particle: the middle goes first, the edges
+          // follow, so the burst reads as a shockwave leaving the tornado.
+          const local = clamp01((burstRaw - particle.burstDelay) / (1 - 0.4));
+          const e = easeOut(local);
+
+          // fade-out at the ends of the spine goes away as the particle bursts,
+          // so every particle is visible and helps cover the screen
+          const rawEdge = smooth(clamp01(f / 0.1)) * smooth(clamp01((1 - f) / 0.12));
+          const edgeFade = rawEdge + (1 - rawEdge) * e;
+
+          let size = particle.size * sizeScale * (0.92 + 0.16 * sinA);
+          let alpha =
+            intro *
+            edgeFade *
+            particle.opacity *
+            (0.58 + 0.05 * sinA) *
+            (1 + (isMobile ? 0.4 : 0) * baseK);
+
+          if (e > 0) {
+            // fly from the tornado to this particle's own spot on the screen,
+            // along a curved (spiral) path
+            // HORIZONTAL burst: x travels all the way to the target, y barely
+            // moves (the tornado column already spans the full height), plus a
+            // small vertical wave so it does not look ruler-straight.
+            const targetX = particle.tx * width;
+            const targetY = particle.ty * height;
+            const dx = targetX - x;
+            const dy = targetY - y;
+
+            x += dx * e;
+            y += dy * e * 0.2 + Math.sin(e * Math.PI) * 16 * particle.swirlDir;
+
+            size = size * (1 - e) + particle.burstSize * sizeMul * e;
+            alpha = alpha * (1 - e) + particle.coverAlpha * e;
+          }
+
+          particle.x = x;
+          particle.y = y;
+          particle.drawSize = size;
+          particle.drawAlpha = Math.min(alpha, 0.9);
+          particle.depth = e > 0.5 ? Math.sin(particle.phase) : sinA;
+
+          // streaks are stretched along the direction of the spin so the
+          // smoke looks like wind-blown bands; they relax into round puffs on burst
+          if (particle.streak) {
+            const streakRot = Math.atan2(Math.cos(angle) * 0.22, -Math.sin(angle));
+            particle.rotation = streakRot * (1 - e);
+            particle.scaleX = 1.2 + e * 0.6;
+            particle.scaleY = 0.75 + e * 0.05;
+          } else {
+            particle.rotation = (particle.phase + angle * (isMobile ? 0.22 : 0.15)) * (1 - e);
+            particle.scaleX = 1 + e * 0.6;
+            particle.scaleY = (0.85 + Math.sin(particle.phase) * 0.1) * (1 - e) + 0.8 * e;
+          }
+        }
+
+// -------------------------------------------------------------
+// 3b. OPAQUE BASE + SMOKE-TEXTURED BACKING
+//     The base reaches alpha 1 exactly when the burst ends, so the
+//     final frame is opaque. The puffs on top keep the cloud texture.
+// -------------------------------------------------------------
+const baseAlpha = smooth(clamp01((burstRaw - 0.4) / 0.6));
+if (baseAlpha > 0.002) {
+  smokeContext.save();
+  smokeContext.globalAlpha = baseAlpha;
+  smokeContext.fillStyle = "rgb(" + COVER_BASE_RGB + ")";
+  smokeContext.fillRect(0, 0, width, height);
+  smokeContext.restore();
+}
+
+const backAlpha = smooth(clamp01((burstRaw - 0.35) / 0.65));
+if (backAlpha > 0.002) {
+  const cellW = width / BACK_COLS;
+  const cellH = height / BACK_ROWS;
+  const rad = Math.hypot(cellW, cellH) * 0.75;
+  smokeContext.save();
+  smokeContext.globalAlpha = backAlpha;
+  for (const b of backing) {
+    const rr = rad * b.k;
+    smokeContext.save();
+    smokeContext.translate(b.x * width, b.y * height);
+    smokeContext.rotate(b.rot);
+    smokeContext.drawImage(spriteList[b.sprite], -rr, -rr, rr * 2, rr * 2);
+    smokeContext.restore();
+  }
+  smokeContext.restore();
+}
+        // -------------------------------------------------------------
+        // 4. DRAW: back half of the spin first, then the front half,
+        //    so the particles read as orbiting around the funnel
+        // -------------------------------------------------------------
+        for (let pass = 0; pass < 2; pass++) {
+          for (const particle of particles) {
+            const isBack = particle.depth < 0;
+            if (pass === 0 && !isBack) continue;
+            if (pass === 1 && isBack) continue;
+            if (particle.drawAlpha <= 0.002) continue;
+
+            smokeContext.save();
+            smokeContext.globalAlpha = particle.drawAlpha;
+            smokeContext.translate(particle.x, particle.y);
+            smokeContext.rotate(particle.rotation);
+            smokeContext.scale(particle.scaleX, particle.scaleY);
+            smokeContext.drawImage(
+              spriteList[particle.sprite],
+              -particle.drawSize,
+              -particle.drawSize,
+              particle.drawSize * 2,
+              particle.drawSize * 2,
+            );
+            smokeContext.restore();
+          }
+        }
+
+        // The flat "final cover" fillRect is gone: the textured backing above
+        // already makes the screen opaque. Once the burst is done, this last
+        // frame is captured and replaced by the light wait screen (drawHold).
+        if (burstP >= 0.999) {
+          captureHold(now);
+          frozenRef.current = true;
+        }
+      };
+      frame = requestAnimationFrame(draw);
+      return () => {
+        cancelAnimationFrame(frame);
+        window.removeEventListener("resize", resize);
+      };
+    }, []);
+
     useImperativeHandle(
       ref,
       () => ({
-        resumeCurtain: () => {
-          const video = videoRef.current;
-          if (!video) return;
-
-          curtainPausedRef.current = true;
-
-          video
-            .play()
-            .catch(() => {
+        resumeSmoke: () => {
+          fadingRef.current = true;
+          const canvas = canvasRef.current;
+          if (!canvas) {
+            onCompleteRef.current?.();
+            return;
+          }
+          gsap.to(canvas, {
+            opacity: 0,
+            duration: 0.8,
+            ease: "power2.out",
+            onComplete: () => {
+              smokeVisibleRef.current = false;
               onCompleteRef.current?.();
-            });
+            },
+          });
         },
       }),
       [],
@@ -139,25 +1070,13 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       const castleEl = document.querySelector<HTMLElement>(CASTLE_SELECTOR);
       const moonEl = document.querySelector<HTMLElement>(MOON_SELECTOR);
 
-
       while (layer.firstChild) {
         layer.removeChild(layer.firstChild);
       }
 
       gsap.killTweensOf(cloudEls);
 
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-
-      if (video && canvas) {
-        video.pause();
-        video.currentTime = 0;
-        canvas.style.opacity = "0";
-        canvas.style.visibility = "hidden";
-        curtainPausedRef.current = false;
-      }
-
-      const ctx = gsap.context(() => {
+      const animationContext = gsap.context(() => {
         const rigs: CloudRig[] = cloudEls.map((el) => {
           const rect = el.getBoundingClientRect();
           const group = document.createElementNS(
@@ -203,8 +1122,6 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           gsap.set(r.path, { opacity: 0 });
         });
 
-        // NOTE: onComplete removed here — video start is now triggered
-        // at VIDEO_START_PERCENT of the total timeline via tl.call() below.
         const tl = gsap.timeline();
 
         if (rigs.length > 0) {
@@ -300,59 +1217,12 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         const FOREGROUND_DURATION = cloudsDuration * 1.0;
         const MOON_DURATION = cloudsDuration * 1.2;
 
-        const applyDrownWobble = (
-          el: HTMLElement,
-          duration: number,
-          sinkDistance = SINK_DISTANCE,
-          basePercent?: { xPercent?: number; yPercent?: number },
-        ) => {
-          gsap.set(el, {
-            willChange: "transform",
-            ...(basePercent ?? {}),
-          });
-
-          const state = { p: 0 };
-
-          tl.to(
-            state,
-            {
-              p: 1,
-              duration,
-              ease: "power2.in",
-
-              onUpdate: () => {
-                const p = state.p;
-
-                const y = sinkDistance * p;
-
-                /*
-                 * IMPORTANT:
-                 * Do NOT touch x.
-                 * Do NOT touch rotation.
-                 *
-                 * The castle's horizontal position is controlled
-                 * entirely by its CSS.
-                 */
-                gsap.set(el, {
-                  y,
-                  ...(basePercent ?? {}),
-                });
-              },
-            },
-            0,
-          );
-        };
-
         const applyDrown = (
           el: HTMLElement,
           duration: number,
           sinkDistance = SINK_DISTANCE,
-          basePercent?: { xPercent?: number; yPercent?: number },
         ) => {
-          gsap.set(el, {
-            willChange: "transform",
-            ...(basePercent ?? {}),
-          });
+          gsap.set(el, { willChange: "transform" });
 
           const state = { p: 0 };
 
@@ -362,15 +1232,10 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
               p: 1,
               duration,
               ease: "power2.in",
-
               onUpdate: () => {
-                const p = state.p;
-                const y = sinkDistance * p;
-
-                gsap.set(el, {
-                  y,
-                  ...(basePercent ?? {}),
-                });
+                // Only y is touched. The element's horizontal position
+                // is controlled entirely by its CSS.
+                gsap.set(el, { y: sinkDistance * state.p });
               },
             },
             0,
@@ -378,15 +1243,12 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         };
 
         if (castleEl) {
-          applyDrownWobble(castleEl, FOREGROUND_DURATION, SINK_DISTANCE, {
-          });
+          applyDrown(castleEl, FOREGROUND_DURATION);
         }
 
         if (moonEl) {
-          applyDrown(moonEl, MOON_DURATION, SINK_DISTANCE, {});
+          applyDrown(moonEl, MOON_DURATION);
         }
-
-
 
         if (fadeEls.length > 0) {
           tl.to(
@@ -400,84 +1262,57 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           );
         }
 
-        // =========================================
-        // START CURTAIN VIDEO AT VIDEO_START_PERCENT
-        // OF THE TOTAL ANIMATION DURATION
-        // =========================================
-        const startVideo = () => {
-          const transitionVideo = videoRef.current;
-          const transitionCanvas = canvasRef.current;
-
-          if (!transitionVideo || !transitionCanvas) {
+        const startSmoke = () => {
+          const canvas = canvasRef.current;
+          if (!canvas) {
             onCompleteRef.current?.();
             return;
           }
 
-          transitionCanvas.style.visibility = "visible";
-          transitionCanvas.style.opacity = "1";
-          transitionVideo.currentTime = 0;
-          curtainPausedRef.current = false;
-
-          transitionVideo.play().catch(() => {
-            onCompleteRef.current?.();
-          });
+          smokeVisibleRef.current = true;
+          smokeStartRef.current = performance.now();
+          burstProgressRef.current.value = 0;
+          burstStartedRef.current = false;
+          fadingRef.current = false;
+          frozenRef.current = false;
+          gsap.set(canvas, { opacity: 1, visibility: "visible" });
         };
 
-        const totalDuration = tl.duration();
-        tl.call(startVideo, [], totalDuration * VIDEO_START_PERCENT);
+        tl.call(
+          startSmoke,
+          [],
+          (tl.duration() || 0.5) * SMOKE_START_PERCENT,
+        );
       });
 
       // Capture the nodes for this effect instance. Refs can point to a
       // different node by the time React runs the cleanup.
-      const transitionVideo = videoRef.current;
       const transitionCanvas = canvasRef.current;
       const transitionLayer = layer;
 
       return () => {
-        ctx.revert();
+        animationContext.revert();
 
         // Release GPU promotion after the transition so will-change
         // does not remain permanently active on animated elements.
         if (castleEl) gsap.set(castleEl, { clearProps: "willChange" });
         if (moonEl) gsap.set(moonEl, { clearProps: "willChange" });
 
-        if (transitionVideo) {
-          transitionVideo.pause();
-          transitionVideo.currentTime = 0;
-        }
         if (transitionCanvas) {
+          gsap.killTweensOf(transitionCanvas);
           transitionCanvas.style.opacity = "0";
           transitionCanvas.style.visibility = "hidden";
+          smokeVisibleRef.current = false;
+          gsap.killTweensOf(burstProgressRef.current);
+          burstProgressRef.current.value = 0;
+          burstStartedRef.current = false;
+          fadingRef.current = false;
+          frozenRef.current = false;
         }
 
         while (transitionLayer.firstChild) {
           transitionLayer.removeChild(transitionLayer.firstChild);
         }
-      };
-    }, []);
-
-    // =========================================
-    // CURTAIN VIDEO TIME CONTROL
-    // =========================================
-    useEffect(() => {
-      const video = videoRef.current;
-      if (!video) return;
-
-      const handleTimeUpdate = () => {
-        if (
-          video.currentTime >= CURTAIN_PAUSE_TIME &&
-          !curtainPausedRef.current
-        ) {
-          curtainPausedRef.current = true;
-          video.currentTime = CURTAIN_PAUSE_TIME;
-          video.pause();
-          onCompleteRef.current?.();
-        }
-      };
-
-      video.addEventListener("timeupdate", handleTimeUpdate);
-      return () => {
-        video.removeEventListener("timeupdate", handleTimeUpdate);
       };
     }, []);
 
@@ -493,25 +1328,54 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           />
         </div>
 
-        {/* HIDDEN VIDEO SOURCE */}
-        <video
-          ref={videoRef}
-          src={curtainVideo}
-          muted
-          playsInline
-          preload="auto"
-          className="hidden"
-          style={{ display: "none" }}
-          onEnded={() => {
-            onCompleteRef.current?.();
+        <canvas
+          ref={canvasRef}
+          aria-hidden="true"
+          style={{
+            position: "fixed",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 10000,
+            pointerEvents: "none",
+            opacity: 0,
+            visibility: "hidden",
           }}
         />
 
-        {/* VISIBLE KEYED CANVAS */}
-        <canvas
-          ref={canvasRef}
-          className={styles.curtainVideo}
-        />
+        {/* LOADING BAR: bottom center, visible while the tornado waits for assets / the new page */}
+        <div
+          ref={barRef}
+          role="progressbar"
+          aria-label="Loading"
+          style={{
+            position: "fixed",
+            left: "50%",
+            transform: "translateX(-50%)",
+            bottom: 28,
+            width: 160,
+            height: 4,
+            borderRadius: 4,
+            overflow: "hidden",
+            background: "rgba(255, 255, 255, 0.22)",
+            zIndex: 10001,
+            pointerEvents: "none",
+            opacity: 0,
+            transition: "opacity 0.4s ease",
+          }}
+        >
+          <div
+            ref={barFillRef}
+            style={{
+              width: "100%",
+              height: "100%",
+              borderRadius: 4,
+              background: "rgba(244, 226, 196, 0.95)",
+              transformOrigin: "left center",
+              transform: "scaleX(0)",
+            }}
+          />
+        </div>
       </div>
     );
   },

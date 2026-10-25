@@ -1,0 +1,378 @@
+// ───────── DESIGN SIZE ─────────
+// The page now FILLS THE WHOLE WINDOW (no side bars on wide screens).
+// --design-w / --design-h are the Mac viewport the page was designed on. At that exact
+// shape the page looks identical to before; on wider or taller windows:
+//   • background, curtains, cushions and all POSITIONS stretch to the full window
+//   • people, labels, icons, back button keep their natural shape (sized with --u below)
+// Keep these two numbers equal to DESIGN_W / DESIGN_H at the top of DevPage.tsx.
+.wrapper {
+  --design-w: 1440;
+  --design-h: 784;
+
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1a0f1f;
+  // the inline bg image on the wrapper only fills the letterbox bars
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+// px(40) = "40px at design width", scaled with the stage
+@function px($n) {
+  @return calc(#{$n} * 100 * var(--u) / var(--design-w));
+}
+
+// u(n) = "n% of the design width", in the shape-preserving unit (was `ncqw`)
+@function u($n) {
+  @return calc(#{$n} * var(--u));
+}
+
+// pw(n) = "n design-pixels", as a % of the stage width, so it STRETCHES with the window.
+// Used for the cushion row, which must stay lined up with the stretched background.
+@function pw($n) {
+  @return calc(#{$n} * 100% / var(--design-w));
+}
+
+.stage {
+  position: relative;
+  // fills the entire window
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  container-type: size; // enables cqw / cqh for all children
+  // --u = the size unit for anything that must NOT be squashed or stretched (1u = 1cqw at the
+  // design shape). It is the smaller of "1% of width" and "1% of height, converted", so
+  // content never grows taller than the window can hold.
+  --u: min(1cqw, calc(1cqh * var(--design-w) / var(--design-h)));
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+.heading {
+  width: 90%;
+  padding-top: px(40);
+  display: flex;
+  justify-content: center;
+
+  img {
+    width: u(36); // = 40% of the 90% heading box, at the design shape
+  }
+}
+
+.cushion {
+  position: absolute;
+  bottom: 13%;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  // The cushions are painted objects that sit on the (stretched) sofa, so they are squashed to
+  // match it: --sy is set by DevPage.tsx (= how much taller/shorter the window is than the
+  // design). Anchored at the bottom so they keep resting on the sofa.
+  transform: scaleY(var(--sy, 1));
+  transform-origin: 50% 100%;
+
+  .FrontendButton {
+    width: 28%;
+    margin-left: pw(100);
+    z-index: 1;
+
+    clip-path: polygon(
+      8% 8%,
+      30% 13%,
+      60% 10%,
+      92% 3%,
+      83% 12%,
+      83% 50%,
+      90% 85%,
+      90% 85%,
+      60% 84%,
+      12% 91%,
+      11% 90%,
+      3.3% 15%
+    );
+  }
+  .BackendButton {
+    margin-left: pw(-130);
+    width: 28%;
+    z-index: 2;
+
+    clip-path: polygon(
+      13% 8%,
+      30% 13%,
+      60% 10%,
+      92% 10%,
+      92% 12%,
+      87.5% 40%,
+      87.5% 75%,
+      90% 90%,
+      50% 87%,
+      11% 87%,
+      7.2% 92%,
+      8.5% 12%
+    );
+  }
+  .UiButton {
+    margin-left: pw(-200);
+    width: 38%;
+    z-index: 1;
+    margin-bottom: pw(-20);
+
+    clip-path: polygon(
+      21% 8%,
+      49% 22%,
+      75% 20%,
+      92% 30%,
+      86% 12%,
+      78% 50%,
+      76% 75%,
+      78% 97%,
+      80% 84%,
+      43% 78%,
+      17% 75%,
+      23% 35%
+    );
+  }
+  .cushionButton {
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    img {
+      object-fit: contain;
+      padding: 0;
+      margin: 0;
+    }
+    .Frontend,
+    .Backend,
+    .Ui {
+      width: 100%;
+    }
+  }
+}
+
+.back {
+  position: absolute;
+  top: 5%;
+  left: 3%;
+  width: u(6);
+  z-index: 6; // stays above the curtains so it's clickable to reset
+
+  .BackButton {
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    pointer-events: auto;
+
+    .backImg {
+      object-fit: contain;
+      width: 100%;
+    }
+  }
+}
+
+// ───────── CURTAINS (relative to the stage, not the window) ─────────
+// The three curtains hang on one rail, so their stacking NEVER changes:
+// pink (1) < blue (2) < purple (3). DevPage.tsx never touches z-index.
+// Only x / rotation / height are animated.
+.curtainOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: hidden;
+  pointer-events: none;
+
+  .pinkCurtain,
+  .purpleCurtain,
+  .blueCurtain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 110%;
+    object-fit: cover;
+    will-change: transform;
+  }
+
+  // resting (home) positions — these match HOME_X in DevPage.tsx.
+  // Keep them in sync if you tweak one side, tweak the other.
+  .pinkCurtain {
+    z-index: 1;
+    transform: translateX(74%) rotateZ(5deg);
+  }
+  .blueCurtain {
+    z-index: 2;
+    transform: translateX(84%) rotateZ(5deg);
+  }
+  .purpleCurtain {
+    z-index: 3;
+    transform: translateX(92%) rotateZ(5deg);
+  }
+}
+.rightTop {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: none;
+  z-index: 1000;
+  width: u(25);
+  height: auto;
+
+}
+
+// ───────── NAV LABELS ─────────
+.verticalLabels {
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+  pointer-events: none; // individual buttons opt back in via gsap when visible
+}
+.verticalLabel {
+  position: absolute;
+  top: 75%;
+  transform: translateY(-50%) translateX(-60%) rotateZ(185deg);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  font-family: "YourDesignFont", cursive; // same font as in Figma
+  font-size: u(2.8);
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  white-space: nowrap;
+
+  color: #cfc3d6; // fallback, overridden per label below
+  text-shadow: none;
+  cursor: pointer;
+  opacity: 0; // GSAP fades this in, don't change
+  pointer-events: none;
+
+  &:hover {
+    filter: brightness(1.25);
+  }
+}
+
+// colours tinted to match each curtain
+.labelFrontend { color: rgba(214, 170, 214, 0.85); }
+.labelBackend  { color: rgba(150, 196, 214, 0.9); }
+.labelUi       { color: rgba(190, 160, 214, 0.85); }
+
+// ───────── CHARACTERS ─────────
+// Groups just gate pointer-events; visibility is handled per-character below
+// so the stagger fade-in has something to animate from.
+.frontendCharacters,
+.backendCharacters,
+.uiCharacters {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.character {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 6%;
+  position: absolute;
+  opacity: 0; // each character starts hidden, GSAP fades it in individually
+
+  img {
+    display: block;
+    width: u(30);
+    object-fit: contain;
+    height: auto;
+  }
+}
+.characterInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  p {
+    margin-top: -50px;
+    font-family: Amita;
+    font-size: 1.5rem;
+    color: #AFA360;
+    margin-bottom: 0;
+  }
+}
+
+// ───────── INSTAGRAM + LINKEDIN ICONS (under each name) ─────────
+.socials {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: u(2.4);        // space BETWEEN the two icons
+  margin-top: u(0.6); // space between the name and the icons
+}
+
+.socialLink {
+  display: block;
+  width: u(1.8);      // icon size
+  height: u(1.8);
+  color: #AFA360;     // same gold as the names
+  transition: color 0.2s ease, transform 0.2s ease;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// only real links (not the not-yet-filled ones) react to hover
+a.socialLink {
+  cursor: pointer;
+
+  &:hover {
+    color: #d8cf8a;
+    transform: scale(1.12);
+  }
+}
+
+// ───────── CHARACTER POSITIONS ─────────
+// Each vertical sits in a different visible window, because the curtains that are
+// folded on the left / parked on the right take up different room each time:
+//
+//   Frontend open:  nothing folded left, Backend + UI parked right  → window ≈  0 – 84 %
+//   Backend  open:  Frontend folded left, UI parked right           → window ≈  5 – 89 %
+//   UI       open:  Frontend + Backend folded left, nothing right   → window ≈ 10 – 100 %
+//
+// Every slot below is placed so the group is CENTRED in its own window.
+//
+// How to read the numbers: a slot's centre = left + 6 (the .character margin-left) + width/2.
+// So to move a person, change `left`; to move a whole group, shift every `left` by the same amount.
+// Window centres used: Frontend 41 %, Backend 47 %, UI 55 %.
+
+// Frontend — 4 people, centres at 11 / 31 / 51 / 71 %
+.frontend1 { left: -4%; top: 12%; width: 18%; }
+.frontend2 { left: 16%; top: 25%; width: 18%; }
+.frontend3 { left: 36%; top: 12%; width: 18%; }
+.frontend4 { left: 56%; top: 25%; width: 18%; }
+
+// Backend — 4 people, centres at 17 / 37 / 57 / 77 %
+.backend1 { left: 2%;  top: 12%; width: 18%; }
+.backend2 { left: 22%; top: 25%; width: 18%; }
+.backend3 { left: 42%; top: 12%; width: 18%; }
+.backend4 { left: 62%; top: 25%; width: 18%; }
+
+// UI/UX — 5 people, centres at 23 / 39 / 55 / 71 / 87 %
+.ui1 { left: 12.5%; top: 3%;  width: 14%; }
+.ui2 { left: 28.5%; top: 28%; width: 14%; }
+.ui3 { left: 44.5%; top: 3%;  width: 14%; }
+.ui4 { left: 60.5%; top: 28%; width: 14%; }
+.ui5 { left: 76.5%; top: 3%;  width: 14%; }

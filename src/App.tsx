@@ -4,261 +4,30 @@ import AppRoutes from "./routes/AppRoutes";
 import Preloader from "./pages/Preloader";
 import { useTransition } from "./context/TransitionProvider";
 import ReactGA from "react-ga4";
-// import video from "./assets/video/curtain.mp4";
-// const camel1 = "https://res.cloudinary.com/bhfhuzru/image/upload/camel1.svg";
-// const camel2 = "https://res.cloudinary.com/bhfhuzru/image/upload/camel2.svg";
-// const Castle = "https://res.cloudinary.com/bhfhuzru/image/upload/castlefinal2.png";
-// const cloudBig = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudBig.svg";
-// const cloudSmall = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudSmall.svg";
-// const cloudThree = "https://res.cloudinary.com/bhfhuzru/image/upload/cloudThree.svg";
-// import hamLine from "./assets/hamLine.svg";
-// const LogoOasis = "https://res.cloudinary.com/bhfhuzru/image/upload/LogoOasisi.webp";
-// const Moon = "https://res.cloudinary.com/bhfhuzru/image/upload/Moon.webp";
-// import navCircle from "./assets/navCircle.svg";
-// import navSan from "./assets/navSan.svg";
-// const sandImg = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454105/sandfinal.webp";
-// import RegBg from "./assets/registration/reg/RegBg.png";
-// import leftbottom from "./assets/registration/reg/leftbottom.png";
-// import rightbottom from "./assets/registration/reg/rightbottom.png";
-// import lefttop from "./assets/registration/reg/lefttop.png";
-// import righttop from "./assets/registration/reg/righttop.png";
-// import book from "./assets/registration/reg/book.png";
-// import buttonBg from "./assets/registration/reg/buttonbg.png";
-// import inputBg from "./assets/registration/reg/inputBg.png";
-// import btn from "./assets/registration/reg/btn.png";
-// import searchBg from "./assets/registration/reg/searchBg.png";
-// import line from "./assets/registration/reg/line.png";
-// import wheel from "./assets/registration/reg/wheel.png";
-// import modalFrame from "./assets/registration/reg/modalFrame.webp";
-// import modalFrameMobile from "./assets/registration/reg/modalFrameMobile.webp";
-// import closedBook from "./assets/registration/reg/closedBook.webp";
-import Syamsiah from "./assets/fonts/Syamsiah Arabic.ttf";
-import EB from "./assets/fonts/EBGaramond-Medium.ttf";
-import Cinzel from "./assets/fonts/Cinzel-VariableFont_wght.ttf";
-// import Scroll1 from "./assets/registration/reg/instructionsScroll.webp";
-// import Scroll2 from "./assets/registration/reg/instructionsScrollLong.webp";
-// import googleButton from "./assets/registration/reg/googleReg.svg";
-
-// import lamps from "/game-icons_magic-lamp.svg";
-
-import video from "./assets/video/curtain.mp4";
-
-const camel1 =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/camel1.svg";
-
-const camel2 =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/camel2.svg";
-
-const Castle =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/castlefinal2.png";
-
-const cloudBig =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudBig.svg";
-
-const cloudSmall =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudSmall.svg";
-
-const cloudThree =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/cloudThree.svg";
-
-import hamLine from "./assets/hamLine.svg";
-
-const LogoOasis =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/LogoOasisi.webp";
-
-const Moon =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/Moon.webp";
-
-import navCircle from "./assets/navCircle.svg";
-import navSan from "./assets/navSan.svg";
-
-const sandImg =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/v1790454105/sandfinal.webp";
-
-const RegBg =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/RegBg.png";
-
-const leftbottom =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/leftbottom.png";
-
-const rightbottom =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/rightbottom.png";
-
-const lefttop =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/lefttop.png";
-
-const righttop =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/righttop.png";
-
-const book =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/book.png";
-
-
-const buttonBg =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/buttonbg.png";
-
-const inputBg =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/inputBg.png";
-
-const btn =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/btn.png";
-
-const searchBg =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/searchBg.png";
-
-const line =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/line.png";
-
-const wheel =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/v1790459176/wheel.png";
-
-const modalFrame =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/modalFrame.webp";
-
-const modalFrameMobile =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/modalFrameMobile.webp";
-
-const closedBook =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/closedBook.webp";
-
-const Scroll1 =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/instructionsScroll.webp";
-
-const Scroll2 =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/instructionsScrollLong.webp";
-
-const googleButton =
-  "https://res.cloudinary.com/bhfhuzru/image/upload/googleReg.svg";
+import { getPreloaderAssets } from "./assets/preloaderLists";
 
 const TRACKING_ID = "GT-PJRTJCBD";
 
-const isOasisDomain =
-  window.location.hostname.includes("bits-oasis.org");
+const isOasisDomain = window.location.hostname.includes("bits-oasis.org");
 
 if (isOasisDomain) {
   ReactGA.initialize(TRACKING_ID);
 }
 
-const isMobile = window.innerWidth <= 768;
+const fonts = ["Ramadhan", "Syamsiah", "EB", "EB Garamond", "Cinzel"];
 
-const mobileAssets = [
-  bgHome,
-  chestBase,
-  chestWell,
-  lidEdge,
-  lidDome,
-  lidInner,
-  trunkStuff,
-  guitarBook,
-  sandAbove,
-  board,
-  sandBottom,
-  video,
-  // camel1,
-  // camel2,
-  // camelLand,
-  Castle,
-  cloudBig,
-  cloudSmall,
-  cloudThree,
-  hamLine,
-  LogoOasis,
-  Moon,
-  navCircle,
-  // navSan,
-  sandImg,
-  RegBg,
-  leftbottom,
-  rightbottom,
-  lefttop,
-  righttop,
-  book,
-  buttonBg,
-  inputBg,
-  btn,
-  searchBg,
-  line,
-  wheel,
-  modalFrameMobile,
-  closedBook,
-  Syamsiah,
-  EB,
-  Cinzel,
-  Scroll1,
-  Scroll2,
-  googleButton,
-  // lamps,
+// Built once at module load (mobile / desktop decided by viewport width).
+const assets = getPreloaderAssets();
 
-];
+/* ======================================================
+   INTRO (PRELOADER) - ONLY ON THE VERY FIRST LOAD
+   Lives at module level, NOT in React state, so it survives
+   App remounts and route changes. It resets only on a full
+   browser reload. If the site is first opened on a page other
+   than "/", the intro is skipped for the whole session.
+====================================================== */
 
-import sandBottom from "./assets/ham/sandBottom.png";
-import sandAbove from "./assets/ham/sandAbove.png";
-import board from "./assets/ham/board.png";
-import guitarBook from "./assets/ham/guitarBook.png";
-import trunkStuff from "./assets/ham/trunkStuff.png";
-import lidInner from "./assets/ham/lidInner.png";
-import lidDome from "./assets/ham/lidDome.png";
-import lidEdge from "./assets/ham/lidEdge.png";
-import chestWell from "./assets/ham/chestWell.png";
-import chestBase from "./assets/ham/chestBase.png";
-import bgHome from "./assets/home/bg.jpg";
-const desktopAssets = [
-  bgHome,
-  chestBase,
-  chestWell,
-  lidEdge,
-  lidDome,
-  lidInner,
-  trunkStuff,
-  guitarBook,
-  sandAbove,
-  board,
-  sandBottom,
-  video,
-  camel1,
-  camel2,
-  Castle,
-  cloudBig,
-  cloudSmall,
-  cloudThree,
-  hamLine,
-  LogoOasis,
-  Moon,
-  navCircle,
-  navSan,
-  sandImg,
-  RegBg,
-  leftbottom,
-  rightbottom,
-  lefttop,
-  righttop,
-  book,
-  buttonBg,
-  inputBg,
-  btn,
-  searchBg,
-  line,
-  wheel,
-  modalFrame,
-  closedBook,
-  Syamsiah,
-  EB,
-  Cinzel,
-  Scroll1,
-  Scroll2,
-  googleButton,
-  // lamps,
-
-];
-
-const fonts = [
-  "Ramadhan",
-  "Syamsiah",
-  "EB",
-  "EB Garamond",
-  "Cinzel",
-];
-const assets = isMobile ? mobileAssets : desktopAssets;
+let introCompleted = window.location.pathname !== "/";
 
 /* ======================================================
    TRANSITION SETTINGS
@@ -292,12 +61,23 @@ export default function App() {
   }, [location]);
 
   /* ======================================================
-     PRELOADER STATE
+     PREFETCH HEAVY ROUTE CHUNKS (while the preloader runs)
   ====================================================== */
 
-  const [preloaderDone, setPreloaderDone] = useState(false);
+  useEffect(() => {
+    import("./pages/registration/Registration").catch(() => undefined);
+    import("./pages/Home").catch(() => undefined);
+  }, []);
 
-  const [homeExiting, setHomeExiting] = useState(false);
+  /* ======================================================
+     PRELOADER STATE
+     Initialised from the module-level flag, so a remounted
+     App never shows the preloader again.
+  ====================================================== */
+
+  const [preloaderDone, setPreloaderDone] = useState(introCompleted);
+
+  const [homeExiting, setHomeExiting] = useState(introCompleted);
 
   /* ======================================================
      PRELOADER EXIT START
@@ -312,6 +92,7 @@ export default function App() {
   ====================================================== */
 
   const handleEnter = () => {
+    introCompleted = true; // never show the intro again this session
     markEntered();
     setPreloaderDone(true);
     setHomeExiting(true);
@@ -319,9 +100,10 @@ export default function App() {
 
   /* ======================================================
      INTRO STATE
+     (introCompleted is checked too, as a hard guard)
   ====================================================== */
 
-  const introActive = isHome && !preloaderDone;
+  const showIntro = isHome && !preloaderDone && !introCompleted;
 
   return (
     <>
@@ -331,37 +113,37 @@ export default function App() {
 
       <div
         style={
-          introActive
+          showIntro
             ? {
-              position: "fixed",
-              inset: 0,
-              width: "100vw",
-              height: "100dvh",
-              overflow: "hidden",
-              background: "#080a18",
-            }
+                position: "fixed",
+                inset: 0,
+                width: "100vw",
+                height: "100dvh",
+                overflow: "hidden",
+                background: "#080a18",
+              }
             : undefined
         }
       >
         <div
           style={
-            introActive
+            showIntro
               ? {
-                width: "100%",
-                minHeight: "100%",
-                transform: homeExiting
-                  ? "translate3d(0, 0, 0)"
-                  : "translate3d(0, 100%, 0)",
-                transition: homeExiting
-                  ? `transform ${TRANSITION_DURATION}ms cubic-bezier(0.76, 0, 0.24, 1)`
-                  : "none",
-                willChange: "transform",
-              }
+                  width: "100%",
+                  minHeight: "100%",
+                  transform: homeExiting
+                    ? "translate3d(0, 0, 0)"
+                    : "translate3d(0, 100%, 0)",
+                  transition: homeExiting
+                    ? `transform ${TRANSITION_DURATION}ms cubic-bezier(0.76, 0, 0.24, 1)`
+                    : "none",
+                  willChange: "transform",
+                }
               : undefined
           }
         >
           <AppRoutes
-            preloaderDone={preloaderDone}
+            preloaderDone={preloaderDone || introCompleted}
             preloaderExiting={homeExiting}
           />
         </div>
@@ -371,7 +153,7 @@ export default function App() {
           PRELOADER
       ================================================== */}
 
-      {isHome && !preloaderDone && (
+      {showIntro && (
         <Preloader
           assets={assets}
           fonts={fonts}

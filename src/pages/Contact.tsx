@@ -14,18 +14,8 @@ import recnacc from "../assets/contact/prithviGowda.webp";
 import prez from "../assets/contact/pulkitBhardwaj.webp";
 import gensec from "../assets/contact/kushalPoosala.jpeg";
 
-// ContactCard also imports this (for the on-card mail icon); imported again
-// here purely so its URL can go in CONTACT_ASSETS below.
-import mail from "../assets/contact/mail.webp";
-// These three are referenced only via CSS url() in Contact.module.scss, never
-// rendered from these bindings — imported here purely to get their
-// bundler-resolved URLs for CONTACT_ASSETS, so the Preloader warms them too.
-import cardBg from "../assets/contact/card.webp";
-import pageBg from "../assets/contact/page.webp";
-import pageMobBg from "../assets/contact/pageMob.webp";
 
 import ContactCard from "../components/ContactCard";
-import Preloader from "../pages/Preloader"; // ⚠️ verify this path — see chat
 import { useTransition } from "../context/TransitionProvider";
 
 // ─────────────────────────────────────────────────────────────
@@ -113,23 +103,7 @@ const DEFAULT_CARD_INDEX = Math.max(
 // map, crosses, mail icon, backgrounds and every team photo are all already
 // cached by the time the page reveals, instead of popping in individually.
 // ─────────────────────────────────────────────────────────────
-const CONTACT_ASSETS = [
-  map,
-  cross,
-  back,
-  mail,
-  cardBg,
-  pageBg,
-  pageMobBg,
-  dvm,
-  pcr,
-  adp,
-  spons,
-  controls,
-  recnacc,
-  prez,
-  gensec
-];
+
 
 // Keyboard controls. Uses e.code (physical keys), so W/A/S/D work on any
 // keyboard layout. Values are the direction the VIEW moves across the map.
@@ -149,8 +123,7 @@ const LIST_PEEK_PADDING = 6;
 const KEY_SPEED = 12;
 
 export default function Contact() {
-  const { entered, markEntered, transitioning } = useTransition();
-
+  const { transitioning, navigateWithTransition } = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
   const mapScaleRef = useRef<HTMLDivElement>(null);
@@ -173,13 +146,13 @@ export default function Contact() {
   const animFrameId = useRef<number | null>(null);
 
   // Set inside the effect, called by the list items
-  const scrollToCard = useRef<(index: number) => void>(() => {});
+  const scrollToCard = useRef<(index: number) => void>(() => { });
   // Re-centers on DEFAULT_CARD_INDEX's card. Set inside the main effect below;
   // also called from the font/transition-settle effect further down, to
   // correct the initial position if it was computed before layout was
   // actually stable (see that effect for why).
   const centerDefaultCard = useRef<(opts?: { instant?: boolean }) => void>(
-    () => {},
+    () => { },
   );
 
   // Which list item / card is the currently "selected" one. Stays highlighted
@@ -738,7 +711,13 @@ export default function Contact() {
       scrollToCard.current(index);
     }
   };
-
+  const handleBack = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // let ctrl/cmd/middle-click still open "/" in a new tab
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    if (transitioning) return; // ignore double taps mid-transition
+    navigateWithTransition("/");
+  };
   return (
     <div ref={containerRef} className={styles.mapContainer}>
       {/* Map layer: same size as the map image, receives the drag transform */}
@@ -779,7 +758,7 @@ export default function Contact() {
         className={`${styles.page} ${expanded ? styles.expanded : ""}`}
       >
         <div className={styles.pageStuff}>
-          <Link to="/">
+          <Link to="/" onClick={handleBack}>
             <img className={styles.backBtn} src={back} alt="Go Back to Home" />
           </Link>
           <h1>CONTACT US</h1>
@@ -819,9 +798,7 @@ export default function Contact() {
           here, revealing the already-ready map underneath. Skipped entirely
           if the preloader already played elsewhere this session (`entered`
           is a single session-wide flag from TransitionProvider). */}
-      {!entered && (
-        <Preloader assets={CONTACT_ASSETS} onEnter={markEntered} />
-      )}
+
     </div>
   );
 }
