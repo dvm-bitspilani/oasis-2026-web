@@ -123,8 +123,7 @@ const LIST_PEEK_PADDING = 6;
 const KEY_SPEED = 12;
 
 export default function Contact() {
-  const {  transitioning } = useTransition();
-
+  const { transitioning, navigateWithTransition } = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
   const mapScaleRef = useRef<HTMLDivElement>(null);
@@ -147,13 +146,13 @@ export default function Contact() {
   const animFrameId = useRef<number | null>(null);
 
   // Set inside the effect, called by the list items
-  const scrollToCard = useRef<(index: number) => void>(() => {});
+  const scrollToCard = useRef<(index: number) => void>(() => { });
   // Re-centers on DEFAULT_CARD_INDEX's card. Set inside the main effect below;
   // also called from the font/transition-settle effect further down, to
   // correct the initial position if it was computed before layout was
   // actually stable (see that effect for why).
   const centerDefaultCard = useRef<(opts?: { instant?: boolean }) => void>(
-    () => {},
+    () => { },
   );
 
   // Which list item / card is the currently "selected" one. Stays highlighted
@@ -712,7 +711,13 @@ export default function Contact() {
       scrollToCard.current(index);
     }
   };
-
+  const handleBack = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // let ctrl/cmd/middle-click still open "/" in a new tab
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    if (transitioning) return; // ignore double taps mid-transition
+    navigateWithTransition("/");
+  };
   return (
     <div ref={containerRef} className={styles.mapContainer}>
       {/* Map layer: same size as the map image, receives the drag transform */}
@@ -753,7 +758,7 @@ export default function Contact() {
         className={`${styles.page} ${expanded ? styles.expanded : ""}`}
       >
         <div className={styles.pageStuff}>
-          <Link to="/">
+          <Link to="/" onClick={handleBack}>
             <img className={styles.backBtn} src={back} alt="Go Back to Home" />
           </Link>
           <h1>CONTACT US</h1>
