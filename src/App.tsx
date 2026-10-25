@@ -20,6 +20,16 @@ const fonts = ["Ramadhan", "Syamsiah", "EB", "EB Garamond", "Cinzel"];
 const assets = getPreloaderAssets();
 
 /* ======================================================
+   INTRO (PRELOADER) - ONLY ON THE VERY FIRST LOAD
+   Lives at module level, NOT in React state, so it survives
+   App remounts and route changes. It resets only on a full
+   browser reload. If the site is first opened on a page other
+   than "/", the intro is skipped for the whole session.
+====================================================== */
+
+let introCompleted = window.location.pathname !== "/";
+
+/* ======================================================
    TRANSITION SETTINGS
 ====================================================== */
 
@@ -61,11 +71,13 @@ export default function App() {
 
   /* ======================================================
      PRELOADER STATE
+     Initialised from the module-level flag, so a remounted
+     App never shows the preloader again.
   ====================================================== */
 
-  const [preloaderDone, setPreloaderDone] = useState(false);
+  const [preloaderDone, setPreloaderDone] = useState(introCompleted);
 
-  const [homeExiting, setHomeExiting] = useState(false);
+  const [homeExiting, setHomeExiting] = useState(introCompleted);
 
   /* ======================================================
      PRELOADER EXIT START
@@ -80,6 +92,7 @@ export default function App() {
   ====================================================== */
 
   const handleEnter = () => {
+    introCompleted = true; // never show the intro again this session
     markEntered();
     setPreloaderDone(true);
     setHomeExiting(true);
@@ -87,9 +100,10 @@ export default function App() {
 
   /* ======================================================
      INTRO STATE
+     (introCompleted is checked too, as a hard guard)
   ====================================================== */
 
-  const introActive = isHome && !preloaderDone;
+  const showIntro = isHome && !preloaderDone && !introCompleted;
 
   return (
     <>
@@ -99,7 +113,7 @@ export default function App() {
 
       <div
         style={
-          introActive
+          showIntro
             ? {
                 position: "fixed",
                 inset: 0,
@@ -113,7 +127,7 @@ export default function App() {
       >
         <div
           style={
-            introActive
+            showIntro
               ? {
                   width: "100%",
                   minHeight: "100%",
@@ -129,7 +143,7 @@ export default function App() {
           }
         >
           <AppRoutes
-            preloaderDone={preloaderDone}
+            preloaderDone={preloaderDone || introCompleted}
             preloaderExiting={homeExiting}
           />
         </div>
@@ -139,7 +153,7 @@ export default function App() {
           PRELOADER
       ================================================== */}
 
-      {isHome && !preloaderDone && (
+      {showIntro && (
         <Preloader
           assets={assets}
           fonts={fonts}
