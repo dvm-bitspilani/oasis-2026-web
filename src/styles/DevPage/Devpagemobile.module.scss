@@ -99,7 +99,6 @@ $bg-bleed: 6%;
 }
 
 .frontendCushion {
-  -webkit-tap-highlight-color: transparent; // no grey box flash on tap
   width: 84%;
   background: none;
   border: none;
@@ -112,15 +111,6 @@ $bg-bleed: 6%;
     width: 80%;
     top: 15%;
     transform: rotateZ(20deg);
-    // CLICK AREA: same polygon as the desktop cushion. clip-path is applied to the image's own
-    // box BEFORE the rotate / resize below, so the shape follows the cushion automatically.
-    // Only the area inside the polygon is visible AND clickable; taps outside go through to
-    // whatever is underneath. Edit the percentages to reshape it.
-    clip-path: polygon(
-      8% 8%, 30% 13%, 60% 10%, 92% 3%, 83% 12%, 83% 50%, 90% 85%, 90% 85%,
-      60% 84%, 12% 91%, 11% 90%, 3.3% 15%
-    );
-
     object-fit: contain;
     display: block;
   }
@@ -134,7 +124,6 @@ $bg-bleed: 6%;
 }
 
 .backendCushion {
-  -webkit-tap-highlight-color: transparent; // no grey box flash on tap
   background: none;
   border: none;
   padding: 0;
@@ -147,22 +136,12 @@ $bg-bleed: 6%;
     top: -30%;
     transform: rotateZ(-8deg);
     width: 150%;
-    // CLICK AREA: same polygon as the desktop cushion. clip-path is applied to the image's own
-    // box BEFORE the rotate / resize below, so the shape follows the cushion automatically.
-    // Only the area inside the polygon is visible AND clickable; taps outside go through to
-    // whatever is underneath. Edit the percentages to reshape it.
-    clip-path: polygon(
-      13% 8%, 30% 13%, 60% 10%, 92% 10%, 92% 12%, 87.5% 40%, 87.5% 75%, 90% 90%,
-      50% 87%, 11% 87%, 7.2% 92%, 8.5% 12%
-    );
-
     object-fit: contain;
     display: block;
   }
 }
 
 .uiCushion {
-  -webkit-tap-highlight-color: transparent; // no grey box flash on tap
   background: none;
   border: none;
   padding: 0;
@@ -175,15 +154,6 @@ $bg-bleed: 6%;
     top: -20%;
     transform: rotateZ(2deg);
     width: 200%;
-    // CLICK AREA: same polygon as the desktop cushion. clip-path is applied to the image's own
-    // box BEFORE the rotate / resize below, so the shape follows the cushion automatically.
-    // Only the area inside the polygon is visible AND clickable; taps outside go through to
-    // whatever is underneath. Edit the percentages to reshape it.
-    clip-path: polygon(
-      21% 8%, 49% 22%, 75% 20%, 92% 30%, 86% 12%, 78% 50%, 76% 75%, 78% 97%,
-      80% 84%, 43% 78%, 17% 75%, 23% 35%
-    );
-
     object-fit: contain;
     display: block;
   }
@@ -245,7 +215,7 @@ $bg-bleed: 6%;
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0vw;
+  gap: 6vw 4vw;
   animation: gridFadeIn 0.5s ease both; // fades in after each swap
 }
 
@@ -254,12 +224,22 @@ $bg-bleed: 6%;
   flex-direction: column;
   align-items: center;
 
-  .cardImage {
-    width: 130%;
-    max-width: 70vw;
-    object-fit: cover;
-    display: block;
+  // size of the whole framed photo (FramedPhoto's own scss does the oval crop)
+  .cardFrame {
+    width: 95%;
+    max-width: 60vw;
   }
+}
+
+// (Written without `.card` on purpose: the card's class comes from another file's copy of this
+// stylesheet, so a `.card` selector here would never match.)
+// If the number of people is ODD, the last card would sit alone in the left column.
+// This lets it use the full row and centres it, while keeping the same card size as the others
+// (width: 50% = exactly one column wide).
+.grid > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: 50%;
 }
 
 .cardName {
@@ -268,7 +248,13 @@ $bg-bleed: 6%;
   font-size: 7.2vw;
   margin: 2vw 0 1vw;
 
-  margin-top: -15px;
+  margin-top: 15px;
+}
+
+// extra rules for the UI/UX page only (see twoLineName in CharacterMobile.tsx)
+.cardNameTwoLines {
+  line-height: 1.05;
+  min-height: 2.1em; // always room for exactly 2 lines, so icons line up across a row
 }
 
 // Instagram + LinkedIn icons under each name (drawn by SocialIcons.tsx)

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MouseEvent, RefObject } from "react";
 import CharacterMobile from "./CharacterMobile";
 import { MEMBERS } from "./DevMembers";
@@ -12,7 +12,6 @@ import BackButton from "../../assets/DevPage/BackButton.png";
 import bgPink from "../../assets/DevPage/bpPink.png";
 import bgPurple from "../../assets/DevPage/bgPurple.png";
 import bgBlue from "../../assets/DevPage/bgBlue.png";
-import image from "../../assets/DevPage/profile.png";
 type Vertical = "Frontend" | "Backend" | "Ui";
 type Direction = "left" | "right";
 // Fixed cycle order for the ‹ › arrows
@@ -98,9 +97,36 @@ export default function DevPageMobile() {
   // each swap
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
+  // Tapping a cushion: that vertical's curtain slides in from the RIGHT (same animation as the
+  // ‹ › arrows), and only when it has landed does the page swap (see finishTransition).
   const goToVertical = (name: Vertical) => {
-    setActiveVertical(name);
+    if (transition) return; // a curtain is already sliding, ignore extra taps
+    setTransition({ to: name, direction: "right" });
   };
+
+  // ───────── FADE where the scrolling cards are cut off ─────────
+  // Top edge fades once you have scrolled down; bottom edge fades while more is below.
+  // The fade grows smoothly over the first FADE_PX pixels of scrolling.
+  const FADE_PX = 40;
+  const [fade, setFade] = useState({ top: 0, bottom: 0 });
+  const updateFade = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const top = Math.min(el.scrollTop, FADE_PX);
+    const bottom = Math.min(Math.max(el.scrollHeight - el.clientHeight - el.scrollTop, 0), FADE_PX);
+    setFade((f) => (f.top === top && f.bottom === bottom ? f : { top, bottom }));
+  };
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    updateFade();
+    const ro = new ResizeObserver(updateFade); // photos loading / rotating the phone
+    ro.observe(el);
+    if (el.firstElementChild) ro.observe(el.firstElementChild);
+    return () => ro.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeVertical]);
+  const fadeMask = `linear-gradient(to bottom, transparent 0px, #000 ${fade.top}px, #000 calc(100% - ${fade.bottom}px), transparent 100%)`;
 
   // the three cushion pictures, used to test which one was really tapped
   const frontendImgRef = useRef<HTMLImageElement | null>(null);
@@ -122,6 +148,12 @@ export default function DevPageMobile() {
     ];
     const hit = stack.find(([, ref]) => isOpaqueAt(ref.current, e.clientX, e.clientY));
     if (hit) goToVertical(hit[0]);
+  };
+
+  // Back button on the HOME screen: leave this page (go to wherever the visitor came from)
+  const leavePage = () => {
+    if (window.history.length > 1) window.history.back();
+    else window.location.assign("/");
   };
 
   const goHome = () => {
@@ -160,7 +192,9 @@ export default function DevPageMobile() {
         <img className={styles.backdrop} src={bgphone} alt="" />
         <div className={styles.wrapper}>
           <div className={styles.back}>
-            <button className={styles.backButton} onClick={goHome} aria-hidden />
+            <button className={styles.backButton} onClick={leavePage}>
+              <img src={BackButton} alt="Back" />
+            </button>
           </div>
 
           <div className={styles.heading}>
@@ -185,6 +219,17 @@ export default function DevPageMobile() {
             </div>
           </div>
         </div>
+
+        {/* The curtain of the tapped cushion slides in from the right. When it has landed,
+            finishTransition swaps to that vertical's page (same backdrop, so no jump). */}
+        {transition && (
+          <img
+            src={VERTICAL_INFO[transition.to].background}
+            alt=""
+            className={`${styles.curtainOverlay} ${styles.fromRight}`}
+            onAnimationEnd={finishTransition}
+          />
+        )}
       </div>
     );
   }
@@ -243,13 +288,17 @@ export default function DevPageMobile() {
           data-lenis-prevent
           onWheel={(e) => e.stopPropagation()}
           onTouchMove={(e) => e.stopPropagation()}
+          onScroll={updateFade}
+          style={{ WebkitMaskImage: fadeMask, maskImage: fadeMask }}
         >
           {/* key = vertical, so the grid remounts (and fades in) after each swap */}
           <div className={styles.grid} key={activeVertical}>
-            {MEMBERS[activeVertical].map((member) => (
+            {MEMBERS[activeVertical].map((member, index, list) => (
               <CharacterMobile
                 key={`${activeVertical}-${member.name}`}
-                image={image}
+                image={member.image}
+                twoLineName={activeVertical === "Ui"}
+                centered={list.length % 2 === 1 && index === list.length - 1}
                 name={member.name}
                 instagram={member.instagram}
                 linkedin={member.linkedin}
