@@ -76,6 +76,9 @@ const TAIL_WIDTH = 1.2;
 // covers the screen, so the burst fills every part of the page.
 const COLS = 36;
 const ROWS = 22;
+// Mobile: fewer, bigger puffs (same coverage, ~60% fewer draws)
+const MOBILE_COLS = 22;
+const MOBILE_ROWS = 14;
 
 const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
   function PageTransitionComponent({ onComplete, assets, preload }, ref) {
@@ -91,6 +94,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
     const loadProgressRef = useRef(0); // 0 -> 1
     const barRef = useRef<HTMLDivElement | null>(null);
     const barFillRef = useRef<HTMLDivElement | null>(null);
+    const frozenRef = useRef(false); // true once the final frame is on screen
     const assetsRef = useRef(assets);
     const preloadRef = useRef(preload);
     const smokeVisibleRef = useRef(false);
@@ -161,12 +165,20 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       const frameInterval = 1000 / 40;
 
       const resize = () => {
-        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-        width = window.innerWidth;
-        height = window.innerHeight;
+        const nextW = window.innerWidth;
+        const nextH = window.innerHeight;
+        const small = nextW < MOBILE_MAX_WIDTH;
+
+        // Mobile browsers fire resize when the URL bar shows/hides. Ignore it.
+        if (width && small && nextW === width && Math.abs(nextH - height) < 160) return;
+
+        const dpr = Math.min(window.devicePixelRatio || 1, small ? 1 : 1.5);
+        width = nextW;
+        height = nextH;
         canvas.width = width * dpr;
         canvas.height = height * dpr;
         smokeContext.setTransform(dpr, 0, 0, dpr, 0, 0);
+        frozenRef.current = false; // resizing clears the canvas, so redraw once
       };
       resize();
       window.addEventListener("resize", resize);
@@ -376,15 +388,17 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       };
 
       // jittered grid of burst targets, shuffled so neighbours in the tornado
-      // do not all land next to each other
+      // do not all land next to each other. Mobile uses a coarser grid.
+      const cols = stylizedTexture ? MOBILE_COLS : COLS;
+      const rows = stylizedTexture ? MOBILE_ROWS : ROWS;
       const targets: Array<[number, number]> = [];
-      for (let row = 0; row < ROWS; row++) {
-        for (let col = 0; col < COLS; col++) {
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
           const jx = (Math.random() - 0.5) * 0.9;
           const jy = (Math.random() - 0.5) * 0.9;
           targets.push([
-            ((col + 0.5 + jx) / COLS) * 1.06 - 0.03,
-            ((row + 0.5 + jy) / ROWS) * 1.06 - 0.03,
+            ((col + 0.5 + jx) / cols) * 1.06 - 0.03,
+            ((row + 0.5 + jy) / rows) * 1.06 - 0.03,
           ]);
         }
       }
@@ -418,7 +432,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           opacity: 0.55 + Math.random() * 0.7,
           tx,
           ty,
-          burstSize: 125 + Math.random() * 70,
+          burstSize: (125 + Math.random() * 70) * (stylizedTexture ? 1.35 : 1),
           burstDelay: dist * 0.4,
           swirlDir: Math.random() < 0.5 ? -1 : 1,
           coverAlpha: 0.34 + Math.random() * 0.2,
@@ -435,6 +449,22 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       };
 
       const particles: TornadoParticle[] = targets.map(makeParticle);
+
+      // Smoke-textured backing (replaces the flat colour cover): big puffs on a coarse grid
+      const BACK_COLS = 8;
+      const BACK_ROWS = 5;
+      const backing: Array<{ x: number; y: number; sprite: number; rot: number; k: number }> = [];
+      for (let r = 0; r < BACK_ROWS; r++) {
+        for (let c = 0; c < BACK_COLS; c++) {
+          backing.push({
+            x: (c + 0.5 + (Math.random() - 0.5) * 0.6) / BACK_COLS,
+            y: (r + 0.5 + (Math.random() - 0.5) * 0.6) / BACK_ROWS,
+            sprite: Math.floor(Math.random() * spriteList.length),
+            rot: Math.random() * Math.PI * 2,
+            k: 1.2 + Math.random() * 0.3,
+          });
+        }
+      }
 
       // ---------------------------------------------------------------
       // SIDE MIST: big soft puffs that drift in from the left and right
@@ -487,6 +517,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           lastSmokeStart = smokeStartRef.current;
           formElapsed = 0;
           formGate = 0;
+          barShown = 0;
           prevNow = now;
         }
         const dt = Math.min(0.1, Math.max(0, (now - prevNow) / 1000));
@@ -520,6 +551,9 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         barShown += (barTarget - barShown) * 0.2;
         if (barRef.current) barRef.current.style.opacity = showBar ? "1" : "0";
         if (barFillRef.current) barFillRef.current.style.transform = "scaleX(" + barShown + ")";
+
+        // Final frame is already on the canvas: stop redrawing so the next page can mount
+        if (frozenRef.current) return;
 
         const burstP = burstProgressRef.current.value;
 
@@ -781,6 +815,29 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         }
 
         // -------------------------------------------------------------
+        // 3b. SMOKE-TEXTURED BACKING: replaces the old flat colour cover.
+        //     A few big puffs on a coarse grid guarantee full coverage
+        //     while keeping the smoke texture all the way to the end.
+        // -------------------------------------------------------------
+        const backAlpha = smooth(clamp01((burstRaw - 0.35) / 0.65)) * 0.92;
+        if (backAlpha > 0.002) {
+          const cellW = width / BACK_COLS;
+          const cellH = height / BACK_ROWS;
+          const rad = Math.hypot(cellW, cellH) * 0.75;
+          smokeContext.save();
+          smokeContext.globalAlpha = backAlpha;
+          for (const b of backing) {
+            const rr = rad * b.k;
+            smokeContext.save();
+            smokeContext.translate(b.x * width, b.y * height);
+            smokeContext.rotate(b.rot);
+            smokeContext.drawImage(spriteList[b.sprite], -rr, -rr, rr * 2, rr * 2);
+            smokeContext.restore();
+          }
+          smokeContext.restore();
+        }
+
+        // -------------------------------------------------------------
         // 4. DRAW: back half of the spin first, then the front half,
         //    so the particles read as orbiting around the funnel
         // -------------------------------------------------------------
@@ -807,16 +864,10 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           }
         }
 
-        // -------------------------------------------------------------
-        // 5. FINAL COVER: only starts once the burst is done. The burst
-        //    particles already hide the page; this just guarantees it is
-        //    100% opaque before the smoke fades, with no visible pop.
-        // -------------------------------------------------------------
-        const coverProgress = clamp01((burstP - BURST_SHARE) / (1 - BURST_SHARE));
-        if (coverProgress > 0) {
-          smokeContext.fillStyle = "rgba(142, 105, 80, " + coverProgress + ")";
-          smokeContext.fillRect(0, 0, width, height);
-        }
+        // The flat "final cover" fillRect is gone: the textured backing above
+        // already makes the screen opaque. Once the burst is done, this last
+        // frame stays on screen and we stop redrawing (see the frozen check).
+        if (burstP >= 0.999) frozenRef.current = true;
       };
       frame = requestAnimationFrame(draw);
       return () => {
@@ -1070,6 +1121,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           burstProgressRef.current.value = 0;
           burstStartedRef.current = false;
           fadingRef.current = false;
+          frozenRef.current = false;
           gsap.set(canvas, { opacity: 1, visibility: "visible" });
         };
 
@@ -1102,6 +1154,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           burstProgressRef.current.value = 0;
           burstStartedRef.current = false;
           fadingRef.current = false;
+          frozenRef.current = false;
         }
 
         while (transitionLayer.firstChild) {
@@ -1128,8 +1181,8 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           style={{
             position: "fixed",
             inset: 0,
-            width: "100vw",
-            height: "100vh",
+            width: "100%",
+            height: "100%",
             zIndex: 10000,
             pointerEvents: "none",
             opacity: 0,
