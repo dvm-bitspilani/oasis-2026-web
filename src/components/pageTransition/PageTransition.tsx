@@ -588,9 +588,12 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           (isMobile ? Math.min(width * 0.4, 190) : Math.min(width * 0.3, 340)) * flareAmount;
         const flareHeight = isMobile ? 0.18 : 0.3;
 
+        // MOBILE: the top cap is already full size, so it doesn't grow as the
+        // tornado rises. Desktop keeps the original growing behaviour.
+        const capSize = isMobile ? 1 : capAmount;
         const capHeight = spineHeight * (0.18 + 0.12 * expand);
-        const capRadius = fullRadius * (0.5 + 0.5 * expand) * (0.25 + 0.75 * capAmount);
-        const topFlareRadius = Math.min(width * 0.3, 340) * capAmount;
+        const capRadius = fullRadius * (0.5 + 0.5 * expand) * (0.25 + 0.75 * capSize);
+        const topFlareRadius = Math.min(width * 0.3, 340) * capSize;
 
         const riseOffset = (1 - flareAmount) * height * 0.2;
 
@@ -598,7 +601,12 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         const headTopU = 1.0;
         const headU = headStartU + (headTopU - headStartU) * streamReach;
         const headAmount = smooth(clamp01((formElapsed - HEAD_START) / 0.5));
-        const headWidth = Math.min(width * 0.2, 230) * (0.6 + 0.4 * headAmount) * (1 + 0.25 * streamReach);
+        // MOBILE: the rising top is already at its final width from the start,
+        // so it doesn't start thin and grow as it climbs. The rest of the
+        // tornado shape is unchanged. Desktop keeps the original growth.
+        const headAmountW = isMobile ? 1 : headAmount;
+        const headReachW = isMobile ? 1 : streamReach;
+        const headWidth = Math.min(width * 0.2, 230) * (0.6 + 0.4 * headAmountW) * (1 + 0.25 * headReachW);
 
         const spineExtent = headU;
 
@@ -610,7 +618,23 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
           const tu = headU > 0.001 ? clamp01(u / headU) : 0;
 
-          const coneTop = headWidth * 0.9 * (0.35 + 0.65 * headAmount);
+          // MOBILE: the tornado already has its FINAL shape (the one it reaches
+          // at the top) from the first frame. The shape is measured along the
+          // rising head (tu) instead of the full screen height (u), so the wide
+          // top travels up with the head. Nothing widens when it reaches the top.
+          if (isMobile) {
+            const topK = tu > 1 - flareHeight
+              ? Math.pow((tu - (1 - flareHeight)) / flareHeight, 1.6)
+              : 0;
+            const topFlareFull = Math.min(width * 0.3, 340);
+            return (
+              Math.min(fullRadius, (baseRadius + (fullRadius - baseRadius) * Math.pow(tu, 1.35)) * TAIL_WIDTH) +
+              flareRadius * 0.7 * flareK +
+              topFlareFull * 0.7 * topK
+            );
+          }
+
+          const coneTop = headWidth * 0.9 * (0.35 + 0.65 * headAmountW);
           const cone = streamRadius + (coneTop - streamRadius) * Math.pow(tu, 1.35) * TAIL_WIDTH;
 
           const formation =
@@ -683,7 +707,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
           const capGlowRadius = capRadius * 0.95 + 1;
           smokeContext.save();
-          smokeContext.globalAlpha = 0.38 * capAmount * glowFade;
+          smokeContext.globalAlpha = 0.38 * capSize * glowFade;
           smokeContext.translate(centerX + Math.sin(elapsed * 2.1 + 3.2) * 26 * swayGrow, topY + capHeight * 0.5);
           smokeContext.scale(1.4, 0.8);
           smokeContext.drawImage(puffSprite, -capGlowRadius, -capGlowRadius, capGlowRadius * 2, capGlowRadius * 2);
@@ -1122,14 +1146,15 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
 
         <canvas ref={canvasRef} aria-hidden="true" style={{position:"fixed",inset:0,width:"100vw",height:"100vh",zIndex:10000,pointerEvents:"none",opacity:0,visibility:"hidden"}} />
 
-        {/* LOADING BAR — bottom right, only visible while the tornado waits for assets / the new page */}
+        {/* LOADING BAR — bottom center, only visible while the tornado waits for assets / the new page */}
         <div
           ref={barRef}
           role="progressbar"
           aria-label="Loading"
           style={{
             position: "fixed",
-            right: 28,
+            left: "50%",
+            transform: "translateX(-50%)",
             bottom: 28,
             width: 160,
             height: 4,
