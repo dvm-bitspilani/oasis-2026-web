@@ -215,7 +215,7 @@ $bg-bleed: 6%;
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0vw;
+  gap: 6vw 4vw;
   animation: gridFadeIn 0.5s ease both; // fades in after each swap
 }
 
@@ -226,8 +226,8 @@ $bg-bleed: 6%;
 
   // size of the whole framed photo (FramedPhoto's own scss does the oval crop)
   .cardFrame {
-    width: 130%;
-    max-width: 70vw;
+    width: 95%;
+    max-width: 60vw;
   }
 }
 
@@ -248,7 +248,7 @@ $bg-bleed: 6%;
   font-size: 7.2vw;
   margin: 2vw 0 1vw;
 
-  margin-top: -15px;
+  margin-top: 15px;
 }
 
 // extra rules for the UI/UX page only (see twoLineName in CharacterMobile.tsx)
