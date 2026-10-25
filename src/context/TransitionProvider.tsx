@@ -373,7 +373,9 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
   );
 
   // Fired when the burst has fully covered the screen. By now the tornado has
-  // formed AND every asset has loaded (PageTransition guarantees both).
+  // formed AND the destination's assets, JS chunk and fonts are preloaded
+  // (PageTransition guarantees it), so the wait below should be short.
+  // The route changes ONLY here, after the burst.
   const handleTransitionComplete = useCallback(async () => {
     const destination = pendingPathRef.current;
 
@@ -389,8 +391,6 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
         document.querySelectorAll(OLD_PAGE_MARKERS),
       );
 
-      // 1. Change the route and wait until the router location has really
-      //    changed (timeout is only a safety net).
       let timer: number | undefined;
       const routeChanged = new Promise<void>((resolve) => {
         if (
@@ -407,13 +407,7 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
       await routeChanged;
       window.clearTimeout(timer);
 
-      // 2. The URL changing does not mean the new page has rendered
-      //    (lazy routes + React Router's startTransition keep the old page
-      //    on screen). Wait until the old page is really gone.
       await waitForOldPageGone(oldMarkers);
-
-      // 3. Let the new route mount and paint, then make sure its images and
-      //    fonts are loaded so the page under the smoke is complete.
       await waitForNextPaint();
       await waitForNextPaint();
       await waitForPageReady();
@@ -422,16 +416,13 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
       } catch {
         // Ignore font errors.
       }
-      // Final settle: let the browser actually paint the decoded images
-      // before the smoke starts to fade.
       await sleep(150);
       await waitForNextPaint();
       await waitForNextPaint();
     } catch (err) {
       console.error("Transition error:", err);
     } finally {
-      // 4. Always fade the smoke away, even if something above failed,
-      //    so the user can never be stuck under it.
+      // Always fade the smoke away, even if something above failed.
       transitionRef.current?.resumeSmoke();
     }
   }, [navigate]);
