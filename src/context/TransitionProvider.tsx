@@ -15,6 +15,9 @@ import PageTransition, {
   type PageTransitionHandle,
 } from "../components/pageTransition/PageTransition";
 
+import { HOME_ASSETS, getRegAssets } from "../assets/preloaderLists";
+import { loadAsset } from "../utils/loadAssest";
+
 // ---------- Contact assets ----------
 import map from "../assets/contact/map.webp";
 import cross from "../assets/contact/cross.webp";
@@ -99,18 +102,19 @@ const EVENTS_ASSETS = [
 ];
 
 // ---------- Per-route config ----------
-// assets : preloaded by PageTransition while the strings animate / tornado forms
+// assets : preloaded by PageTransition while the strings animate / tornado forms.
+//          A function is used when the list depends on the viewport (Reg).
 // chunk  : JS loader for the lazy route, so the page code is ready before navigating
 //
 // Keys MUST be lowercase and match the paths in AppRoutes.tsx
 // (/aboutUs -> "/aboutus", /contactus -> "/contactus", etc.).
 type RouteConfig = {
-  assets: string[];
+  assets: string[] | (() => string[]);
   chunk?: () => Promise<unknown>;
 };
 
 const ROUTES: Record<string, RouteConfig> = {
-  "/": { assets: [], chunk: () => import("../pages/Home") },
+  "/": { assets: HOME_ASSETS, chunk: () => import("../pages/Home") },
   "/aboutus": { assets: ABOUT_ASSETS, chunk: () => import("../pages/About") },
   "/contactus": { assets: CONTACT_ASSETS, chunk: () => import("../pages/Contact") },
   "/events": {
@@ -118,7 +122,7 @@ const ROUTES: Record<string, RouteConfig> = {
     chunk: () => import("../pages/EventsPage/EventsPage"),
   },
   "/register": {
-    assets: [],
+    assets: getRegAssets,
     chunk: () => import("../pages/registration/Registration"),
   },
   "/comingsoon": { assets: [], chunk: () => import("../pages/ComingSoon") },
@@ -195,15 +199,9 @@ const decodeSafe = (img: HTMLImageElement): Promise<void> =>
     : Promise.resolve();
 
 // Load + decode an image by URL (used for CSS background images).
+// Uses the shared memoized loader, so anything already warmed resolves instantly.
 const loadImageUrl = (url: string): Promise<void> =>
-  new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      decodeSafe(img).then(resolve);
-    };
-    img.onerror = () => resolve();
-    img.src = url;
-  });
+  loadAsset(url).catch(() => undefined);
 
 const isNearViewport = (el: Element) => {
   const r = el.getBoundingClientRect();
@@ -217,9 +215,10 @@ const isNearViewport = (el: Element) => {
 
 const BG_URL_RE = /url\((["']?)(.*?)\1\)/g;
 
-// Finds every CSS background-image url() currently applied in the page,
+// Finds every CSS background-image url() currently applied inside the app,
 // including ::before and ::after. <img> tags alone miss these, which is why
 // pages could look black even though "all images" had loaded.
+// Scans only #root (not html/body/everything) to keep it cheap.
 function collectBackgroundUrls(): string[] {
   const urls = new Set<string>();
 
@@ -233,7 +232,7 @@ function collectBackgroundUrls(): string[] {
     }
   };
 
-  document.querySelectorAll<HTMLElement>("html, body, body *").forEach((el) => {
+  document.querySelectorAll<HTMLElement>("#root, #root *").forEach((el) => {
     add(getComputedStyle(el).backgroundImage);
     add(getComputedStyle(el, "::before").backgroundImage);
     add(getComputedStyle(el, "::after").backgroundImage);
@@ -245,7 +244,7 @@ function collectBackgroundUrls(): string[] {
 // Waits until the NEW page is really ready to be seen:
 //  - every <img> has loaded and decoded
 //  - every CSS background image has loaded and decoded
-//  - nothing new has appeared for a few frames (late-mounting components)
+//  - nothing new has appeared for a couple of frames (late-mounting components)
 // Repeats in rounds because new elements can mount while we wait.
 // Capped by PAGE_READY_TIMEOUT_MS so it can never block forever.
 async function waitForPageReady(): Promise<void> {
@@ -256,7 +255,7 @@ async function waitForPageReady(): Promise<void> {
   const handledImgs = new WeakSet<HTMLImageElement>();
   let calmRounds = 0;
 
-  while (calmRounds < 3 && timeLeft() > 0) {
+  while (calmRounds < 2 && timeLeft() > 0) {
     const tasks: Promise<void>[] = [];
 
     for (const img of Array.from(document.images)) {
@@ -364,7 +363,11 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
       // and JS chunk the moment it mounts, in parallel with the strings and
       // the tornado forming.
       const config = ROUTES[routeKey(to)];
-      setTransitionAssets(config?.assets ?? []);
+      const list =
+        typeof config?.assets === "function"
+          ? config.assets()
+          : (config?.assets ?? []);
+      setTransitionAssets(list);
       setTransitionPreload(() => config?.chunk);
 
       setTransitioning(true);
@@ -409,15 +412,12 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
 
       await waitForOldPageGone(oldMarkers);
       await waitForNextPaint();
-      await waitForNextPaint();
       await waitForPageReady();
       try {
         await document.fonts?.ready;
       } catch {
         // Ignore font errors.
       }
-      await sleep(150);
-      await waitForNextPaint();
       await waitForNextPaint();
     } catch (err) {
       console.error("Transition error:", err);

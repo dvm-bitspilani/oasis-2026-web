@@ -6,6 +6,7 @@ import {
   useImperativeHandle,
   useRef,
 } from "react";
+import { loadAsset } from "../../utils/loadAssest";
 
 const CLOUD_SELECTOR = "[data-cloud-string]";
 const CASTLE_SELECTOR = "[data-castle-drown]";
@@ -26,7 +27,7 @@ export type PageTransitionHandle = {
 
 type PageTransitionProps = {
   onComplete?: () => void;
-  /** URLs to start loading as soon as the transition mounts (images, fonts, json, video...). */
+  /** URLs to start loading as soon as the transition mounts (images, fonts, json...). */
   assets?: string[];
   /** Optional extra loader, e.g. () => import("../pages/Home"). Counts as one unit in the bar. */
   preload?: () => Promise<unknown>;
@@ -44,9 +45,9 @@ const SMOKE_START_PERCENT = 0.48;
 //   COVER_SECONDS   : tiny final settle so the screen is guaranteed opaque
 // The route changes only AFTER the burst (in the provider), on the covered
 // screen. The loading bar stays visible until the smoke starts fading.
-const TORNADO_SECONDS = 3.5;
-const BURST_SECONDS = 1.4;
-const COVER_SECONDS = 0.5;
+const TORNADO_SECONDS = 2.2;
+const BURST_SECONDS = 1.0;
+const COVER_SECONDS = 0.3;
 const BURST_SHARE = BURST_SECONDS / (BURST_SECONDS + COVER_SECONDS);
 
 // Safety net: never wait forever on a stuck asset.
@@ -55,38 +56,15 @@ const ASSET_TIMEOUT_SECONDS = 20;
 // Mobile breakpoint (px). Everything "mobile only" below keys off this.
 const MOBILE_MAX_WIDTH = 768;
 
-// Warm the browser cache for one asset. Resolves when done, rejects on error
-// (errors are counted as "done" by the caller so one bad url cannot block the page).
-const loadAsset = (url: string): Promise<void> => {
-  const clean = url.split("?")[0].toLowerCase();
-  if (/\.(png|jpe?g|gif|webp|avif|svg)$/.test(clean)) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        if (img.decode) {
-          img.decode().then(() => resolve(), () => resolve());
-        } else {
-          resolve();
-        }
-      };
-      img.onerror = () => reject(new Error("image failed: " + url));
-      img.src = url;
-    });
-  }
-  return fetch(url).then((res) => {
-    if (!res.ok) throw new Error("asset failed: " + url);
-    return res.blob().then(() => undefined);
-  });
-};
-
 // Formation timeline (seconds). Overlaps are intentional so phases blend together.
-const FLARE_SECONDS = 0.6;
-const STREAM_START = 0.5;
-const STREAM_SECONDS = 2.0;
+// These must stay consistent with TORNADO_SECONDS: expand ends at TORNADO_SECONDS.
+const FLARE_SECONDS = 0.5;
+const STREAM_START = 0.3;
+const STREAM_SECONDS = 1.4;
 const HEAD_START = 0.1;
 const TOP_FLARE_FROM = 0.55;
-const EXPAND_START = 2.0;
-const EXPAND_SECONDS = 1.0;
+const EXPAND_START = 1.3;
+const EXPAND_SECONDS = 0.9;
 
 // Spin builds up with this time constant instead of starting at full speed.
 const SPIN_UP_SECONDS = 0.7;
@@ -104,8 +82,8 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
     const rootRef = useRef<HTMLDivElement | null>(null);
     const layerRef = useRef<SVGSVGElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    // 0 -> 1 over burst + cover. Only starts once the tornado has formed, assets are loaded
-    // AND the new page is ready.
+    // 0 -> 1 over burst + cover. Only starts once the tornado has formed and
+    // everything is preloaded.
     const burstProgressRef = useRef({ value: 0 });
     const burstStartedRef = useRef(false);
     const smokeStartRef = useRef(0); // performance.now() when the smoke started
@@ -459,7 +437,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
       const particles: TornadoParticle[] = targets.map(makeParticle);
 
       // ---------------------------------------------------------------
-      // SIDE MIST — big soft puffs that drift in from the left and right
+      // SIDE MIST: big soft puffs that drift in from the left and right
       // edges while the tornado forms
       // ---------------------------------------------------------------
       const mistPuffs = Array.from({ length: 16 }, (_, index) => {
@@ -682,7 +660,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         }
 
         // -------------------------------------------------------------
-        // 2. SOFT BODY GLOW — puffs along the spine plus one at the top,
+        // 2. SOFT BODY GLOW: puffs along the spine plus one at the top,
         //    so the tornado has a smoky core under the particles.
         //    Fades out as the burst takes over.
         // -------------------------------------------------------------
@@ -803,7 +781,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         }
 
         // -------------------------------------------------------------
-        // 4. DRAW — back half of the spin first, then the front half,
+        // 4. DRAW: back half of the spin first, then the front half,
         //    so the particles read as orbiting around the funnel
         // -------------------------------------------------------------
         for (let pass = 0; pass < 2; pass++) {
@@ -830,7 +808,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
         }
 
         // -------------------------------------------------------------
-        // 5. FINAL COVER — only starts once the burst is done. The burst
+        // 5. FINAL COVER: only starts once the burst is done. The burst
         //    particles already hide the page; this just guarantees it is
         //    100% opaque before the smoke fades, with no visible pop.
         // -------------------------------------------------------------
@@ -859,7 +837,7 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           }
           gsap.to(canvas, {
             opacity: 0,
-            duration: 1.1,
+            duration: 0.8,
             ease: "power2.out",
             onComplete: () => {
               smokeVisibleRef.current = false;
@@ -1144,9 +1122,22 @@ const PageTransition = forwardRef<PageTransitionHandle, PageTransitionProps>(
           />
         </div>
 
-        <canvas ref={canvasRef} aria-hidden="true" style={{position:"fixed",inset:0,width:"100vw",height:"100vh",zIndex:10000,pointerEvents:"none",opacity:0,visibility:"hidden"}} />
+        <canvas
+          ref={canvasRef}
+          aria-hidden="true"
+          style={{
+            position: "fixed",
+            inset: 0,
+            width: "100vw",
+            height: "100vh",
+            zIndex: 10000,
+            pointerEvents: "none",
+            opacity: 0,
+            visibility: "hidden",
+          }}
+        />
 
-        {/* LOADING BAR — bottom center, only visible while the tornado waits for assets / the new page */}
+        {/* LOADING BAR: bottom center, visible while the tornado waits for assets / the new page */}
         <div
           ref={barRef}
           role="progressbar"
