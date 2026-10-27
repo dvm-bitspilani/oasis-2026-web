@@ -20,7 +20,7 @@ import akshat from "../../assets/DevPage/back/akshat.jpg";
 import raghav from "../../assets/DevPage/back/raghav.jpeg";
 import ishan from "../../assets/DevPage/back/ishan.jpg";
 // UI/UX
-import augustya from "../../assets/DevPage/design/agastya.jpg";
+import augustya from "../../assets/DevPage/design/agastya.png";
 import shayan from "../../assets/DevPage/design/shayan.jpeg";
 import krishna from "../../assets/DevPage/design/krishna.jpg";
 import agrima from "../../assets/DevPage/design/agrima.jpg";
