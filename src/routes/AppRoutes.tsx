@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { TransitionProvider } from "../context/TransitionProvider";
-
+import Sponsers from "../pages/spons/Sponsers.tsx"
 // ======================================================
 // LAZY LOADED PAGES
 // ======================================================
@@ -111,6 +111,10 @@ export default function AppRoutes({
           <Route
             path="/events"
             element={<EventsPage />}
+          />
+          <Route
+            path="/sponsers"
+            element={<Sponsers />}
           />
           
 
