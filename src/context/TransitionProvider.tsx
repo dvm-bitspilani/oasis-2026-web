@@ -81,6 +81,41 @@ const cover = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418147/cove
 const backBtn = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418120/backBtn.webp";
 const scrollVid = "https://res.cloudinary.com/bhfhuzru/image/upload/v1790418373/scrollVid.png";
 
+
+// ---------- Dev page assets ----------
+// back team
+import devBackAbhi from "../assets/DevPage/back/abhi.png";
+import devBackAkshat from "../assets/DevPage/back/akshat.jpg";
+import devBackIshan from "../assets/DevPage/back/ishan.jpg";
+import devBackRaghav from "../assets/DevPage/back/raghav.jpeg";
+// design team
+import devDesignAgastya from "../assets/DevPage/design/agastya.jpg";
+import devDesignAgrima from "../assets/DevPage/design/agrima.jpg";
+import devDesignDriv from "../assets/DevPage/design/driv.jpg";
+import devDesignKrishna from "../assets/DevPage/design/krishna.jpg";
+import devDesignParin from "../assets/DevPage/design/parin.jpeg";
+import devDesignShayan from "../assets/DevPage/design/shayan.jpeg";
+// frontend team
+import devFrontArchit from "../assets/DevPage/front/archit.jpeg";
+import devFrontGantavya from "../assets/DevPage/front/gantavya.png";
+import devFrontUjaas from "../assets/DevPage/front/ujaas.jpeg";
+import devFrontVeer from "../assets/DevPage/front/veer.jpeg";
+// shared images
+import devBackButton from "../assets/DevPage/BackButton.png";
+import devBackend from "../assets/DevPage/Backend.png";
+import devBg from "../assets/DevPage/bg.png";
+import devBgBlue from "../assets/DevPage/bgBlue.png";
+import devBgPhone from "../assets/DevPage/bgphone.png";
+import devBgPurple from "../assets/DevPage/bgPurple.png";
+import devBpPink from "../assets/DevPage/bpPink.png";
+import devCharacter from "../assets/DevPage/character.png";
+import devFrontend from "../assets/DevPage/Frontend.png";
+import devHeading from "../assets/DevPage/heading.png";
+import devProfile from "../assets/DevPage/profile.png";
+import devRightTop from "../assets/DevPage/rightTop.png";
+import devSideCurtain from "../assets/DevPage/sideCurtain.png";
+import devSideCurtainBlue from "../assets/DevPage/sideCurtainBlue.png";
+
 const ABOUT_ASSETS = [
   bgback, cloud, backBg, leftCloud, leftTop, leftTopMob, head, lamp,
   bgCon, play, ff, playBtn, bgVid, cover, backBtn, scrollVid,
@@ -97,7 +132,19 @@ const EVENTS_ASSETS = [
   BeatBrawl, FashP, Choreo, StreetDance, DesertDuel, Razzmatazz, Tandav,
   Sukhmanch, StreetPlay, StagePlay, Metamorphosis, Hypercut,
 ];
-
+const DEV_ASSETS = [
+  // back
+  devBackAbhi, devBackAkshat, devBackIshan, devBackRaghav,
+  // design
+  devDesignAgastya, devDesignAgrima, devDesignDriv, devDesignKrishna,
+  devDesignParin, devDesignShayan,
+  // front
+  devFrontArchit, devFrontGantavya, devFrontUjaas, devFrontVeer,
+  // shared
+  devBackButton, devBackend, devBg, devBgBlue, devBgPhone, devBgPurple,
+  devBpPink, devCharacter, devFrontend, devHeading, devProfile, devRightTop,
+  devSideCurtain, devSideCurtainBlue,
+];
 // ---------- Per-route config ----------
 // assets : preloaded by PageTransition while the strings animate / tornado forms
 // chunk  : JS loader for the lazy route, so the page code is ready before navigating
@@ -117,6 +164,7 @@ const ROUTES: Record<string, RouteConfig> = {
     assets: EVENTS_ASSETS,
     chunk: () => import("../pages/EventsPage/EventsPage"),
   },
+  "/DevPage": { assets: DEV_ASSETS, chunk: () => import("../pages/DevPage/Devpageresponsive") },
   "/register": {
     assets: [],
     chunk: () => import("../pages/registration/Registration"),
