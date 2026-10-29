@@ -22,9 +22,9 @@ import acer from "../../assets/spons/acer.png";
 import hdfc from "../../assets/spons/hdfc.png";
 import abhi from "../../assets/spons/abhibus.jpeg";
 import post from "../../assets/spons/post.png";
-import falcon from "../../assets/spons/flacon.jpeg";
 import jio from "../../assets/spons/jio.png";
 import everything from "../../assets/spons/ever.png";
+import falcon from "../../assets/spons/flacon.jpeg";
 import qsw from "../../assets/spons/qsw.png";
 
 const sponsorsData = {
