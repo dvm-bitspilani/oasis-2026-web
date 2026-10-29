@@ -566,6 +566,7 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
     --row: 17vw;
     --lidLine: 0.062; // visible top edge of the chest as a fraction of the art height (raise = boards end lower)
     --lidGap: 2px;    // tiny overlap so no hairline gap shows; 0 = exact, negative = lift boards // + moves the lowest board's bottom edge below the lid line, - above it
+    --topGap: 2vw;    // empty space left above the topmost board when scrolled all the way up (0 = none)
 
     --d: 0;
     translate: none;
@@ -591,10 +592,11 @@ $lidK: 1 + math.div(0.449014, $persp); // 0.449014 = 524/1167 (lid depth / art h
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     pointer-events: auto;
-    // room under the lowest board (same offset it had before) and above the top one
+    // room under the lowest board (same offset it had before)
     padding-bottom: 0;
-    // extra room so the lowest boards can be scrolled all the way into the chest
-    padding-top: 45vw;
+    // In column-reverse the padding-top sits ABOVE the topmost board, so it is the empty
+    // gap you see at the end of the scroll. It used to be 45vw; now it is just --topGap.
+    padding-top: var(--topGap);
     &::-webkit-scrollbar { display: none; }
   }
 

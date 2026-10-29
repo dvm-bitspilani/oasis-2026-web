@@ -116,6 +116,35 @@ import devRightTop from "../assets/DevPage/rightTop.png";
 import devSideCurtain from "../assets/DevPage/sideCurtain.png";
 import devSideCurtainBlue from "../assets/DevPage/sideCurtainBlue.png";
 
+
+// ---------- Sponsors assets ----------
+import sponsBg from "../assets/home/bg.jpg";
+import sponsPepero from "../assets/spons/pep.jpeg";
+import sponsTravel from "../assets/spons/travel.jpeg";
+import sponsDenver from "../assets/spons/denver.jpeg";
+import sponsKsheer from "../assets/spons/Ksheer.png";
+import sponsRungta from "../assets/spons/rungta.jpeg";
+import sponsCampa from "../assets/spons/campa.jpeg";
+import sponsInglu from "../assets/spons/ing.png";
+import sponsTiny from "../assets/spons/tiny.jpeg";
+import sponsMaa from "../assets/spons/maa.png";
+import sponsToo from "../assets/spons/too-yum.jpg";
+import sponsSkippi from "../assets/spons/skippi.jpg";
+import sponsNuware from "../assets/spons/nuware.png";
+import sponsElova from "../assets/spons/elova.png";
+import sponsPlum from "../assets/spons/plum.png";
+import sponsMs from "../assets/spons/ms.jpg";
+import sponsGaba from "../assets/spons/gaba.png";
+import sponsAcer from "../assets/spons/acer.png";
+import sponsHdfc from "../assets/spons/hdfc.png";
+import sponsAbhi from "../assets/spons/abhibus.jpeg";
+import sponsPost from "../assets/spons/post.png";
+import sponsJio from "../assets/spons/jio.png";
+import sponsEverything from "../assets/spons/ever.png";
+import sponsFalcon from "../assets/spons/flacon.jpeg";
+import sponsQsw from "../assets/spons/qsw.png";
+
+
 const ABOUT_ASSETS = [
   bgback, cloud, backBg, leftCloud, leftTop, leftTopMob, head, lamp,
   bgCon, play, ff, playBtn, bgVid, cover, backBtn, scrollVid,
@@ -145,6 +174,14 @@ const DEV_ASSETS = [
   devBpPink, devCharacter, devFrontend, devHeading, devProfile, devRightTop,
   devSideCurtain, devSideCurtainBlue,
 ];
+
+const SPONSORS_ASSETS = [
+  sponsBg, sponsPepero, sponsTravel, sponsDenver, sponsKsheer, sponsRungta,
+  sponsCampa, sponsInglu, sponsTiny, sponsMaa, sponsToo, sponsSkippi,
+  sponsNuware, sponsElova, sponsPlum, sponsMs, sponsGaba, sponsAcer,
+  sponsHdfc, sponsAbhi, sponsPost, sponsJio, sponsEverything, sponsFalcon,
+  sponsQsw,
+];
 // ---------- Per-route config ----------
 // assets : preloaded by PageTransition while the strings animate / tornado forms
 // chunk  : JS loader for the lazy route, so the page code is ready before navigating
@@ -170,6 +207,10 @@ const ROUTES: Record<string, RouteConfig> = {
     chunk: () => import("../pages/registration/Registration"),
   },
   "/comingsoon": { assets: [], chunk: () => import("../pages/ComingSoon") },
+  "/sponsors": {
+    assets: SPONSORS_ASSETS,
+    chunk: () => import("../pages/spons/Sponsers"),
+  },
 };
 
 type TransitionContextValue = {
