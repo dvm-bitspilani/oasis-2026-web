@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom";
+
 import styles from "./Sponsers.module.scss";
 
 import background from "../../assets/home/bg.jpg";
+import back from "../../assets/registration/reg/regBackButton.webp";
 
 import Pepero from "../../assets/spons/pep.jpeg";
 import travel from "../../assets/spons/travel.jpeg";
@@ -29,11 +32,11 @@ import qsw from "../../assets/spons/qsw.png";
 
 const sponsorsData = {
   title: {
-      head: "Title Sponsor",
-      img: acer,
-      name: "Acer",
-      link: "https://www.acer.com/in-en",
-    },
+    head: "Title Sponsor",
+    img: acer,
+    name: "Acer",
+    link: "https://www.acer.com/in-en",
+  },
   otherSponsors: [
     {
       head: "Official Fragrance Partner",
@@ -119,13 +122,12 @@ const sponsorsData = {
       name: "TooYum",
       link: "https://tooyumm.com/?srsltid=AYCX9vILZ5-hjEFqPdy4aNl4Ep5915YuCgWg40sJBvnobVtTrXamVo7v",
     },
-    
     {
-    head: "Official Treat Partner",
-    img: Pepero,
-    name: "Pepero",
-    link: "https://www.lotteindia.com/pepero.html",
-  },
+      head: "Official Treat Partner",
+      img: Pepero,
+      name: "Pepero",
+      link: "https://www.lotteindia.com/pepero.html",
+    },
     {
       head: "Official Sponsor",
       img: abhi,
@@ -178,11 +180,31 @@ const sponsorsData = {
 };
 
 const Sponsors = () => {
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    // go back if there's history, otherwise fall back to home
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
+
   return (
     <div className={styles.Wrapper}>
       <div className={styles.backgroundImage}>
         <img src={background} alt="background" draggable={false} />
       </div>
+
+      <button
+        type="button"
+        className={styles.backBtn}
+        onClick={handleBack}
+        aria-label="Go back"
+        style={{ backgroundImage: `url(${back})` }}
+      />
+
 
       <div className={styles.heading}>
         <h1>SPONSORS</h1>

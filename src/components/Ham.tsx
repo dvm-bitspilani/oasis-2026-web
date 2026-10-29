@@ -14,10 +14,6 @@ import trunkStuff from "../assets/ham/trunkStuff.png";
 import bgHome from "../assets/home/bg.jpg";
 import styles from "../styles/Ham.module.scss";
 
-const BOARDS = [
-    { label: "DEVELOPERS", pos: "board", to: "/DevPage", dx: "14vw", dy: "-16vh" },
-    { label: "WALL MAG", pos: "board1", to: "/comingSoon", dx: "-14vw", dy: "-16vh" },
-    { label: "SPONSORS", pos: "board3", to: "/sponsers", dx: "10vw", dy: "-26vh" },
 type Board = {
     label: string;
     pos: string;
