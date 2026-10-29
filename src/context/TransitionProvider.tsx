@@ -89,7 +89,7 @@ import devBackAkshat from "../assets/DevPage/back/akshat.jpg";
 import devBackIshan from "../assets/DevPage/back/ishan.jpg";
 import devBackRaghav from "../assets/DevPage/back/raghav.jpeg";
 // design team
-import devDesignAgastya from "../assets/DevPage/design/agastya.jpg";
+import devDesignAgastya from "../assets/DevPage/design/agastya.png";
 import devDesignAgrima from "../assets/DevPage/design/agrima.jpg";
 import devDesignDriv from "../assets/DevPage/design/driv.jpg";
 import devDesignKrishna from "../assets/DevPage/design/krishna.jpg";
