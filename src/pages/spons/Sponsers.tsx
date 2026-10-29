@@ -197,16 +197,15 @@ const Sponsors = () => {
         <img src={background} alt="background" draggable={false} />
       </div>
 
-      <button
-        type="button"
-        className={styles.backBtn}
-        onClick={handleBack}
-        aria-label="Go back"
-        style={{ backgroundImage: `url(${back})` }}
-      />
-
-
       <div className={styles.heading}>
+        <button
+          type="button"
+          className={styles.backBtn}
+          onClick={handleBack}
+          aria-label="Go back"
+          style={{ backgroundImage: `url(${back})` }}
+        />
+
         <h1>SPONSORS</h1>
       </div>
 

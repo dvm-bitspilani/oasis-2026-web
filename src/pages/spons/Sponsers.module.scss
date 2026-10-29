@@ -33,13 +33,16 @@
   }
 
   .backBtn {
-    position: fixed;
-    top: 4%;
-    left: 24px;
+    position: absolute;
+    top: 50%;
+    left: clamp(8px, 1.7vw, 24px);
+    transform: translateY(-50%);   // vertically centred with the heading
     z-index: 3;
 
-    width: 140px;
-    height: 80px;
+    // scales smoothly with screen width (7:4 image ratio)
+    width: clamp(40px, 20vw, 210px);
+    aspect-ratio: 7 / 4;
+    height: auto;
     padding: 0;
     border: none;
     background-color: transparent;
@@ -51,22 +54,16 @@
 
     &:hover {
       filter: brightness(1.15);
-      transform: translateX(-3px);
+      transform: translateY(-50%) translateX(-3px);
     }
 
     &:active {
-      transform: translateX(-3px) scale(0.95);
+      transform: translateY(-50%) translateX(-3px) scale(0.95);
     }
 
     &:focus-visible {
       outline: 2px solid #eed8af;
       outline-offset: 3px;
-    }
-
-    @media (max-width: 550px) {
-      left: 12px;
-      width: 100px;
-      height: 56px;
     }
   }
 
@@ -88,14 +85,10 @@
 
       margin: 0;
       width: auto;
-      font-size: 4rem;
+      font-size: clamp(1.8rem, 6vw, 4rem);   // scales with screen, stays centred
       font-weight: 400;
       text-align: center;
       text-shadow: none;
-
-      @media (max-width: 550px) {
-        font-size: 2.8rem;
-      }
     }
   }
 
