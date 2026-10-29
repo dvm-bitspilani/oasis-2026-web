@@ -14,9 +14,25 @@ import trunkStuff from "../assets/ham/trunkStuff.png";
 import bgHome from "../assets/home/bg.jpg";
 import styles from "../styles/Ham.module.scss";
 
-const BOARDS = [
+type Board = {
+    label: string;
+    pos: string;
+    to: string;
+    dx: string;
+    dy: string;
+    external?: boolean;
+};
+
+type NavItem = {
+    label: string;
+    pos: string;
+    to: string;
+    external?: boolean;
+};
+
+const BOARDS: Board[] = [
     { label: "DEVELOPERS", pos: "board4", to: "/DevPage", dx: "14vw", dy: "-16vh" },
-    { label: "WALL MAG", pos: "board1", to: "/comingSoon", dx: "-14vw", dy: "-16vh" },
+    { label: "ROCKTAVES", pos: "board1", to: "https://rocktaves.bits-oasis.org/", external: true, dx: "-14vw", dy: "-16vh" },
     { label: "SPONSORS", pos: "board3", to: "/comingSoon", dx: "10vw", dy: "-26vh" },
     { label: "GALLERY", pos: "board2", to: "/comingSoon", dx: "-10vw", dy: "-26vh" },
     { label: "MEDIA PARTNERS", pos: "board", to: "/comingSoon", dx: "0vw", dy: "-38vh" },
@@ -24,7 +40,7 @@ const BOARDS = [
 
 // Extra links that only exist in the stacked mobile layout (<= 750px).
 // Change label / route as needed. Each `pos` needs a matching .boardN class in the SCSS.
-const MOBILE_EXTRA = [
+const MOBILE_EXTRA: NavItem[] = [
     { label: "EVENTS", pos: "board5", to: "/events" },
     { label: "ABOUT US", pos: "board6", to: "/aboutUs" },
     { label: "CONTACT", pos: "board7", to: "/contactUs" },
@@ -480,11 +496,8 @@ export default function Ham() {
                 const liveCenter = (s: HTMLElement, scrollerTop: number) =>
                     scrollerTop + s.offsetTop - scroller.scrollTop + s.offsetHeight - plankH(s) / 2;
 
-                // Everything is measured fresh on every frame. Before, startY / endY were
-                // measured once at mount, so if the viewport changed afterwards (mobile URL
-                // bar showing or hiding, rotation, resize, fonts or images settling) they
-                // were stale. Then, on the first scroll, every board looked "below the
-                // chest" and shrank, and they only grew back as they scrolled up.
+                // Everything is measured fresh on every frame so viewport changes
+                // (mobile URL bar, rotation, resize, fonts / images settling) never leave stale values.
                 const frame = () => {
                     const sr = scroller.getBoundingClientRect();
                     const half = plankH(first) / 2;
@@ -606,7 +619,7 @@ export default function Ham() {
         };
     }, [narrow]);
 
-    const items = narrow ? [...MOBILE_EXTRA, ...BOARDS] : BOARDS;
+    const items: NavItem[] = narrow ? [...MOBILE_EXTRA, ...BOARDS] : BOARDS;
 
     return (
         <div ref={rootRef} className={styles.container}>
@@ -679,10 +692,14 @@ export default function Ham() {
                     <a
                         key={b.label}
                         href={b.to}
-                        onClick={(e) => {
-                            e.preventDefault();
-                            navigateWithTransition(b.to);
-                        }}
+                        {...(b.external
+                            ? { target: "_blank", rel: "noopener noreferrer" }
+                            : {
+                                  onClick: (e: React.MouseEvent<HTMLAnchorElement>) => {
+                                      e.preventDefault();
+                                      navigateWithTransition(b.to);
+                                  },
+                              })}
                         className={`${styles.sign} ${styles[b.pos]}`}
                         style={{ "--i": i } as CSSProperties}
                     >
