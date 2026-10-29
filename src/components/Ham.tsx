@@ -153,7 +153,7 @@ const E = {
         "0, 0.009, 0.035 2.1%, 0.141, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1.004 84.1%, 1"
     ),
 };
-const MAX_TOP_GAP = 24; // px of empty space allowed above the topmost board
+
 export default function Ham() {
     const { navigateWithTransition } = useTransition();
     const rootRef = useRef<HTMLDivElement>(null);
