@@ -15,11 +15,11 @@ import bgHome from "../assets/home/bg.jpg";
 import styles from "../styles/Ham.module.scss";
 
 const BOARDS = [
-    { label: "DEVELOPERS", pos: "board", to: "/DevPage", dx: "14vw", dy: "-16vh" },
+    { label: "DEVELOPERS", pos: "board4", to: "/DevPage", dx: "14vw", dy: "-16vh" },
     { label: "WALL MAG", pos: "board1", to: "/comingSoon", dx: "-14vw", dy: "-16vh" },
     { label: "SPONSORS", pos: "board3", to: "/comingSoon", dx: "10vw", dy: "-26vh" },
     { label: "GALLERY", pos: "board2", to: "/comingSoon", dx: "-10vw", dy: "-26vh" },
-    { label: "MEDIA PARTNERS", pos: "board4", to: "/comingSoon", dx: "0vw", dy: "-38vh" },
+    { label: "MEDIA PARTNERS", pos: "board", to: "/comingSoon", dx: "0vw", dy: "-38vh" },
 ];
 
 // Extra links that only exist in the stacked mobile layout (<= 750px).
