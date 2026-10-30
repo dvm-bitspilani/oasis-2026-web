@@ -124,7 +124,7 @@ const Instructions = ({
             each college who'll be responsible for allotting heads for
             all the societies the college will be participating for.
           </li>*/}
-          <li>All prof shows are free. </li>
+          {/* <li>All prof shows are free. </li> */}
           <li>All team members are required to register separately.</li>
           <li>
             For further details, contact :-{/*} Srihans:{" "}
