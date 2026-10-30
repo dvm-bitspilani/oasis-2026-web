@@ -92,7 +92,7 @@
   left: 5%;
   height: clamp(180px, 30vh, 324px);
  width: clamp(160px, 60vw, 450px) !important;
-  z-index: 10;
+  z-index: 12 !important;
 
   img {
     width: 100%;

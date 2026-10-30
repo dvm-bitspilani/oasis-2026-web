@@ -1,0 +1,247 @@
+* {
+  box-sizing: border-box;
+}
+
+.Wrapper {
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  a {
+    text-decoration: none;
+  }
+
+  .backgroundImage {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: left;
+      filter: brightness(40%);
+    }
+  }
+
+  .backBtn {
+    position: absolute;
+    top: 50%;
+    left: clamp(8px, 1.7vw, 24px);
+    transform: translateY(-50%);   // vertically centred with the heading
+    z-index: 3;
+
+    // scales smoothly with screen width (7:4 image ratio)
+    width: clamp(40px, 20vw, 210px);
+    aspect-ratio: 7 / 4;
+    height: auto;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;   // image is set inline from JSX
+    cursor: pointer;
+    transition: filter 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      filter: brightness(1.15);
+      transform: translateY(-50%) translateX(-3px);
+    }
+
+    &:active {
+      transform: translateY(-50%) translateX(-3px) scale(0.95);
+    }
+
+    &:focus-visible {
+      outline: 2px solid #eed8af;
+      outline-offset: 3px;
+    }
+  }
+
+  .heading {
+    position: fixed;
+    top: 4%;
+    left: 0;
+    width: 100%;
+    z-index: 2;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    h1 {
+      color: #eed8af;
+      -webkit-text-fill-color: #eed8af;
+      background: none;
+
+      margin: 0;
+      width: auto;
+      font-size: clamp(1.8rem, 6vw, 4rem);   // scales with screen, stays centred
+      font-weight: 400;
+      text-align: center;
+      text-shadow: none;
+    }
+  }
+
+  .sponsors {
+    position: relative;
+    z-index: 1;
+
+    margin-top: clamp(120px, 18vh, 180px);
+    padding: 10px 15px;
+
+    width: 100%;
+    max-width: 1300px;
+
+    height: calc(100vh - 160px);
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .titleSponsor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 40px;
+    padding: 30px;
+
+    img {
+      width: clamp(260px, 80vw, 600px);
+      max-width: 100%;
+    }
+
+    .sponsName {
+      font-size: 36px;
+    }
+
+    .head {
+      font-size: 42px;
+    }
+
+    @media (max-width: 650px) {
+      .sponsName {
+        font-size: 30px;
+      }
+
+      .head {
+        font-size: 34px;
+      }
+    }
+
+    @media (max-width: 550px) {
+      gap: 12px;
+      padding: 20px;
+    }
+  }
+
+  .otherSponsors {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    width: 100%;
+    margin-top: 20px;
+
+    @media (max-width: 550px) {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+
+  .otherSponsor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 30px 15px;
+
+    img {
+      width: 100%;
+      height: 260px;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    .sponsName {
+      font-size: 30px;
+    }
+
+    .head {
+      font-size: 34px;
+      min-height: 80px;
+    }
+
+    @media (max-width: 650px) {
+      img {
+        height: 200px;
+      }
+
+      .sponsName {
+        font-size: 26px;
+      }
+
+      .head {
+        font-size: 28px;
+        min-height: 70px;
+      }
+    }
+
+    @media (max-width: 550px) {
+      padding: 20px 10px;
+
+      img {
+        height: 180px;
+      }
+    }
+  }
+
+  .sponsName {
+    color: #eed8af;
+    -webkit-text-fill-color: #eed8af;
+    background: none;
+
+    letter-spacing: 3px;
+    font-weight: 400;
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .head {
+    color: #eed8af;
+    -webkit-text-fill-color: #eed8af;
+    background: none;
+
+    font-weight: 400;
+    text-align: center;
+  }
+
+  @media (max-width: 550px) {
+    .head {
+      font-size: 24px !important;
+    }
+
+    .sponsName {
+      font-size: 22px !important;
+    }
+  }
+}
